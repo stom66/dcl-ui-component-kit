@@ -1,14 +1,14 @@
-import ReactEcs, { Button, UiEntity} from '@dcl/sdk/react-ecs'
 import { ZoneDefault } from './zone.default'
+
+type ZoneFullScreenProps = Parameters<typeof ZoneDefault>[0]
 
 export function ZoneFullScreen({
 	children,
-	uiTransform
-}: {
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	uiTransform?: any
-}) {
+	uiTransform,
+	...props
+}: ZoneFullScreenProps) {
 	return ZoneDefault({
+		...props,
 		children,
 		uiTransform: {
 			height: "100%", 

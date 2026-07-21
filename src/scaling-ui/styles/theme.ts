@@ -1,60 +1,185 @@
 import { Color4 } from '@dcl/sdk/math'
 
-import { customize } from 'src/scaling-ui/styles/customize'
-import type { Theme } from 'src/scaling-ui/styles/theme.types'
+import { cols } from 'src/scaling-ui/styles/components/cols'
+import type { ThemeCols } from 'src/scaling-ui/styles/components/cols'
 
 
+export type Theme = {
+	baseHeight        : number
+	baseWidth         : number
 
-// MARK: buildTheme
-/** Applies {@link customize} on top of Bootstrap-oriented defaults. */
-function buildTheme(): Theme {
+	border            : {
+		radius: number
+		width : number
+	},
+	colors            : {
+		body             : Color4
+		dark             : Color4
+		light            : Color4
 
-	const defaultBorderWidth : Theme['borderWidth']  = 1
-	const defaultBorderRadius: Theme['borderRadius'] =  8
+		primary          : Color4
+		secondary        : Color4
+		tertiary         : Color4
 
-	const base: Theme = {
-		baseHeight  : 1080,
-		baseWidth   : 1920,
-		borderRadius: defaultBorderRadius,
-		borderWidth : defaultBorderWidth,
-		colors      : {
-			body     : Color4.fromHexString('#212529'),
-			secondary: Color4.fromHexString('#595c5f'),
-			tertiary : Color4.fromHexString("#909294"),
-
-			danger   : Color4.fromHexString('#dc3545'),
-			info     : Color4.fromHexString('#0dcaf0'),
-			primary  : Color4.fromHexString('#0d6efd'),
-			success  : Color4.fromHexString('#198754'),
-			warning  : Color4.fromHexString('#ffc107'),
+		danger           : Color4
+		info             : Color4
+		success          : Color4
+		warning          : Color4
+	}
+	typography: {
+		size: {
+			code: number
+			default: number
+			h1: number
+			h2: number
+			h3: number
+			h4: number
+			h5: number
+			h6: number
 		},
-
-		typography  : {
-			'default-font-size': 16,
-			'h1-font-size'     : 24,
-			'h2-font-size'     : 20,
-			'h3-font-size'     : 18,
-			'h4-font-size'     : 16,
-			'h5-font-size'     : 14,
-			'h6-font-size'     : 12,
+		family: {
+			code: 'monospace' | 'serif' | 'sans-serif'
+			default: 'monospace' | 'serif' | 'sans-serif'
+			h1: 'monospace' | 'serif' | 'sans-serif'
+			h2: 'monospace' | 'serif' | 'sans-serif'
+			h3: 'monospace' | 'serif' | 'sans-serif'
+			h4: 'monospace' | 'serif' | 'sans-serif'
+			h5: 'monospace' | 'serif' | 'sans-serif'
+			h6: 'monospace' | 'serif' | 'sans-serif'
 		}
 	}
 
-	const merged: Theme = {
-		...base,
-		baseHeight  : customize.baseHeight ?? base.baseHeight,
-		baseWidth   : customize.baseWidth ?? base.baseWidth,
-		borderRadius: customize.borderRadius ?? base.borderRadius,
-		borderWidth : customize.borderWidth ?? base.borderWidth,
-		colors      : {
-			...base.colors,
-			...customize.colors,
-		},
-	}
+	cols: ThemeCols
+}
 
-	return merged as Theme
+export type ThemeCustomize = Partial<Omit<Theme, 'border' | 'colors' | 'cols' | 'typography'>> & {
+	border    ?: Partial<Theme['border']>
+	colors    ?: Partial<Theme['colors']>
+	cols      ?: Partial<Theme['cols']>
+	typography?: {
+		size  ?: Partial<Theme['typography']['size']>
+		family?: Partial<Theme['typography']['family']>
+	}
 }
 
 
+// MARK: defaultTheme
+/**
+ * Complete default Scaling UI theme values.
+ *
+ * Consumers can override these by passing theme overrides into `SetupScalingUI`.
+ */
+export const defaultTheme: Theme = {
+	baseHeight  : 1080,
+	baseWidth   : 1920,
+	border      : {
+		radius: 8,
+		width : 1,
+	},
+	colors      : {
+		body     : Color4.fromHexString('#212529'),
+		dark     : Color4.fromHexString('#212529'),
+		light    : Color4.fromHexString('#f8f9fa'),
+		secondary: Color4.fromHexString('#595c5f'),
+		tertiary : Color4.fromHexString('#909294'),
+
+		danger   : Color4.fromHexString('#dc3545'),
+		info     : Color4.fromHexString('#0dcaf0'),
+		primary  : Color4.fromHexString('#0d6efd'),
+		success  : Color4.fromHexString('#198754'),
+		warning  : Color4.fromHexString('#ffc107'),
+	},
+
+	cols: cols,
+
+	typography: {
+		size: {
+			code: 15,
+			default: 16,
+			h1: 24,
+			h2: 20,
+			h3: 18,
+			h4: 16,
+			h5: 14,
+			h6: 12,
+		},
+		family: {
+			code   : 'monospace',
+			default: 'sans-serif',
+			h1     : 'serif',
+			h2     : 'serif',
+			h3     : 'serif',
+			h4     : 'serif',
+			h5     : 'serif',
+			h6     : 'serif',
+		},
+	}
+}
+
+
+// MARK: buildTheme
+/**
+ * Applies project theme overrides on top of a complete base theme.
+ */
+export function buildTheme(
+	baseTheme: Theme          = defaultTheme,
+	overrides: ThemeCustomize = {}
+): Theme {
+
+	const merged: Theme = {
+		...baseTheme,
+		...overrides,
+		border      : {
+			...baseTheme.border,
+			...overrides.border,
+		},
+		colors      : {
+			...baseTheme.colors,
+			...overrides.colors,
+		},
+		cols        : {
+			...baseTheme.cols,
+			...overrides.cols,
+		},
+		typography  : {
+			...baseTheme.typography,
+			size  : {
+				...baseTheme.typography.size,
+				...overrides.typography?.size,
+			},
+			family: {
+				...baseTheme.typography.family,
+				...overrides.typography?.family,
+			},
+		},
+	}
+
+	return merged
+}
+
+
+// MARK: theme
 /** Active theme for utilities and layout. */
-export const theme = buildTheme()
+export let theme = buildTheme()
+
+
+// MARK: getTheme
+/**
+ * Returns the currently active theme after setup-time overrides have been applied.
+ */
+export function getTheme(): Theme {
+	return theme
+}
+
+
+// MARK: setTheme
+/**
+ * Updates the active theme by applying project overrides to the default theme.
+ */
+export function setTheme(
+	overrides: ThemeCustomize = {}
+): Theme {
+	theme = buildTheme(defaultTheme, overrides)
+
+	return theme
+}

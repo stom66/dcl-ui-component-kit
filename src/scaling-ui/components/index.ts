@@ -1,3 +1,8 @@
+// Base
+export { UiBox }            from './base'
+export type { UiBoxProps }  from './base'
+
+
 // Buttons
 export { ButtonImage }      from './buttons'
 export { ButtonImageClose } from './buttons'
@@ -19,6 +24,11 @@ export { RowReverse }       from './helpers'
 // Icons
 export { Icon }             from './icons'
 export { IconNumber }       from './icons'
+
+
+// Props
+export { resolveUiBackground }  from './base'
+export type { ScalingUiProps }  from './base'
 
 
 // Text

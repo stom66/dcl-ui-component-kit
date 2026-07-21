@@ -1,5 +1,5 @@
 export { Column }        from './column'
-export { ColumnReverse } from './columnReverse'
+export { ColumnReverse } from './column.reverse'
 export { Divider }       from './divider'
 export { Row }           from './row'
-export { RowReverse }    from './rowReverse'
+export { RowReverse }    from './row.reverse'

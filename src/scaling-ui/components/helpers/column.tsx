@@ -1,17 +1,30 @@
-import ReactEcs, { UiEntity} from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+
+import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
+import { getColSizing } from 'src/scaling-ui/utils'
+
+type ColumnProps = UiBoxProps & {
+	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	cols?       : number
+	colsDesktop?: number
+	colsMobile? : number
+}
 
 export function Column({
 	children,
-	uiTransform
-}: {
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	uiTransform?: any
-}) {
+	uiTransform,
+	cols,
+	colsDesktop,
+	colsMobile,
+	...props
+}: ColumnProps) {
+	const width = getColSizing(cols, colsDesktop, colsMobile) as PositionUnit | "auto"
 	return (
-		<UiEntity
+		<UiBox
+			{...props}
 			uiTransform={{
 				height        : "auto",
-				width         : "auto",
+				width         : width,
 				display       : "flex",
 				flexGrow      : 0,
 				flexShrink    : 0,
@@ -22,6 +35,6 @@ export function Column({
 			}}
 		>
 			{children}
-		</UiEntity>
+		</UiBox>
 	)
 }

@@ -1,7 +1,14 @@
-import ReactEcs, { Button, PositionUnit, TextureMode, UiEntity} from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit} from '@dcl/sdk/react-ecs'
 import { Color4 } from "@dcl/sdk/math"
 import { Icon } from './icon'
 import { getUVsForAtlasNumber } from 'src/scaling-ui/utils'
+
+type IconNumberProps = Omit<Parameters<typeof Icon>[0], 'iconSrc' | 'textureMode' | 'uvs'> & {
+	value    : number | "/" | "+" | "-" | "×" | "*" | "x" | "=" | "."
+	width?   : PositionUnit | "auto" | undefined
+	height?  : PositionUnit | "auto" | undefined
+	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+}
 
 export const IconNumber = ({
 	children,
@@ -9,15 +16,11 @@ export const IconNumber = ({
 	width   = "auto",
 	height  = "auto",
 	uiTransform,
-}: { 
-	value       : number | "/" | "+" | "-" | "×" | "*" | "x" | "=" | "."
-	width?      : PositionUnit | "auto" | undefined
-	height?     : PositionUnit | "auto" | undefined
-	uiTransform?: any
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-}) => {
+	...props
+}: IconNumberProps) => {
 	return (
 		<Icon 
+			{...props}
 			width       = {width} 
 			height      = {height} 
 			uiTransform = {uiTransform} 

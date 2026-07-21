@@ -1,6 +1,6 @@
-import { UiTransformProps } from '@dcl/sdk/react-ecs'
-
 import { ButtonImage } from '../index'
+
+type ButtonImageCloseProps = Parameters<typeof ButtonImage>[0]
 
 // MARK: ButtonImageClose
 /**
@@ -8,15 +8,15 @@ import { ButtonImage } from '../index'
  */
 export const ButtonImageClose = ({
 	key,
+	children,
 	callback    = undefined,
-	uiTransform = {}
-} : { 
-	key         : string,
-	callback?   : () => void,
-	uiTransform?: UiTransformProps,
-}) => {
+	uiTransform = {},
+	...props
+} : ButtonImageCloseProps) => {
 	return ButtonImage({
+		...props,
 		key        : key,
+		children   : children,
 		width      : 90,
 		height     : 90,
 		textureSrc : "assets/images/scaling-ui/atlas-btn-close.png",

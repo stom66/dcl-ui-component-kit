@@ -1,4 +1,10 @@
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
+
+import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
+
+type ZoneRootProps = UiBoxProps & {
+	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+}
 
 
 // MARK: RootCanvas
@@ -7,13 +13,12 @@ import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
  */
 export function ZoneRoot({
 	children,
-	uiTransform
-}: {
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	uiTransform?: any
-}) {
+	uiTransform,
+	...props
+}: ZoneRootProps) {
 	return (
-		<UiEntity
+		<UiBox
+			{...props}
 			uiTransform={{
 				height        : "100%",
 				width         : "100%",
@@ -26,6 +31,6 @@ export function ZoneRoot({
 			}}
 		>
 			{children}
-		</UiEntity>
+		</UiBox>
 	)
 }

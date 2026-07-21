@@ -1,31 +1,47 @@
-import ReactEcs, { PositionUnit, UiEntity} from '@dcl/sdk/react-ecs'
 import { Color4 } from "@dcl/sdk/math"
+import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
-import { theme, alpha, lighten, darken } from '../../index'
+import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
+import { getTheme } from 'src/scaling-ui/styles'
 
 
-// MARK: Divider
-export const Divider = ({
-	color     = theme.colors.body,
-	margin    = { top: 10, bottom: 10, left: 0, right: 0 },
-	thickness = 2,
-	width     = '100%',
-}: {
+type DividerProps = UiBoxProps & {
+	children? : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	color?    : Color4
 	margin?   : { top?: number, bottom?: number, left?: number, right?: number }
 	thickness?: number
 	width?    : PositionUnit | "auto" | undefined
-}) => {
+}
+
+// MARK: Divider
+export const Divider = ({
+	children,
+	color,
+	margin    = { top: 10, bottom: 10, left: 0, right: 0 },
+	thickness = 2,
+	width     = '100%',
+	uiBackground,
+	uiTransform,
+	...props
+}: DividerProps) => {
+	const theme         = getTheme()
+	const dividerColor  = color ?? theme.colors.body
+
 	return (
-		<UiEntity
+		<UiBox
+			{...props}
 			uiTransform={{
 				width : width,
 				height: thickness,
-				margin: margin
+				margin: margin,
+				...uiTransform
 			}}
 			uiBackground={{
-				color: color
+				...uiBackground,
+				color: dividerColor
 			}}
-		/>
+		>
+			{children}
+		</UiBox>
 	)
 }

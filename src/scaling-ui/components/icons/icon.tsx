@@ -1,5 +1,15 @@
-import ReactEcs, { Button, PositionUnit, TextureMode, UiEntity} from '@dcl/sdk/react-ecs'
-import { Color4 } from "@dcl/sdk/math"
+import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
+
+import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
+
+type IconProps = UiBoxProps & {
+	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	iconSrc     : string
+	textureMode?: TextureMode | undefined
+	uvs?        : number[]
+	width?      : PositionUnit | "auto" | undefined
+	height?     : PositionUnit | "auto" | undefined
+}
 
 export const Icon = ({
 	children,
@@ -8,18 +18,13 @@ export const Icon = ({
 	uvs,
 	width   = "auto",
 	height  = "auto",
-	uiTransform
-}: { 
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	iconSrc     : string
-	textureMode?: TextureMode | undefined
-	uvs?        : number[]
-	width?      : PositionUnit | "auto" | undefined
-	height?     : PositionUnit | "auto" | undefined
-	uiTransform?: any
-}) => {
+	uiBackground,
+	uiTransform,
+	...props
+}: IconProps) => {
 	return (
-		<UiEntity
+		<UiBox
+			{...props}
 			uiTransform={{
 				width     : width,
 				height    : height,
@@ -32,10 +37,11 @@ export const Icon = ({
 			uiBackground={{
 				texture    : { src: iconSrc, },
 				textureMode: textureMode ?? "stretch",
-				uvs        : uvs ?? []
+				uvs        : uvs ?? [],
+				...uiBackground
 			}}
 		>
 			{children}
-		</UiEntity>
+		</UiBox>
 	)
 }

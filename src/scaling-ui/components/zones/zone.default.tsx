@@ -1,5 +1,6 @@
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 
+import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
 import { vhToPixels } from 'src/scaling-ui/utils'
 import { randomColor } from 'src/scaling-ui/utils/colors'
 
@@ -10,28 +11,29 @@ import { VisibilityController } from './class.VisibilityController'
 const color      = randomColor()
 const controller = new VisibilityController(0, -1080)
 
-let hasInitializedVisibility = false
-let currentIsHidden          = false
+type VisibilityPosition = 'bottom' | 'left' | 'right' | 'top'
+
+type ZoneDefaultProps = UiBoxProps & {
+	canBeHidden?         : boolean
+	isHidden?            : boolean
+	children?            : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	visibilityController?: VisibilityController
+	visibilityPosition?  : VisibilityPosition
+}
 
 
 export function ZoneDefault({
-	isHidden    = false,
-	canBeHidden = false,
-	children    = [],
-	uiTransform = {},
-}: {
-	canBeHidden?: boolean
-	isHidden?   : boolean
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	uiTransform?: any
-}) {
+	isHidden             = false,
+	canBeHidden          = false,
+	children             = [],
+	uiTransform          = {},
+	uiBackground,
+	visibilityController = controller,
+	visibilityPosition   = 'bottom',
+	...props
+}: ZoneDefaultProps) {
 	if (canBeHidden) {
-		if (!hasInitializedVisibility) {
-			currentIsHidden = isHidden
-			isHidden ? controller.hide(0) : controller.show(0)
-
-			hasInitializedVisibility = true
-		}
+		visibilityController.initialize(isHidden)
 
 		if (children && !Array.isArray(children)) children = [children]
 
@@ -39,16 +41,20 @@ export function ZoneDefault({
 			<ButtonImageClose
 				key='close'
 				callback={() => {
-					currentIsHidden = !currentIsHidden
-					currentIsHidden ? controller.hide() : controller.show()
+					visibilityController.toggle()
 				}}
 			/>,
 			...(children || [])
 		]
 	}
 
+	const uiPosition = uiTransform.position && typeof uiTransform.position === 'object'
+		? uiTransform.position
+		: {}
+
 	return (
-		<UiEntity
+		<UiBox
+			{...props}
 			uiTransform={{
 				height        : vhToPixels(50),
 				width         : vhToPixels(75),
@@ -58,16 +64,19 @@ export function ZoneDefault({
 				flexDirection : "column",
 				alignItems    : "center",
 				justifyContent: "center",
-				positionType  : canBeHidden ? "relative" : undefined,
-				position      : canBeHidden ? { bottom : controller.position, left: 0 } : undefined,
-				...uiTransform
+				...uiTransform,
+				positionType  : canBeHidden ? "relative" : uiTransform.positionType,
+				position      : canBeHidden
+					? { ...uiPosition, [visibilityPosition]: visibilityController.position }
+					: uiTransform.position
 			}}
 
 			uiBackground={{
 				color: color,
+				...uiBackground
 			}}
 		>
 			{children}
-		</UiEntity>
+		</UiBox>
 	)
 }

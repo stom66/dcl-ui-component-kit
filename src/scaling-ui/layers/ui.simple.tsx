@@ -2,7 +2,6 @@ import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 import { Color4 } from '@dcl/sdk/math'
 
 import { getCanvasInfo, vhToPixels, vwToPixels } from '../utils/'
-import { theme } from '../styles'
 
 import { ButtonImageClose, Row, ZoneDefault, ZoneFullScreen, ZoneRoot } from '../components/'
 import { Icon, IconNumber } from '../components'
@@ -11,14 +10,15 @@ import { Icon, IconNumber } from '../components'
 
 
 // MARK: Main GameUI
-export function SimpleUI() {
+export function MainUI() {
 	return (
 		<ZoneRoot>
 			<ZoneDefault
 				canBeHidden = {true}
 			>
-
-				<Row>
+				<Row
+					//bg = {theme.colors.body}
+				>
 					<IconNumber value = {1} />
 					<IconNumber value = {2} />
 					<IconNumber value = {3} />

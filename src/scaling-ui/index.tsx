@@ -1,18 +1,15 @@
+import { isMobile } from '@dcl/sdk/platform'
 import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
-import { getPlatform, isMobile, isDesktop, isWeb } from '@dcl/sdk/platform'
 
-import { theme } from './styles/theme'
-import { SafeZonesDesktop } from './layers/info.safeZone.desktop'
-import { SafeZonesMobile } from './layers/info.safeZone.mobile'
-
-import { InfoUI } from './layers/ui.info'
-
-import { SimpleUI } from './layers/ui.simple'
+import { activeLayers } from 'src/scaling-ui/layers'
+import { setTheme } from 'src/scaling-ui/styles/theme'
+import type { ThemeCustomize } from 'src/scaling-ui/styles/theme'
 
 
 // Export scaling-ui components, utils
-export { darken, lighten, alpha } from './utils/colors'
-export { theme } from './vars/theme'
+export { darken, lighten, alpha } from 'src/scaling-ui/utils/colors'
+export { buildTheme, defaultTheme, getTheme, setTheme, theme } from 'src/scaling-ui/styles/theme'
+export type { Theme, ThemeCustomize } from 'src/scaling-ui/styles/theme'
 
 // MARK: IS local dev?
 declare var process: {
@@ -27,21 +24,21 @@ export const IS_DEV = process.env.NODE_ENV == "development"
 const uiScale = isMobile() ? 0.5 : 1
 
 
-// MARK: Main
-const uiComponent = () => [
-	InfoUI(),
-	//SafeZonesDesktop(), // Comment out to hide the safe zones
-	//SafeZonesMobile(), // Comment out to hide the safe zones
-	SimpleUI(),
-	//ExampleUI(),
-]
+// MARK: uiComponent
+const uiComponent = () => activeLayers.map((Layer) => Layer())
 
 
-// MARK: SetupScreenUI
-/** Mounts HUD using design resolution from {@link theme}. */
-export function SetupScreenUI() {
+// MARK: SetupScalingUI
+/** Mounts HUD using design resolution from the active Scaling UI theme. */
+export function SetupScalingUI(
+	themeOverrides: ThemeCustomize = {}
+) {
+	const activeTheme = setTheme(themeOverrides)
+
 	ReactEcsRenderer.setUiRenderer(uiComponent, {
-		virtualHeight: theme.baseHeight * uiScale,
-		virtualWidth : theme.baseWidth * uiScale,
+		virtualHeight: activeTheme.baseHeight * uiScale,
+		virtualWidth : activeTheme.baseWidth * uiScale,
 	})
+
+	return activeTheme
 }

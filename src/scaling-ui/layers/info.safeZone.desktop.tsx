@@ -5,7 +5,7 @@ import { Color4 } from '@dcl/sdk/math'
 // MARK: Main GameUI
 const alpha = 1
 
-export function SafeZonesDesktop() {
+export function MainUI() {
 	return (
 		<UiEntity
 			key={`ui_SafeZonesDesktop`}

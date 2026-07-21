@@ -1,14 +1,15 @@
-import ReactEcs, { Button, UiEntity } from '@dcl/sdk/react-ecs'
-import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { getCanvasInfo, vhToPixels } from '../utils/sizing'
-import { theme } from '../styles'
-import { darken } from '../utils/colors'
+import { getTheme } from 'src/scaling-ui/styles'
+import { darken } from 'src/scaling-ui/utils/colors'
+import { vhToPixels } from 'src/scaling-ui/utils/sizing'
 
 const height = 300
 
 // MARK: Main GameUI
-export function InfoUI() {
+export function MainUI() {
+	const theme = getTheme()
+
 	return (
 		<UiEntity
 			key={`debug_Toggles`}
