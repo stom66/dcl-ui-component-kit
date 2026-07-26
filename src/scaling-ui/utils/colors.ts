@@ -1,5 +1,5 @@
 import { Color4 } from "@dcl/sdk/math"
-import { getTheme } from 'src/scaling-ui/styles'
+import { getTheme } from '../styles'
 
 export function darken(
 	color : Color4,
@@ -30,7 +30,7 @@ export function alpha(
 export function randomColor(): Color4 {
 	const theme        = getTheme()
 	const randomColors = [theme.colors.primary, theme.colors.secondary, theme.colors.tertiary, theme.colors.success, theme.colors.danger, theme.colors.warning, theme.colors.info]
-	const randomIndex = Math.floor(Math.random() * randomColors.length)
+	const randomIndex  = Math.floor(Math.random() * randomColors.length)
 
 	const lightDarkDefault = Math.floor(Math.random() * 3)
 	if (lightDarkDefault === 0) {

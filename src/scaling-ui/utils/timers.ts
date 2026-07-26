@@ -49,6 +49,7 @@ const createTimers = (targetEngine: IEngine) => {
 	targetEngine.addSystem(sys_timers, 100e3 + 256)
 	
 	return {
+		//MARK: setTimeout
 		setTimeout(
 			callback    : Callback, 
 			milliseconds: number
@@ -68,12 +69,14 @@ const createTimers = (targetEngine: IEngine) => {
 			return timerId
 		},
 
+		//MARK: clearTimeout
 		clearTimeout(
 			timer: TimerId
 		) {
 			timers.delete(timer)
 		},
 		
+		//MARK: setInterval
 		setInterval(
 			callback    : Callback, 
 			milliseconds: number
@@ -88,6 +91,7 @@ const createTimers = (targetEngine: IEngine) => {
 			return timerId
 		},
 
+		//MARK: clearInterval
 		clearInterval(
 			timer: TimerId
 		) {

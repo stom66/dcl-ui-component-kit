@@ -2,14 +2,14 @@ export { alpha, darken, lighten, randomColor }  from './colors'
 
 export { getColSizing }                         from './colSizing'
 
-export { DataController }                       from './dataController'
+export { DataController }                       from '../classes/dataController'
 
 export { clampNumber }                          from './math'
 
 export { getCanvasInfo }                        from './sizing'
-export { getCurrentCanvasSize }                 from './sizing'
-export { pixelsScaledRelative }                 from './sizing'
+export { getUiScaleFactor }                     from './sizing'
 export { readCanvasDimensions }                 from './sizing'
+export { readPhysicalCanvasDimensions }         from './sizing'
 export { vhToPixels }                           from './sizing'
 export { vwToPixels }                           from './sizing'
 

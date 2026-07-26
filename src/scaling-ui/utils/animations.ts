@@ -1,3 +1,4 @@
+import { timers } from "./timers";
 import { EasingFunction, tweenValue } from "./tweens";
 
 
@@ -15,52 +16,57 @@ export function pulse(
 	height  : number,
 	scale   : number         = 1.25,
 	duration: number         = 0.5, // seconds
+	repeat  : number         = 1,
 	easing  : EasingFunction = EasingFunction.EF_EASECIRC
 ) {
-	tweenValue(
-		width,
-		width * scale,
-		duration / 2,
-		(v: number) => {
-			width = v
-		},
-		() => {
+	for (let i = 0; i < repeat; i++) {
+		timers.setTimeout(() => {
 			tweenValue(
-				width * scale,
 				width,
+				width * scale,
 				duration / 2,
 				(v: number) => {
 					width = v
 				},
 				() => {
-					// complete
+					tweenValue(
+						width * scale,
+						width,
+						duration / 2,
+						(v: number) => {
+							width = v
+						},
+						() => {
+							// complete
+						},
+						easing
+					)
 				},
 				easing
 			)
-		},
-		easing
-	)
-	tweenValue(
-		height,
-		height * scale,
-		duration / 2,
-		(v: number) => {
-			height = v
-		},
-		() => {
 			tweenValue(
-				height * scale,
 				height,
+				height * scale,
 				duration / 2,
 				(v: number) => {
 					height = v
 				},
 				() => {
-					// complete
+					tweenValue(
+						height * scale,
+						height,
+						duration / 2,
+						(v: number) => {
+							height = v
+						},
+						() => {
+							// complete
+						},
+						easing
+					)
 				},
 				easing
 			)
-		},
-		easing
-	)
+		}, duration * i)
+	}
 }

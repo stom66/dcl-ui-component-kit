@@ -1,10 +1,23 @@
-export { VisibilityController } from './class.VisibilityController'
+export { VisibilityController } from '../../classes/visibilityController'
 
-export { ZoneRoot }       from './zone.root'
+export {
+	createVisibilityForZone,
+	ZoneType,
+	zonePresets,
+} from './zone.presets'
+export type { VisibilityPosition, ZonePreset } from './zone.presets'
 
-export { ZoneDefault }    from './zone.default'
-export { ZoneFullScreen } from './zone.fullScreen'
-export { ZoneBarTop }     from './zone.barTop'
-export { ZoneBarBottom }  from './zone.barBottom'
-export { ZoneBarLeft }    from './zone.barLeft'
-export { ZoneBarRight }   from './zone.barRight'
+export { ZoneRoot } from './zone.root'
+
+export { Zone } from './zone.default'
+export type { ZoneProps } from './zone.default'
+
+export {
+	ZoneBarBottom,
+	ZoneBarLeft,
+	ZoneBarRight,
+	ZoneBarTop,
+	ZoneBottomRight,
+	ZoneDefault,
+	ZoneFullScreen,
+} from './zone.named'

@@ -1,19 +1,18 @@
 import { isDesktop, isMobile } from '@dcl/sdk/platform'
 
-import { getTheme } from 'src/scaling-ui/styles'
-import { clampNumber } from 'src/scaling-ui/utils/math'
+import { getTheme } from '../styles'
+import { clampNumber } from './math'
 
 
 const IS_MOBILE  = isMobile()
 const IS_DESKTOP = isDesktop()
-
+const theme      = getTheme()
 
 export function getColSizing(
-	cols?       : number, 
-	colsDesktop?: number, 
-	colsMobile? : number
+	cols       : number = theme.cols.COL_COUNT, 
+	colsDesktop: number = theme.cols.COL_COUNT, 
+	colsMobile : number = theme.cols.COL_COUNT
 ): string {
-	const theme    = getTheme()
 	const colCount = theme.cols.COL_COUNT
 	const colSize  = 100 / colCount
 

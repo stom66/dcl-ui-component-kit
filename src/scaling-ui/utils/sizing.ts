@@ -1,73 +1,66 @@
-import { engine, PBUiCanvasInformation, UiCanvasInformation } from "@dcl/sdk/ecs"
+import { engine, PBUiCanvasInformation, UiCanvasInformation } from '@dcl/sdk/ecs'
+import { isMobile } from '@dcl/sdk/platform'
 
-const BASE_WIDTH  = 1920
-const BASE_HEIGHT = 1080
-
-var actual_width = BASE_WIDTH
-var actual_height = BASE_HEIGHT
+export const [vWidth, vHeight] = isMobile() ? [1600, 720]: [1920, 1080]
 
 
 // MARK: getCanvasInfo
-/**
- * Canvas dimensions when React/UI has mounted them on the root entity;
- * `null` on early frames (preview/worker) before {@link UiCanvasInformation} exists.
- */
+/** Physical client canvas from the engine (changes with viewport size). */
 export function getCanvasInfo(): PBUiCanvasInformation | null {
 	return UiCanvasInformation.getOrNull(engine.RootEntity)
 }
 
 
 // MARK: readCanvasDimensions
-/** Prefer live canvas size; fall back to last known or {@link BASE_WIDTH}/{@link BASE_HEIGHT}. */
+/** Virtual canvas size configured by SetupScalingUI. */
 export function readCanvasDimensions(): { height: number; width: number } {
-	const canvasInfo = getCanvasInfo()
-	if (canvasInfo) {
-		actual_height = canvasInfo.height
-		actual_width  = canvasInfo.width
-		return { height: actual_height, width: actual_width }
-	}
-	return { height: actual_height, width: actual_width }
+	return { height: vHeight, width: vWidth }
 }
 
 
-// MARK: getCurrentCanvasSize
-/** Same as {@link readCanvasDimensions}; convenient alias for layout code. */
-export function getCurrentCanvasSize(): { height: number; width: number } {
-	return readCanvasDimensions()
+// MARK: getUiScaleFactor
+/**
+ * Mirrors @dcl/react-ecs UiScaleSystem:
+ * min(realW/virtualW, realH/virtualH) / devicePixelRatio
+ * Numeric pixel/position values are multiplied by this factor at parse time.
+ */
+export function getUiScaleFactor(): number {
+	const canvas = getCanvasInfo()
+	if (!canvas) return 1
+
+	const ratio = canvas.devicePixelRatio || 1
+	return Math.min(
+		canvas.width  / vWidth,
+		canvas.height / vHeight
+	) / ratio
 }
 
-export function vhToPixels(vh: number, min: number = 0, max: number = 99999): number {
-	const height = readCanvasDimensions().height
-	const value = Math.max(min, Math.min(max, (vh / 100) * height))
-	return value
+
+// MARK: readPhysicalCanvasDimensions
+/** Live engine canvas size; falls back to virtual size before canvas info exists. */
+export function readPhysicalCanvasDimensions(): { height: number; width: number } {
+	const canvas = getCanvasInfo()
+	if (!canvas) return readCanvasDimensions()
+
+	return { height: canvas.height, width: canvas.width }
 }
 
-export function vwToPixels(vw: number, min: number = 0, max: number = 99999): number {
-	const width = readCanvasDimensions().width
-	const value = Math.max(min, Math.min(max, (vw / 100) * width))
-	return value
-}
 
-
-// MARK: pixelsScaledRelative
-export function pixelsScaledRelative(
-	value      : number,
-	normalSize : number,
-	currentSize: number
+// MARK: vhToPixels
+export function vhToPixels(
+	vh : number,
+	min: number = 0,
+	max: number = 99999
 ): number {
-	return value * (currentSize / normalSize)
+	return Math.max(min, Math.min(max, (vh / 100) * vHeight))
 }
 
 
-
-// MARK: system_updateCanvasSize
-function system_updateCanvasSize(_dt: number): void {
-	const canvasInfo = getCanvasInfo()
-	if (!canvasInfo) return
-
-	if (actual_width !== canvasInfo.width)   actual_width  = canvasInfo.width
-	if (actual_height !== canvasInfo.height) actual_height = canvasInfo.height
+// MARK: vwToPixels
+export function vwToPixels(
+	vw : number,
+	min: number = 0,
+	max: number = 99999
+): number {
+	return Math.max(min, Math.min(max, (vw / 100) * vWidth))
 }
-
-engine.addSystem(system_updateCanvasSize)
-

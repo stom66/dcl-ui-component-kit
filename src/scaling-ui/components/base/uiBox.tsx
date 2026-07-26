@@ -1,7 +1,8 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { darken } from 'src/scaling-ui/utils/colors'
+import { darken } from '../../utils/colors'
+import { getTheme } from 'src/scaling-ui/styles'
 
 
 type UiEntityBackground = Parameters<typeof UiEntity>[0]['uiBackground']
@@ -17,6 +18,8 @@ export type ScalingUiProps = {
 export type UiBoxProps = Parameters<typeof UiEntity>[0] & ScalingUiProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
+
+const theme = getTheme()
 
 
 // MARK: resolveUiBackground
@@ -53,8 +56,8 @@ export function resolveUiTransform(
 	return {
 		...uiTransform,
 		borderColor : resolvedBorderColor,
-		borderRadius: borderRadius ?? uiTransform?.borderRadius,
-		borderWidth : borderWidth ?? uiTransform?.borderWidth,
+		borderRadius: borderRadius ?? uiTransform?.borderRadius ?? theme.border.radiusDefault,
+		borderWidth : borderWidth ?? uiTransform?.borderWidth ?? theme.border.width,
 	}
 }
 

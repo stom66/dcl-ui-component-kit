@@ -1,0 +1,17 @@
+---
+description: Conventions for building interfaces with the Scaling UI framework
+globs: src/scaling-ui/**/*.{ts,tsx},src/examples/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Scaling UI
+
+Before adding or changing a Layer, read `.cursor/skills/scaling-ui/SKILL.md` and mirror `src/examples/layers/*.layer.tsx`.
+
+- One Layer = one Zone. Implement **`body()` only**. Base `render()` mounts `Zone`. `SetupScalingUI` owns `ScreenInsetArea` + the full-size stack — do not re-wrap.
+- Select layout with `zone: ZoneType.*`. Override size/alignment/chrome via **`uiTransform`** and **`uiBackground`** only (no Layer shorthands like `backgroundColor` / `borderRadius`).
+- **Do not** invent new Layer option fields. **Do not** override `render()` to re-wrap zones.
+- `showCloseButton` / `canBeHidden` are Layer options forwarded to the Zone (Zone inserts the close control).
+- Prefer native `'30vw'` / `'10vh'` in `uiTransform`. Use `vwToPixels` / `vhToPixels` only for numeric math (virtual canvas, never physical screen size).
+- Inside `src/scaling-ui/**`, relative imports only.
+- Fail loud with `console.error`. Style: tabs, MARK comments, docstrings on public APIs.

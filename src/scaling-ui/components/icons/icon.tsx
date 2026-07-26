@@ -1,6 +1,6 @@
 import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
+import { UiBox, type UiBoxProps } from '../base'
 
 type IconProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]

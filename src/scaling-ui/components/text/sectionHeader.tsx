@@ -1,8 +1,8 @@
 import { Color4 } from "@dcl/sdk/math"
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
-import { getTheme } from 'src/scaling-ui/styles'
+import { UiBox, type UiBoxProps } from '../base'
+import { getTheme } from '../../styles'
 
 
 type SectionHeaderProps = UiBoxProps & {

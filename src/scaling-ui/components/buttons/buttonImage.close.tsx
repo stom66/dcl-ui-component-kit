@@ -1,34 +1,36 @@
-import { ButtonImage } from '../index'
+import ReactEcs from '@dcl/sdk/react-ecs'
 
-type ButtonImageCloseProps = Parameters<typeof ButtonImage>[0]
+import { ButtonImage } from './buttonImage'
+import { isMobile } from '@dcl/sdk/platform'
+
+
+type ButtonImageCloseProps = Omit<Parameters<typeof ButtonImage>[0], 'textureSrc' | 'width' | 'height'>
 
 // MARK: ButtonImageClose
-/**
- * Renders the shared close button image component.
- */
-export const ButtonImageClose = ({
-	key,
+/** Renders the shared close button image component. */
+export function ButtonImageClose({
+	id = 'close',
 	children,
-	callback    = undefined,
+	callback,
 	uiTransform = {},
 	...props
-} : ButtonImageCloseProps) => {
-	return ButtonImage({
-		...props,
-		key        : key,
-		children   : children,
-		width      : 90,
-		height     : 90,
-		textureSrc : "assets/images/scaling-ui/atlas-btn-close.png",
-		uiTransform: {
-			position    : { top: 20, right: 24 },
-			positionType: 'absolute',
-			...uiTransform,
-		},
-		callback  : () => {
-			if (callback !== undefined) {
-				callback()
-			}
-		}
-	})
+}: ButtonImageCloseProps) {
+	const m = isMobile()
+	return (
+		<ButtonImage
+			{...props}
+			id          = {id}
+			width       = {m ? 128 : 90}
+			height      = {m ? 128 : 90}
+			textureSrc  = "assets/images/scaling-ui/atlas-btn-close.png"
+			uiTransform = {{
+				position    : { top: m?10:20, right: m?12:24 },
+				positionType: 'absolute',
+				...uiTransform,
+			}}
+			callback = {callback}
+		>
+			{children}
+		</ButtonImage>
+	)
 }

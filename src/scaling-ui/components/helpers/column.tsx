@@ -1,7 +1,7 @@
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
-import { getColSizing } from 'src/scaling-ui/utils'
+import { UiBox, type UiBoxProps } from '../base'
+import { getColSizing } from '../../utils'
 
 type ColumnProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]

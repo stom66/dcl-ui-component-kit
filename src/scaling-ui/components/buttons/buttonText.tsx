@@ -1,22 +1,20 @@
-import { Color4 } from "@dcl/sdk/math"
+import { Color4 } from '@dcl/sdk/math'
 import { isDesktop, isMobile } from '@dcl/sdk/platform'
-import ReactEcs, { PositionUnit, UiTransformProps} from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
-import { getTheme } from 'src/scaling-ui/styles'
-import { darken, lighten } from 'src/scaling-ui/utils/colors'
+import { UiBox, type UiBoxProps } from '../base'
+import { getTheme } from '../../styles'
+import { darken, lighten } from '../../utils/colors'
 
 
-
-// MARK: Vars
 const hoverStates  : Map<string, boolean> = new Map()
 const pressedStates: Map<string, boolean> = new Map()
 
-type ButtonTextProps = Omit<UiBoxProps, 'key' | 'uiTransform'> & {
-	key         : string
+type ButtonTextProps = Omit<UiBoxProps, 'uiTransform'> & {
+	id          : string
 	textLabel   : string
-	width      ?: PositionUnit | "auto" | undefined
-	height     ?: PositionUnit | "auto" | undefined
+	width      ?: PositionUnit | 'auto' | undefined
+	height     ?: PositionUnit | 'auto' | undefined
 	textureSrc ?: string
 	borderWidth?: number
 	borderColor?: Color4
@@ -25,16 +23,17 @@ type ButtonTextProps = Omit<UiBoxProps, 'key' | 'uiTransform'> & {
 	children?  : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
 
+
 // MARK: ButtonText
 /**
  * Renders a text button with hover styling and an optional click callback.
  */
 export const ButtonText = ({
 	backgroundColor,
-	key,
+	id,
 	children,
-	textLabel   = "Button text", 
-	width       = "100%", 
+	textLabel   = 'Button text',
+	width       = '100%',
 	height      = 64,
 	borderWidth = 2,
 	borderColor,
@@ -54,49 +53,49 @@ export const ButtonText = ({
 	return (
 		<UiBox
 			{...props}
-			backgroundColor = {backgroundColor}
-			key         = {key}
-			uiTransform = {{
+			backgroundColor={backgroundColor}
+			uiTransform={{
 				width       : width,
 				height      : height,
 				margin      : 4,
 				borderRadius: 4,
-				borderColor : hoverStates.get(key) ? lighten(resolvedBorderColor, 0.1) : darken(resolvedBorderColor, 0.1),
+				borderColor : hoverStates.get(id)
+					? lighten(resolvedBorderColor, 0.1)
+					: darken(resolvedBorderColor, 0.1),
 				borderWidth : borderWidth,
 				...uiTransform
 			}}
-			uiText      = {{
+			uiText={{
 				value   : textLabel,
 				fontSize: theme.typography.size.default,
 				...uiText
 			}}
-			onMouseEnter = {() => { 
-				hoverStates.set(key, true)
+			onMouseEnter={() => {
+				hoverStates.set(id, true)
 				onMouseEnter?.()
 			}}
-			onMouseLeave = {() => { 
-				hoverStates.set(key, false)
+			onMouseLeave={() => {
+				hoverStates.set(id, false)
 				onMouseLeave?.()
 			}}
-			onMouseDown  = {() => { 
-				pressedStates.set(key, true)
+			onMouseDown={() => {
+				pressedStates.set(id, true)
 				onMouseDown?.()
 			}}
-			onMouseUp    = {() => { 
-				if (isMobile() || (isDesktop() && hoverStates.get(key) === true)) {
+			onMouseUp={() => {
+				if (isMobile() || (isDesktop() && hoverStates.get(id) === true)) {
 					callback?.()
-				} 
+				}
 
 				onMouseUp?.()
-
-				pressedStates.set(key, false)
+				pressedStates.set(id, false)
 			}}
-			uiBackground = {{ 
+			uiBackground={{
 				...uiBackground,
 				color: resolvedBorderColor
 			}}
-		/>
+		>
+			{children}
+		</UiBox>
 	)
 }
-
-

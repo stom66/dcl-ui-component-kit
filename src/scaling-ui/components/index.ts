@@ -26,6 +26,11 @@ export { Icon }             from './icons'
 export { IconNumber }       from './icons'
 
 
+// Layers
+export { Layer } from './layers'
+export type { LayerOptions } from './layers'
+
+
 // Props
 export { resolveUiBackground }  from './base'
 export type { ScalingUiProps }  from './base'
@@ -36,6 +41,7 @@ export { SectionHeader }    from './text'
 
 
 // Zones
+export { Zone }             from './zones'
 export { ZoneRoot }         from './zones'
 export { ZoneBarBottom }    from './zones'
 export { ZoneBarLeft }      from './zones'
@@ -43,3 +49,7 @@ export { ZoneBarRight }     from './zones'
 export { ZoneBarTop }       from './zones'
 export { ZoneDefault }      from './zones'
 export { ZoneFullScreen }   from './zones'
+export { ZoneBottomRight }  from './zones'
+export { ZoneType }         from './zones'
+export { VisibilityController } from './zones'
+export type { ZoneProps }   from './zones'

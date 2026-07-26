@@ -6,6 +6,7 @@ import { Vector2 } from "@dcl/sdk/math"
 // Note only 0-9 are supported, 
 export function getUVsForAtlasNumber(number: number | string): number[] {
 	const gridSize = 4
+	const horizontalInset = 0.15 // most numbers don't occupyt the full width of the uv square, so we have a small horizontal inset to prevent excess whitepace between them
 	if (typeof number === 'string') {
 		switch (number) {
 			case '/':
@@ -34,7 +35,7 @@ export function getUVsForAtlasNumber(number: number | string): number[] {
 	}
 	const row = Math.floor(number / gridSize) // 4 cols in the atlas
 	const col = number % gridSize
-	return getUVCell(col, row, gridSize, gridSize) 
+	return getUVCell(col, row, gridSize, gridSize, horizontalInset) 
 
 }
 
@@ -65,18 +66,19 @@ export function getUVColumn(
 }
 
 export function getUVCell(
-	x     : number, 
-	y     : number, 
-	width : number, 
-	height: number
+	x              : number, 
+	y              : number, 
+	width          : number, 
+	height         : number,
+	horizontalInset: number = 0
 ): number[] {
 	const sizeX = 1 / width
 	const sizeY = 1 / height
 	return [
-		x*sizeX, y*sizeY	,
-		x*sizeX, (y + 1)*sizeY,
-		(x + 1)*sizeX, (y + 1)*sizeY,
-		(x + 1)*sizeX, y*sizeY,
+		x*sizeX+(horizontalInset*sizeX), y*sizeY	,
+		x*sizeX+(horizontalInset*sizeX), (y + 1)*sizeY,
+		(x + 1)*sizeX-(horizontalInset*sizeX), (y + 1)*sizeY,
+		(x + 1)*sizeX-(horizontalInset*sizeX), y*sizeY,
 	]
 }
 

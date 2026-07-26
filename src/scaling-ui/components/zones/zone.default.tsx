@@ -1,46 +1,66 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
-import { vhToPixels } from 'src/scaling-ui/utils'
-import { randomColor } from 'src/scaling-ui/utils/colors'
-
+import { VisibilityController } from '../../classes/visibilityController'
+import { getTheme } from '../../styles'
+import { UiBox, type UiBoxProps } from '../base'
 import { ButtonImageClose } from '../buttons'
-import { VisibilityController } from './class.VisibilityController'
+import { ZoneType, zonePresets, type VisibilityPosition } from './zone.presets'
 
 
-const color      = randomColor()
-const controller = new VisibilityController(0, -1080)
-
-type VisibilityPosition = 'bottom' | 'left' | 'right' | 'top'
-
-type ZoneDefaultProps = UiBoxProps & {
+export type ZoneProps = UiBoxProps & {
+	type?                : Exclude<ZoneType, ZoneType.None>
 	canBeHidden?         : boolean
-	isHidden?            : boolean
+	startHidden?         : boolean
+	showCloseButton?     : boolean
 	children?            : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	visibilityController?: VisibilityController
 	visibilityPosition?  : VisibilityPosition
 }
 
 
-export function ZoneDefault({
-	isHidden             = false,
+// MARK: Zone
+/**
+ * Positions content in a predefined safe area.
+ * Hideable zones require a VisibilityController from the owning Layer.
+ */
+export function Zone({
+	type                 = ZoneType.Default,
+	startHidden          = false,
 	canBeHidden          = false,
+	showCloseButton      = false,
 	children             = [],
 	uiTransform          = {},
 	uiBackground,
-	visibilityController = controller,
-	visibilityPosition   = 'bottom',
+	visibilityController,
+	visibilityPosition,
 	...props
-}: ZoneDefaultProps) {
-	if (canBeHidden) {
-		visibilityController.initialize(isHidden)
+}: ZoneProps) {
+	const preset           = zonePresets[type]
+	const resolvedPosition = visibilityPosition ?? preset.visibilityPosition
+	const presetTransform  = preset.getUiTransform()
 
+	let hideable = canBeHidden
+
+	if (canBeHidden && !visibilityController) {
+		console.error(`Zone: type=${type} canBeHidden requires a visibilityController from a Layer`)
+		hideable = false
+	}
+
+	if (showCloseButton && !canBeHidden) {
+		console.error(`Zone: type=${type} showCloseButton requires canBeHidden`)
+	}
+
+	if (hideable && visibilityController) {
+		visibilityController.initialize(startHidden)
+	}
+
+	if (showCloseButton && hideable && visibilityController) {
 		if (children && !Array.isArray(children)) children = [children]
 
 		children = [
 			<ButtonImageClose
-				key='close'
-				callback={() => {
+				id       = "btn_close"
+				callback = {() => {
 					visibilityController.toggle()
 				}}
 			/>,
@@ -48,32 +68,38 @@ export function ZoneDefault({
 		]
 	}
 
-	const uiPosition = uiTransform.position && typeof uiTransform.position === 'object'
-		? uiTransform.position
-		: {}
+	const basePosition = (
+		uiTransform.position && typeof uiTransform.position === 'object'
+			? uiTransform.position
+			: presetTransform.position && typeof presetTransform.position === 'object'
+				? presetTransform.position
+				: {}
+	)
+
+	const theme = getTheme()
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
-				height        : vhToPixels(50),
-				width         : vhToPixels(75),
-				display       : "flex",
+				display       : 'flex',
 				flexGrow      : 0,
 				flexShrink    : 0,
-				flexDirection : "column",
-				alignItems    : "center",
-				justifyContent: "center",
+				flexDirection : 'column',
+				alignItems    : 'center',
+				justifyContent: 'center',
+				...presetTransform,
 				...uiTransform,
-				positionType  : canBeHidden ? "relative" : uiTransform.positionType,
-				position      : canBeHidden
-					? { ...uiPosition, [visibilityPosition]: visibilityController.position }
-					: uiTransform.position
+				positionType  : hideable
+					? 'relative'
+					: (uiTransform.positionType ?? presetTransform.positionType),
+				position      : hideable && visibilityController
+					? { ...basePosition, [resolvedPosition]: visibilityController.position }
+					: (uiTransform.position ?? presetTransform.position),
 			}}
-
 			uiBackground={{
-				color: color,
-				...uiBackground
+				color: theme.colors.body,
+				...uiBackground,
 			}}
 		>
 			{children}

@@ -1,7 +1,8 @@
 import { Color4 } from '@dcl/sdk/math'
 
-import { cols } from 'src/scaling-ui/styles/components/cols'
-import type { ThemeCols } from 'src/scaling-ui/styles/components/cols'
+import { cols } from './components/cols'
+import type { ThemeCols } from './components/cols'
+import { PositionUnit } from '@dcl/sdk/react-ecs'
 
 
 export type Theme = {
@@ -9,8 +10,10 @@ export type Theme = {
 	baseWidth         : number
 
 	border            : {
-		radius: number
-		width : number
+		radiusSmall  : number
+		radiusLarge  : number
+		radiusDefault: number
+		width        : number
 	},
 	colors            : {
 		body             : Color4
@@ -73,8 +76,10 @@ export const defaultTheme: Theme = {
 	baseHeight  : 1080,
 	baseWidth   : 1920,
 	border      : {
-		radius: 8,
-		width : 1,
+		radiusDefault: 16,
+		radiusSmall  : 8,
+		radiusLarge  : 32,
+		width        : 1,
 	},
 	colors      : {
 		body     : Color4.fromHexString('#212529'),

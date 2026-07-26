@@ -1,15 +1,18 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from 'src/scaling-ui/components/base'
+import { UiBox, type UiBoxProps } from '../base'
 
 type ZoneRootProps = UiBoxProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
 
 
-// MARK: RootCanvas
+// MARK: ZoneRoot
 /**
- * Renders a full-size UI canvas container.
+ * Full-size flex canvas helper for compositions outside SetupScalingUI.
+ * Prefer SetupScalingUI's ScreenInsetArea stack for normal layers — that path
+ * already provides a 100% × 100% inset-safe parent, so Layers should not wrap
+ * themselves in ZoneRoot.
  */
 export function ZoneRoot({
 	children,
@@ -20,13 +23,14 @@ export function ZoneRoot({
 		<UiBox
 			{...props}
 			uiTransform={{
-				height        : "100%",
-				width         : "100%",
-				display       : "flex",
+				height        : '100%',
+				width         : '100%',
+				positionType  : 'absolute',
+				display       : 'flex',
 				flexShrink    : 0,
-				flexDirection : "column",
-				alignItems    : "center",
-				justifyContent: "center",
+				flexDirection : 'column',
+				alignItems    : 'center',
+				justifyContent: 'center',
 				...uiTransform
 			}}
 		>
