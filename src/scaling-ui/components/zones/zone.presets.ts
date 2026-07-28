@@ -13,13 +13,16 @@ type UiEntityTransform = NonNullable<Parameters<typeof UiEntity>[0]['uiTransform
 // MARK: ZoneType
 export enum ZoneType {
 	None        = 'none',
-	FullScreen  = 'fullScreen',
 	Default     = 'default',
-	BarTop      = 'barTop',
-	BarBottom   = 'barBottom',
-	BarLeft     = 'barLeft',
-	BarRight    = 'barRight',
+	FullScreen  = 'fullScreen',
+	Top         = 'top',
+	TopRight    = 'topRight',
+	TopLeft     = 'topLeft',
+	Left        = 'left',
+	Right       = 'right',
+	Bottom      = 'bottom',
 	BottomRight = 'bottomRight',
+	BottomLeft  = 'bottomLeft',
 }
 
 
@@ -66,52 +69,82 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		visibilityPosition: 'bottom',
 	},
 
-	[ZoneType.BarTop]: {
+	[ZoneType.Top]: {
 		getUiTransform: () => ({
 			height      : '23%',
 			width       : '50%',
 			positionType: 'absolute',
-			position    : { top: 0 },
+			position    : { top: 8 },
 		}),
 		visibilityPosition: 'top',
 	},
 
-	[ZoneType.BarBottom]: {
+	[ZoneType.TopRight]: {
+		getUiTransform: () => ({
+			height      : '23%',
+			width       : '25%',
+			positionType: 'absolute',
+			position    : { top: 8, right: 8 },
+		}),
+		visibilityPosition: 'top',
+	},
+
+	[ZoneType.TopLeft]: {
+		getUiTransform: () => ({
+			height      : '23%',
+			width       : '25%',
+			positionType: 'absolute',
+			position    : { top: 8, left: 8 },
+		}),
+		visibilityPosition: 'top',
+	},
+
+	[ZoneType.Bottom]: {
 		getUiTransform: () => ({
 			height      : '23%',
 			width       : '50%',
 			positionType: 'absolute',
-			position    : { bottom: 0, left: 0 },
+			position    : { bottom: 8 },
 		}),
 		visibilityPosition: 'bottom',
 	},
 
-	[ZoneType.BarLeft]: {
+	[ZoneType.BottomRight]: {
+		getUiTransform: () => ({
+			height      : '23%',
+			width       : '25%',
+			positionType: 'absolute',
+			position    : { bottom: 8, right: 8 },
+		}),
+		visibilityPosition: 'bottom',
+	},
+
+	[ZoneType.BottomLeft]: {
+		getUiTransform: () => ({
+			height      : '23%',
+			width       : '25%',
+			positionType: 'absolute',
+			position    : { bottom: 8, left: 8 },
+		}),
+		visibilityPosition: 'bottom',
+	},
+
+	[ZoneType.Left]: {
 		getUiTransform: () => ({
 			height      : '100%',
 			width       : '25%',
 			positionType: 'absolute',
-			position    : { left: 0, top: 0 },
+			position    : { left: 8 },
 		}),
 		visibilityPosition: 'left',
 	},
 
-	[ZoneType.BarRight]: {
+	[ZoneType.Right]: {
 		getUiTransform: () => ({
 			height      : '100%',
 			width       : '25%',
 			positionType: 'absolute',
-			position    : { right: 0, top: 0 },
-		}),
-		visibilityPosition: 'right',
-	},
-	
-	[ZoneType.BottomRight]: {
-		getUiTransform: () => ({
-			height      : '25%',
-			width       : '25%',
-			positionType: 'absolute',
-			position    : { right: 0, bottom: 0 },
+			position    : { right: 8, top: 0 },
 		}),
 		visibilityPosition: 'right',
 	},

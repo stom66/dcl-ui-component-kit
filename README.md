@@ -41,8 +41,9 @@ import { Header, Layer, Row, UiBox, ZoneType } from 'src/scaling-ui'
 export class ScoreboardLayer extends Layer {
  constructor() {
   super({
-   id  : 'scoreboard',
-   zone: ZoneType.BarTop,
+   id       : 'scoreboard',
+   zone     : ZoneType.BarTop,
+   showFrame: true,
   })
  }
 
@@ -79,6 +80,7 @@ export class NotificationLayer extends Layer {
    canBeHidden    : true,
    startHidden    : true,
    showCloseButton: true,
+   showFrame      : true,
   })
  }
 

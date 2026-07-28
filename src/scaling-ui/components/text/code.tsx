@@ -5,14 +5,15 @@ import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
 
 
-type SectionHeaderProps = UiBoxProps & {
+type SectionHeaderProps = Omit<UiBoxProps, 'uiText'> & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	title    : string
+	uiText  ?: Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
 
-// MARK: SectionHeader
-export const SectionHeader = ({
+// MARK: H1
+export const Code = ({
 	children,
 	title,
 	uiText,
@@ -27,18 +28,19 @@ export const SectionHeader = ({
 			uiTransform={{
 				width  : '100%',
 				height : 'auto',
-				padding: { top: 10, bottom: 5 },
 				...uiTransform
 			}}
 			uiText={{
 				value    : title,
-				fontSize : scaleFontSize(theme.typography.size.h2),
-				color    : Color4.create(1, 0.8, 0.3, 1),
+				fontSize : scaleFontSize(theme.typography.size.code),
+				font     : theme.typography.family.code,
+				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText
 			}}
 		>
 			{children}
+			This is osme text.
 		</UiBox>
 	)
 }

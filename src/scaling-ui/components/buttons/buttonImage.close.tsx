@@ -24,9 +24,11 @@ export function ButtonImageClose({
 			height      = {m ? 128 : 90}
 			textureSrc  = "assets/images/scaling-ui/atlas-btn-close.png"
 			uiTransform = {{
-				position    : { top: m?10:20, right: m?12:24 },
+				position    : { top: 0, right: 0 },
 				positionType: 'absolute',
+				borderWidth : 0,
 				...uiTransform,
+
 			}}
 			callback = {callback}
 		>

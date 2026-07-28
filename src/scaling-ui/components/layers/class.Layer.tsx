@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { DataController } from '../../classes/dataController'
+import { PropsController } from '../../classes/propsController'
 import { VisibilityController } from '../../classes/visibilityController'
 import type { UiBoxProps } from '../base'
 import { Zone } from '../zones/zone.default'
@@ -16,6 +16,8 @@ export type LayerOptions = {
 	canBeHidden?    : boolean
 	startHidden?    : boolean
 	showCloseButton?: boolean
+	/** When true, Zone applies default fill / border / padding. Default false. */
+	showFrame?      : boolean
 	zIndex?         : number
 	uiTransform?    : UiBoxProps['uiTransform']
 	uiBackground?   : UiBoxProps['uiBackground']
@@ -28,12 +30,13 @@ export abstract class Layer {
 	readonly canBeHidden     : boolean
 	readonly startHidden     : boolean
 	readonly showCloseButton : boolean
+	readonly showFrame       : boolean
 	readonly zIndex?         : number
 	readonly uiTransform?    : UiBoxProps['uiTransform']
 	readonly uiBackground?   : UiBoxProps['uiBackground']
 	readonly visibility      : VisibilityController
 
-	protected data?: DataController<Record<string, unknown>>
+	protected props?: PropsController<Record<string, unknown>>
 
 	constructor(options: LayerOptions) {
 		this.id              = options.id
@@ -41,6 +44,7 @@ export abstract class Layer {
 		this.canBeHidden     = options.canBeHidden ?? false
 		this.startHidden     = options.startHidden ?? false
 		this.showCloseButton = options.showCloseButton ?? false
+		this.showFrame       = options.showFrame ?? false
 		this.zIndex          = options.zIndex
 		this.uiTransform     = options.uiTransform
 		this.uiBackground    = options.uiBackground
@@ -90,7 +94,7 @@ export abstract class Layer {
 	/**
 	 * Mounts this layer as one Zone (preset + uiTransform / uiBackground).
 	 * The canvas (`ScreenInsetArea` + full-size stack) is owned by SetupScalingUI.
-	 * `showCloseButton` is configured on the Layer and applied by the Zone.
+	 * `showCloseButton` / `showFrame` are configured on the Layer and applied by the Zone.
 	 */
 	render(): ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | null {
 		const content = this.body()
@@ -106,6 +110,7 @@ export abstract class Layer {
 				canBeHidden          = {this.canBeHidden}
 				startHidden          = {this.startHidden}
 				showCloseButton      = {this.showCloseButton}
+				showFrame            = {this.showFrame}
 				visibilityController = {this.visibility}
 				uiBackground         = {this.uiBackground}
 				uiTransform          = {{

@@ -1,5 +1,7 @@
 import { tweenValue, EasingFunction } from '../utils/tweens'
 
+import { getTheme } from '../styles'
+
 
 export class VisibilityController {
 	public position: number
@@ -8,12 +10,14 @@ export class VisibilityController {
 	private hasInitialized: boolean = false
 
 	constructor(
-		public readonly visiblePosition : number,
-		private readonly getHiddenPosition: () => number,
-		public readonly easingFunction?: EasingFunction
+		public readonly visiblePosition    : number,
+		private readonly getHiddenPosition : () => number,
+		public readonly easingFunctionShow?: EasingFunction,
+		public readonly easingFunctionHide?: EasingFunction
 	) {
-		this.position       = getHiddenPosition()
-		this.easingFunction = easingFunction || EasingFunction.EF_EASEINBACK
+		this.position           = getHiddenPosition()
+		this.easingFunctionShow = easingFunctionShow || EasingFunction.EF_EASEOUTBACK
+		this.easingFunctionHide = easingFunctionHide || EasingFunction.EF_EASEINBACK
 	}
 
 
@@ -38,7 +42,7 @@ export class VisibilityController {
 
 	// MARK: toggle
 	/** Toggles between the hidden and visible positions. */
-	toggle(duration = 0.2) {
+	toggle(duration = this.isHidden ? getTheme().animation.showDuration : getTheme().animation.hideDuration) {
 		this.isHidden = !this.isHidden
 		this.isHidden ? this.hide(duration) : this.show(duration)
 	}
@@ -46,7 +50,7 @@ export class VisibilityController {
 
 	// MARK: hide
 	/** Moves the controlled zone to its hidden position. */
-	hide(duration = 0.2) {
+	hide(duration = getTheme().animation.hideDuration) {
 		this.isHidden = true
 
 		if (duration > 0) {
@@ -56,7 +60,7 @@ export class VisibilityController {
 				duration,
 				v => (this.position = v),
 				undefined,
-				this.easingFunction
+				this.easingFunctionHide
 			)
 		} else {
 			this.position = this.hiddenPosition
@@ -66,7 +70,7 @@ export class VisibilityController {
 
 	// MARK: show
 	/** Moves the controlled zone to its visible position. */
-	show(duration = 0.2) {
+	show(duration = getTheme().animation.showDuration) {
 		this.isHidden = false
 
 		if (duration > 0) {
@@ -76,7 +80,7 @@ export class VisibilityController {
 				duration,
 				v => (this.position = v),
 				undefined,
-				this.easingFunction
+				this.easingFunctionShow
 			)
 		} else {
 			this.position = this.visiblePosition

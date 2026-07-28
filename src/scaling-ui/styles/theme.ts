@@ -2,10 +2,14 @@ import { Color4 } from '@dcl/sdk/math'
 
 import { cols } from './components/cols'
 import type { ThemeCols } from './components/cols'
-import { PositionUnit } from '@dcl/sdk/react-ecs'
 
 
 export type Theme = {
+	animation         : {
+		showDuration: number
+		hideDuration: number
+	},
+
 	baseHeight        : number
 	baseWidth         : number
 
@@ -28,6 +32,18 @@ export type Theme = {
 		info             : Color4
 		success          : Color4
 		warning          : Color4
+	}
+	icons: {
+		/** Default Icon min width/height in virtual UI pixels (see Icon `minWidth` / `minHeight`). */
+		size   : number
+		numbers: {
+			/**
+			 * UV crop applied to each side of a cell in `atlas-numbers.png`.
+			 * Cells are square but glyphs are usually narrower — this trims horizontal whitespace.
+			 * Wider custom font → decrease; narrower font → increase. Default `0.15` matches the bundled atlas.
+			 */
+			horizontalInset: number
+		}
 	}
 	typography: {
 		size: {
@@ -55,10 +71,14 @@ export type Theme = {
 	cols: ThemeCols
 }
 
-export type ThemeCustomize = Partial<Omit<Theme, 'border' | 'colors' | 'cols' | 'typography'>> & {
+export type ThemeCustomize = Partial<Omit<Theme, 'border' | 'colors' | 'cols' | 'icons' | 'typography'>> & {
 	border    ?: Partial<Theme['border']>
 	colors    ?: Partial<Theme['colors']>
 	cols      ?: Partial<Theme['cols']>
+	icons     ?: {
+		size   ?: number
+		numbers?: Partial<Theme['icons']['numbers']>
+	}
 	typography?: {
 		size  ?: Partial<Theme['typography']['size']>
 		family?: Partial<Theme['typography']['family']>
@@ -73,13 +93,17 @@ export type ThemeCustomize = Partial<Omit<Theme, 'border' | 'colors' | 'cols' | 
  * Consumers can override these by passing theme overrides into `SetupScalingUI`.
  */
 export const defaultTheme: Theme = {
+	animation: {
+		showDuration: 0.35,
+		hideDuration: 0.35,
+	},
 	baseHeight  : 1080,
 	baseWidth   : 1920,
 	border      : {
 		radiusDefault: 16,
 		radiusSmall  : 8,
 		radiusLarge  : 32,
-		width        : 1,
+		width        : 2,
 	},
 	colors      : {
 		body     : Color4.fromHexString('#212529'),
@@ -96,6 +120,13 @@ export const defaultTheme: Theme = {
 	},
 
 	cols: cols,
+
+	icons: {
+		size   : 32,
+		numbers: {
+			horizontalInset: 0.15,
+		},
+	},
 
 	typography: {
 		size: {
@@ -145,6 +176,14 @@ export function buildTheme(
 		cols        : {
 			...baseTheme.cols,
 			...overrides.cols,
+		},
+		icons       : {
+			...baseTheme.icons,
+			...overrides.icons,
+			numbers: {
+				...baseTheme.icons.numbers,
+				...overrides.icons?.numbers,
+			},
 		},
 		typography  : {
 			...baseTheme.typography,

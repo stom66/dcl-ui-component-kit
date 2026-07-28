@@ -1,6 +1,6 @@
 type Listener = () => void
 
-export class DataController<T extends Record<string, any>> {
+export class PropsController<T extends Record<string, any>> {
 	private data: T
 	private listeners = new Set<Listener>()
 

@@ -8,7 +8,7 @@ export function main() {
 		theme : themeOverrides,
 		layers: demoLayers,
 		debug : {
-			showDesktopSafeZones: true,
+			showDesktopSafeZones: false,
 			showMobileSafeZones : false,
 		},
 	})

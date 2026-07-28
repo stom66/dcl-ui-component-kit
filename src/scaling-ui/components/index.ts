@@ -17,6 +17,7 @@ export { Header }           from './header'
 export { Column }           from './helpers'
 export { ColumnReverse }    from './helpers'
 export { Divider }          from './helpers'
+export { Label }            from './helpers'
 export { Row }              from './helpers'
 export { RowReverse }       from './helpers'
 

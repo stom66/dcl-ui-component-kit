@@ -5,7 +5,7 @@ import { Layer } from '../components/layers'
 import { ZoneType } from '../components/zones/zone.presets'
 import { SAFE_ZONE_Z_INDEX } from './constants'
 import { getUiScaleFactor } from '../utils'
-//import { vhToPixels, vwToPixels } from '../utils'
+import { vhToPixels, vwToPixels } from '../utils'
 
 
 const bgDanger: UiBackgroundProps = {

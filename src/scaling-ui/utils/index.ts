@@ -2,7 +2,7 @@ export { alpha, darken, lighten, randomColor }  from './colors'
 
 export { getColSizing }                         from './colSizing'
 
-export { DataController }                       from '../classes/dataController'
+export { PropsController }                      from '../classes/propsController'
 
 export { clampNumber }                          from './math'
 

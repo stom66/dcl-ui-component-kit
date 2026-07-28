@@ -51,8 +51,9 @@ function formatCanvasDebugInfo(): string {
 export class InfoLayer extends Layer {
 	constructor() {
 		super({
-			id  : 'info',
-			zone: ZoneType.BottomRight,
+			id       : 'info',
+			zone     : ZoneType.BottomRight,
+			showFrame: true,
 		})
 	}
 

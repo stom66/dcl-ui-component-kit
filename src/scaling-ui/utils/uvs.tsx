@@ -2,26 +2,34 @@
 
 import { Vector2 } from "@dcl/sdk/math"
 
+import { getTheme } from '../styles'
 
-// Note only 0-9 are supported, 
+
+// MARK: getUVsForAtlasNumber
+/**
+ * UV quad for one glyph in `atlas-numbers.png` (4×4 grid).
+ * Uses `theme.icons.numbers.horizontalInset` to crop cell whitespace — see theme note.
+ */
 export function getUVsForAtlasNumber(number: number | string): number[] {
-	const gridSize = 4
-	const horizontalInset = 0.15 // most numbers don't occupyt the full width of the uv square, so we have a small horizontal inset to prevent excess whitepace between them
+	const gridSize         = 4
+	const horizontalInset  = getTheme().icons.numbers.horizontalInset
+
 	if (typeof number === 'string') {
 		switch (number) {
 			case '/':
-				return getUVCell(0, 3, gridSize, gridSize) // see assets/images/ui/atlas-numbers.png
+				return getUVCell(0, 3, gridSize, gridSize, horizontalInset)
 			case '+':
-				return getUVCell(1, 3, gridSize, gridSize) // see assets/images/ui/atlas-numbers.png
+				return getUVCell(1, 3, gridSize, gridSize, horizontalInset)
 			case '-':
-				return getUVCell(2, 3, gridSize, gridSize) // see assets/images/ui/atlas-numbers.png
+				return getUVCell(2, 3, gridSize, gridSize, horizontalInset)
 			case '*':
 			case 'x':
-				return getUVCell(3, 3, gridSize, gridSize) // see assets/images/ui/atlas-numbers.png
-				case '=':
-				return getUVCell(2, 2, gridSize, gridSize) // see assets/images/ui/atlas-numbers.png
+			case '×':
+				return getUVCell(3, 3, gridSize, gridSize, horizontalInset)
+			case '=':
+				return getUVCell(2, 2, gridSize, gridSize, horizontalInset)
 			case '.':
-				return getUVCell(3, 2, gridSize, gridSize) // see assets/images/ui/atlas-numbers.png
+				return getUVCell(3, 2, gridSize, gridSize, horizontalInset)
 		}
 		number = parseInt(number)
 		if (isNaN(number)) {
@@ -33,10 +41,9 @@ export function getUVsForAtlasNumber(number: number | string): number[] {
 		console.error('getUVsForAtlasNumber: invalid number', number)
 		return []
 	}
-	const row = Math.floor(number / gridSize) // 4 cols in the atlas
+	const row = Math.floor(number / gridSize)
 	const col = number % gridSize
-	return getUVCell(col, row, gridSize, gridSize, horizontalInset) 
-
+	return getUVCell(col, row, gridSize, gridSize, horizontalInset)
 }
 
 
@@ -51,43 +58,50 @@ export enum AtlasLabelsRowIndex {
 	UNKNOWN          = 0,
 }
 
+
+// MARK: getUVRow
 export function getUVRow(
-	index : number, 
+	index  : number,
 	maxRows: number = 8
 ): number[] {
 	return getUVCell(0, index, 1, maxRows)
 }
 
+
+// MARK: getUVColumn
 export function getUVColumn(
-	index     : number, 
+	index     : number,
 	maxColumns: number = 8
 ): number[] {
 	return getUVCell(index, 0, maxColumns, 1)
 }
 
+
+// MARK: getUVCell
 export function getUVCell(
-	x              : number, 
-	y              : number, 
-	width          : number, 
+	x              : number,
+	y              : number,
+	width          : number,
 	height         : number,
 	horizontalInset: number = 0
 ): number[] {
 	const sizeX = 1 / width
 	const sizeY = 1 / height
 	return [
-		x*sizeX+(horizontalInset*sizeX), y*sizeY	,
-		x*sizeX+(horizontalInset*sizeX), (y + 1)*sizeY,
-		(x + 1)*sizeX-(horizontalInset*sizeX), (y + 1)*sizeY,
-		(x + 1)*sizeX-(horizontalInset*sizeX), y*sizeY,
+		x * sizeX + (horizontalInset * sizeX), y * sizeY,
+		x * sizeX + (horizontalInset * sizeX), (y + 1) * sizeY,
+		(x + 1) * sizeX - (horizontalInset * sizeX), (y + 1) * sizeY,
+		(x + 1) * sizeX - (horizontalInset * sizeX), y * sizeY,
 	]
 }
 
 
+// MARK: getRotatedUVs
 export function getRotatedUVs(
 	uvs     : number[],
 	rotation: number,
 	origin? : Vector2
-  ): number[] {
+): number[] {
 	if (uvs.length !== 8) {
 		throw new Error("UV array must contain exactly 8 values.")
 	}
@@ -101,8 +115,8 @@ export function getRotatedUVs(
 
 
 	const radians = rotation * Math.PI / 180
-	const cos = Math.cos(radians)
-	const sin = Math.sin(radians)
+	const cos     = Math.cos(radians)
+	const sin     = Math.sin(radians)
 
 	const rotated: number[] = []
 

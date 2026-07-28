@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { IconNumber, Row } from 'src/scaling-ui/components'
+import { IconNumber, Label, Row } from 'src/scaling-ui/components'
 import { ZoneType } from 'src/scaling-ui/components/zones/zone.presets'
 import { Layer } from 'src/scaling-ui/components/layers'
 import { getTheme } from 'src/scaling-ui'
@@ -16,6 +16,7 @@ export class SimpleLayer extends Layer {
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
 			showCloseButton: true,
+			showFrame      : true,
 		})
 	}
 
@@ -23,7 +24,7 @@ export class SimpleLayer extends Layer {
 	// MARK: body
 	protected body() {
 		return (
-			<Row uiTransform={{justifyContent: "center"}} cols={1} backgroundColor={theme.colors.danger}>
+			<Label>
 				<IconNumber value={"+120/2=60"} />
 {/* 				<IconNumber value={2} />
 				<IconNumber value={3} />
@@ -39,7 +40,7 @@ export class SimpleLayer extends Layer {
 				<IconNumber value={'-'} />
 				<IconNumber value={'.'} />
 				<IconNumber value={'='} /> */}
-			</Row>
+			</Label>
 		)
 	}
 }

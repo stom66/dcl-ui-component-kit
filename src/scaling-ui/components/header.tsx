@@ -1,5 +1,5 @@
-import { Color4 } from "@dcl/sdk/math"
-import ReactEcs from '@dcl/sdk/react-ecs'
+import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from './base'
 import { getTheme } from '../styles'
@@ -30,7 +30,7 @@ export const Header = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h2,
+				fontSize : scaleFontSize(theme.typography.size.h2),
 				color    : Color4.create(1, 0.8, 0.3, 1),
 				textAlign: 'middle-left',
 				...uiText

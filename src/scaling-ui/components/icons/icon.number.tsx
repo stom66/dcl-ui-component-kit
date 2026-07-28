@@ -1,9 +1,9 @@
-import ReactEcs, { PositionUnit} from '@dcl/sdk/react-ecs'
-import { Color4 } from "@dcl/sdk/math"
-import { Icon } from './icon'
+import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+
+import { getTheme } from '../../styles'
 import { getUVsForAtlasNumber } from '../../utils'
-import { Row } from '../helpers'
 import { UiBox } from '../base'
+import { Icon } from './icon'
 
 type IconNumberProps = Omit<Parameters<typeof Icon>[0], 'iconSrc' | 'textureMode' | 'uvs'> & {
 	value    : number | "/" | "+" | "-" | "×" | "*" | "x" | "=" | "." | string
@@ -12,6 +12,12 @@ type IconNumberProps = Omit<Parameters<typeof Icon>[0], 'iconSrc' | 'textureMode
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
 
+
+// MARK: IconNumber
+/**
+ * Renders a numeric string from `atlas-numbers.png`.
+ * Digit aspect follows `theme.icons.numbers.horizontalInset` so UV crop does not stretch glyphs.
+ */
 export const IconNumber = ({
 	children,
 	value   = 0,
@@ -20,20 +26,38 @@ export const IconNumber = ({
 	uiTransform,
 	...props
 }: IconNumberProps) => {
-	const icons: any = []
-	const len = value.toString().length
+	const theme           = getTheme()
+	const size            = theme.icons.size
+	const horizontalInset = theme.icons.numbers.horizontalInset
+	const digitAspect     = 1 - 2 * horizontalInset
+
+	const glyphs = value.toString()
+	const len    = glyphs.length
+
+	const digitHeight = height === "auto" ? size : height
+	const digitWidth  = width === "auto" && height === "auto"
+		? size * digitAspect
+		: width === "auto"
+			? `${100 / len}%`
+			: undefined
+
+	const icons: ReactEcs.JSX.Element[] = []
 
 	for (let i = 0; i < len; i++) {
-		icons.push(	
-			<Icon 
+		icons.push(
+			<Icon
 				{...props}
 				key         = {i}
-				width       = {`${100 / len}%`} 
-				height      = {height} 
-				uiTransform = {uiTransform} 
-				iconSrc     = 'assets/images/scaling-ui/atlas-numbers.png'
-				textureMode = 'stretch'
-				uvs         = { getUVsForAtlasNumber(value.toString()[i]) }
+				width       = {digitWidth ?? `${100 / len}%`}
+				height      = {digitHeight}
+				uiTransform = {{
+					...(typeof digitWidth === 'number' ? { minWidth: digitWidth } : {}),
+					...(typeof digitHeight === 'number' ? { minHeight: digitHeight } : {}),
+					...uiTransform,
+				}}
+				iconSrc     = {'assets/images/scaling-ui/atlas-numbers.png'}
+				textureMode = {'stretch'}
+				uvs         = {getUVsForAtlasNumber(glyphs[i])}
 			/>
 		)
 	}
@@ -42,8 +66,13 @@ export const IconNumber = ({
 		<UiBox
 			{...props}
 			uiTransform = {{
-				width : width,
-				height: height,
+				width        : width,
+				height       : height === "auto" ? size : height,
+				display      : 'flex',
+				flexDirection: 'row',
+				alignItems   : 'center',
+				flexGrow     : 0,
+				flexShrink   : 0,
 				...uiTransform,
 			}}
 		>

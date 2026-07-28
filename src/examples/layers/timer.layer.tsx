@@ -1,6 +1,6 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { DataController } from 'src/scaling-ui/classes/dataController'
+import { PropsController } from 'src/scaling-ui/classes/propsController'
 import { UiBox } from 'src/scaling-ui/components'
 import { Layer } from 'src/scaling-ui/components/layers'
 import { ZoneType } from 'src/scaling-ui/components/zones/zone.presets'
@@ -26,40 +26,40 @@ export class TimerLayer extends Layer {
 
 		super({
 			id          : 'timer',
-			zone        : ZoneType.BarTop,
+			zone        : ZoneType.Top,
+			showFrame   : true,
 			uiBackground: {
 				color: theme.colors.primary,
 			},
 			uiTransform: {
-				width       : '30vw',
-				height      : '10vw',
-				//borderRadius: 8,
+				width       : '15vw',
+				height      : '5vw',
 			},
 		})
 
-		this.data = new DataController<Record<string, unknown>>({
+		this.props = new PropsController<Record<string, unknown>>({
 			secondsRemaining: getSecondsRemainingInMinute(),
 		})
 
 		timers.setInterval(() => {
-			if (!this.data) {
-				console.error('TimerLayer: tick: data controller missing')
+			if (!this.props) {
+				console.error('TimerLayer: tick: props controller missing')
 				return
 			}
-			this.data.set('secondsRemaining', getSecondsRemainingInMinute())
+			this.props.set('secondsRemaining', getSecondsRemainingInMinute())
 		}, 250)
 	}
 
 
 	// MARK: body
 	protected body() {
-		if (!this.data) {
-			console.error('TimerLayer.body: data controller missing')
+		if (!this.props) {
+			console.error('TimerLayer.body: props controller missing')
 			return null
 		}
 
 		const theme   = getTheme()
-		const seconds = this.data.get('secondsRemaining') as number
+		const seconds = this.props.get('secondsRemaining') as number
 
 		return (
 			<UiBox
@@ -70,7 +70,7 @@ export class TimerLayer extends Layer {
 				}}
 				uiText={{
 					value    : String(seconds),
-					fontSize : theme.typography.size.h1,
+					fontSize : scaleFontSize(theme.typography.size.h1),
 					font     : theme.typography.family.default,
 					color    : theme.colors.light,
 					textAlign: 'middle-center',

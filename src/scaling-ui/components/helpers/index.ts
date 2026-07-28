@@ -1,5 +1,6 @@
 export { Column }        from './column'
 export { ColumnReverse } from './column.reverse'
 export { Divider }       from './divider'
+export { Label }         from './label'
 export { Row }           from './row'
 export { RowReverse }    from './row.reverse'

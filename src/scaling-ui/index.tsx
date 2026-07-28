@@ -38,6 +38,7 @@ export {
 	Header,
 	Icon,
 	IconNumber,
+	Label,
 	Row,
 	RowReverse,
 	SectionHeader,
@@ -45,7 +46,7 @@ export {
 } from './components'
 
 export { darken, lighten, alpha } from './utils/colors'
-export { DataController } from './classes/dataController'
+export { PropsController } from './classes/propsController'
 export { buildTheme, defaultTheme, getTheme, setTheme, theme } from './styles/theme'
 
 

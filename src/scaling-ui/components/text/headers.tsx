@@ -1,11 +1,11 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
-import { Color4 } from "@dcl/sdk/math"
+import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
 
 
-type SectionHeaderProps = Omit<UiBoxProps, 'uiText'> & {
+type HeaderProps = Omit<UiBoxProps, 'uiText'> & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	title    : string
 	uiText  ?: Partial<NonNullable<UiBoxProps['uiText']>>
@@ -19,7 +19,7 @@ export const H1 = ({
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: HeaderProps) => {
 	const theme = getTheme()
 
 	return (
@@ -32,7 +32,7 @@ export const H1 = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h1,
+				fontSize : scaleFontSize(theme.typography.size.h1),
 				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText
@@ -50,7 +50,7 @@ export const H2 = ({
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: HeaderProps) => {
 	const theme = getTheme()
 
 	return (
@@ -63,7 +63,7 @@ export const H2 = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h2,
+				fontSize : scaleFontSize(theme.typography.size.h2),
 				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText
@@ -81,7 +81,7 @@ export const H3 = ({
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: HeaderProps) => {
 	const theme = getTheme()
 
 	return (
@@ -94,7 +94,7 @@ export const H3 = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h3,
+				fontSize : scaleFontSize(theme.typography.size.h3),
 				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText
@@ -112,7 +112,7 @@ export const H4 = ({
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: HeaderProps) => {
 	const theme = getTheme()
 
 	return (
@@ -125,7 +125,7 @@ export const H4 = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h4,
+				fontSize : scaleFontSize(theme.typography.size.h4),
 				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText
@@ -143,7 +143,7 @@ export const H5 = ({
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: HeaderProps) => {
 	const theme = getTheme()
 
 	return (
@@ -156,7 +156,7 @@ export const H5 = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h5,
+				fontSize : scaleFontSize(theme.typography.size.h5),
 				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText
@@ -174,7 +174,7 @@ export const H6 = ({
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: HeaderProps) => {
 	const theme = getTheme()
 
 	return (
@@ -187,7 +187,7 @@ export const H6 = ({
 			}}
 			uiText={{
 				value    : title,
-				fontSize : theme.typography.size.h6,
+				fontSize : scaleFontSize(theme.typography.size.h6),
 				color    : theme.colors.dark,
 				textAlign: 'middle-left',
 				...uiText

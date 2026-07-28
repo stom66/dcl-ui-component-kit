@@ -12,6 +12,7 @@ export type ZoneProps = UiBoxProps & {
 	canBeHidden?         : boolean
 	startHidden?         : boolean
 	showCloseButton?     : boolean
+	showFrame?           : boolean
 	children?            : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	visibilityController?: VisibilityController
 	visibilityPosition?  : VisibilityPosition
@@ -21,6 +22,8 @@ export type ZoneProps = UiBoxProps & {
 // MARK: Zone
 /**
  * Positions content in a predefined safe area.
+ * Bare by default. Pass `showFrame: true` for theme body fill, theme border
+ * width/radius, and 8px padding — still overridable via `uiTransform` / `uiBackground`.
  * Hideable zones require a VisibilityController from the owning Layer.
  */
 export function Zone({
@@ -28,6 +31,7 @@ export function Zone({
 	startHidden          = false,
 	canBeHidden          = false,
 	showCloseButton      = false,
+	showFrame            = false,
 	children             = [],
 	uiTransform          = {},
 	uiBackground,
@@ -88,6 +92,16 @@ export function Zone({
 				flexDirection : 'column',
 				alignItems    : 'center',
 				justifyContent: 'center',
+				...(showFrame
+					? {
+						padding     : 8,
+						borderWidth : theme.border.width,
+						borderRadius: theme.border.radiusDefault,
+					}
+					: {
+						padding    : 0,
+						borderWidth: 0,
+					}),
 				...presetTransform,
 				...uiTransform,
 				positionType  : hideable
@@ -97,10 +111,12 @@ export function Zone({
 					? { ...basePosition, [resolvedPosition]: visibilityController.position }
 					: (uiTransform.position ?? presetTransform.position),
 			}}
-			uiBackground={{
-				color: theme.colors.body,
-				...uiBackground,
-			}}
+			uiBackground={showFrame
+				? {
+					color: theme.colors.body,
+					...uiBackground,
+				}
+				: uiBackground}
 		>
 			{children}
 		</UiBox>

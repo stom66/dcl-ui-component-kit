@@ -1,5 +1,6 @@
 import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 
+import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
 
 type IconProps = UiBoxProps & {
@@ -11,6 +12,12 @@ type IconProps = UiBoxProps & {
 	height?     : PositionUnit | "auto" | undefined
 }
 
+
+// MARK: Icon
+/**
+ * Texture icon. Defaults to a square cell sized from `theme.icons.size` when
+ * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
+ */
 export const Icon = ({
 	children,
 	iconSrc,
@@ -22,6 +29,8 @@ export const Icon = ({
 	uiTransform,
 	...props
 }: IconProps) => {
+	const size = getTheme().icons.size
+
 	return (
 		<UiBox
 			{...props}
@@ -30,8 +39,8 @@ export const Icon = ({
 				height    : height,
 				flexGrow  : 0,
 				flexShrink: 0,
-				minWidth  : "32",
-				minHeight : "32",
+				...(width  === "auto" ? { minWidth : size } : {}),
+				...(height === "auto" ? { minHeight: size } : {}),
 				...uiTransform
 			}}
 			uiBackground={{

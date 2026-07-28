@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
 import { isDesktop, isMobile } from '@dcl/sdk/platform'
-import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, scaleFontSize, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
@@ -67,7 +67,7 @@ export const ButtonText = ({
 			}}
 			uiText={{
 				value   : textLabel,
-				fontSize: theme.typography.size.default,
+				fontSize: scaleFontSize(theme.typography.size.default),
 				...uiText
 			}}
 			onMouseEnter={() => {
