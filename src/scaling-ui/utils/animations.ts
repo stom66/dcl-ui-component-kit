@@ -1,5 +1,5 @@
 import { timers } from "./timers";
-import { EasingFunction, tweenValue } from "./tweens";
+import { easingFunctions, tweenValue, type EasingFn } from "./tweens";
 
 
 // MARK: Pulse
@@ -14,10 +14,10 @@ import { EasingFunction, tweenValue } from "./tweens";
 export function pulse(
 	width   : number, 
 	height  : number,
-	scale   : number         = 1.25,
-	duration: number         = 0.5, // seconds
-	repeat  : number         = 1,
-	easing  : EasingFunction = EasingFunction.EF_EASECIRC
+	scale   : number  = 1.25,
+	duration: number  = 0.5, // seconds
+	repeat  : number  = 1,
+	easing  : EasingFn = easingFunctions.easeCirc
 ) {
 	for (let i = 0; i < repeat; i++) {
 		timers.setTimeout(() => {

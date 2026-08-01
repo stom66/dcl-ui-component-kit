@@ -1,87 +1,30 @@
-import { Color4 } from '@dcl/sdk/math'
-
-import { cols } from './components/cols'
-import type { ThemeCols } from './components/cols'
+import { animation, base, border, buttons, colors, cols, icons, typography } from './components'
+import type { ThemeAnimation, ThemeBase, ThemeBorder, ThemeButtons, ThemeColors, ThemeCols, ThemeIcons, ThemeTypography } from './components'
 
 
-export type Theme = {
-	animation         : {
-		showDuration: number
-		hideDuration: number
-	},
-
-	baseHeight        : number
-	baseWidth         : number
-
-	border            : {
-		radiusSmall  : number
-		radiusLarge  : number
-		radiusDefault: number
-		width        : number
-	},
-	colors            : {
-		body             : Color4
-		dark             : Color4
-		light            : Color4
-
-		primary          : Color4
-		secondary        : Color4
-		tertiary         : Color4
-
-		danger           : Color4
-		info             : Color4
-		success          : Color4
-		warning          : Color4
-	}
-	icons: {
-		/** Default Icon min width/height in virtual UI pixels (see Icon `minWidth` / `minHeight`). */
-		size   : number
-		numbers: {
-			/**
-			 * UV crop applied to each side of a cell in `atlas-numbers.png`.
-			 * Cells are square but glyphs are usually narrower — this trims horizontal whitespace.
-			 * Wider custom font → decrease; narrower font → increase. Default `0.15` matches the bundled atlas.
-			 */
-			horizontalInset: number
-		}
-	}
-	typography: {
-		size: {
-			code: number
-			default: number
-			h1: number
-			h2: number
-			h3: number
-			h4: number
-			h5: number
-			h6: number
-		},
-		family: {
-			code: 'monospace' | 'serif' | 'sans-serif'
-			default: 'monospace' | 'serif' | 'sans-serif'
-			h1: 'monospace' | 'serif' | 'sans-serif'
-			h2: 'monospace' | 'serif' | 'sans-serif'
-			h3: 'monospace' | 'serif' | 'sans-serif'
-			h4: 'monospace' | 'serif' | 'sans-serif'
-			h5: 'monospace' | 'serif' | 'sans-serif'
-			h6: 'monospace' | 'serif' | 'sans-serif'
-		}
-	}
-
-	cols: ThemeCols
+export type Theme = ThemeBase & {
+	animation : ThemeAnimation
+	border    : ThemeBorder
+	buttons   : ThemeButtons
+	colors    : ThemeColors
+	cols      : ThemeCols
+	icons     : ThemeIcons
+	typography: ThemeTypography
 }
 
-export type ThemeCustomize = Partial<Omit<Theme, 'border' | 'colors' | 'cols' | 'icons' | 'typography'>> & {
-	border    ?: Partial<Theme['border']>
-	colors    ?: Partial<Theme['colors']>
-	cols      ?: Partial<Theme['cols']>
+export type ThemeCustomize = Partial<ThemeBase> & {
+	animation ?: Partial<ThemeAnimation>
+	border    ?: Partial<ThemeBorder>
+	buttons   ?: Partial<ThemeButtons>
+	colors    ?: Partial<ThemeColors>
+	cols      ?: Partial<ThemeCols>
 	icons     ?: {
 		size   ?: number
-		numbers?: Partial<Theme['icons']['numbers']>
+		numbers?: Partial<ThemeIcons['numbers']>
 	}
 	typography?: {
-		size  ?: Partial<Theme['typography']['size']>
-		family?: Partial<Theme['typography']['family']>
+		size  ?: Partial<ThemeTypography['size']>
+		family?: Partial<ThemeTypography['family']>
 	}
 }
 
@@ -90,66 +33,18 @@ export type ThemeCustomize = Partial<Omit<Theme, 'border' | 'colors' | 'cols' | 
 /**
  * Complete default Scaling UI theme values.
  *
+ * Section defaults live in `styles/components/*` (e.g. `animation.ts`, `colors.ts`).
  * Consumers can override these by passing theme overrides into `SetupScalingUI`.
  */
 export const defaultTheme: Theme = {
-	animation: {
-		showDuration: 0.35,
-		hideDuration: 0.35,
-	},
-	baseHeight  : 1080,
-	baseWidth   : 1920,
-	border      : {
-		radiusDefault: 16,
-		radiusSmall  : 8,
-		radiusLarge  : 32,
-		width        : 2,
-	},
-	colors      : {
-		body     : Color4.fromHexString('#212529'),
-		dark     : Color4.fromHexString('#212529'),
-		light    : Color4.fromHexString('#f8f9fa'),
-		secondary: Color4.fromHexString('#595c5f'),
-		tertiary : Color4.fromHexString('#909294'),
-
-		danger   : Color4.fromHexString('#dc3545'),
-		info     : Color4.fromHexString('#0dcaf0'),
-		primary  : Color4.fromHexString('#0d6efd'),
-		success  : Color4.fromHexString('#198754'),
-		warning  : Color4.fromHexString('#ffc107'),
-	},
-
-	cols: cols,
-
-	icons: {
-		size   : 32,
-		numbers: {
-			horizontalInset: 0.15,
-		},
-	},
-
-	typography: {
-		size: {
-			code: 15,
-			default: 16,
-			h1: 24,
-			h2: 20,
-			h3: 18,
-			h4: 16,
-			h5: 14,
-			h6: 12,
-		},
-		family: {
-			code   : 'monospace',
-			default: 'sans-serif',
-			h1     : 'serif',
-			h2     : 'serif',
-			h3     : 'serif',
-			h4     : 'serif',
-			h5     : 'serif',
-			h6     : 'serif',
-		},
-	}
+	...base,
+	animation,
+	border,
+	buttons,
+	colors,
+	cols,
+	icons,
+	typography,
 }
 
 
@@ -165,9 +60,17 @@ export function buildTheme(
 	const merged: Theme = {
 		...baseTheme,
 		...overrides,
+		animation   : {
+			...baseTheme.animation,
+			...overrides.animation,
+		},
 		border      : {
 			...baseTheme.border,
 			...overrides.border,
+		},
+		buttons     : {
+			...baseTheme.buttons,
+			...overrides.buttons,
 		},
 		colors      : {
 			...baseTheme.colors,

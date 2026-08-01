@@ -13,9 +13,10 @@ export function getCanvasInfo(): PBUiCanvasInformation | null {
 
 // MARK: readCanvasDimensions
 /** Virtual canvas size configured by SetupScalingUI. */
-export function readCanvasDimensions(): { height: number; width: number } {
+export function readVirtualCanvasDimensions(): { height: number; width: number } {
 	return { height: vHeight, width: vWidth }
 }
+
 
 
 // MARK: getUiScaleFactor
@@ -40,10 +41,16 @@ export function getUiScaleFactor(): number {
 /** Live engine canvas size; falls back to virtual size before canvas info exists. */
 export function readPhysicalCanvasDimensions(): { height: number; width: number } {
 	const canvas = getCanvasInfo()
-	if (!canvas) return readCanvasDimensions()
+	if (!canvas) return readVirtualCanvasDimensions()
 
 	return { height: canvas.height, width: canvas.width }
 }
+	export function readPhysicalCanvasWidth(): number {
+		return readPhysicalCanvasDimensions().width
+	}
+	export function readPhysicalCanvasHeight(): number {
+		return readPhysicalCanvasDimensions().height
+	}
 
 
 // MARK: vhToPixels

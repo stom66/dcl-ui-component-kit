@@ -13,6 +13,8 @@ node_modules
 Dockerfile
 dist
 README.md
+*.af
+*.af~lock~
 *.blend
 *.fbx
 *.zip

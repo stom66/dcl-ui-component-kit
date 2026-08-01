@@ -15,13 +15,13 @@ When a parent element has multiple children (siblings), each sibling must have a
 ```tsx
 // ✅ unique among siblings
 <Row>
-	<Header key="title" title="Hi" />
+	<Header key="title" value="Hi" />
 	<UiBox key="body" uiText={{ value: '…' }} />
 </Row>
 
 // ❌ duplicate sibling keys
 <Row>
-	<Header key="x" title="Hi" />
+	<Header key="x" value="Hi" />
 	<UiBox key="x" uiText={{ value: '…' }} />
 </Row>
 ```

@@ -6,13 +6,14 @@ import { getTheme } from '../../styles'
 import { getColSizing } from '../../utils'
 
 
-type LabelProps = UiBoxProps & {
+type LabelProps = Omit<UiBoxProps, 'uiText'> & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	value?      : string
 	color?      : Color4
 	cols?       : number
 	colsDesktop?: number
 	colsMobile? : number
+	uiText?     : Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
 
@@ -75,7 +76,6 @@ export function Label({
 				textAlign: 'middle-center',
 				...uiText,
 				value: resolvedValue,
-
 			}}
 		>
 			{children}

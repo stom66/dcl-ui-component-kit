@@ -2,54 +2,29 @@ import { isMobile } from '@dcl/sdk/platform'
 import ReactEcs, { ReactEcsRenderer, ScreenInsetArea, UiEntity } from '@dcl/sdk/react-ecs'
 
 import type { Layer } from './components/layers'
-import {
-	safeZonesDesktopLayer,
-	safeZonesMobileLayer,
-} from './debug'
+import { safeZonesDesktopLayer, safeZonesMobileLayer } from './debug'
 import { setTheme } from './styles/theme'
 import type { Theme, ThemeCustomize } from './styles/theme'
 
 // MARK: Exports
-export { Layer } from './components/layers'
-export type { LayerOptions } from './components/layers'
+export { Layer }                  from './components/layers'
+export type { LayerOptions }      from './components/layers'
 
-export {
-	VisibilityController,
-	Zone,
-	ZoneBarBottom,
-	ZoneBarLeft,
-	ZoneBarRight,
-	ZoneBarTop,
-	ZoneBottomRight,
-	ZoneDefault,
-	ZoneFullScreen,
-	ZoneRoot,
-	ZoneType,
-} from './components/zones'
-export type { ZoneProps } from './components/zones'
+export { VisibilityController, Zone, ZoneBottom, ZoneBottomLeft, ZoneBottomRight, ZoneDefault, ZoneFullScreen, ZoneLeft, ZoneRight, ZoneRoot, ZoneTop, ZoneTopLeft, ZoneTopRight, ZoneType } from './components/zones'
+export type { ZoneProps }         from './components/zones'
 
-export {
-	ButtonImage,
-	ButtonImageClose,
-	ButtonText,
-	Column,
-	ColumnReverse,
-	Divider,
-	Header,
-	Icon,
-	IconNumber,
-	Label,
-	Row,
-	RowReverse,
-	SectionHeader,
-	UiBox,
-} from './components'
+export { Background, BackgroundGradient, ButtonImage, ButtonImageClose, ButtonText, Column, ColumnReverse, Divider, Header, Icon, IconNumber, Label, ProgressBar, ProgressBarImage, Row, RowReverse, SectionHeader, UiBox } from './components'
 
 export { darken, lighten, alpha } from './utils/colors'
-export { PropsController } from './classes/propsController'
+export { resolveAspectDimensions, sizeValueToPixels } from './utils/aspect'
+export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDimensions } from './utils/aspect'
+export { PropsController }        from './classes/propsController'
 export { buildTheme, defaultTheme, getTheme, setTheme, theme } from './styles/theme'
 
+export { TextureAtlas, atlasBtnIcons, atlasBtnIconsStyled, atlasCharsAlphaNumeric, atlasCharsNumbers, atlasCharsSymbols, atlasIcons, atlasSpinners, findAtlasCell } from './atlases'
+export type { AtlasCell, AtlasLayout, TextureAtlasCellOptions, TextureAtlasNamedCell, TextureAtlasOptions } from './atlases'
 
+export type { FillFrom, GradientDirection, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, TextureSlices } from './components'
 export type { Theme, ThemeCustomize }
 export type SetupScalingUIOptions = {
 	theme? : ThemeCustomize

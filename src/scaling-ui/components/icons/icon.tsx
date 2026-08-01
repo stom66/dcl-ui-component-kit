@@ -29,7 +29,7 @@ export const Icon = ({
 	uiTransform,
 	...props
 }: IconProps) => {
-	const size = getTheme().icons.size
+	const size = getTheme().icons.minSize
 
 	return (
 		<UiBox
@@ -39,6 +39,7 @@ export const Icon = ({
 				height    : height,
 				flexGrow  : 0,
 				flexShrink: 0,
+				overflow  : "visible",
 				...(width  === "auto" ? { minWidth : size } : {}),
 				...(height === "auto" ? { minHeight: size } : {}),
 				...uiTransform

@@ -7,4 +7,5 @@ alwaysApply: true
 
 - Decentraland SDK7 reference lives under `/dclcontext` and via `cursor.config`.
 - **Scaling UI:** before creating or editing any `Layer` / zone UI, read and follow `.cursor/skills/scaling-ui/SKILL.md`.
-- Hard rules: one Layer = one Zone; implement `body()` only; forward size/align/chrome through `uiTransform` and `uiBackground` only — never Layer shorthands (`backgroundColor`, `borderRadius`, …) or re-mount `ScreenInsetArea`/`ZoneRoot`/`Zone` in `render()`.
+- Hard rules: one Layer = one Zone; implement `body()` only; forward size/align through `uiTransform` and `uiBackground` only — never Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`, …); panel chrome via `<Background>` in `body()`; do not re-mount `ScreenInsetArea`/`ZoneRoot`/`Zone` in `render()`.
+- **Imports:** always relative (`./`, `../`) under `src/` — never absolute `src/...` paths. Inside `scaling-ui/`, stay package-internal (do not `../../scaling-ui/...`). See `.cursor/rules/relative-imports.mdc`.

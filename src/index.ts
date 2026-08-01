@@ -1,6 +1,6 @@
-import { demoLayers } from 'src/examples/layers'
-import { themeOverrides } from 'src/myTheme'
-import { SetupScalingUI } from 'src/scaling-ui'
+import { themeOverrides } from './myTheme'
+import { SetupScalingUI } from './scaling-ui'
+import { demoLayers } from './scaling-ui/examples/layers'
 
 
 export function main() {

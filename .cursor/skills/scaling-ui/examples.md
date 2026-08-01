@@ -4,28 +4,24 @@
 
 - One layer → one zone (`zone: ZoneType.*`)
 - Implement `body()` only
-- Size / align / chrome via forwarded native props (`uiTransform`, `uiBackground`)
+- Size / align via forwarded native props (`uiTransform`, `uiBackground`)
+- Panel chrome via `<Background>` inside `body()`
 
 Real references: `simple.layer.tsx`, `timer.layer.tsx`, `info.layer.tsx`
 
-## Top-bar timer (preset + uiTransform / uiBackground)
+## Top-bar timer (preset + uiTransform + Background)
 
 ```tsx
 import { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 export class TimerLayer extends Layer {
 	constructor() {
-		const theme = getTheme()
-
 		super({
-			id          : 'timer',
-			zone        : ZoneType.BarTop,
-			showFrame   : true,
-			uiBackground: { color: theme.colors.primary },
-			uiTransform : {
-				width       : '30vw',
-				height      : '10vw',
-				borderRadius: 8,
+			id  : 'timer',
+			zone: ZoneType.Top,
+			uiTransform: {
+				width : '30vw',
+				height: '10vw',
 			},
 		})
 
@@ -38,13 +34,15 @@ export class TimerLayer extends Layer {
 		const theme   = getTheme()
 		const seconds = this.props!.get('secondsRemaining') as number
 		return (
-			<UiBox
-				key="timer-value"
-				uiText={{
-					value   : String(seconds),
-					fontSize: scaleFontSize(theme.typography.size.h1),
-				}}
-			/>
+			<Background backgroundColor={theme.colors.primary} borderRadius={8}>
+				<UiBox
+					key="timer-value"
+					uiText={{
+						value   : String(seconds),
+						fontSize: scaleFontSize(theme.typography.size.h1),
+					}}
+				/>
+			</Background>
 		)
 	}
 }
@@ -55,7 +53,7 @@ export class TimerLayer extends Layer {
 ```tsx
 super({
 	id  : 'hud',
-	zone: ZoneType.BarLeft,
+	zone: ZoneType.Left,
 	uiTransform: {
 		alignItems    : 'flex-start',
 		justifyContent: 'flex-end',
@@ -72,37 +70,92 @@ super({
 	canBeHidden    : true,
 	startHidden    : true,
 	showCloseButton: true,
-	showFrame      : true,
 })
+
+// in body():
+<Background>
+	{/* panel content */}
+</Background>
 ```
 
-Zones are bare by default. Opt in with `showFrame: true` for fill, border, and padding.
+Zones are bare by default. Wrap content in `<Background>` for fill and border.
 
 ## Buttons (ask image vs text first)
+
+> **Variants:** procedural (`ButtonText`) · image-based (`ButtonImage`)
 
 Ask whether the control is an image button or a simple text button, then use `ButtonImage` or `ButtonText`. Never hand-roll `UiBox` + mouse handlers.
 
 ```tsx
-// Text — no dedicated image asset
+// Text — procedural, no dedicated image asset
 <ButtonText
 	id        = "btn_simple_toggle"
 	textLabel = "Simple"
 	callback  = {() => simpleLayer.toggle()}
 />
 
-// Image — atlas / texture
+// Image — atlas / texture (column = variant, rows = states)
+import { atlasBtnIconsStyled } from '../../atlases'
+
 <ButtonImage
 	id         = "btn_help"
-	textureSrc = "assets/images/scaling-ui/atlas-btn-help.png"
+	textureSrc = {atlasBtnIconsStyled.source}
+	uvColumn   = {1}
 	callback   = {() => helpLayer.toggle()}
 />
+```
+
+`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `assets/images/scaling-ui-assets.af` → export under `assets/images/my-theme/`, declare in `src/myTheme.ts`):
+
+```tsx
+import { myBtnIconsAtlas } from '../../../myTheme'
+
+<ButtonImage
+	id            = "btn_custom"
+	textureSrc    = {myBtnIconsAtlas.source}
+	uvColumn      = {1}
+	uvColumnCount = {myBtnIconsAtlas.columns}
+	uvRowCount    = {myBtnIconsAtlas.rows}
+	callback      = {() => { /* … */ }}
+/>
+```
+
+## Progress bars
+
+> **Variants:** procedural (`ProgressBar`) · image-based (`ProgressBarImage`)
+
+```tsx
+// Procedural — colours only
+<ProgressBar id="hp" value={72} height={24} />
+
+// Image — three textures (background / fill / border)
+<ProgressBarImage id="xp" value={55} height={28} />
+
+// Custom textures from myTheme
+import { myProgressBarTexturesHorizontal } from '../../../myTheme'
+
+<ProgressBarImage
+	id       = "xp_custom"
+	value    = {70}
+	textures = {myProgressBarTexturesHorizontal}
+	height   = {28}
+/>
+```
+
+## Icons (image-based)
+
+```tsx
+import { myIconsAtlas, myNumbersAtlas } from '../../../myTheme'
+
+<Icon iconSrc={myIconsAtlas.source} uvs={myIconsAtlas.uv.coin} />
+<IconNumber value={42} atlas={myNumbersAtlas} />
 ```
 
 ## Anti-patterns
 
 ```tsx
 // BAD — UiBox shorthands / parallel APIs on Layer
-super({ backgroundColor: …, borderRadius: 8, themeBackground: 'primary' })
+super({ backgroundColor: …, borderRadius: 8, themeBackground: 'primary', showFrame: true })
 
 // BAD — fake button (no hover / press; bypasses ButtonImage / ButtonText)
 <UiBox uiText={{ value: 'Simple' }} onMouseDown={() => simpleLayer.toggle()} />
@@ -116,11 +169,17 @@ render() {
 	)
 }
 
-// GOOD — native uiBackground / uiTransform
+// GOOD — zone size via uiTransform; chrome via Background
 super({
-	zone        : ZoneType.BarTop,
-	showFrame   : true,
-	uiBackground: { color: getTheme().colors.primary },
-	uiTransform : { width: '30vw', height: '10vw', borderRadius: 8 },
+	zone       : ZoneType.Top,
+	uiTransform: { width: '30vw', height: '10vw' },
 })
+
+protected body() {
+	return (
+		<Background backgroundColor={getTheme().colors.primary} borderRadius={8}>
+			{/* … */}
+		</Background>
+	)
+}
 ```

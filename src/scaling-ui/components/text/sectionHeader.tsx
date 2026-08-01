@@ -1,4 +1,3 @@
-import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from '../base'
@@ -7,14 +6,14 @@ import { getTheme } from '../../styles'
 
 type SectionHeaderProps = UiBoxProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	title    : string
+	value   ?: string
 }
 
 
 // MARK: SectionHeader
 export const SectionHeader = ({
 	children,
-	title,
+	value,
 	uiText,
 	uiTransform,
 	...props
@@ -31,11 +30,11 @@ export const SectionHeader = ({
 				...uiTransform
 			}}
 			uiText={{
-				value    : title,
 				fontSize : scaleFontSize(theme.typography.size.h2),
-				color    : Color4.create(1, 0.8, 0.3, 1),
+				color    : theme.colors.light,
 				textAlign: 'middle-left',
-				...uiText
+				...uiText,
+				value: value ?? uiText?.value ?? '',
 			}}
 		>
 			{children}

@@ -2,18 +2,20 @@ import { Color4 } from '@dcl/sdk/math'
 import { isMobile } from '@dcl/sdk/platform'
 import ReactEcs, { UiTransformProps } from '@dcl/sdk/react-ecs'
 
+import { atlasBtnIconsStyled } from '../../atlases'
 import { PropsController } from '../../classes/propsController'
 import { tweenValue } from '../../utils/tweens'
-import { getUVRow } from '../../utils/uvs'
+import { getUVCell } from '../../utils/uvs'
 
 import { UiBox, type UiBoxProps } from '../base'
 
 
+/** 1-based UV rows for button states (bottom → top in the atlas). */
 enum ButtonIndex {
-	DEFAULT  = 3,
-	HOVER    = 2,
-	PRESS    = 1,
-	DISABLED = 0,
+	DEFAULT  = 4,
+	HOVER    = 3,
+	PRESS    = 2,
+	DISABLED = 1,
 }
 
 const DEFAULT_SCALE = 0.9
@@ -30,13 +32,29 @@ type ButtonImagePropsState = {
 const buttonProps = new Map<string, PropsController<ButtonImagePropsState>>()
 
 type ButtonImageProps = Omit<UiBoxProps, 'uiTransform'> & {
-	id          : string
-	width      ?: number
-	height     ?: number
-	textureSrc ?: string
-	uiTransform?: UiTransformProps
-	callback   ?: () => void
-	children?  : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	id            : string
+	/**
+	 * 1-based atlas column for this button (first column is `1`).
+	 * States are rows within that column.
+	 */
+	uvColumn      : number
+	/**
+	 * Total columns in the atlas. Defaults to `atlasBtnIconsStyled.columns`.
+	 * Pass with `uvRowCount` (and `textureSrc`) when using a custom sheet.
+	 */
+	uvColumnCount?: number
+	/**
+	 * Total rows in the atlas. Defaults to `atlasBtnIconsStyled.rows`.
+	 * Required for correct UVs when a custom sheet has a different row count.
+	 */
+	uvRowCount?  : number
+	width        ?: number
+	height       ?: number
+	/** Atlas texture path. Defaults to `atlasBtnIconsStyled.source`. */
+	textureSrc   ?: string
+	uiTransform  ?: UiTransformProps
+	callback     ?: () => void
+	children?    : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
 
 
@@ -55,13 +73,17 @@ function getButtonProps(id: string): PropsController<ButtonImagePropsState> {
 // MARK: ButtonImage
 /**
  * Renders an image button with per-instance hover and press state.
+ * Atlas layout: columns = button variants, rows = states (disabled → default, UV bottom→top).
  */
 export const ButtonImage = ({
 	id,
 	children,
-	width      = 64,
-	height     = 64,
-	textureSrc = 'assets/images/ui/atlas-btn-close.png',
+	uvColumn,
+	uvColumnCount = atlasBtnIconsStyled.columns,
+	uvRowCount    = atlasBtnIconsStyled.rows,
+	width         = 64,
+	height        = 64,
+	textureSrc    = atlasBtnIconsStyled.source,
 	uiTransform,
 	callback,
 	onMouseDown,
@@ -73,6 +95,21 @@ export const ButtonImage = ({
 }: ButtonImageProps) => {
 	const button = getButtonProps(id)
 	const scale  = button.get('scale')
+	const row    = currentIndex.get(id) ?? ButtonIndex.DEFAULT
+
+	const useDefaultAtlas =
+		textureSrc    === atlasBtnIconsStyled.source &&
+		uvColumnCount === atlasBtnIconsStyled.columns &&
+		uvRowCount    === atlasBtnIconsStyled.rows
+
+	const uvs = useDefaultAtlas
+		? atlasBtnIconsStyled.cell({ xStart: uvColumn, yStart: row })
+		: getUVCell({
+			xStart: uvColumn,
+			yStart: row,
+			xTotal: uvColumnCount,
+			yTotal: uvRowCount,
+		})
 
 	return (
 		<UiBox
@@ -84,6 +121,7 @@ export const ButtonImage = ({
 				position      : { top: 20, left: -24 },
 				alignItems    : 'center',
 				justifyContent: 'center',
+				zIndex        : 1000,
 				...uiTransform
 			}}
 		>
@@ -97,7 +135,7 @@ export const ButtonImage = ({
 				uiBackground={{
 					texture    : { src: textureSrc },
 					textureMode: 'stretch',
-					uvs        : getUVRow(currentIndex.get(id) ?? 3, 4),
+					uvs,
 					color      : Color4.White(),
 					...uiBackground,
 				}}

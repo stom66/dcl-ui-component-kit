@@ -3,7 +3,7 @@ name: scaling-ui
 description: >-
   Build and extend Decentraland Scaling UI layers, zones, and components.
   Use when creating UI, popups, HUDs, layers, zones, timers, themes, buttons
-  (ButtonImage / ButtonText), or anything under src/scaling-ui or src/examples.
+  (ButtonImage / ButtonText), or anything under src/scaling-ui (including examples).
   MUST be read before adding or changing a Layer or button.
 ---
 
@@ -11,7 +11,7 @@ description: >-
 
 Lightweight reusable UI for Decentraland SDK7. Prefer framework primitives over raw `UiEntity` layout.
 
-**Before creating or editing a Layer:** read this skill and mirror `src/examples/layers/*.layer.tsx`. Do not invent a parallel mount path or new Layer option fields for props Zone already accepts.
+**Before creating or editing a Layer:** read this skill and mirror `src/scaling-ui/examples/layers/*.layer.tsx`. Do not invent a parallel mount path or new Layer option fields for props Zone already accepts.
 
 ## Core model
 
@@ -19,18 +19,20 @@ Lightweight reusable UI for Decentraland SDK7. Prefer framework primitives over 
 2. **One Layer = one Zone.** The layer fills that zone. Implement **`body()` only**.
 3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **`Zone`** only (the inset canvas is owned by SetupScalingUI — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`).
 4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset.
-5. Compose content with **`Row` / `Column` / `UiBox` / …** inside `body()`.
+5. Compose content with **`Row` / `Column` / `Background` / `UiBox` / …** inside `body()`.
 
-Import the package entry from whatever path the host project uses.
-**Inside `scaling-ui/` itself, use relative imports only.**
+**All imports under `src/` must be relative** (`./`, `../`) — never absolute `src/...`.
+Stay inside the package with sibling/parent paths (`../components`, `../../styles`) — do not climb out to `src/` and back in via a folder name (`../../scaling-ui/...`). That hardcodes the package directory name and breaks when it is renamed. Keep multi-named imports on one line.
 
 ## Prop forwarding (critical)
 
-Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them to the Zone. Do not add UiBox shorthand props (`backgroundColor`, `borderRadius`, …) on `LayerOptions` — put those on the native objects:
+Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them to the Zone. Do not add UiBox shorthand props (`backgroundColor`, `borderRadius`, …) on `LayerOptions` — put those on the native objects, or wrap body content in **`Background`**:
 
-- Fill → `uiBackground: { color }`
-- Radius / border → `uiTransform: { borderRadius, borderColor, borderWidth, … }`
-- Size / flex → `uiTransform: { width, height, alignItems, justifyContent, … }`
+- Zone size / flex → `uiTransform: { width, height, alignItems, justifyContent, … }`
+- Panel fill / border → `<Background>` inside `body()` (not Layer options)
+- Background fill shorthand → `backgroundColor`
+- Background border → `borderColor` / `borderWidth` / `borderRadius`
+- Background texture → `textureSrc`
 
 Zone merges transforms as:
 
@@ -38,30 +40,31 @@ Zone merges transforms as:
 
 ```tsx
 super({
-	id          : 'timer',
-	zone        : ZoneType.BarTop,
-	showFrame   : true,
-	uiBackground: { color: getTheme().colors.primary },
-	uiTransform : {
+	id         : 'timer',
+	zone       : ZoneType.Top,
+	uiTransform: {
 		width         : '30vw',
 		height        : '10vw',
-		borderRadius  : 8,
 		alignItems    : 'center',
 		justifyContent: 'center',
 	},
 })
+
+// in body():
+<Background backgroundColor={getTheme().colors.primary} borderRadius={8}>
+	{/* … */}
+</Background>
 ```
 
 | Need | How |
 |---|---|
-| Top bar / corner / etc. | `zone: ZoneType.BarTop` |
+| Top / corner / etc. | `zone: ZoneType.*` |
 | Narrower / shorter than preset | `uiTransform: { width, height }` |
 | Flex alignment | `uiTransform: { alignItems, justifyContent, … }` |
-| Fill / radius on the layer-zone | `uiBackground` / `uiTransform.borderRadius` |
+| Fill / border on content | `<Background>` in `body()` |
 | Close control | `showCloseButton: true` (Layer option → Zone inserts button) |
-| Zone fill + border + padding | `showFrame: true` |
 
-**Anti-pattern:** adding Layer shorthand fields (`backgroundColor`, `borderRadius`, `themeBackground`, `widthVw`, …). Use `uiTransform` / `uiBackground` only.
+**Anti-pattern:** adding Layer shorthand fields (`backgroundColor`, `borderRadius`, `themeBackground`, `widthVw`, `showFrame`, …). Use `uiTransform` / `uiBackground` on the Zone, and `Background` for panel chrome.
 
 ### VH / VW helpers
 
@@ -105,14 +108,17 @@ If a caller overrides `uiText.fontSize`, that override must also use `scaleFontS
 export class MyLayer extends Layer {
 	constructor() {
 		super({
-			id       : 'my-layer',
-			zone     : ZoneType.Default,
-			showFrame: true,
+			id  : 'my-layer',
+			zone: ZoneType.Default,
 		})
 	}
 
 	protected body() {
-		return <UiBox key="my-body" uiText={{ value: 'Hello' }} />
+		return (
+			<Background>
+				<UiBox key="my-body" uiText={{ value: 'Hello' }} />
+			</Background>
+		)
 	}
 }
 
@@ -125,12 +131,46 @@ export const myLayer = new MyLayer()
 |---|---|
 | Override `render()` to wrap `ScreenInsetArea` / `ZoneRoot` / `Zone` | Base `Layer.render()`; only implement `body()` |
 | Hand-build edge layout | `zone: ZoneType.*` |
-| Layer shorthands (`backgroundColor`, `borderRadius`) | `uiBackground` / `uiTransform` |
+| Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / `<Background>` |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | Bare `fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` |
 
+## Procedural vs image-based
+
+Several families ship in two flavours. Document and choose explicitly:
+
+| Kind | Meaning |
+|---|---|
+| **Procedural** | Colours / theme only — no texture files |
+| **Image-based** | PNG / atlas — always overridable (`textureSrc`, `textures`, `atlas`, `iconSrc`, …) |
+
+Project art goes under **`assets/images/my-theme/`**. Define custom `TextureAtlas` / texture sets in `src/myTheme.ts` (see examples there). Do not invent parallel texture APIs.
+
+| Family | Procedural | Image-based | Override |
+|---|---|---|---|
+| Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
+| Progress bars | `ProgressBar` | `ProgressBarImage` | `textures` (`background` / `fill` / `border`) |
+| Icons | — | `Icon` / `IconNumber` | `iconSrc` + `uvs`, or `atlas` on `IconNumber` |
+
+## Custom textures / atlases (agent checklist)
+
+When a user wants **their own images, atlases, or styles**, walk them through this — do not invent a parallel path:
+
+1. **Open the Affinity template** at `assets/images/scaling-ui-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
+2. **Export PNGs** into `assets/images/my-theme/` (never into `assets/images/scaling-ui/` unless they intend to replace framework defaults).
+3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/myTheme.ts`, mirroring the examples already in that file (`myBtnIconsAtlas`, `myIconsAtlas`, `myNumbersAtlas`, progress-bar sets).
+4. **Sample UVs only via framework APIs** — never hand-write UV arrays:
+	- Prefer `TextureAtlas.cell` / `.row` / `.column` / `.char` / `.uv.<name>`
+	- Fall back to `getUVCell` / `getUVColumn` / `getUVRow` from `utils/uvs.tsx` for one-off / non-atlas cases
+5. **Coordinates are 1-based and inclusive.** First column/row is `1`, not `0`. Totals (`columns`, `rows`, `xTotal`, `yTotal`, `uvColumnCount`) are counts. Example: first cell of a 4×4 → `{ xStart: 1, yStart: 1, xTotal: 4, yTotal: 4 }`; `ButtonImage` `uvColumn={1}` for the first variant.
+6. Point them at root `README.md` → **Custom textures** and the Affinity callout at the top of the README.
+
+**Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `myTheme.ts` / `scaling-ui/atlases/`.
+
 ## Buttons
+
+> **Variants:** procedural (`ButtonText`) · image-based (`ButtonImage`)
 
 When creating any kind of button element, ask the user if this is meant to be an **image button** or just a **simple text button**, then use the appropriate component. Do not invent a clickable `UiBox`; do not guess.
 
@@ -151,16 +191,89 @@ Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `sr
 ```
 
 ```tsx
+import { atlasBtnIconsStyled } from '../../atlases'
+
 <ButtonImage
 	id         = "btn_help"
-	textureSrc = "assets/images/scaling-ui/atlas-btn-help.png"
+	textureSrc = {atlasBtnIconsStyled.source}
+	uvColumn   = {1}
 	callback   = {() => helpLayer.toggle()}
 />
 ```
 
+Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/myTheme.ts`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`.
+
+## Progress bars
+
+> **Variants:** procedural (`ProgressBar`) · image-based (`ProgressBarImage`)
+
+Shared value API: `id`, `value`, `minValue` / `maxValue`, `fillFrom`, lerp per `id`.
+
+- **`ProgressBar`** — colour track / fill / border (`fillColor`, …)
+- **`ProgressBarImage`** — three full textures (background / fill / border) with `nine-slices`. Override via `textures`. Horizontal vs vertical sets from `fillFrom` / `orientation`. Define custom sets in `src/myTheme.ts`.
 ## Hideable + close button
 
-`canBeHidden` / `startHidden` / `showCloseButton` / `showFrame` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — pass `showFrame: true` for theme body fill, border, and 8px padding (e.g. panels and popups). Leave it off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
+`canBeHidden` / `startHidden` / `showCloseButton` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — wrap panel content in `<Background>` for theme body fill and border. Leave Background off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
+
+## Component prop forwarding
+
+Custom components built on `UiBox` must accept and forward native overrides so callers can escape-hatch anything the shorthand API does not cover:
+
+- Type as `UiBoxProps` (or `Omit<SpinnerProps, …>` / similar) — not a hand-rolled subset
+- Destructure known shorthands, then `...props`
+- Merge `uiTransform` / `uiBackground` / `uiText` as `defaults → …overrides` (overrides last)
+
+```tsx
+export type MyThingProps = Omit<UiBoxProps, 'uiText'> & { value?: string }
+
+export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: MyThingProps) {
+	return (
+		<UiBox
+			{...props}
+			uiTransform={{ width: 'auto', ...uiTransform }}
+			uiBackground={{ color: theme.colors.body, ...uiBackground }}
+			uiText={{ value: value ?? '', ...uiText }}
+		/>
+	)
+}
+```
+
+## Background
+
+```tsx
+<Background
+	backgroundColor = {theme.colors.primary}
+	borderRadius    = {8}
+	textureSrc      = "assets/images/panel.png"
+>
+	{children}
+</Background>
+```
+
+Defaults: fills parent via absolute insets, theme body fill, theme border width/radius, no padding.
+
+## Texture atlases & UV helpers
+
+Bundled sheets live as `TextureAtlas` instances under `src/scaling-ui/atlases/` (`atlasIcons`, `atlasBtnIconsStyled`, `atlasSpinners`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `assets/images/scaling-ui-assets.af`, export to `assets/images/my-theme/`, declare atlases in `src/myTheme.ts`.
+
+**Always use** `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based inclusive**; totals are counts.
+
+```tsx
+import { atlasIcons, atlasCharsNumbers } from '../../atlases'
+
+atlasIcons.source
+atlasIcons.cell({ xStart: 1, yStart: 1 })           // first cell
+atlasIcons.cell({ xStart: 1, xEnd: 2, yStart: 4 })  // columns 1–2, top row of a 4×4
+atlasIcons.row(1)                                   // full bottom row
+atlasIcons.column(1)                                // full first column
+atlasCharsNumbers.char('5', { insetX: 0.15 })
+```
+
+`ProgressBarImage` uses separate full textures (background / fill / border) with `nine-slices` — not an atlas — and picks horizontal vs vertical sets from `fillFrom` / `orientation`.
+
+Low-level UV helpers stay in `utils/uvs.tsx` for one-off / non-atlas cases (same 1-based rules).
+
+Full guides: root `README.md` → Custom textures / Buttons / Progress bars / Icons. When onboarding a user onto custom art, also follow **Custom textures / atlases (agent checklist)** above.
 
 ## Data / keys / style
 
@@ -170,4 +283,4 @@ Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `sr
 
 ## More examples
 
-See [examples.md](examples.md) and `src/examples/layers/`.
+See [examples.md](examples.md) and `src/scaling-ui/examples/layers/`.

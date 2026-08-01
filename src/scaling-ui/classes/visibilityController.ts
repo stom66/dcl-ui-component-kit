@@ -1,4 +1,4 @@
-import { tweenValue, EasingFunction } from '../utils/tweens'
+import { tweenValue, easingFunctions, type EasingFn } from '../utils/tweens'
 
 import { getTheme } from '../styles'
 
@@ -12,12 +12,10 @@ export class VisibilityController {
 	constructor(
 		public readonly visiblePosition    : number,
 		private readonly getHiddenPosition : () => number,
-		public readonly easingFunctionShow?: EasingFunction,
-		public readonly easingFunctionHide?: EasingFunction
+		public readonly easingFunctionShow : EasingFn = easingFunctions.easeOutBack,
+		public readonly easingFunctionHide : EasingFn = easingFunctions.easeInBack
 	) {
-		this.position           = getHiddenPosition()
-		this.easingFunctionShow = easingFunctionShow || EasingFunction.EF_EASEOUTBACK
-		this.easingFunctionHide = easingFunctionHide || EasingFunction.EF_EASEINBACK
+		this.position = getHiddenPosition()
 	}
 
 

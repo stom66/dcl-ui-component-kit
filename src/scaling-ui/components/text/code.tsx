@@ -1,46 +1,47 @@
-import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
 
 
-type SectionHeaderProps = Omit<UiBoxProps, 'uiText'> & {
+type CodeProps = Omit<UiBoxProps, 'uiText'> & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	title    : string
+	value   ?: string
 	uiText  ?: Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
 
-// MARK: H1
+// MARK: Code
+/**
+ * Monospace / code text block. Pass copy via `value` (or `uiText.value`).
+ */
 export const Code = ({
 	children,
-	title,
+	value,
 	uiText,
 	uiTransform,
 	...props
-}: SectionHeaderProps) => {
+}: CodeProps) => {
 	const theme = getTheme()
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
-				width  : '100%',
-				height : 'auto',
+				width : '100%',
+				height: 'auto',
 				...uiTransform
 			}}
 			uiText={{
-				value    : title,
 				fontSize : scaleFontSize(theme.typography.size.code),
 				font     : theme.typography.family.code,
-				color    : theme.colors.dark,
+				color    : theme.colors.light,
 				textAlign: 'middle-left',
-				...uiText
+				...uiText,
+				value: value ?? uiText?.value ?? '',
 			}}
 		>
 			{children}
-			This is osme text.
 		</UiBox>
 	)
 }

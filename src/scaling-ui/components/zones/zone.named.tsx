@@ -12,31 +12,31 @@ export function ZoneFullScreen(props: NamedZoneProps) {
 }
 
 
-// MARK: ZoneBarTop
-/** Top bar zone preset. */
-export function ZoneBarTop(props: NamedZoneProps) {
-	return Zone({ ...props, type: ZoneType.BarTop })
+// MARK: ZoneTop
+/** Top edge zone preset. */
+export function ZoneTop(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.Top })
 }
 
 
-// MARK: ZoneBarBottom
-/** Bottom bar zone preset. */
-export function ZoneBarBottom(props: NamedZoneProps) {
-	return Zone({ ...props, type: ZoneType.BarBottom })
+// MARK: ZoneTopLeft
+/** Top-left corner zone preset. */
+export function ZoneTopLeft(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.TopLeft })
 }
 
 
-// MARK: ZoneBarLeft
-/** Left bar zone preset. */
-export function ZoneBarLeft(props: NamedZoneProps) {
-	return Zone({ ...props, type: ZoneType.BarLeft })
+// MARK: ZoneTopRight
+/** Top-right corner zone preset. */
+export function ZoneTopRight(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.TopRight })
 }
 
 
-// MARK: ZoneBarRight
-/** Right bar zone preset. */
-export function ZoneBarRight(props: NamedZoneProps) {
-	return Zone({ ...props, type: ZoneType.BarRight })
+// MARK: ZoneBottom
+/** Bottom edge zone preset. */
+export function ZoneBottom(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.Bottom })
 }
 
 
@@ -44,6 +44,27 @@ export function ZoneBarRight(props: NamedZoneProps) {
 /** Bottom-right corner zone preset. */
 export function ZoneBottomRight(props: NamedZoneProps) {
 	return Zone({ ...props, type: ZoneType.BottomRight })
+}
+
+
+// MARK: ZoneBottomLeft
+/** Bottom-left corner zone preset. */
+export function ZoneBottomLeft(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.BottomLeft })
+}
+
+
+// MARK: ZoneLeft
+/** Left edge zone preset. */
+export function ZoneLeft(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.Left })
+}
+
+
+// MARK: ZoneRight
+/** Right edge zone preset. */
+export function ZoneRight(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.Right })
 }
 
 

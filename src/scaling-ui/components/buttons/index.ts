@@ -1,3 +1,3 @@
-export { ButtonImage }      from './buttonImage'
+export { ButtonImage } from './buttonImage'
 export { ButtonImageClose } from './buttonImage.close'
-export { ButtonText }       from './buttonText'
+export { ButtonText } from './buttonText'

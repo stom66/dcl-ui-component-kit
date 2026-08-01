@@ -1,10 +1,10 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { UiBox } from 'src/scaling-ui/components'
-import { Layer } from 'src/scaling-ui/components/layers'
-import { ZoneType } from 'src/scaling-ui/components/zones/zone.presets'
-import { getTheme } from 'src/scaling-ui/styles'
-import { getCanvasInfo, getUiScaleFactor, readCanvasDimensions } from 'src/scaling-ui/utils/sizing'
+import { Background } from '../../components'
+import { Layer } from '../../components/layers'
+import { ZoneType } from '../../components/zones/zone.presets'
+import { getTheme } from '../../styles'
+import { getCanvasInfo, getUiScaleFactor, readVirtualCanvasDimensions, readPhysicalCanvasDimensions } from '../../utils/sizing'
 
 
 // MARK: formatCanvasDebugInfo
@@ -13,8 +13,10 @@ function formatCanvasDebugInfo(): string {
 	const canvas = getCanvasInfo()
 	if (!canvas) return `ERROR UiCanvasInformation missing on RootEntity`
 
-	const virtual     = readCanvasDimensions()
+	const virtual     = readVirtualCanvasDimensions()
+	const physical    = readPhysicalCanvasDimensions()
 	const uiScale     = getUiScaleFactor()
+
 	const dpr         = canvas.devicePixelRatio
 	const widthScale  = canvas.width  / virtual.width
 	const heightScale = canvas.height / virtual.height
@@ -25,10 +27,12 @@ function formatCanvasDebugInfo(): string {
 			: 'equal'
 
 	const lines = [
-		`canvas   ${canvas.width}x${canvas.height}`,
-		`virtual  ${virtual.width}x${virtual.height}`,
+		`canvas: virtual  ${virtual.width}x${virtual.height}`,
+		`canvas: physical ${physical.width}x${physical.height}`,
+		`canvasInfo       ${canvas.width}x${canvas.height}`,
+		`canvasInfo.dpr   ${dpr.toFixed(4)}`,
+
 		`uiScale  ${uiScale.toFixed(4)}`,
-		`dpr      ${dpr}`,
 		`fit by   ${fitBy}`,
 	]
 
@@ -51,9 +55,8 @@ function formatCanvasDebugInfo(): string {
 export class InfoLayer extends Layer {
 	constructor() {
 		super({
-			id       : 'info',
-			zone     : ZoneType.BottomRight,
-			showFrame: true,
+			id  : 'info',
+			zone: ZoneType.BottomRight,
 		})
 	}
 
@@ -65,16 +68,14 @@ export class InfoLayer extends Layer {
 		const readout = formatCanvasDebugInfo()
 
 		return (
-			<UiBox
-				backgroundColor={theme.colors.body}
+			<Background
 				uiTransform={{
 					padding: { top: 12, right: 12, bottom: 12, left: 12 },
 				}}
 				uiText={{
 					value    : readout,
-					//fontSize : theme.typography.size.code,
+					fontSize : scaleFontSize(theme.typography.size.code),
 					font     : theme.typography.family.code,
-					color    : canvas ? theme.colors.warning : theme.colors.danger,
 					textAlign: 'top-left',
 				}}
 			/>
