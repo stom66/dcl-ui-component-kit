@@ -3,7 +3,7 @@ export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDim
 
 export { alpha, darken, lighten, randomColor }                        from './colors'
 
-export { getColSizing }                                               from './colSizing'
+export { getColSizing, getColSpan }                                   from './colSizing'
 
 export { PropsController }                                            from '../classes/propsController'
 
@@ -20,8 +20,10 @@ export { easingFunctions, lerp, tweenValue }                          from './tw
 export type { EasingFn }                                              from './tweens'
 
 export type { GetUVCellOptions }                                      from './uvs'
+export { flipUVs }                                                    from './uvs'
 export { getRotatedUVs }                                              from './uvs'
 export { getUVCell }                                                  from './uvs'
 export { getUVColumn }                                                from './uvs'
 export { getUVRow }                                                   from './uvs'
+export { mirrorUVs }                                                  from './uvs'
 export { rotateUvIndexes }                                            from './uvs'

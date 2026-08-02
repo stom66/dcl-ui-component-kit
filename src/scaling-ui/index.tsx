@@ -13,18 +13,20 @@ export type { LayerOptions }      from './components/layers'
 export { VisibilityController, Zone, ZoneBottom, ZoneBottomLeft, ZoneBottomRight, ZoneDefault, ZoneFullScreen, ZoneLeft, ZoneRight, ZoneRoot, ZoneTop, ZoneTopLeft, ZoneTopRight, ZoneType } from './components/zones'
 export type { ZoneProps }         from './components/zones'
 
-export { Background, BackgroundGradient, ButtonImage, ButtonImageClose, ButtonText, Column, ColumnReverse, Divider, Header, Icon, IconNumber, Label, ProgressBar, ProgressBarImage, Row, RowReverse, SectionHeader, UiBox } from './components'
+export { AvatarIcon, Background, BackgroundGradient, Bounce, ButtonImage, ButtonImageClose, ButtonText, Code, Column, ColumnReverse, DEFAULT_AVATAR_USER_ID, Divider, FlashColor, H1, H2, H3, H4, H5, H6, Header, Icon, IconNumber, isPlaying, Label, playOnce, ProgressBar, ProgressBarImage, Pulse, Row, RowReverse, SectionHeader, setLooping, setPlaying, Shake, Spinner, SpinnerBeamsEven, SpinnerBeamsVaried, SpinnerCircle, SpinnerDots, SpinnerHourglass, SpinnerThreeQuarterCircle, Text, UiBox, Wiggle } from './components'
 
 export { darken, lighten, alpha } from './utils/colors'
 export { resolveAspectDimensions, sizeValueToPixels } from './utils/aspect'
 export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDimensions } from './utils/aspect'
+export { flipUVs, getUVCell, getUVColumn, getUVRow, getRotatedUVs, mirrorUVs, rotateUvIndexes } from './utils/uvs'
+export type { GetUVCellOptions } from './utils/uvs'
 export { PropsController }        from './classes/propsController'
 export { buildTheme, defaultTheme, getTheme, setTheme, theme } from './styles/theme'
 
-export { TextureAtlas, atlasBtnIcons, atlasBtnIconsStyled, atlasCharsAlphaNumeric, atlasCharsNumbers, atlasCharsSymbols, atlasIcons, atlasSpinners, findAtlasCell } from './atlases'
+export { TextureAtlas, atlasBtnIcons, atlasBtnIconsStyled, atlasCharsAlphaNumeric, atlasCharsNumbers, atlasCharsSymbols, atlasGradientColors, atlasIcons, atlasIcons2048, atlasSpinners, findAtlasCell } from './atlases'
 export type { AtlasCell, AtlasLayout, TextureAtlasCellOptions, TextureAtlasNamedCell, TextureAtlasOptions } from './atlases'
 
-export type { FillFrom, GradientDirection, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, TextureSlices } from './components'
+export type { AnimationPlaybackState, AvatarIconProps, BounceProps, BurstSample, FillFrom, FlashColorProps, GradientDirection, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, PulseProps, ShakeProps, SpinnerProps, TextureSlices, WiggleProps } from './components'
 export type { Theme, ThemeCustomize }
 export type SetupScalingUIOptions = {
 	theme? : ThemeCustomize

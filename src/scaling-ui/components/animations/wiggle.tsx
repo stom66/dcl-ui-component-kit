@@ -1,14 +1,20 @@
-import { engine } from '@dcl/sdk/ecs'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getRotatedUVs, getUVCell } from '../../utils'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
 
 //MARK: WiggleProps Type
 export type WiggleProps = UiBoxProps & {
+	/** Unique playback instance key. */
+	id              : string
 	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** When true, advances local time. Defaults to `true`. */
+	playing?        : boolean
+	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
+	looping?        : boolean
 	/** Seconds for one full wiggle sequence (all rotations + return). */
 	speed?          : number
 	burstCount?     : number
@@ -23,14 +29,6 @@ export type WiggleProps = UiBoxProps & {
 
 //MARK: Constants/Vars
 const theme = getTheme()
-let elapsedTime = 0
-
-
-// MARK: sys_wiggle
-function sys_wiggle(delta: number) {
-	elapsedTime += delta
-}
-engine.addSystem(sys_wiggle)
 
 
 // MARK: Wiggle
@@ -40,9 +38,13 @@ engine.addSystem(sys_wiggle)
  *
  * One sequence rotates `count` times (default 3: -max, +max, -max),
  * then returns to 0° before the burst pause.
+ * Control playback with `playing` / `looping`, or helpers like `playOnce(id)`.
  */
 export const Wiggle = ({
+	id,
 	children,
+	playing,
+	looping,
 	speed          = theme.animation.wiggleDurationDefault,
 	burstCount     = theme.animation.wiggleBurstCountDefault,
 	burstInterval  = theme.animation.wiggleBurstIntervalDefault,
@@ -59,12 +61,15 @@ export const Wiggle = ({
 	const h       = Number(child?.props?.height ?? theme.icons.defaultSize)
 	const baseUvs = child?.props?.uvs ?? getUVCell({ xStart: 1, yStart: 1, xTotal: 1, yTotal: 1 })
 
-	const totalDuration = burstCount * speed
-	const t             = elapsedTime % (totalDuration + burstInterval)
+	const state  = syncAnimationPlayback(id, { playing, looping })
+	const sample = applyBurstSample(
+		state,
+		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+	)
 
 	let angle = 0
-	if (t < totalDuration && speed > 0 && count > 0) {
-		const cycleT = (t % speed) / speed
+	if (sample.inBurst && count > 0) {
+		const cycleT = sample.cycleT
 
 		// center → -max → +max → -max … → center
 		const keyframes: number[] = [0]

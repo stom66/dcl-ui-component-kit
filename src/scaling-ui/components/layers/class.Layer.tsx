@@ -104,6 +104,7 @@ export abstract class Layer {
 				canBeHidden          = {this.canBeHidden}
 				startHidden          = {this.startHidden}
 				showCloseButton      = {this.showCloseButton}
+				closeButtonId        = {`btn_close_${this.id}`}
 				visibilityController = {this.visibility}
 				uiBackground         = {this.uiBackground}
 				uiTransform          = {{

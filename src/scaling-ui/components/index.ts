@@ -1,3 +1,8 @@
+// Animations
+export { Bounce, FlashColor, isPlaying, playOnce, Pulse, setLooping, setPlaying, Shake, Wiggle } from './animations'
+export type { AnimationPlaybackState, BounceProps, BurstSample, FlashColorProps, PulseProps, ShakeProps, WiggleProps } from './animations'
+
+
 // Base
 export { UiBox }                  from './base'
 export type { UiBoxProps }        from './base'
@@ -26,6 +31,8 @@ export { RowReverse }             from './helpers'
 
 
 // Icons
+export { AvatarIcon, DEFAULT_AVATAR_USER_ID } from './icons'
+export type { AvatarIconProps }   from './icons'
 export { Icon }                   from './icons'
 export { IconNumber }             from './icons'
 
@@ -44,6 +51,11 @@ export type { FillFrom, ProgressBarImageProps, ProgressBarImageTextures, Progres
 // Props
 export { resolveUiBackground }    from './base'
 export type { ScalingUiProps }    from './base'
+
+
+// Spinners
+export { Spinner, SpinnerBeamsEven, SpinnerBeamsVaried, SpinnerCircle, SpinnerDots, SpinnerHourglass, SpinnerThreeQuarterCircle } from './spinners'
+export type { SpinnerBeamsEvenProps, SpinnerBeamsVariedProps, SpinnerCircleProps, SpinnerDotsProps, SpinnerHourglassProps, SpinnerProps, SpinnerThreeQuarterCircleProps } from './spinners'
 
 
 // Text

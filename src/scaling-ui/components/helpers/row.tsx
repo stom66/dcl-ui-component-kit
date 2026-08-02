@@ -5,7 +5,7 @@ import { getColSizing } from '../../utils'
 
 import { UiBox, type UiBoxProps } from '../base'
 
-import { applySpacingToChildren } from './childSpacing'
+import { applyRowChildSpacing } from './childSpacing'
 
 
 type RowProps = UiBoxProps & {
@@ -13,7 +13,11 @@ type RowProps = UiBoxProps & {
 	cols?       : number
 	colsDesktop?: number
 	colsMobile? : number
-	/** Gap between children. Defaults to `theme.spacing`. Pass `0` to disable. */
+	/**
+	 * Gap between children. Defaults to `theme.spacing`. Pass `0` to disable.
+	 * When `spacing > 0`, children with `cols` share remaining width via
+	 * `flexGrow` (Yoga has no `calc()`, so raw `%` + gutters would overflow).
+	 */
 	spacing?    : number
 }
 
@@ -48,7 +52,7 @@ export function Row({
 				...uiTransform,
 			}}
 		>
-			{applySpacingToChildren(children, gap, edge)}
+			{applyRowChildSpacing(children, gap, edge)}
 		</UiBox>
 	)
 }

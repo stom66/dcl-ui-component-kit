@@ -28,8 +28,8 @@ export class DemoTextLayer extends Layer {
 		return (
 			<Background>
 				<Column
+					cols={12}
 					uiTransform={{
-						width         : '100%',
 						height        : '100%',
 						alignItems    : 'flex-start',
 						justifyContent: 'flex-start',
@@ -52,8 +52,8 @@ export class DemoTextLayer extends Layer {
 					<Divider />
 
 					<Row
+						cols={12}
 						uiTransform={{
-							width         : '100%',
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
 							margin        : { top: 8 },
@@ -75,8 +75,8 @@ export class DemoTextLayer extends Layer {
 					</Row>
 
 					<Row
+						cols={12}
 						uiTransform={{
-							width         : '100%',
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
 							margin        : { top: 16 },
@@ -84,14 +84,14 @@ export class DemoTextLayer extends Layer {
 					>
 						<Icon
 							iconSrc = {atlasIcons.source}
-							uvs     = {atlasIcons.cell({ xStart: 1, yStart: 1 })}
+							uvs     = {atlasIcons.uv.gift}
 							width   = "48"
 							height  = "48"
 							uiTransform={{ margin: { right: 12 } }}
 						/>
 						<Text
 							value       = "Icon + atlas number font:"
-							uiTransform = {{ width: 'auto', margin: { right: 8 } }}
+							uiTransform = {{ margin: { right: 8 } }}
 						/>
 						<IconNumber value="+120/2=60" />
 					</Row>

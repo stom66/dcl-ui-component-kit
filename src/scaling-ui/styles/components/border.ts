@@ -3,6 +3,8 @@ export type ThemeBorder = {
 	radiusLarge  : number
 	radiusDefault: number
 	width        : number
+
+	
 }
 
 export const border: ThemeBorder = {

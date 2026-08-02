@@ -4,6 +4,7 @@ export type ThemeTypography = {
 	size: {
 		code   : number
 		default: number
+		small  : number
 		h1     : number
 		h2     : number
 		h3     : number
@@ -27,6 +28,7 @@ export const typography: ThemeTypography = {
 	size: {
 		code   : 12,
 		default: 14,
+		small  : 10,
 		h1     : 48,
 		h2     : 36,
 		h3     : 18,

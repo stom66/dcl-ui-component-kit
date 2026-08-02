@@ -4,6 +4,7 @@ import ReactEcs, { PositionUnit, scaleFontSize, UiTransformProps } from '@dcl/sd
 
 import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
+import { getColSizing } from '../../utils'
 import { resolveAspectDimensions } from '../../utils/aspect'
 import { lighten } from '../../utils/colors'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
@@ -25,6 +26,10 @@ type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio'> & {
 	textLabel?   : string | undefined
 	width?       : PositionUnit | 'auto' | undefined
 	height?      : PositionUnit | 'auto' | undefined
+	/** 12-column grid span. Prefer over `width: '100%'` / `'50%'` / …. */
+	cols?        : number
+	colsDesktop? : number
+	colsMobile?  : number
 	/** Width ÷ height. Defaults to `theme.buttons.aspectRatio` (2.6). */
 	aspectRatio? : number
 	textureSrc?  : string
@@ -67,6 +72,7 @@ function tweenBackgroundColor(
  * Renders a text button with hover styling and an optional click callback.
  * Sizes from `theme.buttons` aspect ratio (default height 48, width = height × 2.6)
  * unless both axes are set. Pass one axis to derive the other.
+ * Prefer `cols` for grid widths (`cols={12}` = full parent width).
  */
 export const ButtonText = ({
 	aspectRatio,
@@ -77,6 +83,9 @@ export const ButtonText = ({
 	textLabel,
 	width,
 	height,
+	cols,
+	colsDesktop,
+	colsMobile,
 	uiTransform,
 	callback,
 	onMouseDown,
@@ -92,9 +101,11 @@ export const ButtonText = ({
 	const hoverColor   = lighten(defaultColor, 0.1)
 	const button       = getButtonProps(id, defaultColor)
 	const color        = button.get('backgroundColor')
+	const colWidth     = getColSizing(cols, colsDesktop, colsMobile) as PositionUnit | 'auto'
+	const resolvedWidth = colWidth !== 'auto' ? colWidth : width
 
 	const size = resolveAspectDimensions({
-		width        : width,
+		width        : resolvedWidth,
 		height       : height,
 		aspectRatio  : aspectRatio ?? theme.buttons.aspectRatio,
 		defaultHeight: theme.buttons.heightDefault,

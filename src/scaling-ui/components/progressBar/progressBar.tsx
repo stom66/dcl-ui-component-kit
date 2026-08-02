@@ -2,11 +2,10 @@ import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { darken } from '../../utils/colors'
 
 import { UiBox, type UiBoxProps } from '../base'
 
-import { type FillFrom, resolveFillFrom, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
+import { type FillFrom, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
 
 
 export type ProgressBarProps = Omit<
@@ -29,9 +28,13 @@ export type ProgressBarProps = Omit<
 	fillColor?     : Color4
 	/** Track (back) layer color. Defaults to theme dark. */
 	backgroundColor?: Color4
-	/** Border (front) layer color. Defaults to a darkened fill. */
+	/** Border (front) layer color. Defaults to theme secondary. */
 	borderColor?   : Color4
 	borderWidth?   : number
+	/**
+	 * Corner radius. Defaults to half the shortest measurable axis
+	 * (pill shape). Pass explicitly to override.
+	 */
 	borderRadius?  : number
 	/** Seconds to lerp when `value` changes. Defaults to theme animation value. */
 	lerpDuration?  : number
@@ -42,6 +45,7 @@ export type ProgressBarProps = Omit<
 // MARK: ProgressBar
 /**
  * Color progress bar: background (back) → fill (middle) → border (front).
+ * Defaults: fill = primary, track = dark, border = secondary, radius = half shortest axis.
  * Pass `fillFrom` to choose the fill origin (`left` / `right` / `top` / `bottom`).
  * Value changes lerp via a per-`id` PropsController.
  */
@@ -67,10 +71,12 @@ export function ProgressBar({
 	const theme    = getTheme()
 	const fill     = fillColor      ?? theme.colors.primary
 	const track    = backgroundColor ?? theme.colors.dark
-	const border   = borderColor    ?? darken(fill, 0.2)
+	const border   = borderColor    ?? theme.colors.secondary
 	const bWidth   = borderWidth    ?? theme.border.width
-	const bRadius  = borderRadius   ?? theme.border.radiusSmall
+	const bRadius  = borderRadius   ?? resolveDefaultBorderRadius(width, height)
 	const duration = lerpDuration   ?? theme.animation.progressBarLerpDurationDefault
+	const inset    = resolveProceduralFillInset(bWidth)
+	const fillRadius = Math.max(0, bRadius - inset)
 
 	const display  = syncDisplayValue(id, value, minValue, maxValue, duration)
 	const percent  = valueToPercent(display, minValue, maxValue)
@@ -107,19 +113,38 @@ export function ProgressBar({
 				}}
 			/>
 
-			{/* Fill (middle) */}
+			{/* Fill (middle) — inset by border width so it stays inside the stroke */}
 			<UiBox
-				key             = {`${id}_fill`}
-				backgroundColor = {fill}
+				key = {`${id}_fill_host`}
 				uiTransform={{
-					width       : layout.fillWidth,
-					height      : layout.fillHeight,
-					borderRadius: bRadius,
-					flexGrow    : 0,
-					flexShrink  : 0,
-					zIndex      : Z_INDEX_FILL,
+					positionType  : 'absolute',
+					position      : {
+						top   : inset,
+						right : inset,
+						bottom: inset,
+						left  : inset,
+					},
+					display       : 'flex',
+					flexDirection : layout.flexDirection,
+					alignItems    : layout.alignItems,
+					justifyContent: 'flex-start',
+					overflow      : 'hidden',
+					borderRadius  : fillRadius,
+					zIndex        : Z_INDEX_FILL,
 				}}
-			/>
+			>
+				<UiBox
+					key             = {`${id}_fill`}
+					backgroundColor = {fill}
+					uiTransform={{
+						width       : layout.fillWidth,
+						height      : layout.fillHeight,
+						borderRadius: fillRadius,
+						flexGrow    : 0,
+						flexShrink  : 0,
+					}}
+				/>
+			</UiBox>
 
 			{/* Border (front) */}
 			<UiBox

@@ -1,6 +1,6 @@
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
-import { atlasCharsNumbers, type TextureAtlas } from '../../atlases'
+import { atlasCharsNumbers, atlasCharsSymbols, type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
 import { UiBox } from '../base'
 import { Icon } from './icon'
@@ -173,12 +173,32 @@ function resolveIconNumberSize(args: {
 }
 
 
+// MARK: resolveGlyphAtlas
+/**
+ * Picks the atlas sheet for one glyph. Default `atlasCharsNumbers` falls back to
+ * `atlasCharsSymbols` for punctuation (e.g. `=` `$` `%`) so formulas work.
+ */
+function resolveGlyphAtlas(
+	atlas: TextureAtlas,
+	glyph: string,
+): TextureAtlas {
+	if (atlas.hasChar(glyph)) {
+		return atlas
+	}
+	if (atlas === atlasCharsNumbers && atlasCharsSymbols.hasChar(glyph)) {
+		return atlasCharsSymbols
+	}
+	return atlas
+}
+
+
 // MARK: IconNumber
 /**
  * Renders a numeric string from a glyph atlas (`atlasCharsNumbers` by default).
  * Digit aspect follows `theme.icons.numbers.horizontalInset` so UV crop does not stretch glyphs.
  * Specify `height` or `width` alone — the other axis is computed from aspect × digit count.
  * Override the sheet with `atlas` (must include a `layout` for `char()`).
+ * When using the default numbers atlas, missing glyphs (e.g. `=`) resolve from `atlasCharsSymbols`.
  */
 export const IconNumber = ({
 	children,
@@ -213,6 +233,8 @@ export const IconNumber = ({
 	const icons: ReactEcs.JSX.Element[] = []
 
 	for (let i = 0; i < len; i++) {
+		const glyph      = glyphs[i]
+		const glyphAtlas = resolveGlyphAtlas(atlas, glyph)
 		icons.push(
 			<Icon
 				{...props}
@@ -224,9 +246,9 @@ export const IconNumber = ({
 					...(typeof digitHeight === 'number' ? { minHeight: digitHeight } : {}),
 					...uiTransform,
 				}}
-				iconSrc     = {atlas.source}
+				iconSrc     = {glyphAtlas.source}
 				textureMode = {'stretch'}
-				uvs         = {atlas.char(glyphs[i], { insetX: horizontalInset })}
+				uvs         = {glyphAtlas.char(glyph, { insetX: horizontalInset })}
 			/>
 		)
 	}

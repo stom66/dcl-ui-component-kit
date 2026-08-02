@@ -9,6 +9,8 @@ import { alpha } from '../../utils/colors'
 import { demoAnimationsLayer } from './demo.animations.layer'
 import { demoBackgroundsLayer } from './demo.backgrounds.layer'
 import { demoButtonsLayer } from './demo.buttons.layer'
+import { demoIconsLayer } from './demo.icons.layer'
+import { demoListLayer } from './demo.list.layer'
 import { demoProgressLayer } from './demo.progress.layer'
 import { demoTextLayer } from './demo.text.layer'
 
@@ -62,31 +64,43 @@ export class DemoLeftBarLayer extends Layer {
 					<ButtonText
 						id        = "btn_demo_animations"
 						textLabel = "Animations"
-						width     = "100%"
+						cols      = {12}
 						callback  = {() => demoAnimationsLayer.toggle()}
 					/>
 					<ButtonText
 						id        = "btn_demo_backgrounds"
 						textLabel = "Backgrounds"
-						width     = "100%"
+						cols      = {12}
 						callback  = {() => demoBackgroundsLayer.toggle()}
 					/>
 					<ButtonText
 						id        = "btn_demo_buttons"
 						textLabel = "Buttons"
-						width     = "100%"
+						cols      = {12}
 						callback  = {() => demoButtonsLayer.toggle()}
+					/>
+					<ButtonText
+						id        = "btn_demo_icons"
+						textLabel = "Icons"
+						cols      = {12}
+						callback  = {() => demoIconsLayer.toggle()}
+					/>
+					<ButtonText
+						id        = "btn_demo_list"
+						textLabel = "List"
+						cols      = {12}
+						callback  = {() => demoListLayer.toggle()}
 					/>
 					<ButtonText
 						id        = "btn_demo_progress"
 						textLabel = "Progress"
-						width     = "100%"
+						cols      = {12}
 						callback  = {() => demoProgressLayer.toggle()}
 					/>
 					<ButtonText
 						id        = "btn_demo_text"
 						textLabel = "Text"
-						width     = "100%"
+						cols      = {12}
 						callback  = {() => demoTextLayer.toggle()}
 					/>
 				</Column>

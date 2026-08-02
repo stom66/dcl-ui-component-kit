@@ -61,6 +61,28 @@ super({
 })
 ```
 
+## Row / Column widths (`cols`)
+
+**Required for grid widths.** Use `cols` on `Row` / `Column` / `Label` / `ButtonText` — never `width: '100%'` / `'50%'` / `'25%'` when a span will do. Grid is 12-wide; `cols={12}` = full width. Parents of nested `cols` children need a definite width (usually `cols={12}`).
+
+```tsx
+// GOOD
+<Column cols={12}>
+	<Row cols={12}>
+		<Column cols={3}>{/* sidebar */}</Column>
+		<Column cols={9}>{/* main */}</Column>
+	</Row>
+</Column>
+
+// BAD — do not copy this from older demos
+<Column uiTransform={{ width: '100%' }}>
+	<Row uiTransform={{ width: '100%' }}>
+```
+
+Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is unaffected — keep using `uiTransform.height` as needed.
+
+`Row` applies default `theme.spacing` gutters. Yoga has no `calc()`, so when `spacing > 0` it lays out `cols` children with `flexGrow` (not raw `%`) so columns stay inside the parent. Avoid extra horizontal margins on those children; use `spacing={0}` only for gapless exact percentages.
+
 ## Close button / framed panel
 
 ```tsx
@@ -122,23 +144,40 @@ import { myBtnIconsAtlas } from '../../../myTheme'
 
 ## Progress bars
 
-> **Variants:** procedural (`ProgressBar`) · image-based (`ProgressBarImage`)
+> **Variants:** procedural (`ProgressBar`) · image / hybrid (`ProgressBarImage`)
 
 ```tsx
+import { atlasGradientColors } from '../../atlases'
+import { myProgressBarTexturesHorizontal } from '../../../myTheme'
+
 // Procedural — colours only
 <ProgressBar id="hp" value={72} height={24} />
 
-// Image — three textures (background / fill / border)
-<ProgressBarImage id="xp" value={55} height={28} />
+// Full built-in nine-slice set
+<ProgressBarImage id="xp" value={55} height={64} />
 
-// Custom textures from myTheme
-import { myProgressBarTexturesHorizontal } from '../../../myTheme'
+// Image fill + procedural border / track
+<ProgressBarImage
+	id       = "xp_hybrid"
+	value    = {60}
+	height   = {32}
+	textures = {{ fill: 'assets/images/scaling-ui/progressBar-horizontal-fill.png' }}
+/>
 
+// Atlas fill + procedural border / track
+<ProgressBarImage
+	id     = "xp_grad"
+	value  = {65}
+	height = {24}
+	atlas  = {atlasGradientColors}
+/>
+
+// Custom textures from myTheme (partial OK)
 <ProgressBarImage
 	id       = "xp_custom"
 	value    = {70}
 	textures = {myProgressBarTexturesHorizontal}
-	height   = {28}
+	height   = {64}
 />
 ```
 
@@ -146,9 +185,11 @@ import { myProgressBarTexturesHorizontal } from '../../../myTheme'
 
 ```tsx
 import { myIconsAtlas, myNumbersAtlas } from '../../../myTheme'
+import { AvatarIcon, DEFAULT_AVATAR_USER_ID } from '../../components'
 
 <Icon iconSrc={myIconsAtlas.source} uvs={myIconsAtlas.uv.coin} />
 <IconNumber value={42} atlas={myNumbersAtlas} />
+<AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
 ```
 
 ## Anti-patterns

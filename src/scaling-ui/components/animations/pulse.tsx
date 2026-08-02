@@ -1,13 +1,19 @@
-import { engine } from '@dcl/sdk/ecs'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
 
 //MARK: PulseProps Type
 export type PulseProps = UiBoxProps & {
+	/** Unique playback instance key. */
+	id              : string
 	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** When true, advances local time. Defaults to `true`. */
+	playing?        : boolean
+	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
+	looping?        : boolean
 	/** Seconds for one full pulse (grow + shrink). */
 	speed?          : number
 	burstCount?     : number
@@ -27,14 +33,6 @@ export type PulseProps = UiBoxProps & {
 
 //MARK: Constants/Vars
 const theme = getTheme()
-let elapsedTime = 0
-
-
-// MARK: sys_pulse
-function sys_pulse(delta: number) {
-	elapsedTime += delta
-}
-engine.addSystem(sys_pulse)
 
 
 // MARK: Pulse
@@ -44,9 +42,13 @@ engine.addSystem(sys_pulse)
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingGrow` /
  * `easingShrink` for independent curves (defaults: ease-out grow, ease-in shrink).
+ * Control playback with `playing` / `looping`, or helpers like `playOnce(id)`.
  */
 export const Pulse = ({
+	id,
 	children,
+	playing,
+	looping,
 	speed          = theme.animation.pulseDurationDefault,
 	burstCount     = theme.animation.pulseBurstCountDefault,
 	burstInterval  = theme.animation.pulseBurstIntervalDefault,
@@ -67,12 +69,15 @@ export const Pulse = ({
 	const easeGrow   = easingGrow   ?? easingFunction ?? easingFunctions.easeOutCubic
 	const easeShrink = easingShrink ?? easingFunction ?? easingFunctions.easeInCubic
 
-	const totalDuration = burstCount * speed
-	const t             = elapsedTime % (totalDuration + burstInterval)
+	const state  = syncAnimationPlayback(id, { playing, looping })
+	const sample = applyBurstSample(
+		state,
+		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+	)
 
 	let scale = scaleMin
-	if (t < totalDuration && speed > 0) {
-		const cycleT = (t % speed) / speed
+	if (sample.inBurst) {
+		const cycleT = sample.cycleT
 		if (cycleT < 0.5) {
 			const amount = easeGrow(cycleT * 2)
 			scale = scaleMin + amount * (scaleMax - scaleMin)

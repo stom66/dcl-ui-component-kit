@@ -31,8 +31,8 @@ export class DemoButtonsLayer extends Layer {
 		return (
 			<Background>
 				<Column
+					cols={12}
 					uiTransform={{
-						width         : '100%',
 						height        : '100%',
 						alignItems    : 'stretch',
 						justifyContent: 'flex-start',
@@ -45,41 +45,42 @@ export class DemoButtonsLayer extends Layer {
 					<Divider uiTransform={{ margin: { top: 8, bottom: 8 } }} />
 
 					<Label
+						cols        = {12}
 						value       = "ButtonText"
-						uiTransform = {{ margin: { bottom: 8 }, width: '100%' }}
+						uiTransform = {{ margin: { bottom: 8 } }}
 					/>
 					<Row
+						cols={12}
 						uiTransform={{
-							width         : '100%',
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
 						}}
 					>
 						<ButtonText
-							id          = "demo_btn_text_primary"
-							textLabel   = "Primary"
-							width       = "30%"
-							callback    = {() => console.log('DemoButtonsLayer: primary clicked')}
+							id        = "demo_btn_text_primary"
+							textLabel = "Primary"
+							cols      = {4}
+							callback  = {() => console.log('DemoButtonsLayer: primary clicked')}
 						/>
 						<ButtonText
 							id              = "demo_btn_text_success"
 							textLabel       = "Success"
-							width           = "30%"
+							cols            = {4}
 							backgroundColor = {theme.colors.success}
 							callback        = {() => console.log('DemoButtonsLayer: success clicked')}
 						/>
 						<ButtonText
 							id              = "demo_btn_text_danger"
 							textLabel       = "Danger"
-							width           = "30%"
+							cols            = {4}
 							backgroundColor = {theme.colors.danger}
 							callback        = {() => console.log('DemoButtonsLayer: danger clicked')}
 						/>
 					</Row>
 
 					<Row
+						cols={12}
 						uiTransform={{
-							width         : '100%',
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
 							margin        : { top: 4 },
@@ -88,21 +89,21 @@ export class DemoButtonsLayer extends Layer {
 						<ButtonText
 							id              = "demo_btn_text_info"
 							textLabel       = "Info"
-							width           = "30%"
+							cols            = {4}
 							backgroundColor = {theme.colors.info}
 							callback        = {() => console.log('DemoButtonsLayer: info clicked')}
 						/>
 						<ButtonText
 							id              = "demo_btn_text_warning"
 							textLabel       = "Warning"
-							width           = "30%"
+							cols            = {4}
 							backgroundColor = {theme.colors.warning}
 							callback        = {() => console.log('DemoButtonsLayer: warning clicked')}
 						/>
 						<ButtonText
 							id              = "demo_btn_text_secondary"
 							textLabel       = "Secondary"
-							width           = "30%"
+							cols            = {4}
 							backgroundColor = {theme.colors.secondary}
 							callback        = {() => console.log('DemoButtonsLayer: secondary clicked')}
 						/>
@@ -111,12 +112,13 @@ export class DemoButtonsLayer extends Layer {
 					<Divider uiTransform={{ margin: { top: 16, bottom: 8 } }} />
 
 					<Label
+						cols        = {12}
 						value       = "ButtonImage (atlas columns)"
-						uiTransform = {{ margin: { bottom: 8 }, width: '100%' }}
+						uiTransform = {{ margin: { bottom: 8 } }}
 					/>
 					<Row
+						cols={12}
 						uiTransform={{
-							width         : '100%',
 							height        : 80,
 							justifyContent: 'flex-start',
 							alignItems    : 'center',

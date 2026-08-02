@@ -1,6 +1,7 @@
 import { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
+import { sizeValueToPixels } from '../../utils/aspect'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
 
 
@@ -16,8 +17,40 @@ export const Z_INDEX_FILL       = 11
 export const Z_INDEX_BORDER     = 12
 export const Z_INDEX_CONTENT    = 13
 
+/**
+ * Minimum pixel inset for fill inside a procedural border.
+ * Prefer `Math.max(FILL_INSET_PX, borderWidth)` so the fill sits inside the stroke.
+ */
+export const FILL_INSET_PX = 1
+
+
+// MARK: resolveProceduralFillInset
+/** Inset for fill under a procedural border — at least the border width. */
+export function resolveProceduralFillInset(borderWidth: number): number {
+	return Math.max(FILL_INSET_PX, Math.max(0, borderWidth))
+}
+
 const progressProps   = new Map<string, PropsController<ProgressBarPropsState>>()
 const tweenGeneration = new Map<string, number>()
+
+
+// MARK: resolveDefaultBorderRadius
+/**
+ * Pill radius: half the shortest axis when width/height can be measured in
+ * virtual pixels. Falls back to half of whichever axis is known.
+ */
+export function resolveDefaultBorderRadius(
+	width : PositionUnit | 'auto',
+	height: PositionUnit | 'auto',
+): number {
+	const w = sizeValueToPixels(width)
+	const h = sizeValueToPixels(height)
+
+	if (w != null && h != null) return Math.min(w, h) / 2
+	if (h != null) return h / 2
+	if (w != null) return w / 2
+	return 12
+}
 
 
 // MARK: clampValue

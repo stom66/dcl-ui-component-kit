@@ -11,6 +11,8 @@ export type ZoneProps = UiBoxProps & {
 	canBeHidden?         : boolean
 	startHidden?         : boolean
 	showCloseButton?     : boolean
+	/** Unique id for the close ButtonImage. Required for per-button hover when multiple close buttons are on screen. */
+	closeButtonId?       : string
 	children?            : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	visibilityController?: VisibilityController
 	visibilityPosition?  : VisibilityPosition
@@ -28,6 +30,7 @@ export function Zone({
 	startHidden          = false,
 	canBeHidden          = false,
 	showCloseButton      = false,
+	closeButtonId,
 	children             = [],
 	uiTransform          = {},
 	uiBackground,
@@ -57,9 +60,15 @@ export function Zone({
 	if (showCloseButton && hideable && visibilityController) {
 		if (children && !Array.isArray(children)) children = [children]
 
+		// ButtonImage hover/press state is keyed by id — must be unique per open layer.
+		const resolvedCloseId = closeButtonId ?? 'btn_close'
+		if (!closeButtonId) {
+			console.error(`Zone: type=${type} showCloseButton without closeButtonId shares hover state with other close buttons`)
+		}
+
 		children = [
 			<ButtonImageClose
-				id       = "btn_close"
+				id       = {resolvedCloseId}
 				callback = {() => {
 					visibilityController.toggle()
 				}}

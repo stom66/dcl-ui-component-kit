@@ -52,7 +52,8 @@ export const myBtnIconsAtlas = new TextureAtlas({
 // MARK: myIconsAtlas
 /**
  * Example general icon atlas for `Icon`.
- * Pick a cell with `.cell({ xStart, yStart })` (1-based) or a named UV via `.uv.<name>`.
+ * Pick a cell with `.cell({ xStart, yStart })` (1-based), `.named.<name>` (cell options),
+ * or `.uv.<name>` (precomputed UV quad).
  */
 export const myIconsAtlas = new TextureAtlas({
 	source : 'assets/images/my-theme/atlas-icons.png',
@@ -75,14 +76,14 @@ export const myNumbersAtlas = new TextureAtlas({
 	columns: 4,
 	rows   : 4,
 	layout : [
-		'/+-x',
-		'89=.',
+		'/+-×',
+		'89,:',
 		'4567',
 		'0123',
 	],
 	aliases: {
-		'*': 'x',
-		'×': 'x',
+		'*': '×',
+		'x': '×',
 	},
 })
 
@@ -90,7 +91,8 @@ export const myNumbersAtlas = new TextureAtlas({
 // MARK: myProgressBarTexturesHorizontal
 /**
  * Example horizontal progress-bar textures for `ProgressBarImage`.
- * Three separate full images (not an atlas): background, fill, border.
+ * Each key is optional — omit a layer to fall back to procedural colours
+ * (`fillColor` / `backgroundColor` / `borderColor`).
  */
 export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
 	background: 'assets/images/my-theme/progressBar-horizontal-background.png',
@@ -102,6 +104,7 @@ export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
 // MARK: myProgressBarTexturesVertical
 /**
  * Example vertical progress-bar textures for `ProgressBarImage`.
+ * Partial sets are fine (e.g. `{ fill }` + procedural border).
  */
 export const myProgressBarTexturesVertical: ProgressBarImageTextures = {
 	background: 'assets/images/my-theme/progressBar-vertical-background.png',

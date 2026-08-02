@@ -1,13 +1,19 @@
-import { engine } from '@dcl/sdk/ecs'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
 
 //MARK: ShakeProps Type
 export type ShakeProps = UiBoxProps & {
+	/** Unique playback instance key. */
+	id              : string
 	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** When true, advances local time. Defaults to `true`. */
+	playing?        : boolean
+	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
+	looping?        : boolean
 	/** Seconds for one full shake sequence (all left/right moves + return). */
 	speed?          : number
 	burstCount?     : number
@@ -24,14 +30,6 @@ export type ShakeProps = UiBoxProps & {
 
 //MARK: Constants/Vars
 const theme = getTheme()
-let elapsedTime = 0
-
-
-// MARK: sys_shake
-function sys_shake(delta: number) {
-	elapsedTime += delta
-}
-engine.addSystem(sys_shake)
 
 
 // MARK: Shake
@@ -41,9 +39,13 @@ engine.addSystem(sys_shake)
  *
  * One sequence moves left/right `count` times (default 3: left, right, left),
  * then returns to center before the burst pause.
+ * Control playback with `playing` / `looping`, or helpers like `playOnce(id)`.
  */
 export const Shake = ({
+	id,
 	children,
+	playing,
+	looping,
 	speed          = theme.animation.shakeDurationDefault,
 	burstCount     = theme.animation.shakeBurstCountDefault,
 	burstInterval  = theme.animation.shakeBurstIntervalDefault,
@@ -60,12 +62,15 @@ export const Shake = ({
 	const w     = Number(child?.props?.width  ?? theme.icons.defaultSize)
 	const h     = Number(child?.props?.height ?? theme.icons.defaultSize)
 
-	const totalDuration = burstCount * speed
-	const t             = elapsedTime % (totalDuration + burstInterval)
+	const state  = syncAnimationPlayback(id, { playing, looping })
+	const sample = applyBurstSample(
+		state,
+		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+	)
 
 	let offset = 0
-	if (t < totalDuration && speed > 0 && count > 0) {
-		const cycleT = (t % speed) / speed
+	if (sample.inBurst && count > 0) {
+		const cycleT = sample.cycleT
 
 		// center → left → right → left … → center
 		const keyframes: number[] = [0]

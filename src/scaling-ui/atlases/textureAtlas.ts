@@ -36,8 +36,8 @@ export type TextureAtlasOptions<
 	/** Glyph aliases resolved before layout lookup (e.g. `*` → `x`). */
 	aliases?: Record<string, string>
 	/**
-	 * Named UV regions resolved with this atlas's column/row counts.
-	 * Access via `atlas.uv.<name>`. Cell coords are 1-based inclusive.
+	 * Named regions (1-based cell options). Stored on the instance as
+	 * `atlas.named.<name>`; precomputed quads as `atlas.uv.<name>`.
 	 */
 	named?  : TNamed
 }
@@ -83,6 +83,15 @@ export class TextureAtlas<
 	readonly columns: number
 	readonly rows   : number
 	readonly layout?: AtlasLayout
+	/**
+	 * Named cell options as declared in the constructor (`xStart` / `yStart` / …).
+	 * Pass to `uvCell` / `.cell()` — e.g. `atlas.named.yellowOrange`.
+	 */
+	readonly named  : { readonly [K in keyof TNamed]: TNamed[K] }
+	/**
+	 * Precomputed UV quads for each named region.
+	 * Pass to `uvs` props — e.g. `atlas.uv.coin`.
+	 */
 	readonly uv     : { readonly [K in keyof TNamed]: number[] }
 
 	private readonly defaultInset: number
@@ -104,7 +113,8 @@ export class TextureAtlas<
 			uv[key] = this.cell(named[key])
 		}
 
-		this.uv = uv
+		this.named = named
+		this.uv    = uv
 	}
 
 
@@ -172,6 +182,20 @@ export class TextureAtlas<
 
 
 	// MARK: char
+	/**
+	 * Whether `char` resolves via `layout` (after aliases).
+	 *
+	 * @param char - Character or digit to look up
+	 */
+	hasChar(char: string | number): boolean {
+		if (!this.layout) {
+			return false
+		}
+		const glyph = this.aliases[String(char)] ?? String(char)
+		return findAtlasCell(this.layout, glyph) !== null
+	}
+
+
 	/**
 	 * UV quad for one glyph from `layout`. No-ops with an error log when the
 	 * atlas has no layout or the glyph is missing.

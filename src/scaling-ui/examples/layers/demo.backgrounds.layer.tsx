@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { Background, BackgroundGradient, Column, Label, Row, UiBox } from '../../components'
+import { Background, BackgroundGradient, Column, Label, Row } from '../../components'
 import { Layer } from '../../components/layers'
 import { ZoneType } from '../../components/zones/zone.presets'
 import { getTheme } from '../../styles'
@@ -18,15 +18,15 @@ function DemoSample({
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }) {
 	return (
-		<UiBox
+		<Column
+			cols={12}
 			uiTransform={{
-				width : '100%',
 				height: SAMPLE_HEIGHT,
 				margin: SAMPLE_MARGIN,
 			}}
 		>
 			{children}
-		</UiBox>
+		</Column>
 	)
 }
 
@@ -60,15 +60,15 @@ export class DemoBackgroundsLayer extends Layer {
 				}}
 			>
 				<Row
+					cols={12}
 					uiTransform={{
-						width         : '100%',
 						height        : '100%',
 						alignItems    : 'flex-start',
 						justifyContent: 'flex-start',
 					}}
 				>
 					<Column
-						cols = {4}
+						cols={4}
 						uiTransform={{
 							height        : '100%',
 							alignItems    : 'stretch',
@@ -76,8 +76,8 @@ export class DemoBackgroundsLayer extends Layer {
 							padding       : { right: 8 },
 						}}
 					>
-						<Row uiTransform={{ width: '100%', margin: { bottom: 4 } }}>
-							<Label value="Backgrounds" uiTransform={{ width: '100%' }} />
+						<Row cols={12} uiTransform={{ margin: { bottom: 4 } }}>
+							<Label cols={12} value="Backgrounds" />
 						</Row>
 
 						<DemoSample>
@@ -98,7 +98,7 @@ export class DemoBackgroundsLayer extends Layer {
 					</Column>
 
 					<Column
-						cols = {8}
+						cols={8}
 						uiTransform={{
 							height        : '100%',
 							alignItems    : 'stretch',
@@ -106,8 +106,8 @@ export class DemoBackgroundsLayer extends Layer {
 							padding       : { left: 8 },
 						}}
 					>
-						<Row uiTransform={{ width: '100%', margin: { bottom: 4 } }}>
-							<Label value="Background gradients" uiTransform={{ width: '100%' }} />
+						<Row cols={12} uiTransform={{ margin: { bottom: 4 } }}>
+							<Label cols={12} value="Background gradients" />
 						</Row>
 
 						<DemoSample>

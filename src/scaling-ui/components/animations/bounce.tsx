@@ -1,13 +1,19 @@
-import { engine } from '@dcl/sdk/ecs'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
 
 //MARK: BounceProps Type
 export type BounceProps = UiBoxProps & {
+	/** Unique playback instance key. */
+	id              : string
 	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** When true, advances local time. Defaults to `true`. */
+	playing?        : boolean
+	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
+	looping?        : boolean
 	/** Seconds for one full bounce (up + down). */
 	speed?          : number
 	burstCount?     : number
@@ -29,14 +35,6 @@ export type BounceProps = UiBoxProps & {
 
 //MARK: Constants/Vars
 const theme = getTheme()
-let elapsedTime = 0
-
-
-// MARK: sys_bounce
-function sys_bounce(delta: number) {
-	elapsedTime += delta
-}
-engine.addSystem(sys_bounce)
 
 
 // MARK: Bounce
@@ -46,9 +44,13 @@ engine.addSystem(sys_bounce)
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingUp` /
  * `easingDown` for independent curves (defaults: ease-out up, ease-out-bounce down).
+ * Control playback with `playing` / `looping`, or helpers like `playOnce(id)`.
  */
 export const Bounce = ({
+	id,
 	children,
+	playing,
+	looping,
 	speed          = theme.animation.bounceDurationDefault,
 	burstCount     = theme.animation.bounceBurstCountDefault,
 	burstInterval  = theme.animation.bounceBurstIntervalDefault,
@@ -69,12 +71,15 @@ export const Bounce = ({
 	const easeUp   = easingUp   ?? easingFunction ?? easingFunctions.easeOutCirc
 	const easeDown = easingDown ?? easingFunction ?? easingFunctions.easeOutBounce
 
-	const totalDuration = burstCount * speed
-	const t             = elapsedTime % (totalDuration + burstInterval)
+	const state  = syncAnimationPlayback(id, { playing, looping })
+	const sample = applyBurstSample(
+		state,
+		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+	)
 
 	let offset = offsetMin
-	if (t < totalDuration && speed > 0) {
-		const cycleT = (t % speed) / speed
+	if (sample.inBurst) {
+		const cycleT = sample.cycleT
 		if (cycleT < 0.5) {
 			const amount = easeUp(cycleT * 2)
 			offset = offsetMin + amount * (offsetMax - offsetMin)

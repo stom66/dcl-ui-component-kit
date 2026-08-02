@@ -1,14 +1,20 @@
-import { engine } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
 
 //MARK: FlashColorProps Type
 export type FlashColorProps = UiBoxProps & {
+	/** Unique playback instance key. */
+	id              : string
 	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** When true, advances local time. Defaults to `true`. */
+	playing?        : boolean
+	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
+	looping?        : boolean
 	/** Seconds for one full flash (to target + back). */
 	speed?          : number
 	burstCount?     : number
@@ -28,14 +34,6 @@ export type FlashColorProps = UiBoxProps & {
 
 //MARK: Constants/Vars
 const theme = getTheme()
-let elapsedTime = 0
-
-
-// MARK: sys_flashColor
-function sys_flashColor(delta: number) {
-	elapsedTime += delta
-}
-engine.addSystem(sys_flashColor)
 
 
 // MARK: resolveChildBaseColor
@@ -57,9 +55,13 @@ function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingFlash` /
  * `easingReturn` for independent curves (defaults: ease-out flash, ease-in return).
+ * Control playback with `playing` / `looping`, or helpers like `playOnce(id)`.
  */
 export const FlashColor = ({
+	id,
 	children,
+	playing,
+	looping,
 	speed          = theme.animation.flashColorDurationDefault,
 	burstCount     = theme.animation.flashColorBurstCountDefault,
 	burstInterval  = theme.animation.flashColorBurstIntervalDefault,
@@ -79,12 +81,15 @@ export const FlashColor = ({
 	const easeFlash  = easingFlash  ?? easingFunction ?? easingFunctions.easeOutCubic
 	const easeReturn = easingReturn ?? easingFunction ?? easingFunctions.easeInCubic
 
-	const totalDuration = burstCount * speed
-	const t             = elapsedTime % (totalDuration + burstInterval)
+	const state  = syncAnimationPlayback(id, { playing, looping })
+	const sample = applyBurstSample(
+		state,
+		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+	)
 
 	let currentColor = baseColor
-	if (t < totalDuration && speed > 0) {
-		const cycleT = (t % speed) / speed
+	if (sample.inBurst) {
+		const cycleT = sample.cycleT
 		if (cycleT < 0.5) {
 			currentColor = Color4.lerp(baseColor, color, easeFlash(cycleT * 2))
 		} else {
