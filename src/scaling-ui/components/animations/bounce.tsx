@@ -4,6 +4,7 @@ import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: BounceProps Type
 export type BounceProps = UiBoxProps & {
@@ -40,7 +41,7 @@ const theme = getTheme()
 // MARK: Bounce
 /**
  * Bounces a single child by animating `position.top` relative to the wrapper.
- * Size comes from the child's `width` / `height` (numeric).
+ * Size comes from the child (or nested leaf) / parent size overrides.
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingUp` /
  * `easingDown` for independent curves (defaults: ease-out up, ease-out-bounce down).
@@ -59,14 +60,19 @@ export const Bounce = ({
 	easingFunction,
 	easingUp,
 	easingDown,
+	width,
+	height,
 	uiBackground,
 	uiTransform,
 	...props
 }: BounceProps) => {
-	// Our sizes come from the childs width and height
 	const child = Array.isArray(children) ? children[0] : children
-	const w     = Number(child?.props?.width  ?? theme.icons.defaultSize)
-	const h     = Number(child?.props?.height ?? theme.icons.defaultSize)
+	const { width: w, height: h } = resolveAnimBoxSize(
+		width,
+		height,
+		child,
+		theme.icons.defaultSize,
+	)
 
 	const easeUp   = easingUp   ?? easingFunction ?? easingFunctions.easeOutCirc
 	const easeDown = easingDown ?? easingFunction ?? easingFunctions.easeOutBounce
@@ -103,8 +109,9 @@ export const Bounce = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && ReactEcs.createElement(child.type, {
-				...child.props,
+			{child && cloneAnimChild(child, {
+				width : w,
+				height: h,
 				uiTransform: {
 					...child.props?.uiTransform,
 					positionType: 'absolute',
@@ -114,7 +121,6 @@ export const Bounce = ({
 						left: 0,
 					},
 				},
-				key: child.key,
 			})}
 		</UiBox>
 	)

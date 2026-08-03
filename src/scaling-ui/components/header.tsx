@@ -1,20 +1,28 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from './base'
 import { getTheme } from '../styles'
+import { UiBox, type UiBoxProps } from './base'
 
 
-type HeaderProps = Omit<UiBoxProps, 'uiText'> & {
+export type HeaderProps = Omit<UiBoxProps, 'uiText'> & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	value   ?: string
-	uiText  ?: Partial<NonNullable<UiBoxProps['uiText']>>
+	/** Title copy. Prefer this over JSX text children (DCL `uiText` needs `value`). */
+	value?  : string
+	/** Font color. Defaults to `theme.colors.light`. Overrides `uiText.color`. */
+	color?  : Color4
+	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
 
 // MARK: Header
+/**
+ * Simple panel title line (h2-sized). Pass copy via `value`; tint via `color`.
+ */
 export const Header = ({
 	children,
 	value,
+	color,
 	uiText,
 	uiTransform,
 	...props
@@ -29,13 +37,14 @@ export const Header = ({
 				height   : 'auto',
 				alignSelf: 'stretch',
 				padding  : { top: 10, bottom: 5 },
-				...uiTransform
+				...uiTransform,
 			}}
 			uiText={{
 				fontSize : scaleFontSize(theme.typography.size.h2),
 				color    : theme.colors.light,
 				textAlign: 'middle-left',
 				...uiText,
+				...(color !== undefined ? { color } : {}),
 				value: value ?? uiText?.value ?? '',
 			}}
 		>

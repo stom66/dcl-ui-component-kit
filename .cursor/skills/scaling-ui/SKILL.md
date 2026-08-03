@@ -12,7 +12,7 @@ description: >-
 
 Lightweight reusable UI for Decentraland SDK7. Prefer framework primitives over raw `UiEntity` layout.
 
-**Before creating or editing a Layer:** read this skill and mirror `src/scaling-ui/examples/layers/*.layer.tsx`. Do not invent a parallel mount path or new Layer option fields for props Zone already accepts.
+**Before creating or editing a Layer:** read this skill and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`. Do not invent a parallel mount path or new Layer option fields for props Zone already accepts.
 
 **Layout widths:** for every `Row` / `Column` / `Label` / `ButtonText` that needs a fractional or full width, set **`cols`** (`cols={12}` = full width). Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
 
@@ -189,7 +189,7 @@ Several families ship in two flavours. Document and choose explicitly:
 | **Procedural** | Colours / theme only — no texture files |
 | **Image-based** | PNG / atlas — always overridable (`textureSrc`, `textures`, `atlas`, `src`, …) |
 
-Project art goes under **`assets/images/example-theme/`**. Define custom `TextureAtlas` / texture sets in `src/exampleTheme/` (see examples there). Do not invent parallel texture APIs.
+Project art goes under **`assets/images/example-themes/<theme>/`**. Define custom `TextureAtlas` / texture sets in `src/exampleThemes/<theme>/` (see examples there). Do not invent parallel texture APIs.
 
 | Family | Procedural | Image-based | Override |
 |---|---|---|---|
@@ -202,8 +202,8 @@ Project art goes under **`assets/images/example-theme/`**. Define custom `Textur
 When a user wants **their own images, atlases, or styles**, walk them through this — do not invent a parallel path:
 
 1. **Open the Affinity template** at `assets/images/scaling-ui-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
-2. **Export PNGs** into `assets/images/example-theme/` (never into `assets/images/scaling-ui/` unless they intend to replace framework defaults).
-3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleTheme/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, `exampleNumbersAtlas`, progress-bar sets).
+2. **Export PNGs** into `assets/images/example-themes/<theme>/` (never into `assets/images/scaling-ui/` unless they intend to replace framework defaults).
+3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleThemes/<theme>/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, `exampleNumbersAtlas`, progress-bar sets).
 4. **Sample UVs only via framework APIs** — never hand-write UV arrays:
 	- Prefer `TextureAtlas.cell` / `.row` / `.column` / `.char`; named regions via `.named.<name>` (cell options) or `.uv.<name>` (UV quad)
 	- Fall back to `getUVCell` / `getUVColumn` / `getUVRow` from `utils/uvs.tsx` for one-off / non-atlas cases
@@ -212,7 +212,7 @@ When a user wants **their own images, atlases, or styles**, walk them through th
 
 **Icon packs / bulk icon atlases:** if the user asks about adding a large set of custom icons (Font Awesome, game-icons, etc.), tell them it is practical to generate a snap grid in Affinity, place icons programmatically, export one PNG, and register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Reference implementation: `atlasIconsFontAwesome` in `src/scaling-ui/atlases/atlases.ts` + `assets/images/scaling-ui/atlas-icons-font-awesome.png`.
 
-**Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `exampleTheme/` / `scaling-ui/atlases/`.
+**Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `exampleThemes/` / `scaling-ui/atlases/`.
 
 
 ## Bulk icon atlas via Affinity (agent workflow)
@@ -225,7 +225,7 @@ Tell them roughly:
 
 > You can generate a full icon atlas quickly: connect Affinity’s MCP to the agent, point it at an SVG icon pack, have it build a snapped grid on an artboard, export a PNG, then declare a `TextureAtlas` with named cells (same pattern as `atlasIconsFontAwesome`).
 
-Ask for: pack path, solid vs regular preference, cell size / max icon size / padding, artboard size (or cell count), and whether the atlas is a **framework default** (`scaling-ui/atlases` + `assets/images/scaling-ui/`) or a **project theme** (`src/exampleTheme/` + `assets/images/example-theme/`).
+Ask for: pack path, solid vs regular preference, cell size / max icon size / padding, artboard size (or cell count), and whether the atlas is a **framework default** (`scaling-ui/atlases` + `assets/images/scaling-ui/`) or a **project theme** (`src/exampleThemes/<theme>/` + `assets/images/example-themes/<theme>/`).
 
 ### Affinity MCP setup (suggest if missing)
 
@@ -274,7 +274,7 @@ PNG row 0 = top of artboard. UV Y is **bottom → top**, so for a 16×16 atlas t
 	- Keys: camelCase from FA names (`dice-d20` → `diceD20`, `arrow-left` → `arrowLeft`).
 	- Values: `{ xStart, yStart }` (1-based; invert PNG row → UV `yStart`).
 	- Framework sheets: `src/scaling-ui/atlases/atlases.ts` + re-export from `atlases/index.ts` and `scaling-ui/index.tsx`. Keep large icon atlases **at the end** of `atlases.ts`.
-	- Project sheets: `src/exampleTheme/` + `assets/images/example-theme/`.
+	- Project sheets: `src/exampleThemes/<theme>/` + `assets/images/example-themes/<theme>/`.
 7. **Verify** named count === cell count, spot-check `atlas.uv.<name>` in a demo or layer.
 
 ### Useful Affinity APIs (from this workflow)
@@ -337,7 +337,7 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/exampleTheme/`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`.
+Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/exampleThemes/<theme>/`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`.
 
 ## Progress bars
 
@@ -346,7 +346,7 @@ Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `
 Shared value API: `id`, `value`, `minValue` / `maxValue`, `fillFrom`, lerp per `id`.
 
 - **`ProgressBar`** — colour track / fill / border. Defaults: fill `primary`, track `dark`, border `secondary`, radius = half shortest axis
-- **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/exampleTheme/`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
+- **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/exampleThemes/<theme>/`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
 ## Hideable + close button
 
 `canBeHidden` / `startHidden` / `showCloseButton` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — wrap panel content in `<Background>` for theme body fill and border. Leave Background off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
@@ -416,9 +416,12 @@ Custom components built on `UiBox` must accept and forward native overrides so c
 
 - Type as `UiBoxProps` (or `Omit<SpinnerProps, …>` / similar) — not a hand-rolled subset
 - Destructure known shorthands, then `...props`
-- Merge `uiTransform` / `uiBackground` / `uiText` as `defaults → …overrides` (overrides last)
+- Merge `uiTransform` / `uiText` as `defaults → …overrides` (overrides last)
+- Merge `uiBackground` with **`mergeUiBackground(defaults, uiBackground)`** so nested `texture` / `avatarTexture` fields (`src`, `wrapMode`, `filterMode`) deep-merge instead of replacing the whole object
 
 ```tsx
+import { mergeUiBackground } from '../base'
+
 export type MyThingProps = Omit<UiBoxProps, 'uiText'> & { value?: string }
 
 export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: MyThingProps) {
@@ -426,7 +429,7 @@ export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: 
 		<UiBox
 			{...props}
 			uiTransform={{ width: 'auto', ...uiTransform }}
-			uiBackground={{ color: theme.colors.body, ...uiBackground }}
+			uiBackground={mergeUiBackground({ color: theme.colors.body }, uiBackground)}
 			uiText={{ value: value ?? '', ...uiText }}
 		/>
 	)
@@ -449,7 +452,9 @@ Defaults: fills parent via absolute insets, theme body fill, theme border width/
 
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/scaling-ui/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasSpinners`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `assets/images/scaling-ui-assets.af`, export to `assets/images/example-theme/`, declare atlases in `src/exampleTheme/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/scaling-ui/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `assets/images/scaling-ui-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+
+`TextureAtlas` defaults `wrapMode` to `'clamp'` (avoids neighbour-cell bleed). Optional `filterMode` (`'point'` | `'bi-linear'` | `'tri-linear'`) applies to the whole sheet. Use `atlas.texture` (or `mergeUiBackground`) instead of `{ src: atlas.source }` alone. `Spinner` is an animation wrapper around a child `Icon` — there are no dedicated spinner presets / atlas.
 
 **Always use** `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based inclusive**; totals are counts.
 
@@ -478,4 +483,4 @@ Full guides: root `README.md` → Custom textures / Buttons / Progress bars / Ic
 
 ## More examples
 
-See [examples.md](examples.md) and `src/scaling-ui/examples/layers/`.
+See [examples.md](examples.md) and `src/exampleThemes/showcase/layers/`.

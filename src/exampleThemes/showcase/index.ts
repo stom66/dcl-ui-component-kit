@@ -1,0 +1,16 @@
+import { layers } from './layers'
+import { theme } from './theme'
+
+export { theme } from './theme'
+export { layers } from './layers'
+export { exampleBtnIconsAtlas, exampleIconsAtlas, exampleNumbersAtlas, exampleProgressBarTexturesHorizontal, exampleProgressBarTexturesVertical } from './atlases'
+
+
+/**
+ * Showcase theme bundle — Scaling UI component demos.
+ * Switch the active theme in `src/index.ts`.
+ */
+export const showcase = {
+	theme,
+	layers,
+}

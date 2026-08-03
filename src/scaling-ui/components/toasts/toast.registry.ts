@@ -71,6 +71,7 @@ export class ToastRegistry {
 		}
 
 		const iconSize = theme.icons.defaultSize
+		const slide    = options.slide ?? true
 		const item: ToastItem = {
 			id,
 			position      : options.position,
@@ -79,6 +80,7 @@ export class ToastRegistry {
 			isDismissable : options.isDismissable ?? false,
 			showFrom      : resolved.showFrom,
 			hideTo        : resolved.hideTo,
+			slide,
 			scaleIn       : options.scaleIn ?? false,
 			scaleOut      : options.scaleOut ?? false,
 			scalePulse    : options.scalePulse ?? false,
@@ -89,7 +91,7 @@ export class ToastRegistry {
 			zIndex        : options.zIndex ?? 2000,
 			phase         : 'queued',
 			activeEdge    : resolved.showFrom,
-			slideOffset   : getOffscreenPosition(resolved.showFrom),
+			slideOffset   : slide ? getOffscreenPosition(resolved.showFrom) : 0,
 			scale         : options.scaleIn ? 0 : 1,
 		}
 
@@ -210,14 +212,14 @@ export class ToastRegistry {
 	private startEnter(item: ToastItem) {
 		item.phase       = 'entering'
 		item.activeEdge  = item.showFrom
-		item.slideOffset = getOffscreenPosition(item.showFrom)
+		item.slideOffset = item.slide ? getOffscreenPosition(item.showFrom) : 0
 		item.scale       = item.scaleIn ? 0 : 1
 
 		const duration  = getTheme().animation.showDuration
 		const fromSlide = item.slideOffset
 		const fromScale = item.scale
 
-		let slideDone = false
+		let slideDone = !item.slide
 		let scaleDone = !item.scaleIn
 
 		const maybeFinish = () => {
@@ -228,12 +230,14 @@ export class ToastRegistry {
 			this.afterEnter(item)
 		}
 
-		tweenValue(fromSlide, 0, duration, v => {
-			item.slideOffset = v
-		}, () => {
-			slideDone = true
-			maybeFinish()
-		}, easingFunctions.easeOutBack)
+		if (item.slide) {
+			tweenValue(fromSlide, 0, duration, v => {
+				item.slideOffset = v
+			}, () => {
+				slideDone = true
+				maybeFinish()
+			}, easingFunctions.easeOutBack)
+		}
 
 		if (item.scaleIn) {
 			tweenValue(fromScale, 1, duration, v => {
@@ -310,7 +314,7 @@ export class ToastRegistry {
 		const toSlide   = getOffscreenPosition(item.hideTo)
 		const fromScale = item.scale
 
-		let slideDone = false
+		let slideDone = !item.slide
 		let scaleDone = !item.scaleOut
 
 		const maybeFinish = () => {
@@ -318,12 +322,14 @@ export class ToastRegistry {
 			this.finishExit(id)
 		}
 
-		tweenValue(0, toSlide, duration, v => {
-			item.slideOffset = v
-		}, () => {
-			slideDone = true
-			maybeFinish()
-		}, easingFunctions.easeInBack)
+		if (item.slide) {
+			tweenValue(0, toSlide, duration, v => {
+				item.slideOffset = v
+			}, () => {
+				slideDone = true
+				maybeFinish()
+			}, easingFunctions.easeInBack)
+		}
 
 		if (item.scaleOut) {
 			tweenValue(fromScale, 0, duration, v => {

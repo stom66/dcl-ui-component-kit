@@ -24,7 +24,7 @@ type ParsedPositionUnit = {
 type ResolvedIconNumberSize = {
 	containerWidth : PositionUnit
 	containerHeight: PositionUnit
-	digitWidth     : PositionUnit
+	digitWidths    : PositionUnit[]
 	digitHeight    : PositionUnit
 }
 
@@ -39,16 +39,16 @@ const digitTransformCache  = new Map<string, UiEntityTransform>()
 // MARK: getDigitBackground
 /** Cached stretch background for one atlas glyph (shared across IconNumber instances). */
 function getDigitBackground(
-	atlasSource: string,
-	uvs         : number[],
-	glyph       : string,
-	insetX      : number,
+	atlas : TextureAtlas,
+	uvs   : number[],
+	glyph : string,
+	insetX: number,
 ) {
-	const key = `${atlasSource}|${glyph}|${insetX}`
+	const key = `${atlas.source}|${atlas.wrapMode}|${atlas.filterMode ?? ''}|${glyph}|${insetX}`
 	let bg = digitBackgroundCache.get(key)
 	if (!bg) {
 		bg = {
-			texture    : { src: atlasSource },
+			texture    : atlas.texture,
 			textureMode: 'stretch',
 			uvs,
 		}
@@ -128,97 +128,136 @@ function scalePositionUnit(
 }
 
 
+// MARK: sumPositionUnits
+/** Adds PositionUnits that share a unit suffix; errors and returns the first value on mismatch. */
+function sumPositionUnits(values: PositionUnit[]): PositionUnit {
+	if (values.length === 0) {
+		return 0
+	}
+	let total  = 0
+	let unit   = ''
+	let hasUnit = false
+	for (const value of values) {
+		const parsed = parsePositionUnit(value)
+		if (!parsed) {
+			console.error('IconNumber: sumPositionUnits: unsupported PositionUnit', value)
+			return values[0]
+		}
+		if (!hasUnit) {
+			unit    = parsed.unit
+			hasUnit = true
+		} else if (parsed.unit !== unit) {
+			console.error('IconNumber: sumPositionUnits: mixed units', values)
+			return values[0]
+		}
+		total += parsed.amount
+	}
+	return formatPositionUnit(total, unit)
+}
+
+
+// MARK: widthsFromHeight
+/** Per-glyph widths from a shared height and each glyph's width/height aspect. */
+function widthsFromHeight(
+	digitHeight : PositionUnit,
+	glyphAspects: number[],
+): PositionUnit[] {
+	return glyphAspects.map((aspect) => scalePositionUnit(digitHeight, aspect))
+}
+
+
 // MARK: resolveIconNumberSize
 /**
- * Resolves container and per-digit sizes so glyphs keep `digitAspect` (width / height).
- * Pass height only, width only, or neither — the missing axis is derived from glyph count.
- * When both are set, sizes fit inside the box without stretching glyphs.
+ * Resolves container and per-digit sizes so each glyph keeps its own aspect
+ * (`1 - 2 * insetX`). Pass height only, width only, or neither — the missing
+ * axis is derived from the sum of glyph aspects. When both are set, sizes fit
+ * inside the box without stretching glyphs.
  */
 function resolveIconNumberSize(args: {
-	width      : PositionUnit | "auto"
-	height     : PositionUnit | "auto"
-	len        : number
-	size       : number
-	digitAspect: number
+	width       : PositionUnit | "auto"
+	height      : PositionUnit | "auto"
+	glyphAspects: number[]
+	size        : number
 }): ResolvedIconNumberSize {
-	const { width, height, len, size, digitAspect } = args
-	const count      = Math.max(len, 1)
-	const widthAuto  = width  === "auto"
-	const heightAuto = height === "auto"
+	const { width, height, size } = args
+	const glyphAspects = args.glyphAspects.length > 0 ? args.glyphAspects : [1]
+	const aspectSum    = glyphAspects.reduce((sum, aspect) => sum + aspect, 0)
+	const widthAuto    = width  === "auto"
+	const heightAuto   = height === "auto"
 
-	// Height-driven: digit height fixed, width from aspect × count
+	// Height-driven: digit height fixed, each width from its aspect
 	if (!heightAuto && widthAuto) {
 		const digitHeight = height
-		const digitWidth  = scalePositionUnit(height, digitAspect)
+		const digitWidths = widthsFromHeight(digitHeight, glyphAspects)
 		return {
-			containerWidth : scalePositionUnit(digitWidth, count),
+			containerWidth : sumPositionUnits(digitWidths),
 			containerHeight: height,
-			digitWidth,
+			digitWidths,
 			digitHeight,
 		}
 	}
 
-	// Width-driven: total width fixed, height from aspect
+	// Width-driven: total width fixed, height from sum of aspects
 	if (!widthAuto && heightAuto) {
-		const digitWidth  = scalePositionUnit(width, 1 / count)
-		const digitHeight = scalePositionUnit(digitWidth, 1 / digitAspect)
+		const digitHeight = scalePositionUnit(width, 1 / aspectSum)
+		const digitWidths = widthsFromHeight(digitHeight, glyphAspects)
 		return {
 			containerWidth : width,
 			containerHeight: digitHeight,
-			digitWidth,
+			digitWidths,
 			digitHeight,
 		}
 	}
 
-	// Both set: fit inside the box, preserve aspect (no stretch when digit count changes)
+	// Both set: fit inside the box, preserve per-glyph aspect
 	if (!widthAuto && !heightAuto) {
 		const parsedW = parsePositionUnit(width)
 		const parsedH = parsePositionUnit(height)
 
 		if (parsedW && parsedH && parsedW.unit === parsedH.unit) {
-			const widthFromHeight  = parsedH.amount * digitAspect * count
-			const heightFromWidth  = parsedW.amount / (digitAspect * count)
+			const widthFromHeight  = parsedH.amount * aspectSum
+			const heightFromWidth  = parsedW.amount / aspectSum
 			const heightDrivenFits = widthFromHeight <= parsedW.amount + 1e-6
 
 			if (heightDrivenFits) {
 				const digitHeight = height
-				const digitWidth  = scalePositionUnit(height, digitAspect)
+				const digitWidths = widthsFromHeight(digitHeight, glyphAspects)
 				return {
 					containerWidth : width,
 					containerHeight: height,
-					digitWidth,
+					digitWidths,
 					digitHeight,
 				}
 			}
 
-			const digitWidth  = formatPositionUnit(parsedW.amount / count, parsedW.unit)
 			const digitHeight = formatPositionUnit(heightFromWidth, parsedH.unit)
+			const digitWidths = widthsFromHeight(digitHeight, glyphAspects)
 			return {
 				containerWidth : width,
 				containerHeight: height,
-				digitWidth,
+				digitWidths,
 				digitHeight,
 			}
 		}
 
 		// Mixed / unparsable units: prefer height for glyph size
 		const digitHeight = height
-		const digitWidth  = scalePositionUnit(height, digitAspect)
+		const digitWidths = widthsFromHeight(digitHeight, glyphAspects)
 		return {
 			containerWidth : width,
 			containerHeight: height,
-			digitWidth,
+			digitWidths,
 			digitHeight,
 		}
 	}
 
 	// Both auto: theme icon size
 	const digitHeight = size
-	const digitWidth  = size * digitAspect
+	const digitWidths = glyphAspects.map((aspect) => size * aspect)
 	return {
-		containerWidth : digitWidth * count,
+		containerWidth : sumPositionUnits(digitWidths),
 		containerHeight: size,
-		digitWidth,
+		digitWidths,
 		digitHeight,
 	}
 }
@@ -246,8 +285,9 @@ function resolveGlyphAtlas(
 // MARK: IconNumber
 /**
  * Renders a numeric string from a glyph atlas (`atlasCharsNumbers` by default).
- * Digit aspect follows `theme.icons.numbers.horizontalInset` so UV crop does not stretch glyphs.
- * Specify `height` or `width` alone — the other axis is computed from aspect × digit count.
+ * Digit aspect follows each glyph's effective `insetX` (theme `horizontalInset`,
+ * overridden by atlas `charInsets`) so UV crop does not stretch glyphs.
+ * Specify `height` or `width` alone — the other axis is computed from the sum of glyph aspects.
  * Override the sheet with `atlas` (must include a `layout` for `char()`).
  * When using the default numbers atlas, missing glyphs (e.g. `=`) resolve from `atlasCharsSymbols`.
  */
@@ -263,22 +303,33 @@ export const IconNumber = ({
 	const theme           = getTheme()
 	const size            = theme.icons.minSize
 	const horizontalInset = theme.icons.numbers.horizontalInset
-	const digitAspect     = 1 - 2 * horizontalInset
 
 	const glyphs = value.toString()
 	const len    = glyphs.length
 
+	const glyphAtlases: TextureAtlas[] = []
+	const glyphInsets : number[]       = []
+	const glyphAspects: number[]       = []
+
+	for (let i = 0; i < len; i++) {
+		const glyph      = glyphs[i]
+		const glyphAtlas = resolveGlyphAtlas(atlas, glyph)
+		const insetX     = glyphAtlas.charInsetX(glyph, horizontalInset)
+		glyphAtlases.push(glyphAtlas)
+		glyphInsets.push(insetX)
+		glyphAspects.push(1 - 2 * insetX)
+	}
+
 	const {
 		containerWidth,
 		containerHeight,
-		digitWidth,
+		digitWidths,
 		digitHeight,
 	} = resolveIconNumberSize({
 		width,
 		height,
-		len,
+		glyphAspects,
 		size,
-		digitAspect,
 	})
 
 	// Digits are raw `UiEntity`s with string keys. Wrapping through `Icon` /
@@ -288,13 +339,14 @@ export const IconNumber = ({
 
 	for (let i = 0; i < len; i++) {
 		const glyph      = glyphs[i]
-		const glyphAtlas = resolveGlyphAtlas(atlas, glyph)
-		const uvs = glyphAtlas.char(glyph, { insetX: horizontalInset })
+		const glyphAtlas = glyphAtlases[i]
+		const insetX     = glyphInsets[i]
+		const uvs        = glyphAtlas.char(glyph, { insetX: horizontalInset })
 		icons.push(
 			<UiEntity
 				key={`icon-num-${i}`}
-				uiTransform={getDigitTransform(digitWidth, digitHeight)}
-				uiBackground={getDigitBackground(glyphAtlas.source, uvs, glyph, horizontalInset)}
+				uiTransform={getDigitTransform(digitWidths[i] ?? digitHeight, digitHeight)}
+				uiBackground={getDigitBackground(glyphAtlas, uvs, glyph, insetX)}
 			/>
 		)
 	}

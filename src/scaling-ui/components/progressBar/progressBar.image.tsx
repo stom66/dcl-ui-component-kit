@@ -258,7 +258,7 @@ function layerAtlas(
 
 	return {
 		textureMode: 'stretch' as const,
-		texture    : { src: atlas.source },
+		texture    : atlas.texture,
 		uvs,
 	}
 }

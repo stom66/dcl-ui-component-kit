@@ -49,6 +49,13 @@ export type ThemeAnimation = {
 	/** Seconds to rest between bursts. Defaults to `1`. */
 	flashColorBurstIntervalDefault: number
 
+	/** Seconds for one full border flash (to target + back). Defaults to `0.5`. */
+	flashBorderDurationDefault     : number
+	/** Number of border flashes before the pause. Defaults to `2`. */
+	flashBorderBurstCountDefault   : number
+	/** Seconds to rest between border-flash bursts. Defaults to `1`. */
+	flashBorderBurstIntervalDefault: number
+
 	/** Seconds for one full wiggle sequence. Defaults to `0.5`. */
 	wiggleDurationDefault     : number
 	/** Number of wiggle sequences before the pause. Defaults to `2`. */
@@ -93,6 +100,10 @@ export const animation: ThemeAnimation = {
 	flashColorDurationDefault     : 0.5,
 	flashColorBurstCountDefault   : 2,
 	flashColorBurstIntervalDefault: 1,
+
+	flashBorderDurationDefault     : 0.5,
+	flashBorderBurstCountDefault   : 2,
+	flashBorderBurstIntervalDefault: 1,
 
 	wiggleDurationDefault     : 0.75,
 	wiggleBurstCountDefault   : 1,

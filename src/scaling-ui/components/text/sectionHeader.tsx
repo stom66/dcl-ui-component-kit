@@ -1,19 +1,28 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
+import { UiBox, type UiBoxProps } from '../base'
 
 
-type SectionHeaderProps = UiBoxProps & {
+export type SectionHeaderProps = Omit<UiBoxProps, 'uiText'> & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	value   ?: string
+	/** Section title copy. Prefer this over JSX text children. */
+	value?  : string
+	/** Font color. Defaults to `theme.colors.light`. Overrides `uiText.color`. */
+	color?  : Color4
+	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
 
 // MARK: SectionHeader
+/**
+ * Section title within a panel body (h2-sized). Pass copy via `value`; tint via `color`.
+ */
 export const SectionHeader = ({
 	children,
 	value,
+	color,
 	uiText,
 	uiTransform,
 	...props
@@ -28,13 +37,14 @@ export const SectionHeader = ({
 				height   : 'auto',
 				alignSelf: 'stretch',
 				padding  : { top: 10, bottom: 5 },
-				...uiTransform
+				...uiTransform,
 			}}
 			uiText={{
 				fontSize : scaleFontSize(theme.typography.size.h2),
 				color    : theme.colors.light,
 				textAlign: 'middle-left',
 				...uiText,
+				...(color !== undefined ? { color } : {}),
 				value: value ?? uiText?.value ?? '',
 			}}
 		>

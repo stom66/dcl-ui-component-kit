@@ -39,11 +39,53 @@ function resolveFillColor(
 }
 
 
+// MARK: mergeUiBackground
+/**
+ * Merges two `uiBackground` objects. Nested `texture` and `avatarTexture` are
+ * deep-merged so callers can override `filterMode` / `wrapMode` / `src` without
+ * replacing the whole texture object (shallow `{ ...base, ...override }` would
+ * drop sibling texture fields).
+ */
+export function mergeUiBackground(
+	base    : UiEntityBackground | undefined,
+	override: UiEntityBackground | undefined,
+): UiEntityBackground | undefined {
+	if (base === undefined)     return override
+	if (override === undefined) return base
+
+	const merged: NonNullable<UiEntityBackground> = {
+		...base,
+		...override,
+	}
+
+	const textureSrc = override.texture?.src ?? base.texture?.src
+	if (textureSrc !== undefined) {
+		merged.texture = {
+			...(base.texture     ?? {}),
+			...(override.texture ?? {}),
+			src: textureSrc,
+		}
+	}
+
+	const avatarUserId = override.avatarTexture?.userId ?? base.avatarTexture?.userId
+	if (avatarUserId !== undefined) {
+		merged.avatarTexture = {
+			...(base.avatarTexture     ?? {}),
+			...(override.avatarTexture ?? {}),
+			userId: avatarUserId,
+		}
+	}
+
+	return merged
+}
+
+
 // MARK: resolveUiBackground
 /**
  * Applies Scaling UI background shortcuts on top of native Decentraland UI background props.
  * No default fill — only applies when `backgroundColor` is set.
  * Copies the color so theme tokens are never shared by reference with ECS components.
+ * Texture / avatarTexture fields deep-merge via `mergeUiBackground`.
  */
 export function resolveUiBackground(
 	uiBackground   : UiEntityBackground | undefined,
@@ -51,15 +93,14 @@ export function resolveUiBackground(
 ): UiEntityBackground | undefined {
 	if (backgroundColor === undefined) return uiBackground
 
-	return {
-		...uiBackground,
+	return mergeUiBackground(uiBackground, {
 		color: Color4.create(
 			backgroundColor.r,
 			backgroundColor.g,
 			backgroundColor.b,
 			backgroundColor.a
 		),
-	}
+	})
 }
 
 

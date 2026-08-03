@@ -4,6 +4,7 @@ import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { cloneAnimChild, resolveAnimContentSize } from './animationChild'
 
 //MARK: PulseProps Type
 export type PulseProps = UiBoxProps & {
@@ -38,7 +39,9 @@ const theme = getTheme()
 // MARK: Pulse
 /**
  * Scales a single child in a grow/shrink burst loop.
- * Size comes from the child's `width` / `height` (numeric).
+ * Intrinsic size is resolved from the child (or nested leaf, e.g. Icon inside
+ * FlashColor) via numeric `width` / `height`. Scaled size is written onto the
+ * direct child so intermediate wrappers can forward it inward.
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingGrow` /
  * `easingShrink` for independent curves (defaults: ease-out grow, ease-in shrink).
@@ -57,14 +60,16 @@ export const Pulse = ({
 	easingFunction,
 	easingGrow,
 	easingShrink,
+	width: _width,
+	height: _height,
 	uiBackground,
 	uiTransform,
 	...props
 }: PulseProps) => {
-	// Our sizes come from the childs width and height
-	const child = Array.isArray(children) ? children[0] : children
-	const w     = Number(child?.props?.width  ?? theme.icons.defaultSize)
-	const h     = Number(child?.props?.height ?? theme.icons.defaultSize)
+	const child   = Array.isArray(children) ? children[0] : children
+	const content = resolveAnimContentSize(child, theme.icons.defaultSize)
+	const w       = content.width
+	const h       = content.height
 
 	const easeGrow   = easingGrow   ?? easingFunction ?? easingFunctions.easeOutCubic
 	const easeShrink = easingShrink ?? easingFunction ?? easingFunctions.easeInCubic
@@ -101,11 +106,9 @@ export const Pulse = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && ReactEcs.createElement(child.type, {
-				...child.props,
+			{child && cloneAnimChild(child, {
 				width : w * scale,
 				height: h * scale,
-				key   : child.key,
 			})}
 		</UiBox>
 	)

@@ -24,6 +24,8 @@ export type ShowToastOptions = {
 	isDismissable?: boolean
 	showFrom?     : VisibilityPosition
 	hideTo?       : VisibilityPosition
+	/** When false, toast stays at its dock and only uses scale motion. Default `true`. */
+	slide?        : boolean
 	scaleIn?      : boolean
 	scaleOut?     : boolean
 	/** One pulse at rest before auto-hide (score-style). */
@@ -45,6 +47,7 @@ export type ToastItem = {
 	isDismissable : boolean
 	showFrom      : VisibilityPosition
 	hideTo        : VisibilityPosition
+	slide         : boolean
 	scaleIn       : boolean
 	scaleOut      : boolean
 	scalePulse    : boolean

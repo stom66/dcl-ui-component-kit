@@ -1,215 +1,97 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
+import { UiBox, type UiBoxProps } from '../base'
 
 
-type HeaderProps = Omit<UiBoxProps, 'uiText'> & {
+type HeaderLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+
+export type HeadingProps = Omit<UiBoxProps, 'uiText'> & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	value   ?: string
-	uiText  ?: Partial<NonNullable<UiBoxProps['uiText']>>
+	/** Heading copy. Prefer this over JSX text children (DCL `uiText` needs `value`). */
+	value?  : string
+	/** Font color. Defaults to `theme.colors.light`. Overrides `uiText.color`. */
+	color?  : Color4
+	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
+}
+
+
+// MARK: Heading
+/** Shared H1–H6 renderer — theme size/family per level, optional `color` shorthand. */
+function Heading({
+	level,
+	children,
+	value,
+	color,
+	uiText,
+	uiTransform,
+	...props
+}: HeadingProps & { level: HeaderLevel }) {
+	const theme = getTheme()
+
+	return (
+		<UiBox
+			{...props}
+			uiTransform={{
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
+				...uiTransform,
+			}}
+			uiText={{
+				fontSize : scaleFontSize(theme.typography.size[level]),
+				font     : theme.typography.family[level],
+				color    : theme.colors.light,
+				textAlign: 'middle-left',
+				...uiText,
+				...(color !== undefined ? { color } : {}),
+				value: value ?? uiText?.value ?? '',
+			}}
+		>
+			{children}
+		</UiBox>
+	)
 }
 
 
 // MARK: H1
-export function H1({
-	children,
-	value,
-	uiText,
-	uiTransform,
-	...props
-}: HeaderProps) {
-	const theme = getTheme()
-
-	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				...uiTransform
-			}}
-			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h1),
-				font     : theme.typography.family.h1,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				value: value ?? uiText?.value ?? '',
-			}}
-		>
-			{children}
-		</UiBox>
-	)
+/** Theme `h1` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+export function H1(props: HeadingProps) {
+	return <Heading level="h1" {...props} />
 }
 
 
 // MARK: H2
-export function H2({
-	children,
-	value,
-	uiText,
-	uiTransform,
-	...props
-}: HeaderProps) {
-	const theme = getTheme()
-
-	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				...uiTransform
-			}}
-			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h2),
-				font     : theme.typography.family.h2,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				value: value ?? uiText?.value ?? '',
-			}}
-		>
-			{children}
-		</UiBox>
-	)
+/** Theme `h2` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+export function H2(props: HeadingProps) {
+	return <Heading level="h2" {...props} />
 }
 
 
 // MARK: H3
-export function H3({
-	children,
-	value,
-	uiText,
-	uiTransform,
-	...props
-}: HeaderProps) {
-	const theme = getTheme()
-
-	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				...uiTransform
-			}}
-			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h3),
-				font     : theme.typography.family.h3,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				value: value ?? uiText?.value ?? '',
-			}}
-		>
-			{children}
-		</UiBox>
-	)
+/** Theme `h3` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+export function H3(props: HeadingProps) {
+	return <Heading level="h3" {...props} />
 }
 
 
 // MARK: H4
-export function H4({
-	children,
-	value,
-	uiText,
-	uiTransform,
-	...props
-}: HeaderProps) {
-	const theme = getTheme()
-
-	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				...uiTransform
-			}}
-			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h4),
-				font     : theme.typography.family.h4,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				value: value ?? uiText?.value ?? '',
-			}}
-		>
-			{children}
-		</UiBox>
-	)
+/** Theme `h4` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+export function H4(props: HeadingProps) {
+	return <Heading level="h4" {...props} />
 }
 
 
 // MARK: H5
-export function H5({
-	children,
-	value,
-	uiText,
-	uiTransform,
-	...props
-}: HeaderProps) {
-	const theme = getTheme()
-
-	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				...uiTransform
-			}}
-			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h5),
-				font     : theme.typography.family.h5,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				value: value ?? uiText?.value ?? '',
-			}}
-		>
-			{children}
-		</UiBox>
-	)
+/** Theme `h5` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+export function H5(props: HeadingProps) {
+	return <Heading level="h5" {...props} />
 }
 
 
 // MARK: H6
-export function H6({
-	children,
-	value,
-	uiText,
-	uiTransform,
-	...props
-}: HeaderProps) {
-	const theme = getTheme()
-
-	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				...uiTransform
-			}}
-			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h6),
-				font     : theme.typography.family.h6,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				value: value ?? uiText?.value ?? '',
-			}}
-		>
-			{children}
-		</UiBox>
-	)
+/** Theme `h6` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+export function H6(props: HeadingProps) {
+	return <Heading level="h6" {...props} />
 }

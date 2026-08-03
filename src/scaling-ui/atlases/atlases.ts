@@ -25,26 +25,6 @@ export const atlasBtnIconsStyled = new TextureAtlas({
 })
 
 
-// MARK: atlasSpinners
-/** Spinner atlas — 2×2 grid with a default cell inset. */
-export const atlasSpinners = new TextureAtlas({
-	source : 'assets/images/scaling-ui/atlas-spinners-01.png',
-	columns: 2,
-	rows   : 2,
-	inset  : 0.15,
-	named  : {
-		/** Top-left. */
-		threeQuarterCircle: { xStart: 1, yStart: 2 },
-		/** Top-right. */
-		dots              : { xStart: 2, yStart: 2 },
-		/** Bottom-left. */
-		hourglass         : { xStart: 1, yStart: 1 },
-		/** Bottom-right. */
-		circle            : { xStart: 2, yStart: 1 },
-	},
-})
-
-
 // MARK: atlasCharsNumbers
 /**
  * Number / operator atlas (`atlas-chars-numbers.png`), top → bottom in the PNG.
@@ -69,6 +49,11 @@ export const atlasCharsNumbers = new TextureAtlas({
 	aliases: {
 		'*': '×',
 		'x': '×',
+	},
+	charInsets: {
+		'1': { insetX: 0.3  },
+		',': { insetX: 0.35 },
+		':': { insetX: 0.35 },
 	},
 })
 
@@ -172,7 +157,7 @@ export const atlasIconsFontAwesome = new TextureAtlas({
 	source : 'assets/images/scaling-ui/atlas-icons-font-awesome.png',
 	columns: 16,
 	rows   : 16,
-	inset  : 0.1465,
+	inset  : 0.1,
 	named  : {
 		/** Row 1 (PNG top→bottom). */
 		plus               : { xStart:  1, yStart: 16 },
@@ -248,7 +233,7 @@ export const atlasIconsFontAwesome = new TextureAtlas({
 		gears              : { xStart:  3, yStart: 12 },
 		ghost              : { xStart:  4, yStart: 12 },
 		wrench             : { xStart:  5, yStart: 12 },
-		headset            : { xStart:  6, yStart: 12 },
+		dots               : { xStart:  6, yStart: 12 },
 		sliders            : { xStart:  7, yStart: 12 },
 		bullseye           : { xStart:  8, yStart: 12 },
 		explosion          : { xStart:  9, yStart: 12 },

@@ -173,10 +173,10 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `assets/images/scaling-ui-assets.af` → export under `assets/images/example-theme/`, declare in `src/exampleTheme/`):
+`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `assets/images/scaling-ui-assets.af` → export under `assets/images/example-themes/showcase/`, declare in `src/exampleThemes/showcase/`):
 
 ```tsx
-import { exampleBtnIconsAtlas } from '../../../exampleTheme'
+import { exampleBtnIconsAtlas } from '../../exampleThemes/showcase'
 
 <ButtonImage
 	id            = "btn_custom"
@@ -194,7 +194,7 @@ import { exampleBtnIconsAtlas } from '../../../exampleTheme'
 
 ```tsx
 import { atlasGradientColors } from '../../atlases'
-import { exampleProgressBarTexturesHorizontal } from '../../../exampleTheme'
+import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showcase'
 
 // Procedural — colours only
 <ProgressBar id="hp" value={72} height={24} />
@@ -218,7 +218,7 @@ import { exampleProgressBarTexturesHorizontal } from '../../../exampleTheme'
 	atlas  = {atlasGradientColors}
 />
 
-// Custom textures from exampleTheme (partial OK)
+// Custom textures from exampleThemes/showcase (partial OK)
 <ProgressBarImage
 	id       = "xp_custom"
 	value    = {70}
@@ -230,7 +230,7 @@ import { exampleProgressBarTexturesHorizontal } from '../../../exampleTheme'
 ## Icons (image-based)
 
 ```tsx
-import { exampleIconsAtlas, exampleNumbersAtlas } from '../../../exampleTheme'
+import { exampleIconsAtlas, exampleNumbersAtlas } from '../../exampleThemes/showcase'
 import { AvatarIcon, DEFAULT_AVATAR_USER_ID } from '../../components'
 
 <Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />

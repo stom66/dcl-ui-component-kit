@@ -14,7 +14,7 @@ This package may be copied, moved, or renamed into another project. Absolute `sr
 - **Never use absolute paths** such as `src/scaling-ui/...` or bare `src/...`.
 - **Stay inside the package:** from files under `scaling-ui/`, import siblings/parents (`../components`, `../../styles`). Do not climb out to `src/` and back in with a folder name (`../../scaling-ui/...`) — that breaks if the package directory is renamed.
 - External packages (`@dcl/sdk/...`, npm modules) stay as package specifiers — not relative.
-- Host entry files outside the package (`src/index.ts`, `src/exampleTheme/`) may reference the package folder once at the boundary.
+- Host entry files outside the package (`src/index.ts`, `src/exampleThemes/`) may reference the package folder once at the boundary.
 - When importing **multiple named bindings** from one module, keep them on **one line**:
 	`import { A, B, C } from '../components'`
 	Do not split the `{ … }` list across multiple lines.

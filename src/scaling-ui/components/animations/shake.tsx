@@ -4,6 +4,7 @@ import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: ShakeProps Type
 export type ShakeProps = UiBoxProps & {
@@ -35,7 +36,7 @@ const theme = getTheme()
 // MARK: Shake
 /**
  * Shakes a single child by animating `position.left` relative to the wrapper.
- * Size comes from the child's `width` / `height` (numeric).
+ * Size comes from the child (or nested leaf) / parent size overrides.
  *
  * One sequence moves left/right `count` times (default 3: left, right, left),
  * then returns to center before the burst pause.
@@ -53,14 +54,19 @@ export const Shake = ({
 	offsetMin      = theme.animation.shakeOffsetMinDefault,
 	offsetMax      = theme.animation.shakeOffsetMaxDefault,
 	easingFunction = easingFunctions.easeOutCubic,
+	width,
+	height,
 	uiBackground,
 	uiTransform,
 	...props
 }: ShakeProps) => {
-	// Our sizes come from the childs width and height
 	const child = Array.isArray(children) ? children[0] : children
-	const w     = Number(child?.props?.width  ?? theme.icons.defaultSize)
-	const h     = Number(child?.props?.height ?? theme.icons.defaultSize)
+	const { width: w, height: h } = resolveAnimBoxSize(
+		width,
+		height,
+		child,
+		theme.icons.defaultSize,
+	)
 
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
@@ -102,8 +108,9 @@ export const Shake = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && ReactEcs.createElement(child.type, {
-				...child.props,
+			{child && cloneAnimChild(child, {
+				width : w,
+				height: h,
 				uiTransform: {
 					...child.props?.uiTransform,
 					positionType: 'absolute',
@@ -113,7 +120,6 @@ export const Shake = ({
 						left: offset,
 					},
 				},
-				key: child.key,
 			})}
 		</UiBox>
 	)

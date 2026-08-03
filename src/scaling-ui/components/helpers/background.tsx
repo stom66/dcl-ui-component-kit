@@ -1,7 +1,7 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { UiBox, type UiBoxProps } from '../base'
+import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 
 
 type BackgroundProps = UiBoxProps & {
@@ -54,16 +54,15 @@ export function Background({
 				overflow      : 'hidden',
 				...uiTransform,
 			}}
-			uiBackground={{
+			uiBackground={mergeUiBackground({
 				color: fill,
 				...(textureSrc !== undefined
 					? {
-						texture    : { src: textureSrc },
+						texture    : { src: textureSrc, wrapMode: 'clamp' as const },
 						textureMode: 'stretch' as const,
 					}
 					: {}),
-				...uiBackground,
-			}}
+			}, uiBackground)}
 		>
 			{children}
 		</UiBox>

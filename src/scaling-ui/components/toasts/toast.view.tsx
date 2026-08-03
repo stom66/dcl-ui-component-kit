@@ -20,6 +20,10 @@ export function ToastView({ item, key }: { item: ToastItem; key?: string }) {
 		item.phase === 'visible' || item.phase === 'pulsing' || item.phase === 'entering'
 	)
 
+	const rootPosition = item.slide
+		? { [item.activeEdge]: item.slideOffset }
+		: undefined
+
 	return (
 		<UiBox
 			key={key ?? `toast_dock_${item.id}`}
@@ -27,7 +31,6 @@ export function ToastView({ item, key }: { item: ToastItem; key?: string }) {
 				...dock,
 				positionType: 'absolute',
 				zIndex      : item.zIndex,
-				display     : 'flex',
 				flexGrow    : 0,
 				flexShrink  : 0,
 			}}
@@ -43,7 +46,7 @@ export function ToastView({ item, key }: { item: ToastItem; key?: string }) {
 					justifyContent: 'center',
 					display       : 'flex',
 					positionType  : 'relative',
-					position      : { [item.activeEdge]: item.slideOffset },
+					...(rootPosition ? { position: rootPosition } : {}),
 				}}
 				onMouseDown={dismissable ? () => toastRegistry.dismiss(item.id) : undefined}
 			>

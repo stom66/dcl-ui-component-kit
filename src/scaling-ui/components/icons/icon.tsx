@@ -2,7 +2,7 @@ import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 
 import { atlasIconsFontAwesome } from '../../atlases'
 import { getTheme } from '../../styles'
-import { UiBox, type UiBoxProps } from '../base'
+import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 
 type IconProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
@@ -19,7 +19,8 @@ type IconProps = UiBoxProps & {
 /**
  * Texture icon. Defaults to a square cell sized from `theme.icons.size` when
  * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
- * `src` defaults to `atlasIconsFontAwesome.source`.
+ * `src` defaults to `atlasIconsFontAwesome.source` and inherits that atlas's
+ * `wrapMode` / `filterMode` (override via `uiBackground.texture` — deep-merged).
  */
 export const Icon = ({
 	children,
@@ -33,6 +34,9 @@ export const Icon = ({
 	...props
 }: IconProps) => {
 	const size = getTheme().icons.minSize
+	const texture = src === atlasIconsFontAwesome.source
+		? atlasIconsFontAwesome.texture
+		: { src, wrapMode: 'clamp' as const }
 
 	return (
 		<UiBox
@@ -47,12 +51,11 @@ export const Icon = ({
 				...(height === "auto" ? { minHeight: size } : {}),
 				...uiTransform
 			}}
-			uiBackground={{
-				texture    : { src },
+			uiBackground={mergeUiBackground({
+				texture,
 				textureMode: textureMode ?? "stretch",
 				uvs        : uvs ?? [],
-				...uiBackground
-			}}
+			}, uiBackground)}
 		>
 			{children}
 		</UiBox>

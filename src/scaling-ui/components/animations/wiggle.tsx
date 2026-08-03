@@ -5,6 +5,7 @@ import { getRotatedUVs, getUVCell } from '../../utils'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { cloneAnimChildDeep, resolveAnimBoxSize } from './animationChild'
 
 //MARK: WiggleProps Type
 export type WiggleProps = UiBoxProps & {
@@ -31,10 +32,23 @@ export type WiggleProps = UiBoxProps & {
 const theme = getTheme()
 
 
+// MARK: resolveLeafUvs
+/** Finds UV quads on the child or a nested leaf (for wrappers without `uvs`). */
+function resolveLeafUvs(element: ReactEcs.JSX.Element | undefined): number[] {
+	let current: ReactEcs.JSX.Element | undefined = element
+	while (current) {
+		if (current.props?.uvs) return current.props.uvs as number[]
+		const nested = current.props?.children as ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | undefined
+		current = Array.isArray(nested) ? nested[0] : nested
+	}
+	return getUVCell({ xStart: 1, yStart: 1, xTotal: 1, yTotal: 1 })
+}
+
+
 // MARK: Wiggle
 /**
  * Wiggles a single child by rotating its UVs around the cell center.
- * Size comes from the child's `width` / `height` (numeric).
+ * Size comes from the child (or nested leaf) / parent size overrides.
  *
  * One sequence rotates `count` times (default 3: -max, +max, -max),
  * then returns to 0° before the burst pause.
@@ -51,15 +65,20 @@ export const Wiggle = ({
 	count          = theme.animation.wiggleCountDefault,
 	maxRotation    = theme.animation.wiggleMaxRotationDefault,
 	easingFunction = easingFunctions.easeOutCubic,
+	width,
+	height,
 	uiBackground,
 	uiTransform,
 	...props
 }: WiggleProps) => {
-	// Our sizes come from the childs width and height
 	const child   = Array.isArray(children) ? children[0] : children
-	const w       = Number(child?.props?.width  ?? theme.icons.defaultSize)
-	const h       = Number(child?.props?.height ?? theme.icons.defaultSize)
-	const baseUvs = child?.props?.uvs ?? getUVCell({ xStart: 1, yStart: 1, xTotal: 1, yTotal: 1 })
+	const { width: w, height: h } = resolveAnimBoxSize(
+		width,
+		height,
+		child,
+		theme.icons.defaultSize,
+	)
+	const baseUvs = resolveLeafUvs(child)
 
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
@@ -101,10 +120,10 @@ export const Wiggle = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && ReactEcs.createElement(child.type, {
-				...child.props,
-				uvs: getRotatedUVs(baseUvs, angle),
-				key: child.key,
+			{child && cloneAnimChildDeep(child, {
+				width : w,
+				height: h,
+				uvs   : getRotatedUVs(baseUvs, angle),
 			})}
 		</UiBox>
 	)

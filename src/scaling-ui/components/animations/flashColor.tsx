@@ -3,8 +3,9 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { UiBox, type UiBoxProps } from '../base'
+import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: FlashColorProps Type
 export type FlashColorProps = UiBoxProps & {
@@ -52,6 +53,8 @@ function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 
 /**
  * Flashes a single child's background color toward `color` and back.
  * The child's original `backgroundColor` / `uiBackground.color` is used as the base.
+ * Forwards `width` / `height` (including scaled sizes from an outer `Pulse`) to
+ * the child so nested animation stacks keep sizing in sync.
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingFlash` /
  * `easingReturn` for independent curves (defaults: ease-out flash, ease-in return).
@@ -69,17 +72,23 @@ export const FlashColor = ({
 	easingFunction,
 	easingFlash,
 	easingReturn,
+	width,
+	height,
 	uiBackground,
 	uiTransform,
 	...props
 }: FlashColorProps) => {
-	const child     = Array.isArray(children) ? children[0] : children
-	const w         = Number(child?.props?.width  ?? child?.props?.uiTransform?.width  ?? theme.icons.defaultSize)
-	const h         = Number(child?.props?.height ?? child?.props?.uiTransform?.height ?? theme.icons.defaultSize)
+	const child = Array.isArray(children) ? children[0] : children
+	const { width: w, height: h } = resolveAnimBoxSize(
+		width,
+		height,
+		child,
+		theme.icons.defaultSize,
+	)
 	const baseColor = resolveChildBaseColor(child)
 
-	const easeFlash  = easingFlash  ?? easingFunction ?? easingFunctions.easeOutCubic
-	const easeReturn = easingReturn ?? easingFunction ?? easingFunctions.easeInCubic
+	const easeFlash  = easingFlash  ?? easingFunction ?? easingFunctions.linear
+	const easeReturn = easingReturn ?? easingFunction ?? easingFunctions.linear
 
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
@@ -111,17 +120,13 @@ export const FlashColor = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && ReactEcs.createElement(child.type, {
-				...child.props,
-				// Tint only — never replace uiBackground, so Icon textures stay intact.
+			{child && cloneAnimChild(child, {
+				width          : w,
+				height         : h,
 				backgroundColor: currentColor,
-				...(child.props?.uiBackground ? {
-					uiBackground: {
-						...child.props.uiBackground,
-						color: currentColor,
-					},
-				} : {}),
-				key: child.key,
+				uiBackground   : mergeUiBackground(child.props?.uiBackground, {
+					color: currentColor,
+				}),
 			})}
 		</UiBox>
 	)

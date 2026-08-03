@@ -1,6 +1,6 @@
 // Animations
-export { Bounce, FlashColor, isPlaying, playOnce, Pulse, setLooping, setPlaying, Shake, Wiggle } from './animations'
-export type { AnimationPlaybackState, BounceProps, BurstSample, FlashColorProps, PulseProps, ShakeProps, WiggleProps } from './animations'
+export { Bounce, FlashBorder, FlashColor, isPlaying, playOnce, Pulse, setLooping, setPlaying, Shake, Spinner, Wiggle } from './animations'
+export type { AnimationPlaybackState, BounceProps, BurstSample, FlashBorderProps, FlashColorProps, PulseProps, ShakeProps, SpinnerProps, WiggleProps } from './animations'
 
 
 // Base
@@ -49,13 +49,8 @@ export type { FillFrom, ProgressBarImageProps, ProgressBarImageTextures, Progres
 
 
 // Props
-export { resolveUiBackground }    from './base'
+export { mergeUiBackground, resolveUiBackground } from './base'
 export type { ScalingUiProps }    from './base'
-
-
-// Spinners
-export { Spinner, SpinnerBeamsEven, SpinnerBeamsVaried, SpinnerCircle, SpinnerDots, SpinnerHourglass, SpinnerThreeQuarterCircle } from './spinners'
-export type { SpinnerBeamsEvenProps, SpinnerBeamsVariedProps, SpinnerCircleProps, SpinnerDotsProps, SpinnerHourglassProps, SpinnerProps, SpinnerThreeQuarterCircleProps } from './spinners'
 
 
 // Text
@@ -63,6 +58,11 @@ export { Code }                   from './text'
 export { H1, H2, H3, H4, H5, H6 } from './text'
 export { SectionHeader }          from './text'
 export { Text }                   from './text'
+
+
+// Toggle
+export { getToggleProps, Toggle } from './toggle'
+export type { ToggleProps }       from './toggle'
 
 
 // Toasts

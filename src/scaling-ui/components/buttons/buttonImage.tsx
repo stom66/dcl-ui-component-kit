@@ -7,7 +7,7 @@ import { PropsController } from '../../classes/propsController'
 import { tweenValue } from '../../utils/tweens'
 import { getUVCell } from '../../utils/uvs'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 
 
 /** 1-based UV rows for button states (bottom → top in the atlas). */
@@ -132,13 +132,14 @@ export const ButtonImage = ({
 					height      : `${height * scale}`,
 					borderWidth : 0,
 				}}
-				uiBackground={{
-					texture    : { src: textureSrc },
+				uiBackground={mergeUiBackground({
+					texture    : textureSrc === atlasBtnIconsStyled.source
+						? atlasBtnIconsStyled.texture
+						: { src: textureSrc, wrapMode: 'clamp' as const },
 					textureMode: 'stretch',
 					uvs,
 					color      : Color4.White(),
-					...uiBackground,
-				}}
+				}, uiBackground)}
 				onMouseEnter={() => {
 					hoverStates.set(id, true)
 					currentIndex.set(id, ButtonIndex.HOVER)

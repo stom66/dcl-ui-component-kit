@@ -24,7 +24,10 @@ export function defaultEdgesForPosition(position: ToastPosition): {
 // MARK: getToastDockTransform
 /**
  * Absolute dock rect inset by the top/bottom (~23%) and left/right (~25%) bar zones.
- * Left docks sit to the right of the left bar; right docks sit to the left of the right bar.
+ *
+ * Center docks span the full width and center the toast with `alignItems`.
+ * Side docks pin with `left` / `right` only and shrink-wrap the toast
+ * (avoids collapsed %-width strips that all landed near the left).
  */
 export function getToastDockTransform(position: ToastPosition): UiTransform {
 	const barH = '23%'
@@ -34,27 +37,33 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 		case 'top':
 			return {
 				positionType  : 'absolute',
-				position      : { top: barH, left: side },
-				width         : '50%',
+				position      : { top: barH, left: 0, right: 0 },
+				width         : '100%',
 				height        : 'auto',
-				alignItems    : 'center',
-				justifyContent: 'flex-start',
+				display       : 'flex',
+				flexDirection : 'row',
+				alignItems    : 'flex-start',
+				justifyContent: 'center',
 			}
 		case 'bottom':
 			return {
 				positionType  : 'absolute',
-				position      : { bottom: barH, left: side },
-				width         : '50%',
+				position      : { bottom: barH, left: 0, right: 0 },
+				width         : '100%',
 				height        : 'auto',
-				alignItems    : 'center',
-				justifyContent: 'flex-end',
+				display       : 'flex',
+				flexDirection : 'row',
+				alignItems    : 'flex-end',
+				justifyContent: 'center',
 			}
 		case 'topLeft':
 			return {
 				positionType  : 'absolute',
 				position      : { top: barH, left: side },
-				width         : '25%',
+				width         : 'auto',
 				height        : 'auto',
+				display       : 'flex',
+				flexDirection : 'row',
 				alignItems    : 'flex-start',
 				justifyContent: 'flex-start',
 			}
@@ -62,36 +71,44 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 			return {
 				positionType  : 'absolute',
 				position      : { top: barH, right: side },
-				width         : '25%',
+				width         : 'auto',
 				height        : 'auto',
-				alignItems    : 'flex-end',
-				justifyContent: 'flex-start',
+				display       : 'flex',
+				flexDirection : 'row',
+				alignItems    : 'flex-start',
+				justifyContent: 'flex-end',
 			}
 		case 'bottomLeft':
 			return {
 				positionType  : 'absolute',
 				position      : { bottom: barH, left: side },
-				width         : '25%',
+				width         : 'auto',
 				height        : 'auto',
-				alignItems    : 'flex-start',
-				justifyContent: 'flex-end',
+				display       : 'flex',
+				flexDirection : 'row',
+				alignItems    : 'flex-end',
+				justifyContent: 'flex-start',
 			}
 		case 'bottomRight':
 			return {
 				positionType  : 'absolute',
 				position      : { bottom: barH, right: side },
-				width         : '25%',
+				width         : 'auto',
 				height        : 'auto',
+				display       : 'flex',
+				flexDirection : 'row',
 				alignItems    : 'flex-end',
 				justifyContent: 'flex-end',
 			}
 		default:
 			return {
 				positionType  : 'absolute',
-				position      : { top: barH, left: side },
-				width         : '50%',
+				position      : { top: barH, left: 0, right: 0 },
+				width         : '100%',
 				height        : 'auto',
-				alignItems    : 'center',
+				display       : 'flex',
+				flexDirection : 'row',
+				alignItems    : 'flex-start',
 				justifyContent: 'center',
 			}
 	}
