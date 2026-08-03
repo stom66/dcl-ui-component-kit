@@ -1,9 +1,11 @@
 import { isMobile } from '@dcl/sdk/platform'
 import { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { VisibilityController } from '../../classes/visibilityController'
+import { VisibilityController, type VisibilityPosition } from '../../classes/visibilityController'
 import { getUiScaleFactor, readPhysicalCanvasDimensions, vhToPixels } from '../../utils'
 import { getCanvasInfo, readPhysicalCanvasWidth, vwToPixels } from '../../utils/sizing'
+
+export type { VisibilityPosition }
 
 
 type UiEntityTransform = NonNullable<Parameters<typeof UiEntity>[0]['uiTransform']>
@@ -24,9 +26,6 @@ export enum ZoneType {
 	BottomLeft       = 'bottomLeft',
 }
 
-
-export type VisibilityPosition = 'bottom' | 'left' | 'right' | 'top'
-
 export type ZonePreset = {
 	getUiTransform     : () => UiEntityTransform
 	visibilityPosition : VisibilityPosition
@@ -41,7 +40,7 @@ const m = isMobile()
  * DCL scales virtual pixels by min(real/virtual), while % parents still use the real
  * screen — so travel distance is realSize / scaleFactor, not virtual size alone.
  */
-function getOffscreenPosition(visibilityPosition: VisibilityPosition): number {
+export function getOffscreenPosition(visibilityPosition: VisibilityPosition): number {
 	const { height, width } = readPhysicalCanvasDimensions()
 	const scale             = getUiScaleFactor()
 
@@ -49,6 +48,26 @@ function getOffscreenPosition(visibilityPosition: VisibilityPosition): number {
 		return -(width / scale)
 	}
 	return -(height / scale)
+}
+
+
+// MARK: resolveVisibilityEdges
+/** Resolves showFrom / hideTo from optional overrides + zone preset default. */
+export function resolveVisibilityEdges(
+	presetEdge : VisibilityPosition,
+	showFrom?  : VisibilityPosition,
+	hideTo?    : VisibilityPosition,
+): { showFrom: VisibilityPosition; hideTo: VisibilityPosition } {
+	if (showFrom !== undefined && hideTo !== undefined) {
+		return { showFrom, hideTo }
+	}
+	if (showFrom !== undefined) {
+		return { showFrom, hideTo: showFrom }
+	}
+	if (hideTo !== undefined) {
+		return { showFrom: hideTo, hideTo }
+	}
+	return { showFrom: presetEdge, hideTo: presetEdge }
 }
 
 function getInteractableArea(): { top: number; bottom: number; left: number; right: number } {
@@ -64,7 +83,13 @@ function getInteractableArea(): { top: number; bottom: number; left: number; rig
  * `UiCanvasInformation.interactableArea.left` as a live inset (see info HUD).
  * `screenInsetArea` is hardware-only and already handled by `ScreenInsetArea`.
  */
-const LEFT_ZONE_INSET = 56
+export const LEFT_ZONE_INSET = isMobile() ? 8 : vwToPixels(3)
+
+/** Top / bottom bar height fraction used by zone presets and toast docks. */
+export const BAR_ZONE_HEIGHT = '23%'
+
+/** Right bar width fraction used by zone presets and toast docks. */
+export const RIGHT_ZONE_WIDTH = '25%'
 
 
 // MARK: zonePresets
@@ -158,13 +183,14 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			// Content-sized width; clamp to (12.5%|25%) vw − left rail inset.
 			// Yoga has no calc(), so min/max use vwToPixels (reliable for widths).
+			// Vertical: clear top/bottom bar bands (~23%) so demo nav can fit more buttons.
 			width       : 'auto',
 			minWidth    : vwToPixels(12.5) - LEFT_ZONE_INSET,
 			maxWidth    : vwToPixels(25)   - LEFT_ZONE_INSET,
 			positionType: 'absolute',
 			position    : {
 				top   : '12vh',
-				bottom: '56vh',
+				bottom: '25vh',
 				left  : LEFT_ZONE_INSET,
 			},
 		}),
@@ -183,13 +209,26 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 }
 
 
-// MARK: createVisibilityForZone
-/** Creates a VisibilityController for the given zone preset. */
-export function createVisibilityForZone(zone: ZoneType): VisibilityController {
-	if (zone === ZoneType.None) {
-		return new VisibilityController(0, () => getOffscreenPosition('bottom'))
-	}
+export type CreateVisibilityForZoneOptions = {
+	showFrom?: VisibilityPosition
+	hideTo?  : VisibilityPosition
+}
 
-	const preset = zonePresets[zone]
-	return new VisibilityController(0, () => getOffscreenPosition(preset.visibilityPosition))
+
+// MARK: createVisibilityForZone
+/** Creates a VisibilityController for the given zone preset (optional edge overrides). */
+export function createVisibilityForZone(
+	zone    : ZoneType,
+	options : CreateVisibilityForZoneOptions = {},
+): VisibilityController {
+	const presetEdge = zone === ZoneType.None
+		? 'bottom' as VisibilityPosition
+		: zonePresets[zone].visibilityPosition
+	const edges = resolveVisibilityEdges(presetEdge, options.showFrom, options.hideTo)
+
+	return new VisibilityController({
+		showFrom            : edges.showFrom,
+		hideTo              : edges.hideTo,
+		getOffscreenPosition,
+	})
 }

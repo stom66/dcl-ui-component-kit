@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { atlasIcons } from '../../atlases'
+import { atlasIconsFontAwesome } from '../../atlases'
 import { AvatarIcon, Background, Column, DEFAULT_AVATAR_USER_ID, H2, Icon, IconNumber, Row, Text, UiBox } from '../../components'
 import { Layer } from '../../components/layers'
 import { ZoneType } from '../../components/zones/zone.presets'
@@ -49,7 +49,7 @@ export class DemoListLayer extends Layer {
 			id             : 'demo-list',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : false,
+			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
 				width : '42vw',
@@ -119,10 +119,9 @@ export class DemoListLayer extends Layer {
 				>
 					{entry.icon ? (
 						<Icon
-							iconSrc = {atlasIcons.source}
-							uvs     = {atlasIcons.uv[entry.icon]}
-							width   = {ICON_SIZE}
-							height  = {ICON_SIZE}
+							uvs    = {atlasIconsFontAwesome.uv[entry.icon]}
+							width  = {ICON_SIZE}
+							height = {ICON_SIZE}
 						/>
 					) : (
 						<UiBox
@@ -160,7 +159,7 @@ export class DemoListLayer extends Layer {
 					/>
 				</Column>
 
-				{/* Name — cols 6 */}
+				{/* Name — cols 6; nowrap so short names stay on one line in the row */}
 				<Column
 					cols        = {6}
 					uiTransform = {{
@@ -168,7 +167,10 @@ export class DemoListLayer extends Layer {
 						justifyContent: 'center',
 					}}
 				>
-					<Text value={entry.name} />
+					<Text
+						value  = {entry.name}
+						uiText = {{ textWrap: 'nowrap' }}
+					/>
 				</Column>
 
 				{/* Score — cols 3, right-aligned */}

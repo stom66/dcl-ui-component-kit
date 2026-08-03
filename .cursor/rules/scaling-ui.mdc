@@ -14,5 +14,5 @@ Before adding or changing a Layer, read `.cursor/skills/scaling-ui/SKILL.md` and
 - `showCloseButton` / `canBeHidden` are Layer options forwarded to the Zone (Zone inserts the close control).
 - Prefer native `'30vw'` / `'10vh'` in `uiTransform`. Use `vwToPixels` / `vhToPixels` only for numeric math (virtual canvas, never physical screen size).
 - Inside `src/scaling-ui/**`, relative imports only.
-- Texture / atlas UVs: always use `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based**; totals are counts. Custom art starts from `assets/images/scaling-ui-assets.af` → `assets/images/my-theme/` → declare in `src/myTheme.ts` (see skill).
+- Texture / atlas UVs: always use `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based**; totals are counts. Custom art starts from `assets/images/scaling-ui-assets.af` → `assets/images/example-theme/` → declare in `src/exampleTheme/` (see skill).
 - Fail loud with `console.error`. Style: tabs, MARK comments, docstrings on public APIs.

@@ -126,61 +126,53 @@ export const atlasGradientColors = new TextureAtlas({
 	columns: 8,
 	rows   : 12,
 	named  : {
-		/** Default progress fill: columns 4–5, UV row 11, vertical inset 0.4. */
+		/** UV row 2 — warm pinks / yellows / oranges / reds / purples. */
+		pink           : { xStart: 1, xEnd: 2, yStart: 2, insetY: 0.4 },
+		pinkYellow     : { xStart: 1, xEnd: 3, yStart: 2, insetY: 0.4 },
 		yellowOrange   : { xStart: 3, xEnd: 5, yStart: 2, insetY: 0.4 },
 		yellowOrangeRed: { xStart: 3, xEnd: 6, yStart: 2, insetY: 0.4 },
+		orangeRed      : { xStart: 4, xEnd: 6, yStart: 2, insetY: 0.4 },
 		redPurple      : { xStart: 5, xEnd: 7, yStart: 2, insetY: 0.4 },
-		blue           : { xStart: 3, xEnd: 5, yStart: 5, insetY : 0.4 },
-		green          : { xStart: 1, xEnd: 3, yStart: 8, insetY : 0.4 },
+		purpleSlate    : { xStart: 7, xEnd: 8, yStart: 2, insetY: 0.4 },
 
+		/** UV row 5 — cyans / blues / violets. */
+		cyan           : { xStart: 1, xEnd: 3, yStart: 5, insetY: 0.4 },
+		blue           : { xStart: 3, xEnd: 5, yStart: 5, insetY: 0.4 },
+		bluePurple     : { xStart: 5, xEnd: 7, yStart: 5, insetY: 0.4 },
+		violet         : { xStart: 7, xEnd: 8, yStart: 5, insetY: 0.4 },
+
+		/** UV row 8 — greens / greys / neutrals. */
+		green          : { xStart: 1, xEnd: 3, yStart: 8, insetY: 0.4 },
+		tealBlack      : { xStart: 3, xEnd: 5, yStart: 8, insetY: 0.4 },
+		grey           : { xStart: 4, xEnd: 6, yStart: 8, insetY: 0.4 },
+		sand           : { xStart: 6, xEnd: 8, yStart: 8, insetY: 0.4 },
+
+		/** UV row 11 — browns / terracotta / peach / chartreuse. */
+		brown          : { xStart: 1, xEnd: 3, yStart: 11, insetY: 0.4 },
+		brownTerracotta: { xStart: 3, xEnd: 5, yStart: 11, insetY: 0.4 },
+		terracottaPeach: { xStart: 4, xEnd: 6, yStart: 11, insetY: 0.4 },
+		peachCream     : { xStart: 6, xEnd: 7, yStart: 11, insetY: 0.4 },
+		chartreuse     : { xStart: 7, xEnd: 8, yStart: 11, insetY: 0.4 },
+
+		/** Default progress fill: columns 4–5, UV row 2, vertical inset 0.4. */
 		progressBar: { xStart: 4, xEnd: 5, yStart: 2, insetY: 0.4 },
 	},
 })
 
 
-// MARK: atlasIcons
-/** General UI icons — 4×4 grid (PNG top → bottom; UV Y is bottom → top). */
-export const atlasIcons = new TextureAtlas({
-	source : 'assets/images/scaling-ui/atlas-icons.png',
-	columns: 4,
-	rows   : 4,
-	named  : {
-		/** Top row. */
-		prohibited: { xStart: 1, yStart: 4 },
-		target    : { xStart: 2, yStart: 4 },
-		play      : { xStart: 3, yStart: 4 },
-		cat       : { xStart: 4, yStart: 4 },
-		/** Second row. */
-		starburst : { xStart: 1, yStart: 3 },
-		check     : { xStart: 2, yStart: 3 },
-		coins     : { xStart: 3, yStart: 3 },
-		phone     : { xStart: 4, yStart: 3 },
-		/** Third row. */
-		crown     : { xStart: 1, yStart: 2 },
-		crosshair : { xStart: 2, yStart: 2 },
-		dice      : { xStart: 3, yStart: 2 },
-		ghost     : { xStart: 4, yStart: 2 },
-		/** Bottom row. */
-		gift      : { xStart: 1, yStart: 1 },
-		heart     : { xStart: 2, yStart: 1 },
-		stopwatch : { xStart: 3, yStart: 1 },
-		trash     : { xStart: 4, yStart: 1 },
-	},
-})
-
-
-// MARK: atlasIcons2048
+// MARK: atlasIconsFontAwesome
 /**
  * Font Awesome solid icon atlas — 16×16 grid (PNG top → bottom; UV Y is
  * bottom → top). Cells are 128×128 with icons fit to an **86px** max axis
  * (~0.707 × cell, minus shadow budget) and centered so rotations / wiggle
  * animations do not clip into neighbours. Named keys are camelCase FA names
- * (e.g. `dice-d20` → `diceD20`).
+ * (e.g. `dice-d20` → `diceD20`). Default source for `Icon`.
  */
-export const atlasIcons2048 = new TextureAtlas({
-	source : 'assets/images/scaling-ui/atlas-icons-2048.png',
+export const atlasIconsFontAwesome = new TextureAtlas({
+	source : 'assets/images/scaling-ui/atlas-icons-font-awesome.png',
 	columns: 16,
 	rows   : 16,
+	inset  : 0.1465,
 	named  : {
 		/** Row 1 (PNG top→bottom). */
 		plus               : { xStart:  1, yStart: 16 },
@@ -296,7 +288,7 @@ export const atlasIcons2048 = new TextureAtlas({
 		comment            : { xStart:  9, yStart: 10 },
 		forward            : { xStart: 10, yStart: 10 },
 		palette            : { xStart: 11, yStart: 10 },
-		spinner            : { xStart: 12, yStart: 10 },
+		ban                : { xStart: 12, yStart: 10 },
 		toolbox            : { xStart: 13, yStart: 10 },
 		ellipsis           : { xStart: 14, yStart: 10 },
 		envelope           : { xStart: 15, yStart: 10 },

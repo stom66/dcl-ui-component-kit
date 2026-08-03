@@ -1,7 +1,8 @@
 export { VisibilityController } from '../../classes/visibilityController'
+export type { VisibilityPosition } from '../../classes/visibilityController'
 
-export { createVisibilityForZone, ZoneType, zonePresets } from './zone.presets'
-export type { VisibilityPosition, ZonePreset }            from './zone.presets'
+export { createVisibilityForZone, getOffscreenPosition, LEFT_ZONE_INSET, BAR_ZONE_HEIGHT, RIGHT_ZONE_WIDTH, resolveVisibilityEdges, ZoneType, zonePresets } from './zone.presets'
+export type { CreateVisibilityForZoneOptions, ZonePreset } from './zone.presets'
 
 export { ZoneRoot }                                       from './zone.root'
 

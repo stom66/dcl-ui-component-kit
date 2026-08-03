@@ -1,4 +1,4 @@
-import { themeOverrides } from './myTheme'
+import { themeOverrides } from './exampleTheme'
 import { SetupScalingUI } from './scaling-ui'
 import { demoLayers } from './scaling-ui/examples/layers'
 

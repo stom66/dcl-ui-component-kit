@@ -28,8 +28,9 @@ export const Code = ({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{

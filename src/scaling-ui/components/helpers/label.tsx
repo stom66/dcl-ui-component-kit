@@ -1,9 +1,9 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
-import { getColSizing } from '../../utils'
+import { getColSelfTransform } from '../../utils'
 
 
 type LabelProps = Omit<UiBoxProps, 'uiText'> & {
@@ -38,7 +38,7 @@ export function Label({
 	...props
 }: LabelProps) {
 	const theme         = getTheme()
-	const width         = getColSizing(cols, colsDesktop, colsMobile) as PositionUnit | "auto"
+	const col           = getColSelfTransform(cols, colsDesktop, colsMobile)
 	const resolvedValue = value ?? uiText?.value ?? ''
 	const padding       = theme.border.radiusSmall
 
@@ -47,10 +47,11 @@ export function Label({
 			{...props}
 			uiTransform={{
 				height        : "auto",
-				width         : width,
+				width         : col.width,
 				display       : "flex",
-				flexGrow      : 0,
-				flexShrink    : 0,
+				flexGrow      : col.flexGrow,
+				flexShrink    : col.flexShrink,
+				flexBasis     : col.flexBasis,
 				flexDirection : "row",
 				alignItems    : "center",
 				justifyContent: "space-between",

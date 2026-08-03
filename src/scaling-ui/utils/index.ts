@@ -3,7 +3,8 @@ export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDim
 
 export { alpha, darken, lighten, randomColor }                        from './colors'
 
-export { getColSizing, getColSpan }                                   from './colSizing'
+export { getColSizing, getColSpan, getColSelfTransform }              from './colSizing'
+export type { ColSelfTransform }                                      from './colSizing'
 
 export { PropsController }                                            from '../classes/propsController'
 

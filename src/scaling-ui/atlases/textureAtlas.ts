@@ -17,7 +17,7 @@ export type TextureAtlasNamedCell = TextureAtlasCellOptions
 export type TextureAtlasOptions<
 	TNamed extends Record<string, TextureAtlasNamedCell> = Record<string, never>,
 > = {
-	/** Texture path used in `uiBackground.texture.src` / `iconSrc`. */
+	/** Texture path used in `uiBackground.texture.src` / Icon `src`. */
 	source  : string
 	/** Column count in the atlas grid. */
 	columns : number
@@ -96,6 +96,8 @@ export class TextureAtlas<
 
 	private readonly defaultInset: number
 	private readonly aliases     : Record<string, string>
+	/** Stable UV quads for `char()` — new arrays every frame leak ReactEcs entities. */
+	private readonly charCache   = new Map<string, number[]>()
 
 
 	constructor(options: TextureAtlasOptions<TNamed>) {
@@ -214,16 +216,32 @@ export class TextureAtlas<
 		}
 
 		const glyph = this.aliases[String(char)] ?? String(char)
-		const cell  = findAtlasCell(this.layout, glyph)
+		const cacheKey = [
+			glyph,
+			options.inset       ?? '',
+			options.insetX      ?? '',
+			options.insetY      ?? '',
+			options.insetLeft   ?? '',
+			options.insetRight  ?? '',
+			options.insetTop    ?? '',
+			options.insetBottom ?? '',
+		].join('|')
+
+		const cached = this.charCache.get(cacheKey)
+		if (cached) return cached
+
+		const cell = findAtlasCell(this.layout, glyph)
 		if (!cell) {
 			console.error('TextureAtlas.char: character not in layout', glyph, this.source)
 			return []
 		}
 
-		return this.cell({
+		const uvs = this.cell({
 			...options,
 			xStart: cell.col,
 			yStart: cell.row,
 		})
+		this.charCache.set(cacheKey, uvs)
+		return uvs
 	}
 }

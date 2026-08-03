@@ -1,9 +1,9 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { VisibilityController } from '../../classes/visibilityController'
+import { VisibilityController, type VisibilityPosition } from '../../classes/visibilityController'
 import { UiBox, type UiBoxProps } from '../base'
 import { ButtonImageClose } from '../buttons'
-import { ZoneType, zonePresets, type VisibilityPosition } from './zone.presets'
+import { ZoneType, zonePresets } from './zone.presets'
 
 
 export type ZoneProps = UiBoxProps & {
@@ -15,7 +15,10 @@ export type ZoneProps = UiBoxProps & {
 	closeButtonId?       : string
 	children?            : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	visibilityController?: VisibilityController
+	/** @deprecated Prefer showFrom / hideTo. Kept as a single-edge shorthand for both. */
 	visibilityPosition?  : VisibilityPosition
+	showFrom?            : VisibilityPosition
+	hideTo?              : VisibilityPosition
 }
 
 
@@ -36,11 +39,12 @@ export function Zone({
 	uiBackground,
 	visibilityController,
 	visibilityPosition,
+	showFrom,
+	hideTo,
 	...props
 }: ZoneProps) {
-	const preset           = zonePresets[type]
-	const resolvedPosition = visibilityPosition ?? preset.visibilityPosition
-	const presetTransform  = preset.getUiTransform()
+	const preset          = zonePresets[type]
+	const presetTransform = preset.getUiTransform()
 
 	let hideable = canBeHidden
 
@@ -68,6 +72,7 @@ export function Zone({
 
 		children = [
 			<ButtonImageClose
+				key      = {resolvedCloseId}
 				id       = {resolvedCloseId}
 				callback = {() => {
 					visibilityController.toggle()
@@ -84,6 +89,17 @@ export function Zone({
 				? presetTransform.position
 				: {}
 	)
+
+	const activeEdge = hideable && visibilityController
+		? visibilityController.activeEdge
+		: (showFrom ?? hideTo ?? visibilityPosition ?? preset.visibilityPosition)
+
+	const animatedPosition = hideable && visibilityController
+		? (() => {
+			const { top: _t, bottom: _b, left: _l, right: _r, ...rest } = basePosition as Record<string, unknown>
+			return { ...rest, [activeEdge]: visibilityController.position }
+		})()
+		: (uiTransform.position ?? presetTransform.position)
 
 	return (
 		<UiBox
@@ -102,9 +118,7 @@ export function Zone({
 				positionType  : hideable
 					? 'relative'
 					: (uiTransform.positionType ?? presetTransform.positionType),
-				position      : hideable && visibilityController
-					? { ...basePosition, [resolvedPosition]: visibilityController.position }
-					: (uiTransform.position ?? presetTransform.position),
+				position      : animatedPosition,
 			}}
 			uiBackground={uiBackground}
 		>

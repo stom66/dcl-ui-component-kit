@@ -1,7 +1,7 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
-import { VisibilityController } from '../../classes/visibilityController'
+import { VisibilityController, type VisibilityPosition } from '../../classes/visibilityController'
 import type { UiBoxProps } from '../base'
 import { Zone } from '../zones/zone.default'
 import { createVisibilityForZone, ZoneType } from '../zones/zone.presets'
@@ -13,6 +13,10 @@ export type LayerOptions = {
 	canBeHidden?    : boolean
 	startHidden?    : boolean
 	showCloseButton?: boolean
+	/** Edge the layer slides in from when shown. Defaults to the zone preset (or `hideTo` if only that is set). */
+	showFrom?       : VisibilityPosition
+	/** Edge the layer slides out to when hidden. Defaults to `showFrom` / zone preset. */
+	hideTo?         : VisibilityPosition
 	zIndex?         : number
 	uiTransform?    : UiBoxProps['uiTransform']
 	uiBackground?   : UiBoxProps['uiBackground']
@@ -25,6 +29,8 @@ export abstract class Layer {
 	readonly canBeHidden     : boolean
 	readonly startHidden     : boolean
 	readonly showCloseButton : boolean
+	readonly showFrom?       : VisibilityPosition
+	readonly hideTo?         : VisibilityPosition
 	readonly zIndex?         : number
 	readonly uiTransform?    : UiBoxProps['uiTransform']
 	readonly uiBackground?   : UiBoxProps['uiBackground']
@@ -38,10 +44,21 @@ export abstract class Layer {
 		this.canBeHidden     = options.canBeHidden ?? false
 		this.startHidden     = options.startHidden ?? false
 		this.showCloseButton = options.showCloseButton ?? false
+		this.showFrom        = options.showFrom
+		this.hideTo          = options.hideTo
 		this.zIndex          = options.zIndex
 		this.uiTransform     = options.uiTransform
 		this.uiBackground    = options.uiBackground
-		this.visibility      = createVisibilityForZone(this.zone)
+		this.visibility      = createVisibilityForZone(this.zone, {
+			showFrom: options.showFrom,
+			hideTo  : options.hideTo,
+		})
+
+		// Apply startHidden before the first render so off-screen layers can
+		// unmount immediately instead of building a full UI tree every frame.
+		if (this.canBeHidden) {
+			this.visibility.initialize(this.startHidden)
+		}
 	}
 
 
@@ -89,8 +106,15 @@ export abstract class Layer {
 	 * The canvas (`ScreenInsetArea` + full-size stack) is owned by SetupScalingUI.
 	 * `showCloseButton` is configured on the Layer and applied by the Zone.
 	 * For fill / border, wrap `body()` content in `Background`.
+	 *
+	 * After the hide animation finishes, returns `null` so the UiEntity tree is
+	 * unmounted (driven by `visibility.isFullyHidden`, not viewport math).
 	 */
 	render(): ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | null {
+		if (this.canBeHidden && this.visibility.isFullyHidden) {
+			return null
+		}
+
 		const content = this.body()
 
 		if (this.zone === ZoneType.None) {
@@ -106,6 +130,8 @@ export abstract class Layer {
 				showCloseButton      = {this.showCloseButton}
 				closeButtonId        = {`btn_close_${this.id}`}
 				visibilityController = {this.visibility}
+				showFrom             = {this.showFrom}
+				hideTo               = {this.hideTo}
 				uiBackground         = {this.uiBackground}
 				uiTransform          = {{
 					zIndex: this.zIndex,

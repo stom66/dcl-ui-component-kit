@@ -1,30 +1,32 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { atlasIcons } from '../../atlases'
-import { AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, Divider, H2, Icon, Label, Row, Text } from '../../components'
+import { atlasIconsFontAwesome } from '../../atlases'
+import { AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, H2, Icon, Label, Row, Text } from '../../components'
 import { Layer } from '../../components/layers'
 import { ZoneType } from '../../components/zones/zone.presets'
 import { getTheme } from '../../styles'
 import { alpha } from '../../utils'
 
 
-const NAMED_ICONS = [
-	'prohibited', 'target', 'play', 'cat',
-	'starburst', 'check', 'coins', 'phone',
-	'crown', 'crosshair', 'dice', 'ghost',
-	'gift', 'heart', 'stopwatch', 'trash',
+/** Curated sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
+const SAMPLE_ICONS = [
+	'cat', 'check', 'coins', 'crown', 'dice', 'gift', 'ghost', 'heart',
+	'play', 'phone', 'star', 'bolt', 'rocket', 'shield', 'trophy', 'ban',
+	'crosshairs', 'stopwatch', 'trash', 'user', 'gear', 'bell', 'map', 'fire',
 ] as const
+
+const GRID_COLS = 6
 
 
 // MARK: DemoIconsLayer
-/** Demo panel for named atlas icons (`atlasIcons`). */
+/** Demo panel for named Font Awesome atlas icons (`atlasIconsFontAwesome`). */
 export class DemoIconsLayer extends Layer {
 	constructor() {
 		super({
 			id             : 'demo-icons',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : false,
+			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
 				width : '42vw',
@@ -48,7 +50,7 @@ export class DemoIconsLayer extends Layer {
 					}}
 				>
 					<H2 value="Icons" />
-					<Text value="Named cells from atlasIcons — use atlas.uv.<name> with Icon. AvatarIcon uses uiBackground.avatarTexture." />
+					<Text value="Named cells from atlasIconsFontAwesome — use atlas.uv.<name> with Icon (src defaults to this atlas). AvatarIcon uses uiBackground.avatarTexture." />
 
 					<Label
 						cols        = {12}
@@ -64,13 +66,12 @@ export class DemoIconsLayer extends Layer {
 						}}
 					>
 						<Icon
-							iconSrc     = {atlasIcons.source}
-							uvs         = {atlasIcons.uv.cat}
+							uvs         = {atlasIconsFontAwesome.uv.cat}
 							width       = "64"
 							height      = "64"
 							uiTransform = {{ margin: { right: 12 } }}
 						/>
-						<Code value = "uvs={atlasIcons.uv.cat}" />
+						<Code value = "uvs={atlasIconsFontAwesome.uv.cat}" />
 					</Row>
 
 					<Label
@@ -92,13 +93,13 @@ export class DemoIconsLayer extends Layer {
 							height      = {64}
 							uiTransform = {{ margin: { right: 12 } }}
 						/>
-						<Code value = {'userId="0xcec7…"'} />
+						<Code value = {'<AvatarIcon userId="0xcec7…" />'} />
 					</Row>
 
 
 					<Label
 						cols        = {12}
-						value       = "Full atlas (atlasIcons.named)"
+						value       = "Sample icons (atlasIconsFontAwesome)"
 						uiTransform = {{ margin: { bottom: 8 } }}
 					/>
 					{this.renderIconGrid()}
@@ -109,16 +110,19 @@ export class DemoIconsLayer extends Layer {
 
 
 	// MARK: renderIconGrid
-	/** Renders the 4×4 named atlas as labelled rows. */
+	/** Renders a curated sample of named Font Awesome icons. */
 	private renderIconGrid() {
 		const theme = getTheme()
 		const rows: ReactEcs.JSX.Element[] = []
+		const rowCount = Math.ceil(SAMPLE_ICONS.length / GRID_COLS)
 
-		for (let row = 0; row < 4; row++) {
+		for (let row = 0; row < rowCount; row++) {
 			const cells: ReactEcs.JSX.Element[] = []
 
-			for (let col = 0; col < 6; col++) {
-				const name = NAMED_ICONS[row * 4 + col]
+			for (let col = 0; col < GRID_COLS; col++) {
+				const name = SAMPLE_ICONS[row * GRID_COLS + col]
+				if (!name) break
+
 				cells.push(
 					<Column
 						key          = {`icon-cell-${name}`}
@@ -134,8 +138,7 @@ export class DemoIconsLayer extends Layer {
 						}}
 					>
 						<Icon
-							iconSrc     = {atlasIcons.source}
-							uvs         = {atlasIcons.uv[name]}
+							uvs         = {atlasIconsFontAwesome.uv[name]}
 							width       = "40"
 							height      = "40"
 							uiTransform = {{ margin: { bottom: 4 } }}

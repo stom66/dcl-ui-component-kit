@@ -102,6 +102,52 @@ super({
 
 Zones are bare by default. Wrap content in `<Background>` for fill and border.
 
+### Different show / hide edges
+
+```tsx
+super({
+	id         : 'panel',
+	zone       : ZoneType.Default,
+	canBeHidden: true,
+	startHidden: true,
+	showFrom   : 'bottom',
+	hideTo     : 'top',
+})
+```
+
+## Toasts
+
+Include `toastHostLayer` in the `SetupScalingUI` layer list, then:
+
+```tsx
+import { showToast, clearToastGroup } from '../../components/toasts'
+
+showToast({
+	position     : 'bottom',
+	showFrom     : 'bottom',
+	hideTo       : 'top',
+	duration     : 2.5,
+	isDismissable: true,
+	content      : () => <Text value="Hello" />,
+	width        : 180,
+	height       : 48,
+})
+
+// Queued hint sequence
+showToast({
+	position   : 'top',
+	group      : 'hints',
+	groupPolicy: 'queue',
+	content    : () => <Icon … width="100%" height="100%" />,
+	width      : 64,
+	height     : 64,
+})
+
+clearToastGroup('hints')
+```
+
+Demo control panel: `demo.toasts.layer.tsx`.
+
 ## Buttons (ask image vs text first)
 
 > **Variants:** procedural (`ButtonText`) · image-based (`ButtonImage`)
@@ -127,17 +173,17 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `assets/images/scaling-ui-assets.af` → export under `assets/images/my-theme/`, declare in `src/myTheme.ts`):
+`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `assets/images/scaling-ui-assets.af` → export under `assets/images/example-theme/`, declare in `src/exampleTheme/`):
 
 ```tsx
-import { myBtnIconsAtlas } from '../../../myTheme'
+import { exampleBtnIconsAtlas } from '../../../exampleTheme'
 
 <ButtonImage
 	id            = "btn_custom"
-	textureSrc    = {myBtnIconsAtlas.source}
+	textureSrc    = {exampleBtnIconsAtlas.source}
 	uvColumn      = {1}
-	uvColumnCount = {myBtnIconsAtlas.columns}
-	uvRowCount    = {myBtnIconsAtlas.rows}
+	uvColumnCount = {exampleBtnIconsAtlas.columns}
+	uvRowCount    = {exampleBtnIconsAtlas.rows}
 	callback      = {() => { /* … */ }}
 />
 ```
@@ -148,7 +194,7 @@ import { myBtnIconsAtlas } from '../../../myTheme'
 
 ```tsx
 import { atlasGradientColors } from '../../atlases'
-import { myProgressBarTexturesHorizontal } from '../../../myTheme'
+import { exampleProgressBarTexturesHorizontal } from '../../../exampleTheme'
 
 // Procedural — colours only
 <ProgressBar id="hp" value={72} height={24} />
@@ -172,11 +218,11 @@ import { myProgressBarTexturesHorizontal } from '../../../myTheme'
 	atlas  = {atlasGradientColors}
 />
 
-// Custom textures from myTheme (partial OK)
+// Custom textures from exampleTheme (partial OK)
 <ProgressBarImage
 	id       = "xp_custom"
 	value    = {70}
-	textures = {myProgressBarTexturesHorizontal}
+	textures = {exampleProgressBarTexturesHorizontal}
 	height   = {64}
 />
 ```
@@ -184,11 +230,11 @@ import { myProgressBarTexturesHorizontal } from '../../../myTheme'
 ## Icons (image-based)
 
 ```tsx
-import { myIconsAtlas, myNumbersAtlas } from '../../../myTheme'
+import { exampleIconsAtlas, exampleNumbersAtlas } from '../../../exampleTheme'
 import { AvatarIcon, DEFAULT_AVATAR_USER_ID } from '../../components'
 
-<Icon iconSrc={myIconsAtlas.source} uvs={myIconsAtlas.uv.coin} />
-<IconNumber value={42} atlas={myNumbersAtlas} />
+<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
+<IconNumber value={42} atlas={exampleNumbersAtlas} />
 <AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
 ```
 

@@ -13,6 +13,7 @@ import { demoIconsLayer } from './demo.icons.layer'
 import { demoListLayer } from './demo.list.layer'
 import { demoProgressLayer } from './demo.progress.layer'
 import { demoTextLayer } from './demo.text.layer'
+import { demoToastsLayer } from './demo.toasts.layer'
 
 
 // MARK: DemoLeftBarLayer
@@ -62,46 +63,60 @@ export class DemoLeftBarLayer extends Layer {
 					}}
 				>
 					<ButtonText
+						key       = "btn_demo_animations"
 						id        = "btn_demo_animations"
 						textLabel = "Animations"
 						cols      = {12}
 						callback  = {() => demoAnimationsLayer.toggle()}
 					/>
 					<ButtonText
+						key       = "btn_demo_backgrounds"
 						id        = "btn_demo_backgrounds"
 						textLabel = "Backgrounds"
 						cols      = {12}
 						callback  = {() => demoBackgroundsLayer.toggle()}
 					/>
 					<ButtonText
+						key       = "btn_demo_buttons"
 						id        = "btn_demo_buttons"
 						textLabel = "Buttons"
 						cols      = {12}
 						callback  = {() => demoButtonsLayer.toggle()}
 					/>
 					<ButtonText
+						key       = "btn_demo_icons"
 						id        = "btn_demo_icons"
 						textLabel = "Icons"
 						cols      = {12}
 						callback  = {() => demoIconsLayer.toggle()}
 					/>
 					<ButtonText
+						key       = "btn_demo_list"
 						id        = "btn_demo_list"
 						textLabel = "List"
 						cols      = {12}
 						callback  = {() => demoListLayer.toggle()}
 					/>
 					<ButtonText
+						key       = "btn_demo_progress"
 						id        = "btn_demo_progress"
 						textLabel = "Progress"
 						cols      = {12}
 						callback  = {() => demoProgressLayer.toggle()}
 					/>
 					<ButtonText
+						key       = "btn_demo_text"
 						id        = "btn_demo_text"
 						textLabel = "Text"
 						cols      = {12}
 						callback  = {() => demoTextLayer.toggle()}
+					/>
+					<ButtonText
+						key       = "btn_demo_toasts"
+						id        = "btn_demo_toasts"
+						textLabel = "Toasts"
+						cols      = {12}
+						callback  = {() => demoToastsLayer.toggle()}
 					/>
 				</Column>
 			</Background>

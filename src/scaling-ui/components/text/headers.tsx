@@ -25,8 +25,9 @@ export function H1({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{
@@ -58,8 +59,9 @@ export function H2({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{
@@ -91,8 +93,9 @@ export function H3({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{
@@ -124,8 +127,9 @@ export function H4({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{
@@ -157,8 +161,9 @@ export function H5({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{
@@ -190,8 +195,9 @@ export function H6({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width : '100%',
-				height: 'auto',
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
 				...uiTransform
 			}}
 			uiText={{

@@ -1,7 +1,7 @@
-import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { getColSizing } from '../../utils'
+import { getColSelfTransform } from '../../utils'
 
 import { UiBox, type UiBoxProps } from '../base'
 
@@ -29,7 +29,7 @@ export function Column({
 	spacing,
 	...props
 }: ColumnProps) {
-	const width = getColSizing(cols, colsDesktop, colsMobile) as PositionUnit | 'auto'
+	const col   = getColSelfTransform(cols, colsDesktop, colsMobile)
 	const edge  = uiTransform?.flexDirection === 'column-reverse' ? 'top' : 'bottom'
 	const gap   = spacing ?? getTheme().spacing
 
@@ -38,13 +38,15 @@ export function Column({
 			{...props}
 			uiTransform={{
 				height        : 'auto',
-				width         : width,
+				width         : col.width,
 				display       : 'flex',
-				flexGrow      : 0,
-				flexShrink    : 0,
+				flexGrow      : col.flexGrow,
+				flexShrink    : col.flexShrink,
+				flexBasis     : col.flexBasis,
 				flexDirection : 'column',
 				alignItems    : 'center',
-				justifyContent: 'space-between',
+				// flex-start so spacer gutters stay adjacent (space-between fights them)
+				justifyContent: 'flex-start',
 				...uiTransform,
 			}}
 		>

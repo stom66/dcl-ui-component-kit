@@ -4,7 +4,7 @@ import ReactEcs, { PositionUnit, scaleFontSize, UiTransformProps } from '@dcl/sd
 
 import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
-import { getColSizing } from '../../utils'
+import { getColSelfTransform, getColSpan } from '../../utils'
 import { resolveAspectDimensions } from '../../utils/aspect'
 import { lighten } from '../../utils/colors'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
@@ -101,15 +101,23 @@ export const ButtonText = ({
 	const hoverColor   = lighten(defaultColor, 0.1)
 	const button       = getButtonProps(id, defaultColor)
 	const color        = button.get('backgroundColor')
-	const colWidth     = getColSizing(cols, colsDesktop, colsMobile) as PositionUnit | 'auto'
-	const resolvedWidth = colWidth !== 'auto' ? colWidth : width
+	const col          = getColSelfTransform(cols, colsDesktop, colsMobile)
+	const span         = getColSpan(cols, colsDesktop, colsMobile)
+	const colCount     = theme.cols.COL_COUNT
+	// Partial cols share a Row via flexGrow; full / none keep aspect-ratio sizing.
+	const useFlexCols  = span !== undefined && span < colCount
 
-	const size = resolveAspectDimensions({
-		width        : resolvedWidth,
-		height       : height,
-		aspectRatio  : aspectRatio ?? theme.buttons.aspectRatio,
-		defaultHeight: theme.buttons.heightDefault,
-	})
+	const size = useFlexCols
+		? {
+			width : col.width,
+			height: height ?? theme.buttons.heightDefault,
+		}
+		: resolveAspectDimensions({
+			width        : col.width !== 'auto' ? col.width : width,
+			height       : height,
+			aspectRatio  : aspectRatio ?? theme.buttons.aspectRatio,
+			defaultHeight: theme.buttons.heightDefault,
+		})
 
 	return (
 		<UiBox
@@ -117,11 +125,13 @@ export const ButtonText = ({
 			backgroundColor = {color}
 			borderWidth     = {borderWidth ?? theme.buttons.borderWidth}
 			uiTransform     = {{
-				width       : size.width,
-				height      : size.height,
-				//margin      : 4,
-				borderRadius: scaleFontSize(theme.border.radiusSmall),
-				alignItems  : 'center',
+				width         : size.width,
+				height        : size.height,
+				flexGrow      : useFlexCols ? col.flexGrow : 0,
+				flexShrink    : useFlexCols ? col.flexShrink : 0,
+				flexBasis     : useFlexCols ? 0 : undefined,
+				borderRadius  : scaleFontSize(theme.border.radiusSmall),
+				alignItems    : 'center',
 				justifyContent: 'center',
 				...uiTransform
 			}}

@@ -1,7 +1,7 @@
-import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { getColSizing } from '../../utils'
+import { getColSelfTransform } from '../../utils'
 
 import { UiBox, type UiBoxProps } from '../base'
 
@@ -15,8 +15,8 @@ type RowProps = UiBoxProps & {
 	colsMobile? : number
 	/**
 	 * Gap between children. Defaults to `theme.spacing`. Pass `0` to disable.
-	 * When `spacing > 0`, children with `cols` share remaining width via
-	 * `flexGrow` (Yoga has no `calc()`, so raw `%` + gutters would overflow).
+	 * Gutters are spacer entities; `cols` children use `flexGrow` so percentages
+	 * are not required (Yoga has no `calc()`).
 	 */
 	spacing?    : number
 }
@@ -33,22 +33,24 @@ export function Row({
 	spacing,
 	...props
 }: RowProps) {
-	const width = getColSizing(cols, colsDesktop, colsMobile) as PositionUnit | 'auto'
-	const edge  = uiTransform?.flexDirection === 'row-reverse' ? 'left' : 'right'
-	const gap   = spacing ?? getTheme().spacing
+	const col  = getColSelfTransform(cols, colsDesktop, colsMobile)
+	const edge = uiTransform?.flexDirection === 'row-reverse' ? 'left' : 'right'
+	const gap  = spacing ?? getTheme().spacing
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
 				height        : 'auto',
-				width         : width,
+				width         : col.width,
 				display       : 'flex',
-				flexGrow      : 0,
-				flexShrink    : 0,
+				flexGrow      : col.flexGrow,
+				flexShrink    : col.flexShrink,
+				flexBasis     : col.flexBasis,
 				flexDirection : 'row',
 				alignItems    : 'center',
-				justifyContent: 'space-between',
+				// flex-start so spacer gutters stay adjacent (space-between fights them)
+				justifyContent: 'flex-start',
 				...uiTransform,
 			}}
 		>

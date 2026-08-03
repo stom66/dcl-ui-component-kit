@@ -105,7 +105,7 @@ super({
 
 **Nesting rule:** any `Column` / `Row` that hosts children with `cols={…}` (or `width: '…%'`) must itself have a **definite** width — typically `cols={12}` (or a parent that already spans). If the parent is `cols`-omitted (`auto`), nested percentage widths collapse and content can vanish (fixed-`px` children may still show).
 
-**Row spacing + `cols`:** Yoga has no `calc()`. A `Row` defaults to `theme.spacing` gutters between children. Raw `%` widths from `cols` would ignore those gutters and overflow (last column past the parent). When `spacing > 0`, `Row` switches children that declare `cols` to `flexGrow: span` so free space **after** gutters is shared in column proportions. Pass `spacing={0}` only when you need exact `%` columns with no gutters. Do **not** add extra horizontal `margin` on `cols` children inside a spaced `Row` — that reintroduces overflow; use padding or the Row’s `spacing` instead.
+**Row spacing + `cols`:** Yoga has no `calc()`. A `Row` defaults to `theme.spacing` gutters (spacer entities between children — never `createElement` clones; those leak UiEntities in ReactEcs). Partial `cols` (1–11) size via `flexGrow: span` so gutters do not overflow. `cols={12}` stays `width: 100%`. Pass `spacing={0}` to disable gutters. Do **not** add extra horizontal `margin` on `cols` children inside a spaced `Row`.
 
 Optional platform overrides: `colsDesktop` / `colsMobile`. `uiTransform.height` is unrelated — keep using it for vertical size.
 
@@ -187,32 +187,32 @@ Several families ship in two flavours. Document and choose explicitly:
 | Kind | Meaning |
 |---|---|
 | **Procedural** | Colours / theme only — no texture files |
-| **Image-based** | PNG / atlas — always overridable (`textureSrc`, `textures`, `atlas`, `iconSrc`, …) |
+| **Image-based** | PNG / atlas — always overridable (`textureSrc`, `textures`, `atlas`, `src`, …) |
 
-Project art goes under **`assets/images/my-theme/`**. Define custom `TextureAtlas` / texture sets in `src/myTheme.ts` (see examples there). Do not invent parallel texture APIs.
+Project art goes under **`assets/images/example-theme/`**. Define custom `TextureAtlas` / texture sets in `src/exampleTheme/` (see examples there). Do not invent parallel texture APIs.
 
 | Family | Procedural | Image-based | Override |
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` | `textures?` (per-layer optional) / `atlas` + `uvCell` |
-| Icons | — | `Icon` / `IconNumber` / `AvatarIcon` | `iconSrc` + `uvs`, or `atlas` on `IconNumber`; `userId` on `AvatarIcon` (`avatarTexture`) |
+| Icons | — | `Icon` / `IconNumber` / `AvatarIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); `atlas` on `IconNumber`; `userId` on `AvatarIcon` |
 
 ## Custom textures / atlases (agent checklist)
 
 When a user wants **their own images, atlases, or styles**, walk them through this — do not invent a parallel path:
 
 1. **Open the Affinity template** at `assets/images/scaling-ui-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
-2. **Export PNGs** into `assets/images/my-theme/` (never into `assets/images/scaling-ui/` unless they intend to replace framework defaults).
-3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/myTheme.ts`, mirroring the examples already in that file (`myBtnIconsAtlas`, `myIconsAtlas`, `myNumbersAtlas`, progress-bar sets).
+2. **Export PNGs** into `assets/images/example-theme/` (never into `assets/images/scaling-ui/` unless they intend to replace framework defaults).
+3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleTheme/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, `exampleNumbersAtlas`, progress-bar sets).
 4. **Sample UVs only via framework APIs** — never hand-write UV arrays:
 	- Prefer `TextureAtlas.cell` / `.row` / `.column` / `.char`; named regions via `.named.<name>` (cell options) or `.uv.<name>` (UV quad)
 	- Fall back to `getUVCell` / `getUVColumn` / `getUVRow` from `utils/uvs.tsx` for one-off / non-atlas cases
 5. **Coordinates are 1-based and inclusive.** First column/row is `1`, not `0`. Totals (`columns`, `rows`, `xTotal`, `yTotal`, `uvColumnCount`) are counts. Example: first cell of a 4×4 → `{ xStart: 1, yStart: 1, xTotal: 4, yTotal: 4 }`; `ButtonImage` `uvColumn={1}` for the first variant.
 6. Point them at root `README.md` → **Custom textures** and the Affinity callout at the top of the README.
 
-**Icon packs / bulk icon atlases:** if the user asks about adding a large set of custom icons (Font Awesome, game-icons, etc.), tell them it is practical to generate a snap grid in Affinity, place icons programmatically, export one PNG, and register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Reference implementation: `atlasIcons2048` in `src/scaling-ui/atlases/atlases.ts` + `assets/images/scaling-ui/atlas-icons-2048.png`.
+**Icon packs / bulk icon atlases:** if the user asks about adding a large set of custom icons (Font Awesome, game-icons, etc.), tell them it is practical to generate a snap grid in Affinity, place icons programmatically, export one PNG, and register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Reference implementation: `atlasIconsFontAwesome` in `src/scaling-ui/atlases/atlases.ts` + `assets/images/scaling-ui/atlas-icons-font-awesome.png`.
 
-**Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `myTheme.ts` / `scaling-ui/atlases/`.
+**Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `exampleTheme/` / `scaling-ui/atlases/`.
 
 
 ## Bulk icon atlas via Affinity (agent workflow)
@@ -223,9 +223,9 @@ Use this when a user wants a **grid of icons from an SVG pack** turned into a `T
 
 Tell them roughly:
 
-> You can generate a full icon atlas quickly: connect Affinity’s MCP to the agent, point it at an SVG icon pack, have it build a snapped grid on an artboard, export a PNG, then declare a `TextureAtlas` with named cells (same pattern as `atlasIcons2048`).
+> You can generate a full icon atlas quickly: connect Affinity’s MCP to the agent, point it at an SVG icon pack, have it build a snapped grid on an artboard, export a PNG, then declare a `TextureAtlas` with named cells (same pattern as `atlasIconsFontAwesome`).
 
-Ask for: pack path, solid vs regular preference, cell size / max icon size / padding, artboard size (or cell count), and whether the atlas is a **framework default** (`scaling-ui/atlases` + `assets/images/scaling-ui/`) or a **project theme** (`src/myTheme.ts` + `assets/images/my-theme/`).
+Ask for: pack path, solid vs regular preference, cell size / max icon size / padding, artboard size (or cell count), and whether the atlas is a **framework default** (`scaling-ui/atlases` + `assets/images/scaling-ui/`) or a **project theme** (`src/exampleTheme/` + `assets/images/example-theme/`).
 
 ### Affinity MCP setup (suggest if missing)
 
@@ -239,7 +239,7 @@ Affinity 3.2+ exposes a local MCP server. Cursor may need a bridge:
 
 Always `read_sdk_documentation_topic({ filename: 'preamble' })` before `execute_script`.
 
-### Artboard / grid conventions (match `atlas-icons-2048`)
+### Artboard / grid conventions (match `atlas-icons-font-awesome`)
 
 | Setting | Typical value | Notes |
 |---|---|---|
@@ -261,7 +261,7 @@ PNG row 0 = top of artboard. UV Y is **bottom → top**, so for a 16×16 atlas t
 
 ### Generation steps
 
-1. **Prepare artboard** in `scaling-ui-assets.af` (or a duplicate): size, guides, name (e.g. `atlas-icons-2048`). Use `doc.setArtboardSizeWithAnchor(artboard, w, h, SpatialAnchor.TopLeft)` / `DocumentCommand.createAddHorizontalGuide` / `createAddVerticalGuide`. Find artboards via `doc.artboards` + `ab.description`.
+1. **Prepare artboard** in `scaling-ui-assets.af` (or a duplicate): size, guides, name (e.g. `atlas-icons-font-awesome`). Use `doc.setArtboardSizeWithAnchor(artboard, w, h, SpatialAnchor.TopLeft)` / `DocumentCommand.createAddHorizontalGuide` / `createAddVerticalGuide`. Find artboards via `doc.artboards` + `ab.description`.
 2. **Curate icons** from the pack (score / hand-pick for the use case). Prefer solid. Cap at `columns × rows` (e.g. 256).
 3. **Place icons** left → right, top → bottom:
 	- Host-side: parse SVG `d` with something like `svgpath` (`.abs().unshort().unarc()`).
@@ -269,12 +269,12 @@ PNG row 0 = top of artboard. UV Y is **bottom → top**, so for a 16×16 atlas t
 	- Name layers with `Selection.create(doc, node)` + `doc.setLayerDescription(name)` — **never** rely on `selection.clear()` / `add()` alone (multi-select can rename the artboard).
 	- Batch (e.g. 8–16 icons per `execute_script`) to keep scripts small and retries cheap.
 4. **Smoke-test one cell** before the full grid (placement, naming, artboard name intact).
-5. **Export PNG** from Affinity (user or script) to the correct assets folder (`atlas-icons-2048.png`).
+5. **Export PNG** from Affinity (user or script) to the correct assets folder (`atlas-icons-font-awesome.png`).
 6. **Declare `TextureAtlas`** with `columns` / `rows` / `named`:
 	- Keys: camelCase from FA names (`dice-d20` → `diceD20`, `arrow-left` → `arrowLeft`).
 	- Values: `{ xStart, yStart }` (1-based; invert PNG row → UV `yStart`).
 	- Framework sheets: `src/scaling-ui/atlases/atlases.ts` + re-export from `atlases/index.ts` and `scaling-ui/index.tsx`. Keep large icon atlases **at the end** of `atlases.ts`.
-	- Project sheets: `src/myTheme.ts` + `assets/images/my-theme/`.
+	- Project sheets: `src/exampleTheme/` + `assets/images/example-theme/`.
 7. **Verify** named count === cell count, spot-check `atlas.uv.<name>` in a demo or layer.
 
 ### Useful Affinity APIs (from this workflow)
@@ -337,7 +337,7 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/myTheme.ts`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`.
+Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/exampleTheme/`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`.
 
 ## Progress bars
 
@@ -346,10 +346,69 @@ Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `
 Shared value API: `id`, `value`, `minValue` / `maxValue`, `fillFrom`, lerp per `id`.
 
 - **`ProgressBar`** — colour track / fill / border. Defaults: fill `primary`, track `dark`, border `secondary`, radius = half shortest axis
-- **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/myTheme.ts`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
+- **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/exampleTheme/`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
 ## Hideable + close button
 
 `canBeHidden` / `startHidden` / `showCloseButton` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — wrap panel content in `<Background>` for theme body fill and border. Leave Background off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
+
+### showFrom / hideTo
+
+Hideable layers slide on a visibility edge. By default both edges come from the zone preset (`visibilityPosition`). Override independently on `LayerOptions`:
+
+| Option | Meaning |
+|---|---|
+| `showFrom` | Edge the layer snaps to off-screen, then tweens in from |
+| `hideTo` | Edge the layer tweens out to when hiding |
+
+If only one is set, the other matches it. Re-show always re-snaps to `showFrom` off-screen first (so hide-to-top then show-from-bottom works).
+
+```tsx
+super({
+	id         : 'panel',
+	zone       : ZoneType.Default,
+	canBeHidden: true,
+	startHidden: true,
+	showFrom   : 'bottom',
+	hideTo     : 'top',
+})
+```
+
+## Toasts
+
+Ephemeral notifications via an always-mounted **ToastHost** (not one Layer per toast).
+
+1. Include `toastHostLayer` in `SetupScalingUI({ layers })` (demos already do).
+2. Call `showToast({ position, content, … })` / `hideToast(id)` / `clearToastGroup(group)`.
+
+| Field | Notes |
+|---|---|
+| `position` | Dock: `top` / `bottom` / `topLeft` / `topRight` / `bottomLeft` / `bottomRight` (inset by bar zones) |
+| `content` | `() => JSX` — prefer `%` / `cols` children so root scale works |
+| `duration` | Seconds after enter (+ optional pulse); `0` = until dismiss / `hideToast` |
+| `isDismissable` | Click toast to hide early |
+| `showFrom` / `hideTo` | Slide edges (same rules as layers) |
+| `scaleIn` / `scaleOut` / `scalePulse` | Root width/height scale (DCL has no `uiTransform.scale`) |
+| `group` + `groupPolicy` | `stack` (default) / `queue` / `replace` — queue/replace require `group` |
+
+```tsx
+import { showToast, toastHostLayer } from './scaling-ui'
+
+// in SetupScalingUI layers:
+toastHostLayer,
+
+showToast({
+	position     : 'top',
+	group        : 'hints',
+	groupPolicy  : 'queue',
+	duration     : 2,
+	isDismissable: true,
+	content      : () => <Icon src={…} uvs={…} width="100%" height="100%" />,
+	width        : 64,
+	height       : 64,
+})
+```
+
+See `demo.toasts.layer.tsx`. The host registry is generic enough for a future UI particle system.
 
 ## Component prop forwarding
 
@@ -390,18 +449,18 @@ Defaults: fills parent via absolute insets, theme body fill, theme border width/
 
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/scaling-ui/atlases/` (`atlasIcons`, `atlasIcons2048`, `atlasBtnIconsStyled`, `atlasSpinners`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `assets/images/scaling-ui-assets.af`, export to `assets/images/my-theme/`, declare atlases in `src/myTheme.ts`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/scaling-ui/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasSpinners`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `assets/images/scaling-ui-assets.af`, export to `assets/images/example-theme/`, declare atlases in `src/exampleTheme/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
 
 **Always use** `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based inclusive**; totals are counts.
 
 ```tsx
-import { atlasIcons, atlasCharsNumbers } from '../../atlases'
+import { atlasIconsFontAwesome, atlasCharsNumbers } from '../../atlases'
 
-atlasIcons.source
-atlasIcons.cell({ xStart: 1, yStart: 1 })           // first cell
-atlasIcons.cell({ xStart: 1, xEnd: 2, yStart: 4 })  // columns 1–2, top row of a 4×4
-atlasIcons.row(1)                                   // full bottom row
-atlasIcons.column(1)                                // full first column
+atlasIconsFontAwesome.source
+atlasIconsFontAwesome.uv.star                        // named cell UV quad
+atlasIconsFontAwesome.cell({ xStart: 1, yStart: 1 }) // first cell
+atlasIconsFontAwesome.row(1)                         // full bottom row
+atlasIconsFontAwesome.column(1)                      // full first column
 atlasCharsNumbers.char('5', { insetX: 0.15 })
 ```
 

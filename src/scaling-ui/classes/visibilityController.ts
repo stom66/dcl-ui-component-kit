@@ -1,28 +1,51 @@
 import { tweenValue, easingFunctions, type EasingFn } from '../utils/tweens'
-
 import { getTheme } from '../styles'
 
 
+export type VisibilityPosition = 'bottom' | 'left' | 'right' | 'top'
+
+export type VisibilityControllerOptions = {
+	showFrom            : VisibilityPosition
+	hideTo              : VisibilityPosition
+	getOffscreenPosition: (edge: VisibilityPosition) => number
+	visiblePosition?    : number
+	easingFunctionShow? : EasingFn
+	easingFunctionHide? : EasingFn
+}
+
+
 export class VisibilityController {
-	public position: number
-	public isHidden: boolean = false
+	public position   : number
+	public isHidden   : boolean = false
+	public activeEdge : VisibilityPosition
+	public isFullyHidden: boolean = false
+
+	public readonly showFrom : VisibilityPosition
+	public readonly hideTo   : VisibilityPosition
+
+	private readonly getOffscreenPosition : (edge: VisibilityPosition) => number
+	public  readonly visiblePosition      : number
+	public  readonly easingFunctionShow   : EasingFn
+	public  readonly easingFunctionHide   : EasingFn
 
 	private hasInitialized: boolean = false
 
-	constructor(
-		public readonly visiblePosition    : number,
-		private readonly getHiddenPosition : () => number,
-		public readonly easingFunctionShow : EasingFn = easingFunctions.easeOutBack,
-		public readonly easingFunctionHide : EasingFn = easingFunctions.easeInBack
-	) {
-		this.position = getHiddenPosition()
+	constructor(options: VisibilityControllerOptions) {
+		this.showFrom             = options.showFrom
+		this.hideTo               = options.hideTo
+		this.getOffscreenPosition = options.getOffscreenPosition
+		this.visiblePosition      = options.visiblePosition ?? 0
+		this.easingFunctionShow   = options.easingFunctionShow ?? easingFunctions.easeOutBack
+		this.easingFunctionHide   = options.easingFunctionHide ?? easingFunctions.easeInBack
+		this.activeEdge           = this.hideTo
+		this.position             = this.getOffscreenPosition(this.hideTo)
 	}
 
 
 	// MARK: hiddenPosition
-	/** Live off-screen target; recomputed so viewport/aspect changes stay correct. */
+	/** Live off-screen target for the active hide edge. */
 	get hiddenPosition(): number {
-		return this.getHiddenPosition()
+		return this.getOffscreenPosition(this.activeEdge)
 	}
 
 
@@ -47,29 +70,42 @@ export class VisibilityController {
 
 
 	// MARK: hide
-	/** Moves the controlled zone to its hidden position. */
+	/** Slides out along `hideTo`, tweening from the visible position to off-screen. */
 	hide(duration = getTheme().animation.hideDuration) {
-		this.isHidden = true
+		this.isHidden      = true
+		this.isFullyHidden = false
+		this.activeEdge    = this.hideTo
+		const target       = this.getOffscreenPosition(this.hideTo)
 
 		if (duration > 0) {
 			tweenValue(
 				this.position,
-				this.hiddenPosition,
+				target,
 				duration,
 				v => (this.position = v),
-				undefined,
+				() => {
+					// Ignore stale hide tweens interrupted by a later show().
+					if (this.isHidden) this.isFullyHidden = true
+				},
 				this.easingFunctionHide
 			)
 		} else {
-			this.position = this.hiddenPosition
+			this.position      = target
+			this.isFullyHidden = true
 		}
 	}
 
 
 	// MARK: show
-	/** Moves the controlled zone to its visible position. */
+	/**
+	 * Slides in along `showFrom`: snaps to that edge off-screen, then tweens to visible.
+	 * Re-snap ensures a prior hide-to a different edge does not leave the zone stranded.
+	 */
 	show(duration = getTheme().animation.showDuration) {
-		this.isHidden = false
+		this.isHidden      = false
+		this.isFullyHidden = false
+		this.activeEdge    = this.showFrom
+		this.position      = this.getOffscreenPosition(this.showFrom)
 
 		if (duration > 0) {
 			tweenValue(

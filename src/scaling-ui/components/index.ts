@@ -65,6 +65,11 @@ export { SectionHeader }          from './text'
 export { Text }                   from './text'
 
 
+// Toasts
+export { clearToastGroup, hideToast, showToast, toastHostLayer, ToastHostLayer } from './toasts'
+export type { ShowToastOptions, ToastGroupPolicy, ToastItem, ToastPhase, ToastPosition } from './toasts'
+
+
 // Zones
 export { Zone }                   from './zones'
 export { ZoneRoot }               from './zones'
@@ -80,4 +85,4 @@ export { ZoneTopLeft }            from './zones'
 export { ZoneTopRight }           from './zones'
 export { ZoneType }               from './zones'
 export { VisibilityController }   from './zones'
-export type { ZoneProps }         from './zones'
+export type { VisibilityPosition, ZoneProps } from './zones'

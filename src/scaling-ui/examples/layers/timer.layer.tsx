@@ -59,7 +59,8 @@ export class TimerLayer extends Layer {
 		return (
 			<Background backgroundColor={theme.colors.primary}>
 				<IconNumber
-					value  = {String(seconds)}
+					// Fixed width so the digit entity count stays at 2 (no 9↔10 remount churn).
+					value  = {String(seconds).padStart(2, '0')}
 					height = {"80px"}
 				/>
 			</Background>

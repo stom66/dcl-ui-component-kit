@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { atlasIcons } from '../../atlases'
+import { atlasIconsFontAwesome } from '../../atlases'
 import { Background, Column, Icon, playOnce, Row, setPlaying, Text, UiBox } from '../../components'
 import { Bounce, FlashColor, Pulse, Shake, Wiggle } from '../../components/animations'
 import { Layer } from '../../components/layers'
@@ -17,8 +17,7 @@ const CELL = {
 	width : '128',
 } as const
 
-const ICON_SRC = atlasIcons.source
-const ICON_UVS = atlasIcons.cell({ xStart: 1, yStart: 1 })
+const ICON_UVS = atlasIconsFontAwesome.uv.star
 
 const ID = {
 	pulse               : 'demo-anim-pulse',
@@ -73,10 +72,9 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Pulse', theme.colors.primary, (
 							<Pulse id={ID.pulse}>
 								<Icon
-									iconSrc = {ICON_SRC}
-									uvs     = {ICON_UVS}
-									width   = {64}
-									height  = {64}
+									uvs    = {ICON_UVS}
+									width  = {64}
+									height = {64}
 								/>
 							</Pulse>
 						))}
@@ -99,10 +97,9 @@ export class DemoAnimationsLayer extends Layer {
 								burstInterval  = {0}
 							>
 								<Icon
-									iconSrc = {ICON_SRC}
-									uvs     = {ICON_UVS}
-									width   = {64}
-									height  = {64}
+									uvs    = {ICON_UVS}
+									width  = {64}
+									height = {64}
 								/>
 							</Pulse>,
 						])}
@@ -110,10 +107,9 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Bounce', theme.colors.info, (
 							<Bounce id={ID.bounce}>
 								<Icon
-									iconSrc = {ICON_SRC}
-									uvs     = {ICON_UVS}
-									width   = {64}
-									height  = {64}
+									uvs    = {ICON_UVS}
+									width  = {64}
+									height = {64}
 								/>
 							</Bounce>
 						))}
@@ -121,10 +117,9 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Shake', theme.colors.danger, (
 							<Shake id={ID.shake}>
 								<Icon
-									iconSrc = {ICON_SRC}
-									uvs     = {ICON_UVS}
-									width   = {64}
-									height  = {64}
+									uvs    = {ICON_UVS}
+									width  = {64}
+									height = {64}
 								/>
 							</Shake>
 						))}
@@ -135,10 +130,9 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('FlashColor', theme.colors.info, (
 							<FlashColor id={ID.flashColor}>
 								<Icon
-									iconSrc = {ICON_SRC}
-									uvs     = {ICON_UVS}
-									width   = {64}
-									height  = {64}
+									uvs    = {ICON_UVS}
+									width  = {64}
+									height = {64}
 								/>
 							</FlashColor>
 						))}
@@ -146,10 +140,9 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Wiggle', theme.colors.warning, (
 							<Wiggle id={ID.wiggle}>
 								<Icon
-									iconSrc = {ICON_SRC}
-									uvs     = {ICON_UVS}
-									width   = {64}
-									height  = {64}
+									uvs    = {ICON_UVS}
+									width  = {64}
+									height = {64}
 								/>
 							</Wiggle>
 						))}
@@ -171,7 +164,6 @@ export class DemoAnimationsLayer extends Layer {
 								speed          = {1}
 							>
 								<Icon
-									iconSrc         = {ICON_SRC}
 									uvs             = {ICON_UVS}
 									width           = {64}
 									height          = {64}
@@ -224,10 +216,9 @@ export class DemoAnimationsLayer extends Layer {
 									burstCount = {1}
 								>
 									<Icon
-										iconSrc = {ICON_SRC}
-										uvs     = {ICON_UVS}
-										width   = {64}
-										height  = {64}
+										uvs    = {ICON_UVS}
+										width  = {64}
+										height = {64}
 									/>
 								</Shake>
 							),
@@ -247,10 +238,9 @@ export class DemoAnimationsLayer extends Layer {
 									burstInterval={0}
 								>
 									<Icon
-										iconSrc = {ICON_SRC}
-										uvs     = {ICON_UVS}
-										width   = {64}
-										height  = {64}
+										uvs    = {ICON_UVS}
+										width  = {64}
+										height = {64}
 									/>
 								</Pulse>
 							),
@@ -271,10 +261,9 @@ export class DemoAnimationsLayer extends Layer {
 									burstCount = {1}
 								>
 									<Icon
-										iconSrc = {ICON_SRC}
-										uvs     = {ICON_UVS}
-										width   = {64}
-										height  = {64}
+										uvs    = {ICON_UVS}
+										width  = {64}
+										height = {64}
 									/>
 								</FlashColor>
 							),
@@ -294,10 +283,9 @@ export class DemoAnimationsLayer extends Layer {
 									burstCount = {1}
 								>
 									<Icon
-										iconSrc = {ICON_SRC}
-										uvs     = {ICON_UVS}
-										width   = {64}
-										height  = {64}
+										uvs    = {ICON_UVS}
+										width  = {64}
+										height = {64}
 									/>
 								</Wiggle>
 							),

@@ -25,9 +25,10 @@ export const Header = ({
 		<UiBox
 			{...props}
 			uiTransform={{
-				width  : '100%',
-				height : 'auto',
-				padding: { top: 10, bottom: 5 },
+				width    : 'auto',
+				height   : 'auto',
+				alignSelf: 'stretch',
+				padding  : { top: 10, bottom: 5 },
 				...uiTransform
 			}}
 			uiText={{

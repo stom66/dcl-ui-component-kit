@@ -1,11 +1,13 @@
 import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 
+import { atlasIconsFontAwesome } from '../../atlases'
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
 
 type IconProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	iconSrc     : string
+	/** Texture path. Defaults to the bundled Font Awesome atlas. */
+	src?        : string
 	textureMode?: TextureMode | undefined
 	uvs?        : number[]
 	width?      : PositionUnit | "auto" | undefined
@@ -17,10 +19,11 @@ type IconProps = UiBoxProps & {
 /**
  * Texture icon. Defaults to a square cell sized from `theme.icons.size` when
  * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
+ * `src` defaults to `atlasIconsFontAwesome.source`.
  */
 export const Icon = ({
 	children,
-	iconSrc,
+	src         = atlasIconsFontAwesome.source,
 	textureMode,
 	uvs,
 	width   = "auto",
@@ -45,7 +48,7 @@ export const Icon = ({
 				...uiTransform
 			}}
 			uiBackground={{
-				texture    : { src: iconSrc, },
+				texture    : { src },
 				textureMode: textureMode ?? "stretch",
 				uvs        : uvs ?? [],
 				...uiBackground

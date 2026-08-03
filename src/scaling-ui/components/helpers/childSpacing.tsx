@@ -1,17 +1,7 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { getColSpan } from '../../utils'
+import { UiBox } from '../base'
 
-
-type ColProps = {
-	cols?       : number
-	colsDesktop?: number
-	colsMobile? : number
-	uiTransform?: {
-		margin?: number | { top?: number; right?: number; bottom?: number; left?: number }
-		[key: string]: unknown
-	}
-}
 
 type ChildList = ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | undefined
 
@@ -40,10 +30,49 @@ function flattenChildren(children: ChildList): ReactEcs.JSX.Element[] {
 }
 
 
+// MARK: insertSpacers
+/**
+ * Inserts stably keyed spacer `UiBox`es between children.
+ *
+ * Do **not** `createElement`-clone children to apply margin — ReactEcs leaks
+ * UiEntities when those clones are recreated every frame (left-bar Column with
+ * N buttons → ~N-1 new entities per frame, thousands of CRDT entries/minute).
+ */
+function insertSpacers(
+	children: ChildList,
+	spacing : number,
+	edge    : 'top' | 'right' | 'bottom' | 'left',
+): ReactEcs.JSX.Element[] {
+	const list = flattenChildren(children)
+	if (list.length <= 1) return list
+
+	const vertical = edge === 'top' || edge === 'bottom'
+	const out    : ReactEcs.JSX.Element[] = []
+
+	for (let i = 0; i < list.length; i++) {
+		out.push(list[i])
+		if (i >= list.length - 1) continue
+
+		out.push(
+			<UiBox
+				key={`__gap_${edge}_${i}`}
+				uiTransform={{
+					width     : vertical ? 1 : spacing,
+					height    : vertical ? spacing : 1,
+					flexGrow  : 0,
+					flexShrink: 0,
+				}}
+			/>
+		)
+	}
+
+	return out
+}
+
+
 // MARK: applySpacingToChildren
 /**
- * Sets margin[edge] = spacing on every child except the last.
- * Preserves each child's `key` when recloning via `createElement`.
+ * Gap between stacked children via spacer entities (not child margin clones).
  * Nested arrays from `.map()` are flattened first.
  */
 export function applySpacingToChildren(
@@ -52,35 +81,15 @@ export function applySpacingToChildren(
 	edge    : 'top' | 'right' | 'bottom' | 'left',
 ) {
 	if (!spacing || children == null) return children
-
-	const list = flattenChildren(children)
-
-	return list.map((child, i) => {
-		// Leave the last child as the original element — recreating it is unnecessary
-		// and has been flaky with ReactEcs for large subtrees.
-		if (!child || i === list.length - 1) return child
-
-		const uiTransform = child.props?.uiTransform ?? {}
-		const margin      = typeof uiTransform.margin === 'object' ? uiTransform.margin : {}
-		return ReactEcs.createElement(child.type, {
-			...child.props,
-			key        : child.key,
-			uiTransform: {
-				...uiTransform,
-				margin: { ...margin, [edge]: spacing },
-			},
-		})
-	})
+	return insertSpacers(children, spacing, edge)
 }
 
 
 // MARK: applyRowChildSpacing
 /**
- * Row gutters + `cols` widths. Yoga has no `calc()`, so percentage `cols`
- * plus sibling margins overflow the parent. When `spacing > 0`, children with
- * `cols` use `flexGrow: span` (and `width: 0`) so free space after gutters is
- * shared in column proportions. Children without `cols` keep their own width.
- * Nested arrays from `.map()` are flattened first.
+ * Horizontal gutters via spacer entities. `cols` children size themselves with
+ * `flexGrow` (`getColSelfTransform`) so gutters do not overflow and no
+ * `createElement` prop rewrite is required.
  */
 export function applyRowChildSpacing(
 	children: ChildList,
@@ -96,34 +105,5 @@ export function applyRowChildSpacing(
 		return list
 	}
 
-	return list.map((child, i) => {
-		if (!child) return child
-
-		const props       = (child.props ?? {}) as ColProps
-		const span        = getColSpan(props.cols, props.colsDesktop, props.colsMobile)
-		const uiTransform = props.uiTransform ?? {}
-		const margin      = typeof uiTransform.margin === 'object' ? uiTransform.margin : {}
-		const isLast      = i === list.length - 1
-
-		if (span === undefined && isLast) return child
-
-		return ReactEcs.createElement(child.type, {
-			...child.props,
-			key        : child.key,
-			uiTransform: {
-				...uiTransform,
-				...(span !== undefined
-					? {
-						width     : 0,
-						flexGrow  : span,
-						flexShrink: 0,
-						flexBasis : 0,
-					}
-					: {}),
-				...(!isLast
-					? { margin: { ...margin, [edge]: gap } }
-					: {}),
-			},
-		})
-	})
+	return insertSpacers(list, gap, edge)
 }

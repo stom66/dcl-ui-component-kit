@@ -2,7 +2,7 @@
 
 `dcl-scaling-ui` is a reusable UI framework for Decentraland SDK7. Build interfaces from **layers**, **zones**, and shared components instead of hand-placing every `UiEntity`.
 
-> **Custom images / atlases:** whenever you need your own textures, start from the bundled Affinity template at [`assets/images/scaling-ui-assets.af`](assets/images/scaling-ui-assets.af). Open it in Affinity, duplicate the existing artboards (buttons, icons, numbers, spinners, progress bars, …), keep the same grid / margins, export PNGs into `assets/images/my-theme/`, then declare them as `TextureAtlas` / texture sets in [`src/myTheme.ts`](src/myTheme.ts). Always sample cells with the built-in UV helpers (`getUVCell` / `getUVColumn` / `getUVRow`) or `TextureAtlas.cell` / `.row` / `.column` / `.char` — cell coordinates are **1-based** (first column/row is `1`, not `0`). See [Custom textures](#custom-textures) below.
+> **Custom images / atlases:** whenever you need your own textures, start from the bundled Affinity template at [`assets/images/scaling-ui-assets.af`](assets/images/scaling-ui-assets.af). Open it in Affinity, duplicate the existing artboards (buttons, icons, numbers, spinners, progress bars, …), keep the same grid / margins, export PNGs into `assets/images/example-theme/`, then declare them as `TextureAtlas` / texture sets in [`src/exampleTheme/`](src/exampleTheme/). Always sample cells with the built-in UV helpers (`getUVCell` / `getUVColumn` / `getUVRow`) or `TextureAtlas.cell` / `.row` / `.column` / `.char` — cell coordinates are **1-based** (first column/row is `1`, not `0`). See [Custom textures](#custom-textures) below.
 
 ## Table of contents
 
@@ -15,7 +15,7 @@
 - [Layout helpers](#layout-helpers)
 - [Custom textures](#custom-textures)
 	- [Affinity template](#affinity-template-start-here)
-	- [Declaring atlases in myTheme.ts](#declaring-atlases-in-mythemets)
+	- [Declaring atlases in exampleTheme](#declaring-atlases-in-exampletheme)
 	- [UV helpers (1-based)](#uv-helpers-1-based)
 - [Component reference](#component-reference)
 	- [Setup / core](#setup--core)
@@ -39,12 +39,12 @@
 | **Zone** | Predefined layout slot (`Default`, `Top`, `BottomRight`, …) on the virtual canvas. Device hardware insets are handled once by `ScreenInsetArea` inside `SetupScalingUI`. |
 | **Layout** | `Row`, `Column`, `Background`, `BackgroundGradient`, and related helpers for arranging children. |
 | **Components** | Shared controls: `UiBox`, buttons, progress bars, text, icons, spinners, animations (many ship as procedural + image-based variants). |
-| **Theme** | Central colours / type / sizing via `SetupScalingUI({ theme })`. Custom atlases / textures live beside overrides in `src/myTheme.ts`. |
+| **Theme** | Central colours / type / sizing via `SetupScalingUI({ theme })`. Custom atlases / textures live beside overrides in `src/exampleTheme/`. |
 
 ## Quick start
 
 ```tsx
-import { themeOverrides } from './myTheme'
+import { themeOverrides } from './exampleTheme'
 import { SetupScalingUI } from './scaling-ui'
 import { demoLayers } from './scaling-ui/examples/layers'
 
@@ -68,7 +68,7 @@ A **Layer** is a class-based UI surface. Rules:
 4. Panel chrome belongs inside `body()` via **`<Background>`** (or `BackgroundGradient`).
 5. Register an instance in the `layers` array passed to `SetupScalingUI`.
 
-Optional Layer options: `canBeHidden`, `startHidden`, `showCloseButton`, `zIndex`. Hideable layers expose `show()` / `hide()` / `toggle()`. Live values belong on `this.props` (`PropsController`) — see `timer.layer.tsx`.
+Optional Layer options: `canBeHidden`, `startHidden`, `showCloseButton`, `showFrom`, `hideTo`, `zIndex`. Hideable layers expose `show()` / `hide()` / `toggle()`. `showFrom` / `hideTo` set independent slide-in / slide-out edges (default: zone preset for both). Live values belong on `this.props` (`PropsController`) — see `timer.layer.tsx`.
 
 ### Adding a layer
 
@@ -109,7 +109,7 @@ export const scoreboardLayer = new ScoreboardLayer()
 
 ### Hideable popup example
 
-`canBeHidden` enables `show()` / `hide()` / `toggle()`. `showCloseButton` auto-injects `ButtonImageClose`. `startHidden` begins the layer off-screen.
+`canBeHidden` enables `show()` / `hide()` / `toggle()`. `showCloseButton` auto-injects `ButtonImageClose`. `startHidden` begins the layer off-screen. Use `showFrom` / `hideTo` when enter and exit should use different edges.
 
 ```tsx
 import ReactEcs from '@dcl/sdk/react-ecs'
@@ -124,6 +124,8 @@ export class NotificationLayer extends Layer {
 			canBeHidden    : true,
 			startHidden    : true,
 			showCloseButton: true,
+			showFrom       : 'bottom',
+			hideTo         : 'top',
 		})
 	}
 
@@ -154,6 +156,33 @@ SetupScalingUI({
 // later…
 notificationLayer.show()
 ```
+
+### Toasts
+
+Ephemeral notifications use an always-mounted `toastHostLayer` (include it in `SetupScalingUI({ layers })`), then `showToast` / `hideToast` / `clearToastGroup`.
+
+```tsx
+import { showToast, toastHostLayer } from './scaling-ui'
+
+SetupScalingUI({
+	layers: [/* … */, toastHostLayer],
+})
+
+showToast({
+	position     : 'top',
+	duration     : 2.5,
+	isDismissable: true,
+	showFrom     : 'bottom',
+	hideTo       : 'top',
+	content      : () => <Text value="Quest updated" />,
+	width        : 200,
+	height       : 48,
+	group        : 'hints',       // optional
+	groupPolicy  : 'queue',       // stack | queue | replace
+})
+```
+
+Docks: `top` / `bottom` / `topLeft` / `topRight` / `bottomLeft` / `bottomRight` (inset by the bar zones). Scale via `scaleIn` / `scaleOut` / `scalePulse` on the toast root (prefer `%` children). Demo: `demo.toasts.layer.tsx`.
 
 ## Zones
 
@@ -211,21 +240,21 @@ Use it as the starting point for custom art:
 1. Open the `.af` file in Affinity.
 2. Duplicate the artboard closest to what you need (button icons, icons, numbers, spinners, progress bars, …).
 3. Keep the same cell grid, guidelines, and margins so UV sampling stays aligned.
-4. Export PNGs into **`assets/images/my-theme/`** (not into `assets/images/scaling-ui/`, which holds framework defaults).
-5. Declare a `TextureAtlas` (or progress-bar texture set) in **`src/myTheme.ts`** — see the examples already in that file.
+4. Export PNGs into **`assets/images/example-theme/`** (not into `assets/images/scaling-ui/`, which holds framework defaults).
+5. Declare a `TextureAtlas` (or progress-bar texture set) in **`src/exampleTheme/`** — see the examples already in that folder.
 6. Import your atlas from layers and sample cells with `TextureAtlas` / UV helpers (below).
 
 **Icon cell sizing (rotation / animation):** if icons will rotate or wiggle inside their UV cell, the glyph’s longest axis must stay within about **0.707 × cell size** (`1 / √2`). That is the largest square that still fits inside the cell when spun. Also leave a few pixels for shadows/glows (e.g. on a **128px** cell with ~6px shadow budget, use a max axis of **~86px**, centered). Filling the whole cell looks fine when static, but animated icons will clip into neighbouring cells.
 
-### Declaring atlases in `myTheme.ts`
+### Declaring atlases in `exampleTheme`
 
 ```tsx
-// src/myTheme.ts — see the file for full examples
-import { TextureAtlas } from './scaling-ui'
-import type { ProgressBarImageTextures } from './scaling-ui'
+// src/exampleTheme/atlases.ts — see the folder for full examples
+import { TextureAtlas } from '../scaling-ui'
+import type { ProgressBarImageTextures } from '../scaling-ui'
 
-export const myBtnIconsAtlas = new TextureAtlas({
-	source : 'assets/images/my-theme/atlas-btn-icons.png',
+export const exampleBtnIconsAtlas = new TextureAtlas({
+	source : 'assets/images/example-theme/atlas-btn-icons.png',
 	columns: 4,
 	rows   : 4,
 	named  : {
@@ -234,10 +263,10 @@ export const myBtnIconsAtlas = new TextureAtlas({
 	},
 })
 
-export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
-	background: 'assets/images/my-theme/progressBar-horizontal-background.png',
-	fill      : 'assets/images/my-theme/progressBar-horizontal-fill.png',
-	border    : 'assets/images/my-theme/progressBar-horizontal-border.png',
+export const exampleProgressBarTexturesHorizontal: ProgressBarImageTextures = {
+	background: 'assets/images/example-theme/progressBar-horizontal-background.png',
+	fill      : 'assets/images/example-theme/progressBar-horizontal-fill.png',
+	border    : 'assets/images/example-theme/progressBar-horizontal-border.png',
 }
 ```
 
@@ -245,28 +274,27 @@ Bundled framework atlases live as `TextureAtlas` instances under `src/scaling-ui
 
 | Atlas | Use |
 |---|---|
-| `atlasIcons` | General UI icons (4×4) |
-| `atlasIcons2048` | Font Awesome solid UI icons (16×16, 128px cells, ~86px max glyph) |
+| `atlasIconsFontAwesome` | Font Awesome solid UI icons (16×16, 128px cells, ~86px max glyph) — default `Icon` `src` |
 | `atlasBtnIcons` / `atlasBtnIconsStyled` | Button variants × states |
 | `atlasSpinners` | Spinner cells (2×2) |
 | `atlasCharsNumbers` | Digits / operators for `IconNumber` |
 | `atlasCharsSymbols` | Symbol glyphs |
 | `atlasCharsAlphaNumeric` | Alphanumeric sheet (8×8) |
 
-Prefer those (or your own `TextureAtlas`) over hard-coded paths and repeated `xTotal` / `yTotal`.
+Project example: `exampleIconsAtlas` in `src/exampleTheme/` (4×4 sheet at `assets/images/example-theme/atlas-icons.png`). Prefer framework atlases (or your own `TextureAtlas`) over hard-coded paths and repeated `xTotal` / `yTotal`.
 
 ### UV helpers (1-based)
 
 Always use `getUVCell` / `getUVColumn` / `getUVRow`, or the matching `TextureAtlas` methods. **Cell / column / row numbers start at `1`.** Totals (`columns`, `rows`, `xTotal`, `yTotal`) are counts. Ends (`xEnd` / `yEnd`) are inclusive.
 
 ```tsx
-import { atlasCharsNumbers, atlasIcons } from './scaling-ui'
+import { atlasCharsNumbers, atlasIconsFontAwesome } from './scaling-ui'
 
-atlasIcons.source
-atlasIcons.cell({ xStart: 1, yStart: 1 })           // first cell (bottom-left in UV space)
-atlasIcons.cell({ xStart: 1, xEnd: 2, yStart: 4 })  // columns 1–2 on the top row of a 4×4
-atlasIcons.row(1)                                   // full bottom row
-atlasIcons.column(1)                                // full first column
+atlasIconsFontAwesome.source
+atlasIconsFontAwesome.uv.star                        // named cell UV quad
+atlasIconsFontAwesome.cell({ xStart: 1, yStart: 1 }) // first cell (bottom-left in UV space)
+atlasIconsFontAwesome.row(1)                         // full bottom row
+atlasIconsFontAwesome.column(1)                      // full first column
 atlasCharsNumbers.char('5', { insetX: 0.15 })
 ```
 
@@ -372,19 +400,19 @@ import { atlasBtnIconsStyled } from './scaling-ui'
 
 ##### Using your own button textures
 
-1. Duplicate the button artboard in `assets/images/scaling-ui-assets.af`, then export to `assets/images/my-theme/atlas-btn-icons.png` (same column/row convention).
-2. Define a `TextureAtlas` in `src/myTheme.ts` (see `myBtnIconsAtlas`).
+1. Duplicate the button artboard in `assets/images/scaling-ui-assets.af`, then export to `assets/images/example-theme/atlas-btn-icons.png` (same column/row convention).
+2. Define a `TextureAtlas` in `src/exampleTheme/` (see `exampleBtnIconsAtlas`).
 3. Pass `textureSrc`, `uvColumnCount`, and `uvRowCount` so UVs match your grid:
 
 ```tsx
-import { myBtnIconsAtlas } from '../myTheme'
+import { exampleBtnIconsAtlas } from '../exampleTheme'
 
 <ButtonImage
 	id            = "btn_custom"
-	textureSrc    = {myBtnIconsAtlas.source}
+	textureSrc    = {exampleBtnIconsAtlas.source}
 	uvColumn      = {1}
-	uvColumnCount = {myBtnIconsAtlas.columns}
-	uvRowCount    = {myBtnIconsAtlas.rows}
+	uvColumnCount = {exampleBtnIconsAtlas.columns}
+	uvRowCount    = {exampleBtnIconsAtlas.rows}
 	callback      = {() => { /* … */ }}
 />
 ```
@@ -457,18 +485,18 @@ Atlas UV orientation: `uvMirror` flips left ↔ right; `uvFlip` flips UV bottom 
 
 ##### Using your own progress-bar textures
 
-1. Duplicate the progress-bar artboards in `assets/images/scaling-ui-assets.af`, then export PNGs per orientation into `assets/images/my-theme/` (any subset of background / fill / border). Design image layers to align edge-to-edge and for your intended display sizes (see nine-slice note above). Default `textureSlices`: horizontal ~25% top/bottom and ~6% left/right; vertical swaps those pairs. Override with `textureSlices` when needed. For gradient fills, sample from a colour atlas via `atlas` / `uvCell` instead.
-2. Define a `ProgressBarImageTextures` object in `src/myTheme.ts` (see `myProgressBarTexturesHorizontal` / `myProgressBarTexturesVertical`). Partial objects are fine.
+1. Duplicate the progress-bar artboards in `assets/images/scaling-ui-assets.af`, then export PNGs per orientation into `assets/images/example-theme/` (any subset of background / fill / border). Design image layers to align edge-to-edge and for your intended display sizes (see nine-slice note above). Default `textureSlices`: horizontal ~25% top/bottom and ~6% left/right; vertical swaps those pairs. Override with `textureSlices` when needed. For gradient fills, sample from a colour atlas via `atlas` / `uvCell` instead.
+2. Define a `ProgressBarImageTextures` object in `src/exampleTheme/` (see `exampleProgressBarTexturesHorizontal` / `exampleProgressBarTexturesVertical`). Partial objects are fine.
 3. Pass `textures` and/or `atlas` (and `orientation` when needed):
 
 ```tsx
-import { myProgressBarTexturesHorizontal } from '../myTheme'
+import { exampleProgressBarTexturesHorizontal } from '../exampleTheme'
 
 <ProgressBarImage
 	id          = "xp_custom"
 	value       = {70}
 	orientation = "horizontal"
-	textures    = {myProgressBarTexturesHorizontal}
+	textures    = {exampleProgressBarTexturesHorizontal}
 	height      = {64}
 />
 ```
@@ -500,36 +528,33 @@ Typography components wrap theme sizes with `scaleFontSize` at render time. Pass
 > **Variants:** image-based (`Icon`, `IconNumber`) · avatar portrait (`AvatarIcon`)
 
 #### `Icon`
-Single texture / atlas-cell icon sized from the theme (or explicit width/height). Pass `iconSrc` and optional `uvs` from a `TextureAtlas`.
+Single texture / atlas-cell icon sized from the theme (or explicit width/height). `src` defaults to `atlasIconsFontAwesome.source`; pass optional `uvs` from that atlas (or override `src` for a custom sheet).
 
 ```tsx
-import { atlasIcons } from './scaling-ui'
+import { atlasIconsFontAwesome } from './scaling-ui'
 
-<Icon
-	iconSrc = {atlasIcons.source}
-	uvs     = {atlasIcons.cell({ xStart: 1, yStart: 4 })}
-/>
+<Icon uvs={atlasIconsFontAwesome.uv.cat} width={64} height={64} />
 ```
 
 Cell coordinates are **1-based** (`1` = first column / bottom UV row).
 
 ##### Using your own icon textures
 
-1. Duplicate the icons artboard in `assets/images/scaling-ui-assets.af`, then export to `assets/images/my-theme/atlas-icons.png`.
+1. Duplicate an icons artboard in `assets/images/scaling-ui-assets.af`, then export to `assets/images/example-theme/atlas-icons.png` (a sample 4×4 sheet ships there).
 2. Keep each glyph **centered** in its cell. For rotatable / animated icons, max axis ≈ **0.707 × cellSize** (minus any shadow budget — e.g. **86px** on a 128px cell). See [Affinity template](#affinity-template-start-here).
-3. Define a `TextureAtlas` in `src/myTheme.ts` (see `myIconsAtlas`).
-4. Pass `iconSrc` + `uvs`:
+3. Declare a `TextureAtlas` in `src/exampleTheme/` (see `exampleIconsAtlas`).
+4. Pass `src` + `uvs`:
 
 ```tsx
-import { myIconsAtlas } from '../myTheme'
+import { exampleIconsAtlas } from '../exampleTheme'
 
 <Icon
-	iconSrc = {myIconsAtlas.source}
-	uvs     = {myIconsAtlas.uv.coin}
+	src = {exampleIconsAtlas.source}
+	uvs = {exampleIconsAtlas.uv.coins}
 />
 ```
 
-The bundled `atlasIcons2048` sheet is a 16×16 / 128px-cell example built with that margin rule.
+The bundled `atlasIconsFontAwesome` sheet is a 16×16 / 128px-cell atlas built with that margin rule (default `Icon` source).
 
 #### `AvatarIcon`
 Player portrait via Decentraland `uiBackground.avatarTexture`. Same sizing props as `Icon` (`width` / `height`); defaults to a square from `theme.icons.defaultSize`. `userId` is lowercased before use; omit it to fall back to `DEFAULT_AVATAR_USER_ID` (handy in demos).
@@ -579,14 +604,14 @@ Symbols atlas grid (top → bottom as in the PNG):
 
 ##### Using your own number atlas
 
-1. Export a glyph sheet to `assets/images/my-theme/atlas-chars-numbers.png` with the same cell layout (or update `layout` / `aliases` to match).
-2. Define a `TextureAtlas` with `layout` in `src/myTheme.ts` (see `myNumbersAtlas`).
+1. Export a glyph sheet to `assets/images/example-theme/atlas-chars-numbers.png` with the same cell layout (or update `layout` / `aliases` to match).
+2. Define a `TextureAtlas` with `layout` in `src/exampleTheme/` (see `exampleNumbersAtlas`).
 3. Pass it as `atlas`:
 
 ```tsx
-import { myNumbersAtlas } from '../myTheme'
+import { exampleNumbersAtlas } from '../exampleTheme'
 
-<IconNumber value={42} atlas={myNumbersAtlas} />
+<IconNumber value={42} atlas={exampleNumbersAtlas} />
 ```
 
 ##### Changing the built-in number font
@@ -625,7 +650,7 @@ Low-level rotating image control. Requires `textureSrc`; optional `uvs`, `speed`
 <SpinnerDots width={48} height={48} />
 ```
 
-For a custom sheet, use `Spinner` with `textureSrc` + `uvs` from your `TextureAtlas` (declare in `src/myTheme.ts`).
+For a custom sheet, use `Spinner` with `textureSrc` + `uvs` from your `TextureAtlas` (declare in `src/exampleTheme/`).
 
 ---
 
@@ -642,14 +667,13 @@ Motion wrappers that animate a **single child** (child must expose numeric `widt
 | `FlashColor` | Lerps the child’s tint toward `color` and back |
 
 ```tsx
-import { Bounce, Icon, atlasIcons } from './scaling-ui'
+import { Bounce, Icon, atlasIconsFontAwesome } from './scaling-ui'
 
 <Bounce speed={0.6}>
 	<Icon
-		iconSrc = {atlasIcons.source}
-		uvs     = {atlasIcons.cell({ xStart: 1, yStart: 1 })}
-		width   = {48}
-		height  = {48}
+		uvs    = {atlasIconsFontAwesome.uv.star}
+		width  = {48}
+		height = {48}
 	/>
 </Bounce>
 ```
@@ -661,7 +685,7 @@ See `demo.animations.layer.tsx` for every preset side by side.
 ### Theme & utilities
 
 #### `getTheme` / `buildTheme` / `defaultTheme` / `setTheme` / `theme`
-Read or customize the active Scaling UI theme (colours, type sizes, animation defaults, icon sizing). Pass overrides into `SetupScalingUI({ theme })` or keep them in `src/myTheme.ts`.
+Read or customize the active Scaling UI theme (colours, type sizes, animation defaults, icon sizing). Pass overrides into `SetupScalingUI({ theme })` or keep them in `src/exampleTheme/`.
 
 #### `darken` / `lighten` / `alpha`
 Small colour utilities used by buttons and chrome.
@@ -685,13 +709,13 @@ Shared animation easing used by buttons, progress bars, and motion wrappers.
 ```
 assets/images/scaling-ui-assets.af   Affinity template for all default UI art
 assets/images/scaling-ui/            framework default textures / atlases
-assets/images/my-theme/              project-specific textures (recommended)
+assets/images/example-theme/              project-specific textures (recommended)
 src/scaling-ui/                      framework (import from here)
 src/scaling-ui/atlases/              bundled TextureAtlas instances
 src/scaling-ui/components/           UiBox, layers, zones, buttons, …
 src/scaling-ui/utils/uvs.tsx         getUVCell / getUVColumn / getUVRow (1-based)
 src/scaling-ui/examples/             demo layers for the sample scene
-src/myTheme.ts                       theme overrides + custom atlases / textures
+src/exampleTheme/                         theme overrides + custom atlases / textures
 .cursor/skills/                      agent skills for this framework
 .cursor/rules/                       agent rules when editing UI
 ```

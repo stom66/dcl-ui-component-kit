@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { atlasIcons } from '../../atlases'
+import { atlasIconsFontAwesome } from '../../atlases'
 import { Background, Code, Column, Divider, H1, H2, H3, H4, H5, H6, Icon, IconNumber, Label, Row, SectionHeader, Text } from '../../components'
 import { Layer } from '../../components/layers'
 import { ZoneType } from '../../components/zones/zone.presets'
@@ -83,10 +83,9 @@ export class DemoTextLayer extends Layer {
 						}}
 					>
 						<Icon
-							iconSrc = {atlasIcons.source}
-							uvs     = {atlasIcons.uv.gift}
-							width   = "48"
-							height  = "48"
+							uvs    = {atlasIconsFontAwesome.uv.gift}
+							width  = "48"
+							height = "48"
 							uiTransform={{ margin: { right: 12 } }}
 						/>
 						<Text

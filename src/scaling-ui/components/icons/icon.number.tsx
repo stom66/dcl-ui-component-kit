@@ -1,11 +1,10 @@
-import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { atlasCharsNumbers, atlasCharsSymbols, type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
-import { UiBox } from '../base'
-import { Icon } from './icon'
+import { UiBox, type UiBoxProps } from '../base'
 
-type IconNumberProps = Omit<Parameters<typeof Icon>[0], 'iconSrc' | 'textureMode' | 'uvs'> & {
+type IconNumberProps = Omit<UiBoxProps, 'uiText'> & {
 	value    : number | "/" | "+" | "-" | "×" | "*" | "x" | "=" | ":" | string
 	/**
 	 * Glyph atlas with a `layout`. Defaults to `atlasCharsNumbers`.
@@ -27,6 +26,58 @@ type ResolvedIconNumberSize = {
 	containerHeight: PositionUnit
 	digitWidth     : PositionUnit
 	digitHeight    : PositionUnit
+}
+
+type UiEntityBackground = NonNullable<Parameters<typeof UiEntity>[0]['uiBackground']>
+type UiEntityTransform  = NonNullable<Parameters<typeof UiEntity>[0]['uiTransform']>
+
+/** Stable prop objects — new literals every frame have been leaking ReactEcs entities. */
+const digitBackgroundCache = new Map<string, UiEntityBackground>()
+const digitTransformCache  = new Map<string, UiEntityTransform>()
+
+
+// MARK: getDigitBackground
+/** Cached stretch background for one atlas glyph (shared across IconNumber instances). */
+function getDigitBackground(
+	atlasSource: string,
+	uvs         : number[],
+	glyph       : string,
+	insetX      : number,
+) {
+	const key = `${atlasSource}|${glyph}|${insetX}`
+	let bg = digitBackgroundCache.get(key)
+	if (!bg) {
+		bg = {
+			texture    : { src: atlasSource },
+			textureMode: 'stretch',
+			uvs,
+		}
+		digitBackgroundCache.set(key, bg)
+	}
+	return bg
+}
+
+
+// MARK: getDigitTransform
+/** Cached per-digit size transform (shared when width/height match). */
+function getDigitTransform(
+	digitWidth : PositionUnit,
+	digitHeight: PositionUnit,
+): UiEntityTransform {
+	const key = `${digitWidth}|${digitHeight}`
+	let transform = digitTransformCache.get(key)
+	if (!transform) {
+		transform = {
+			width     : digitWidth,
+			height    : digitHeight,
+			flexGrow  : 0,
+			flexShrink: 0,
+			...(typeof digitWidth === 'number' ? { minWidth: digitWidth } : {}),
+			...(typeof digitHeight === 'number' ? { minHeight: digitHeight } : {}),
+		}
+		digitTransformCache.set(key, transform)
+	}
+	return transform
 }
 
 
@@ -230,25 +281,20 @@ export const IconNumber = ({
 		digitAspect,
 	})
 
+	// Digits are raw `UiEntity`s with string keys. Wrapping through `Icon` /
+	// `UiBox` + `key={i}` was recreating entities every frame in ReactEcs
+	// (~1 entry per digit per frame — the top timer alone ≈ 2 × FPS).
 	const icons: ReactEcs.JSX.Element[] = []
 
 	for (let i = 0; i < len; i++) {
 		const glyph      = glyphs[i]
 		const glyphAtlas = resolveGlyphAtlas(atlas, glyph)
+		const uvs = glyphAtlas.char(glyph, { insetX: horizontalInset })
 		icons.push(
-			<Icon
-				{...props}
-				key         = {i}
-				width       = {digitWidth}
-				height      = {digitHeight}
-				uiTransform = {{
-					...(typeof digitWidth === 'number' ? { minWidth: digitWidth } : {}),
-					...(typeof digitHeight === 'number' ? { minHeight: digitHeight } : {}),
-					...uiTransform,
-				}}
-				iconSrc     = {glyphAtlas.source}
-				textureMode = {'stretch'}
-				uvs         = {glyphAtlas.char(glyph, { insetX: horizontalInset })}
+			<UiEntity
+				key={`icon-num-${i}`}
+				uiTransform={getDigitTransform(digitWidth, digitHeight)}
+				uiBackground={getDigitBackground(glyphAtlas.source, uvs, glyph, horizontalInset)}
 			/>
 		)
 	}
