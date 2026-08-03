@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { Background, getTheme, IconNumber, Layer, PropsController, ZoneType } from '../../../scaling-ui'
-import { timers } from '../../../scaling-ui/utils/timers'
+import { Background, getTheme, IconNumber, Layer, PropsController, ZoneType } from '../../../ui-component-kit'
+import { timers } from '../../../ui-component-kit/utils/timers'
 
 // MARK: getSecondsRemainingInMinute
 /** Seconds left until the next wall-clock minute. */

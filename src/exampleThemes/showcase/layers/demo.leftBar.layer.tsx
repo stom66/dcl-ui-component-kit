@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, ButtonText, Column, getTheme, Layer, ZoneType } from '../../../scaling-ui'
+import { alpha, Background, ButtonText, Column, getTheme, Layer, ZoneType } from '../../../ui-component-kit'
 
 import { demoAnimationsLayer } from './demo.animations.layer'
 import { demoBackgroundsLayer } from './demo.backgrounds.layer'

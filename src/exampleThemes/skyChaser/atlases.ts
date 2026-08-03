@@ -1,12 +1,12 @@
-import type { ProgressBarImageTextures } from '../../scaling-ui'
-import { TextureAtlas } from '../../scaling-ui'
+import type { ProgressBarImageTextures } from '../../ui-component-kit'
+import { TextureAtlas } from '../../ui-component-kit'
 
 
 // ---------------------------------------------------------------------------
 // SkyChaser textures
 //
 // Export PNGs into `assets/images/example-themes/skyChaser/` and keep the
-// filenames in sync. Placeholder art currently mirrors Scaling UI defaults —
+// filenames in sync. Placeholder art currently mirrors UI Component Kit defaults —
 // replace those files when the real SkyChaser assets are ready.
 // ---------------------------------------------------------------------------
 

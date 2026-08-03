@@ -1,12 +1,12 @@
-// import type { ProgressBarImageTextures } from '../../scaling-ui'
-// import { TextureAtlas } from '../../scaling-ui'
+// import type { ProgressBarImageTextures } from '../../ui-component-kit'
+// import { TextureAtlas } from '../../ui-component-kit'
 
 
 // ---------------------------------------------------------------------------
 // Clean the Club textures
 //
 // Export PNGs into `assets/images/example-themes/cleanTheClub/` and declare
-// atlases / texture sets here. Start from `assets/images/scaling-ui-assets.af`.
+// atlases / texture sets here. Start from `assets/images/ui-component-kit-assets.af`.
 //
 // Example:
 //

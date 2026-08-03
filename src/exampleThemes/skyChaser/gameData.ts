@@ -1,4 +1,4 @@
-import { PropsController } from '../../scaling-ui'
+import { PropsController } from '../../ui-component-kit'
 
 
 export type SkyChaserGameData = {

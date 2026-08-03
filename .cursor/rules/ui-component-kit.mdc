@@ -1,0 +1,18 @@
+---
+description: Conventions for building interfaces with the UI Component Kit framework
+globs: src/ui-component-kit/**/*.{ts,tsx},src/exampleThemes/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# UI Component Kit
+
+Before adding or changing a Layer, read `.cursor/skills/ui-component-kit/SKILL.md` and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`.
+
+- One Layer = one Zone. Implement **`body()` only**. Base `render()` mounts `Zone`. `SetupUiComponentKit` owns `ScreenInsetArea` + the full-size stack — do not re-wrap.
+- Select layout with `zone: ZoneType.*`. Override size/alignment via **`uiTransform`** / **`uiBackground`** only (no Layer shorthands like `backgroundColor` / `borderRadius` / `showFrame`). Panel fill / border → wrap `body()` content in **`Background`**.
+- **Do not** invent new Layer option fields. **Do not** override `render()` to re-wrap zones.
+- `showCloseButton` / `canBeHidden` are Layer options forwarded to the Zone (Zone inserts the close control).
+- Prefer native `'30vw'` / `'10vh'` in `uiTransform`. Use `vwToPixels` / `vhToPixels` only for numeric math (virtual canvas, never physical screen size).
+- Inside `src/ui-component-kit/**`, relative imports only.
+- Texture / atlas UVs: always use `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based**; totals are counts. Custom art starts from `assets/images/ui-component-kit-assets.af` → `assets/images/example-themes/<theme>/` → declare in `src/exampleThemes/<theme>/` (see skill).
+- Fail loud with `console.error`. Style: tabs, MARK comments, docstrings on public APIs.

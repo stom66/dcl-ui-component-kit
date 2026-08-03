@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../scaling-ui'
+import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
 
 /** Curated sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
 const SAMPLE_ICONS = [

@@ -1,0 +1,29 @@
+---
+description: React ECS sibling key uniqueness for UI Component Kit / JSX lists
+globs: src/**/*.{tsx,jsx}
+alwaysApply: false
+---
+
+# Sibling keys
+
+When a parent element has multiple children (siblings), each sibling must have a `key` that uniquely identifies it **among that sibling list**.
+
+- Keys do not need to be unique across the whole tree — only among siblings under the same parent.
+- A single child does not require a key; add keys as soon as there are two or more siblings.
+- Do not reuse the same key for two children of the same parent.
+
+```tsx
+// ✅ unique among siblings
+<Row>
+	<Header key="title" value="Hi" />
+	<UiBox key="body" uiText={{ value: '…' }} />
+</Row>
+
+// ❌ duplicate sibling keys
+<Row>
+	<Header key="x" value="Hi" />
+	<UiBox key="x" uiText={{ value: '…' }} />
+</Row>
+```
+
+Note: `ButtonImage` `id` is separate from React `key`. Button `id` values used for hover/press state must be unique across concurrent buttons (e.g. `close_${layerId}`).

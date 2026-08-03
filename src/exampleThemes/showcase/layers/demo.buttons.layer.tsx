@@ -1,5 +1,5 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { Background, ButtonImage, ButtonText, Column, Divider, getTheme, H2, Label, Layer, Row, Text, ZoneType } from '../../../scaling-ui'
+import { Background, ButtonImage, ButtonText, Column, Divider, getTheme, H2, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
 
 // MARK: DemoButtonsLayer
 /** Demo panel for ButtonText and ButtonImage variants. */

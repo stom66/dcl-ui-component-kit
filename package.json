@@ -1,13 +1,51 @@
 {
-  "name": "dcl-project",
-  "version": "1.0.0",
-  "description": "ScalingUI",
+  "name": "@stom66/dcl-ui-component-kit",
+  "version": "0.1.0",
+  "description": "DCL UI Component Kit — reusable Decentraland SDK7 UI components, layers, zones, and themes",
+  "keywords": [
+    "decentraland",
+    "dcl",
+    "ui",
+    "sdk7",
+    "react-ecs"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stom66/dcl-ui-component-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stom66/dcl-ui-component-kit/issues"
+  },
+  "homepage": "https://github.com/stom66/dcl-ui-component-kit#readme",
+  "main": "src/ui-component-kit/index.tsx",
+  "types": "src/ui-component-kit/index.tsx",
+  "exports": {
+    ".": {
+      "types": "./src/ui-component-kit/index.tsx",
+      "default": "./src/ui-component-kit/index.tsx"
+    }
+  },
+  "files": [
+    "src/ui-component-kit",
+    "assets/images/ui-component-kit",
+    "scripts"
+  ],
+  "bin": {
+    "dcl-ui-component-kit": "scripts/cli.js"
+  },
   "scripts": {
     "start": "sdk-commands start",
     "deploy": "sdk-commands deploy",
     "build": "sdk-commands build",
+    "postinstall": "node scripts/postinstall.js",
+    "copy-assets": "node scripts/cli.js copy-assets",
+    "init-theme": "node scripts/cli.js init-theme",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next"
+  },
+  "peerDependencies": {
+    "@dcl/sdk": ">=7.0.0"
   },
   "devDependencies": {
     "@dcl/asset-packs": "latest",

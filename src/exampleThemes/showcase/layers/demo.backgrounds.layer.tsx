@@ -1,5 +1,5 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { Background, BackgroundGradient, Column, getTheme, Label, Layer, Row, ZoneType } from '../../../scaling-ui'
+import { Background, BackgroundGradient, Column, getTheme, Label, Layer, Row, ZoneType } from '../../../ui-component-kit'
 
 const SAMPLE_HEIGHT = 72
 const SAMPLE_MARGIN = { top: 8, bottom: 8 }

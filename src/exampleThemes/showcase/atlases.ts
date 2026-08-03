@@ -1,13 +1,13 @@
-import type { ProgressBarImageTextures } from '../../scaling-ui'
-import { TextureAtlas } from '../../scaling-ui'
+import type { ProgressBarImageTextures } from '../../ui-component-kit'
+import { TextureAtlas } from '../../ui-component-kit'
 
 
 // ---------------------------------------------------------------------------
 // Custom textures (showcase)
 //
 // Drop your PNGs into `assets/images/example-themes/showcase/` and keep the
-// filenames in sync. Copy this folder + its assets folder with Scaling UI;
-// rename freely — updates to `scaling-ui/` will not overwrite your theme.
+// filenames in sync. Copy this folder + its assets folder with UI Component Kit;
+// rename freely — updates to `ui-component-kit/` will not overwrite your theme.
 // ---------------------------------------------------------------------------
 
 
@@ -32,7 +32,7 @@ export const exampleBtnIconsAtlas = new TextureAtlas({
  * Example general icon atlas for `Icon` — 4×4 grid (PNG top → bottom; UV Y is
  * bottom → top). Sample with `.cell({ xStart, yStart })`, `.named.<name>`, or
  * `.uv.<name>`. For the bundled Font Awesome sheet use `atlasIconsFontAwesome`
- * from Scaling UI instead.
+ * from UI Component Kit instead.
  */
 export const exampleIconsAtlas = new TextureAtlas({
 	source : 'assets/images/example-themes/showcase/atlas-icons.png',

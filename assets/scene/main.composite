@@ -444,8 +444,8 @@
       "data": {
         "0": {
           "json": {
-            "name": "Scaling UI",
-            "description": "Test scene for a scaling UI system",
+            "name": "DCL UI Component Kit",
+            "description": "Demo scene for the DCL UI Component Kit",
             "thumbnail": "images/scene-thumbnail.png",
             "categories": [],
             "author": "SDK",

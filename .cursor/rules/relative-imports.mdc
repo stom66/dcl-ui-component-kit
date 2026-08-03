@@ -11,8 +11,8 @@ This package may be copied, moved, or renamed into another project. Absolute `sr
 ## Rules
 
 - **Always use relative paths** for imports and re-exports within the repo (`./`, `../`, …).
-- **Never use absolute paths** such as `src/scaling-ui/...` or bare `src/...`.
-- **Stay inside the package:** from files under `scaling-ui/`, import siblings/parents (`../components`, `../../styles`). Do not climb out to `src/` and back in with a folder name (`../../scaling-ui/...`) — that breaks if the package directory is renamed.
+- **Never use absolute paths** such as `src/ui-component-kit/...` or bare `src/...`.
+- **Stay inside the package:** from files under `ui-component-kit/`, import siblings/parents (`../components`, `../../styles`). Do not climb out to `src/` and back in with a folder name (`../../ui-component-kit/...`) — that breaks if the package directory is renamed.
 - External packages (`@dcl/sdk/...`, npm modules) stay as package specifiers — not relative.
 - Host entry files outside the package (`src/index.ts`, `src/exampleThemes/`) may reference the package folder once at the boundary.
 - When importing **multiple named bindings** from one module, keep them on **one line**:
@@ -23,8 +23,8 @@ This package may be copied, moved, or renamed into another project. Absolute `sr
 
 ```ts
 // BAD — absolute, or hardcodes package folder name
-import { Layer } from 'src/scaling-ui/components/layers'
-import { Layer } from '../../scaling-ui/components/layers'
+import { Layer } from 'src/ui-component-kit/components/layers'
+import { Layer } from '../../ui-component-kit/components/layers'
 import {
 	A,
 	B,

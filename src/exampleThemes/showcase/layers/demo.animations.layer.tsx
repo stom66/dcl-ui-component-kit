@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Text, UiBox, Wiggle, ZoneType } from '../../../scaling-ui'
-import { alpha, easingFunctions, vwToPixels } from '../../../scaling-ui/utils'
+import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Text, UiBox, Wiggle, ZoneType } from '../../../ui-component-kit'
+import { alpha, easingFunctions, vwToPixels } from '../../../ui-component-kit/utils'
 
 const CELL = {
 	height: '128',
@@ -10,8 +10,8 @@ const CELL = {
 
 const ICON_UVS = atlasIconsFontAwesome.uv.star
 
-const BEAMS_EVEN   = 'assets/images/scaling-ui/spinner-beams-even.png'
-const BEAMS_VARIED = 'assets/images/scaling-ui/spinner-beams-varied.png'
+const BEAMS_EVEN   = 'assets/images/ui-component-kit/spinner-beams-even.png'
+const BEAMS_VARIED = 'assets/images/ui-component-kit/spinner-beams-varied.png'
 
 const ID = {
 	pulse               : 'demo-anim-pulse',

@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { Background, Column, Divider, getTheme, H2, Label, Layer, PropsController, Row, Text, Toggle, ZoneType } from '../../../scaling-ui'
+import { Background, Column, Divider, getTheme, H2, Label, Layer, PropsController, Row, Text, Toggle, ZoneType } from '../../../ui-component-kit'
 
 
 // MARK: DemoToggleLayer

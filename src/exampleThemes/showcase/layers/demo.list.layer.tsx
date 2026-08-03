@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Column, darken, DEFAULT_AVATAR_USER_ID, FlashBorder, getTheme, H2, Icon, IconNumber, Layer, lighten, Row, Text, ZoneType, type Theme } from '../../../scaling-ui'
+import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Column, darken, DEFAULT_AVATAR_USER_ID, FlashBorder, getTheme, H2, Icon, IconNumber, Layer, lighten, Row, Text, ZoneType, type Theme } from '../../../ui-component-kit'
 
 type ScoreboardIcon = 'crown' | 'cat' | 'ghost'
 

@@ -1,5 +1,5 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { alpha, atlasIconsFontAwesome, Background, ButtonText, clearToastGroup, Column, Divider, getTheme, H2, Icon, IconNumber, Label, Layer, Row, showToast, Text, ZoneType, type ToastPosition } from '../../../scaling-ui'
+import { alpha, atlasIconsFontAwesome, Background, ButtonText, clearToastGroup, Column, Divider, getTheme, H2, Icon, IconNumber, Label, Layer, Row, showToast, Text, ZoneType, type ToastPosition } from '../../../ui-component-kit'
 
 const POSITIONS: ToastPosition[] = [
 	'topLeft',

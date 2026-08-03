@@ -7,7 +7,7 @@ export { exampleBtnIconsAtlas, exampleIconsAtlas, exampleNumbersAtlas, examplePr
 
 
 /**
- * Showcase theme bundle — Scaling UI component demos.
+ * Showcase theme bundle — UI Component Kit component demos.
  * Switch the active theme in `src/index.ts`.
  */
 export const showcase = {

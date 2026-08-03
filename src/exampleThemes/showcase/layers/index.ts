@@ -1,5 +1,5 @@
-import type { Layer } from '../../../scaling-ui'
-import { toastHostLayer } from '../../../scaling-ui'
+import type { Layer } from '../../../ui-component-kit'
+import { toastHostLayer } from '../../../ui-component-kit'
 
 import { demoAnimationsLayer }  from './demo.animations.layer'
 import { demoBackgroundsLayer } from './demo.backgrounds.layer'

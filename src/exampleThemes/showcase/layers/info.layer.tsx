@@ -1,6 +1,6 @@
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
-import { Background, getTheme, Layer, ZoneType } from '../../../scaling-ui'
-import { getCanvasInfo, getUiScaleFactor, readPhysicalCanvasDimensions, readVirtualCanvasDimensions } from '../../../scaling-ui/utils/sizing'
+import { Background, getTheme, Layer, ZoneType } from '../../../ui-component-kit'
+import { getCanvasInfo, getUiScaleFactor, readPhysicalCanvasDimensions, readVirtualCanvasDimensions } from '../../../ui-component-kit/utils/sizing'
 
 // MARK: formatCanvasDebugInfo
 /** Compact canvas / virtual-scale readout for the example info HUD. */

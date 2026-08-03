@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
-import { alpha, atlasGradientColors, Background, Column, Divider, getTheme, H2, IconNumber, Label, Layer, ProgressBar, ProgressBarImage, PropsController, Row, ZoneType } from '../../../scaling-ui'
-import { timers } from '../../../scaling-ui/utils/timers'
+import { alpha, atlasGradientColors, Background, Column, Divider, getTheme, H2, IconNumber, Label, Layer, ProgressBar, ProgressBarImage, PropsController, Row, ZoneType } from '../../../ui-component-kit'
+import { timers } from '../../../ui-component-kit/utils/timers'
 
 const DANGER_MIN_VALUE = 0
 const DANGER_MAX_VALUE = 100
@@ -212,9 +212,9 @@ export class DemoProgressLayer extends Layer {
 								value    = {randomValue2}
 								height   = {64}
 								textures = {{
-									background: 'assets/images/scaling-ui/progressBar-horizontal-background.png',
-									fill      : 'assets/images/scaling-ui/progressBar-horizontal-fill.png',
-									border    : 'assets/images/scaling-ui/progressBar-horizontal-border.png',
+									background: 'assets/images/ui-component-kit/progressBar-horizontal-background.png',
+									fill      : 'assets/images/ui-component-kit/progressBar-horizontal-fill.png',
+									border    : 'assets/images/ui-component-kit/progressBar-horizontal-border.png',
 								}}
 							>
 								<Label
@@ -240,9 +240,9 @@ export class DemoProgressLayer extends Layer {
 								height      = {80}
 								borderColor = {theme.colors.primary}
 								textures    = {{
-									//background: 'assets/images/scaling-ui/progressBar-horizontal-background.png',
-									//fill      : 'assets/images/scaling-ui/progressBar-horizontal-fill.png',
-									border    : 'assets/images/scaling-ui/progressBar-horizontal-border-2.png',
+									//background: 'assets/images/ui-component-kit/progressBar-horizontal-background.png',
+									//fill      : 'assets/images/ui-component-kit/progressBar-horizontal-fill.png',
+									border    : 'assets/images/ui-component-kit/progressBar-horizontal-border-2.png',
 								}}
 								contentInset = {16}
 								textureSlices = {{
@@ -262,7 +262,7 @@ export class DemoProgressLayer extends Layer {
 								value    = {randomValue1}
 								height   = {64}
 								textures = {{
-									fill: 'assets/images/scaling-ui/progressBar-horizontal-fill.png',
+									fill: 'assets/images/ui-component-kit/progressBar-horizontal-fill.png',
 								}}
 							/>
 

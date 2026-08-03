@@ -3,7 +3,7 @@ import { showcase } from './exampleThemes/showcase'
 // import { flagTag } from './exampleThemes/flagTag'
 // import { cleanTheClub } from './exampleThemes/cleanTheClub'
 
-import { SetupScalingUI } from './scaling-ui'
+import { SetupUiComponentKit } from './ui-component-kit'
 
 
 // Enable exactly one example theme for the scene:
@@ -14,7 +14,7 @@ const active = showcase
 
 
 export function main() {
-	SetupScalingUI({
+	SetupUiComponentKit({
 		theme : active.theme,
 		layers: active.layers,
 		debug : {

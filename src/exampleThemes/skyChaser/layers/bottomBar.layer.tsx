@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
-import { ButtonImage, Column, getTheme, IconNumber, Label, Layer, ProgressBarImage, Row, ZoneType } from '../../../scaling-ui'
-import { timers } from '../../../scaling-ui/utils/timers'
+import { ButtonImage, Column, getTheme, IconNumber, Label, Layer, ProgressBarImage, Row, ZoneType } from '../../../ui-component-kit'
+import { timers } from '../../../ui-component-kit/utils/timers'
 import { skyChaserProgressBarTextures, startButtonAtlas } from '../atlases'
 import { skyChaserGameData } from '../gameData'
 

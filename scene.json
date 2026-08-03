@@ -2,8 +2,8 @@
   "ecs7": true,
   "runtimeVersion": "7",
   "display": {
-    "title": "Scaling UI",
-    "description": "Test scene for a scaling UI system",
+    "title": "DCL UI Component Kit",
+    "description": "Demo scene for the DCL UI Component Kit",
     "navmapThumbnail": "images/scene-thumbnail.png",
     "favicon": "favicon_asset"
   },

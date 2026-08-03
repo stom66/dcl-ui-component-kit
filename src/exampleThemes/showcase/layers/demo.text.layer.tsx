@@ -1,5 +1,5 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Code, Column, Divider, getTheme, H1, H2, H3, H4, H5, H6, Icon, IconNumber, Label, Layer, Row, SectionHeader, Text, ZoneType } from '../../../scaling-ui'
+import { atlasIconsFontAwesome, Background, Code, Column, Divider, getTheme, H1, H2, H3, H4, H5, H6, Icon, IconNumber, Label, Layer, Row, SectionHeader, Text, ZoneType } from '../../../ui-component-kit'
 
 // MARK: DemoTextLayer
 /** Demo panel for headers, body text, labels, code, and icons. */

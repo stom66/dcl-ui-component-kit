@@ -1,10 +1,10 @@
-import type { ThemeCustomize } from '../../scaling-ui'
+import type { ThemeCustomize } from '../../ui-component-kit'
 
 
 // MARK: theme
 /**
  * Flag Tag theme overrides.
- * Only define values that differ from the Scaling UI default theme.
+ * Only define values that differ from the UI Component Kit default theme.
  */
 export const theme: ThemeCustomize = {
 	// colors: {

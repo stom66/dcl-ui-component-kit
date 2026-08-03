@@ -1,18 +1,18 @@
 import { Color4 } from '@dcl/sdk/math'
 
-import type { ThemeCustomize } from '../../scaling-ui'
+import type { ThemeCustomize } from '../../ui-component-kit'
 
 
 // MARK: theme
 /**
- * Showcase theme overrides for the Scaling UI component demos.
+ * Showcase theme overrides for the UI Component Kit component demos.
  *
  * Only define values that should differ from the default theme. Section defaults
- * live in `scaling-ui/styles/components/*` (e.g. `colors.ts`, `animation.ts`).
+ * live in `ui-component-kit/styles/components/*` (e.g. `colors.ts`, `animation.ts`).
  *
  * Put project art under `assets/images/example-themes/showcase/` and define
  * atlases / texture sets in `./atlases.ts`. Start custom art from the Affinity
- * template at `assets/images/scaling-ui-assets.af` (duplicate artboards, keep
+ * template at `assets/images/ui-component-kit-assets.af` (duplicate artboards, keep
  * grids/margins). Cell coords on `TextureAtlas` are 1-based.
  */
 export const theme: ThemeCustomize = {
