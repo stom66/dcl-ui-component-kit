@@ -71,11 +71,14 @@ Widths: prefer **`cols`** on `Row` / `Column` / `Label` / `ButtonText` (`cols={1
 
 Full-size panel chrome (theme body fill + border by default).
 
+Default layout is absolute fill (for fixed-size Zones). Use `fitContent` when the Layer Zone uses `height: 'auto'` so chrome contributes in-flow height.
+
 | Option | Type | Description |
 |---|---|---|
 | `backgroundColor` | `Color4` | Fill |
 | `borderColor` / `borderWidth` / `borderRadius` | — | Border |
 | `textureSrc` | `string` | Optional texture |
+| `fitContent` | `boolean` | Size to children (required for Layer `height: 'auto'`) |
 | `children` | JSX | Panel content |
 
 ### `BackgroundGradient`
@@ -86,6 +89,7 @@ Full-size panel chrome (theme body fill + border by default).
 | `gradientStart` / `gradientEnd` | `number` | UV ratios 0–1 |
 | `color` | `Color4` | Tint |
 | `textureSrc` | `string` | Optional override texture |
+| `fitContent` | `boolean` | Forwarded to `Background` |
 
 ### `Divider`
 
@@ -238,12 +242,14 @@ Nine-slice note: corners keep absolute size from `texture size × slice fraction
 |---|---|---|
 | `src` | `string` | Texture (default: Font Awesome atlas) |
 | `uvs` | UV quad | Atlas cell (`atlas.uv.name`) |
+| `color` | `Color4` | Tint multiply (texture × color; not `backgroundColor`) |
 | `width` / `height` | number | Size (theme default if omitted) |
 
 ```tsx
-import { Icon, atlasIconsFontAwesome } from '@stom66/dcl-ui-component-kit'
+import { Icon, atlasIconsFontAwesome, getTheme } from '@stom66/dcl-ui-component-kit'
 
 <Icon uvs={atlasIconsFontAwesome.uv.cat} width={64} height={64} />
+<Icon uvs={atlasIconsFontAwesome.uv.star} color={getTheme().colors.primary} width={64} height={64} />
 ```
 
 ### `AvatarIcon`
@@ -296,12 +302,16 @@ Supported glyphs and atlas grids: see the Affinity numbers / symbols artboards, 
 
 Wrappers that animate a **single child** (child should expose numeric `width` / `height` where needed).
 
-### Shared options
+### Shared burst options
+
+Used by `Bounce`, `Pulse`, `Shake`, `Wiggle`, `FlashColor`, `FlashBorder`, and `Spinner` (`BurstAnimationProps`).
 
 | Option | Type | Description |
 |---|---|---|
-| `speed` | `number` | Effect speed |
-| `burstCount` / `burstInterval` | number | Burst playback |
+| `id` | `string` | Playback instance key |
+| `duration` | `number` | Seconds for **one** instance (not the whole burst) |
+| `burstCount` / `burstInterval` / `burstOffset` | number | Burst playback (`burstOffset` delays the timeline start) |
+| `playing` / `looping` | `boolean` | Playback control |
 | `children` | single child | Animated target |
 
 | Component | Effect |
@@ -310,18 +320,24 @@ Wrappers that animate a **single child** (child should expose numeric `width` / 
 | `Pulse` | Scale grow/shrink |
 | `Shake` | `position.left` left/right |
 | `Wiggle` | Rotates child UVs |
-| `Spinner` | Continuous UV rotation (`speed` deg/sec) |
+| `Spinner` | UV rotation via `duration` + `degrees` |
 | `FlashColor` | Lerps child tint toward `color` |
 | `FlashBorder` | Flashes border colour |
+
+### Spinner extras
+
+| Option | Type | Description |
+|---|---|---|
+| `degrees` | `number` | Degrees rotated during one `duration` (negative = reverse) |
 
 ```tsx
 import { Bounce, Icon, Spinner, atlasIconsFontAwesome } from '@stom66/dcl-ui-component-kit'
 
-<Spinner speed={180}>
+<Spinner id="loader" duration={1} degrees={180} burstInterval={0}>
 	<Icon uvs={atlasIconsFontAwesome.uv.hourglass} width={48} height={48} />
 </Spinner>
 
-<Bounce speed={0.6}>
+<Bounce duration={0.6}>
 	<Icon uvs={atlasIconsFontAwesome.uv.star} width={48} height={48} />
 </Bounce>
 ```

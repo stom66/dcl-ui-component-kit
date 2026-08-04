@@ -1,0 +1,42 @@
+# Publishes @stom66/dcl-ui-component-kit to npm via trusted publishing (OIDC).
+# No NPM_TOKEN secret — configure the trusted publisher on npmjs.com first
+# (Package → Settings → Trusted Publisher → GitHub Actions).
+#
+# Local flow:
+#   1. npm run bump:patch|minor|major
+#   2. git push && git push --tags
+#   3. Actions → Publish to npm → Run workflow
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # required for npm OIDC trusted publishing
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      # Trusted publishing needs npm >= 11.5.1 (Node 24 usually has it; pin latest to be safe)
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      # Do not set NODE_AUTH_TOKEN — npm will use OIDC when no token is present
+      - name: Publish
+        run: npm publish

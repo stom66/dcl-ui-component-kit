@@ -6,7 +6,7 @@
 // Clean the Club textures
 //
 // Export PNGs into `assets/images/example-themes/cleanTheClub/` and declare
-// atlases / texture sets here. Start from `assets/images/ui-component-kit-assets.af`.
+// atlases / texture sets here. Start from `design/ui-component-kit-assets.af`.
 //
 // Example:
 //

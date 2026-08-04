@@ -1,15 +1,16 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
+import { vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
 
 /** Curated sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
 const SAMPLE_ICONS = [
-	'cat', 'check', 'coins', 'crown', 'dice', 'gift', 'ghost', 'heart',
-	'play', 'phone', 'star', 'bolt', 'rocket', 'shield', 'trophy', 'ban',
-	'crosshairs', 'stopwatch', 'trash', 'user', 'gear', 'bell', 'map', 'fire',
+	'cat', 'check', 'coins', 'crown', 'dice', 'gift',
+	'ghost', 'heart', 'play', 'flagCheckered', 'star', 'meteor', 'bolt',
+	'rocket', 'shield', 'trophy', 'caretLeft', 'ban', 'crosshairs', 'stopwatch', 'fireFlameCurved', 'caretRight'
 ] as const
 
-const GRID_COLS = 6
+const GRID_COLS = 8
 
 
 // MARK: DemoIconsLayer
@@ -20,11 +21,11 @@ export class DemoIconsLayer extends Layer {
 			id             : 'demo-icons',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : true,
+			startHidden    : false,
 			showCloseButton: true,
 			uiTransform    : {
-				width : '42vw',
-				height: '90vh',
+				width : vwToPixels(50),
+				height: vhToPixels(80),
 			},
 		})
 	}
@@ -32,17 +33,22 @@ export class DemoIconsLayer extends Layer {
 
 	// MARK: body
 	protected body() {
+		const theme = getTheme()
+
 		return (
 			<Background>
 				<Column
 					cols={12}
+					spacing={6}
 					uiTransform={{
 						height        : '100%',
-						alignItems    : 'stretch',
+						alignItems    : 'flex-start',
 						justifyContent: 'flex-start',
-						padding       : { top: 16, right: 20, bottom: 16, left: 20 },
+						padding       : { top: 12, right: 20, bottom: 12, left: 20 },
 					}}
 				>
+					{/* MARK: Title 
+					*/}
 					<H2 value="Icons" />
 					<Text value="Named cells from atlasIconsFontAwesome — use atlas.uv.<name> with Icon (src defaults to this atlas). AvatarIcon uses uiBackground.avatarTexture." />
 
@@ -68,26 +74,129 @@ export class DemoIconsLayer extends Layer {
 						<Code value = "<Icon uvs={atlasIconsFontAwesome.uv.cat} />" />
 					</Row>
 
-					<Label
-						cols        = {12}
-						value       = "AvatarIcon (player portrait)"
-						uiTransform = {{ margin: { bottom: 8 } }}
-					/>
+					{/* MARK: Colors 
+					*/}
 					<Row
-						cols = {12}
+						cols={12}
 						uiTransform={{
 							justifyContent: 'flex-start',
-							alignItems    : 'center',
+							alignItems    : 'flex-start',
 							margin        : { bottom: 8 },
 						}}
 					>
-						<AvatarIcon
-							userId      = {DEFAULT_AVATAR_USER_ID}
-							width       = {64}
-							height      = {64}
-							uiTransform = {{ margin: { right: 12 } }}
-						/>
-						<Code value = {'<AvatarIcon userId="0xcec7…" />'} />
+						<Column
+							cols={6}
+							uiTransform={{
+								alignItems    : 'flex-start',
+								justifyContent: 'flex-start',
+								padding       : { right: 8 },
+							}}
+						>
+							<Label
+								cols        = {12}
+								value       = "color tint (texture × color)"
+								uiTransform = {{ margin: { bottom: 8 } }}
+							/>
+							<Row
+								cols={12}
+								uiTransform={{
+									justifyContent: 'flex-start',
+									alignItems    : 'center',
+									margin        : { bottom: 6 },
+								}}
+							>
+								<Icon
+									uvs         = {atlasIconsFontAwesome.uv.star}
+									width       = "64"
+									height      = "64"
+									color       = {theme.colors.primary}
+									uiTransform = {{ margin: { right: 8 } }}
+								/>
+								<Icon
+									uvs         = {atlasIconsFontAwesome.uv.star}
+									width       = "64"
+									height      = "64"
+									color       = {theme.colors.danger}
+									uiTransform = {{ margin: { right: 8 } }}
+								/>
+								<Icon
+									uvs    = {atlasIconsFontAwesome.uv.star}
+									width  = "64"
+									height = "64"
+									color  = {theme.colors.success}
+								/>
+							</Row>
+							<Code
+								value  = "<Icon color={…} />"
+								uiText = {{
+									fontSize: scaleFontSize(theme.typography.size.code+3, -0.1),
+									textWrap: 'nowrap',
+								}}
+							/>
+						</Column>
+
+					{/* MARK: Avatar 
+					*/}
+						<Column
+							cols={6}
+							uiTransform={{
+								alignItems    : 'flex-start',
+								justifyContent: 'flex-start',
+								padding       : { left: 8 },
+							}}
+						>
+							<Label
+								cols        = {12}
+								value       = "AvatarIcon (player portrait)"
+								uiTransform = {{ margin: { bottom: 8 } }}
+							/>
+							<Row
+								cols={12}
+								uiTransform={{
+									justifyContent: 'flex-start',
+									alignItems    : 'center',
+									margin        : { bottom: 6 },
+								}}
+							>
+								<AvatarIcon
+									userId = {DEFAULT_AVATAR_USER_ID}
+									width  = {64}
+									height = {64}
+								/>
+								<AvatarIcon
+									userId       = {DEFAULT_AVATAR_USER_ID}
+									width        = {64}
+									height       = {64}
+									borderRadius = {32}
+									borderWidth  = {3}
+									borderColor  = {alpha(theme.colors.light, 0.8)}
+								/>
+								<AvatarIcon
+									userId       = {DEFAULT_AVATAR_USER_ID}
+									width        = {64}
+									height       = {64}
+									borderRadius = {theme.border.radiusDefault}
+									borderWidth  = {3}
+									borderColor  = {alpha(theme.colors.info, 0.8)}
+								/>
+								<AvatarIcon
+									userId       = {DEFAULT_AVATAR_USER_ID}
+									width        = {64}
+									height       = {64}
+									borderRadius = {theme.border.radiusDefault}
+									borderWidth  = {3}
+									borderColor  = {alpha(theme.colors.light, 0.8)}
+									backgroundColor={theme.colors.danger}
+								/>
+							</Row>
+							<Code
+								value  = {'<AvatarIcon userId="…" />'}
+								uiText = {{
+									fontSize: scaleFontSize(theme.typography.size.code+2, -0.1),
+									textWrap: 'nowrap',
+								}}
+							/>
+						</Column>
 					</Row>
 
 
@@ -123,11 +232,12 @@ export class DemoIconsLayer extends Layer {
 						cols         = {2}
 						borderWidth  = {theme.border.width}
 						borderRadius = {theme.border.radiusDefault}
-						borderColor  = {alpha(theme.colors.light, 0.5)}
+						borderColor  = {alpha(theme.colors.light, 0.1)}
+						spacing      = {0}
 						uiTransform  = {{
 							alignItems    : 'center',
 							justifyContent: 'center',
-							padding       : 8,
+							padding       : { top: 8, left: 2, right: 2, bottom: 8 },
 							margin        : { bottom: 8 },
 						}}
 					>
@@ -135,11 +245,12 @@ export class DemoIconsLayer extends Layer {
 							uvs         = {atlasIconsFontAwesome.uv[name]}
 							width       = "40"
 							height      = "40"
-							uiTransform = {{ margin: { bottom: 4 } }}
+							uiTransform = {{ margin: { bottom: 0 } }}
 						/>
 						<Text
-							value  = {name}
-							uiText = {{ textAlign: 'middle-center', fontSize: theme.typography.size.small }}
+							value           = {name}
+							uiText          = {{ textAlign     : 'middle-center', fontSize: scaleFontSize(theme.typography.size.default, -0.1) }}
+							uiTransform     = {{ justifyContent: 'center', padding: 0 }}
 						/>
 					</Column>
 				)

@@ -27,6 +27,7 @@ export type AvatarIconProps = UiBoxProps & {
  * Player portrait via Decentraland `uiBackground.avatarTexture`.
  * Defaults to a square cell sized from `theme.icons.defaultSize`.
  * Pass a single axis and keep `aspectRatio` (default `1`) to derive the other.
+ * Defaults `overflow: 'hidden'` so `borderRadius` clips the portrait.
  */
 export function AvatarIcon({
 	children,
@@ -59,7 +60,7 @@ export function AvatarIcon({
 			uiTransform = {{
 				flexGrow  : 0,
 				flexShrink: 0,
-				overflow  : 'visible',
+				overflow  : 'hidden',
 				...(!hasWidth  ? { minWidth : size } : {}),
 				...(!hasHeight ? { minHeight: size } : {}),
 				...uiTransform,

@@ -1,5 +1,5 @@
 export { applyBurstSample, isPlaying, playOnce, sampleBurstTime, setLooping, setPlaying, syncAnimationPlayback } from './animationPlayback'
-export type { AnimationPlaybackState, BurstSample } from './animationPlayback'
+export type { AnimationPlaybackState, BurstAnimationProps, BurstSample } from './animationPlayback'
 
 export { cloneAnimChild, cloneAnimChildDeep, resolveAnimBoxSize, resolveAnimContentSize } from './animationChild'
 

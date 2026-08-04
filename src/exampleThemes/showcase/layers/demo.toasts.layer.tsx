@@ -23,14 +23,17 @@ function toastLabel(value: string) {
 			backgroundColor = {theme.colors.primary}
 			borderRadius    = {8}
 			uiTransform={{
-				width         : '100%',
-				height        : '100%',
+				width         : '140',
+				height        : '64',
 				alignItems    : 'center',
 				justifyContent: 'center',
 				padding       : { top: 8, right: 12, bottom: 8, left: 12 },
 			}}
 		>
-			<Text value={value} />
+			<Row>
+				<Icon uvs={atlasIconsFontAwesome.uv.cat} />
+				<Text value={value} />
+			</Row>
 		</Background>
 	)
 }
@@ -72,15 +75,16 @@ export class DemoToastsLayer extends Layer {
 					<H2 value="Toasts" />
 					<Text value="Dock positions, slide edges, scale, and group policies." />
 
-					<Label cols={12} value="Positions" uiTransform={{ margin: { bottom: 4 } }} color={alpha(theme.colors.secondary, 0.25)} />
+					<Label cols={12} value="Positions" uiTransform={{ margin: { bottom: 4 } }} color={theme.colors.primary} />
 					<Row cols={12} spacing={4}>
 						{POSITIONS.slice(0, 3).map((position) => (
 							<ButtonText
-								key       = {`btn_toast_pos_${position}`}
-								id        = {`btn_toast_pos_${position}`}
-								textLabel = {position}
-								cols      = {4}
-								callback  = {() => {
+								key             = {`btn_toast_pos_${position}`}
+								id              = {`btn_toast_pos_${position}`}
+								textLabel       = {position}
+								cols            = {4}
+								backgroundColor = {theme.colors.secondary}
+								callback        = {() => {
 									showToast({
 										position,
 										duration      : 2.5,
@@ -102,6 +106,7 @@ export class DemoToastsLayer extends Layer {
 								id        = {`btn_toast_pos_${position}`}
 								textLabel = {position}
 								cols      = {4}
+								backgroundColor = {theme.colors.secondary}
 								callback  = {() => {
 									showToast({
 										position,
@@ -118,12 +123,13 @@ export class DemoToastsLayer extends Layer {
 						))}
 					</Row>
 
-					<Label cols={12} value="Motion" uiTransform={{ margin: { bottom: 4 } }} color={alpha(theme.colors.secondary, 0.25)}  />
+					<Label cols={12} value="Motion" uiTransform={{ margin: { bottom: 4 } }} color={theme.colors.primary}  />
 					<Row cols={12} spacing={4}>
 						<ButtonText
 							id        = "btn_toast_slide_cross"
 							textLabel = "In top / out bottom"
 							cols      = {6}
+							backgroundColor = {theme.colors.secondary}
 							callback  = {() => {
 								showToast({
 									position      : 'bottom',
@@ -141,6 +147,7 @@ export class DemoToastsLayer extends Layer {
 							id        = "btn_toast_score"
 							textLabel = "Score scale"
 							cols      = {6}
+							backgroundColor = {theme.colors.secondary}
 							callback  = {() => {
 								scoreValue += 25
 								const value = scoreValue
@@ -170,12 +177,13 @@ export class DemoToastsLayer extends Layer {
 						/>
 					</Row>
 
-					<Label cols={12} value="Hint group" uiTransform={{ margin: { bottom: 4 } }} color={alpha(theme.colors.secondary, 0.25)}  />
+					<Label cols={12} value="Hint group" uiTransform={{ margin: { bottom: 4 } }} color={theme.colors.primary}  />
 					<Row cols={12} spacing={4}>
 						<ButtonText
 							id        = "btn_toast_hint_queue"
 							textLabel = "Queue hint"
 							cols      = {4}
+							backgroundColor = {theme.colors.secondary}
 							callback  = {() => {
 								const name = HINT_ICONS[hintIndex % HINT_ICONS.length]
 								hintIndex++
@@ -201,6 +209,7 @@ export class DemoToastsLayer extends Layer {
 							id        = "btn_toast_hint_replace"
 							textLabel = "Replace hint"
 							cols      = {4}
+							backgroundColor = {theme.colors.secondary}
 							callback  = {() => {
 								const name = HINT_ICONS[hintIndex % HINT_ICONS.length]
 								hintIndex++

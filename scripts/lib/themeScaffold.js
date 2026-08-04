@@ -84,7 +84,7 @@ export const theme: ThemeCustomize = {
 //
 // Export PNGs into \`${assetDir}/\` and declare atlases / texture sets here.
 // Start from the Affinity template shipped with UI Component Kit
-// (\`assets/images/ui-component-kit-assets.af\` in the package repo).
+// (\`design/ui-component-kit-assets.af\` in the package repo).
 //
 // Example:
 //

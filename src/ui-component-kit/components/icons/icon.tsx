@@ -1,11 +1,17 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 
 import { atlasIconsFontAwesome } from '../../atlases'
 import { getTheme } from '../../styles'
 import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 
-type IconProps = UiBoxProps & {
+export type IconProps = Omit<UiBoxProps, 'backgroundColor'> & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/**
+	 * Tint multiply for the icon texture (applied as `uiBackground.color`).
+	 * Prefer this over `backgroundColor` — icons are glyphs, not filled panels.
+	 */
+	color?      : Color4
 	/** Texture path. Defaults to the bundled Font Awesome atlas. */
 	src?        : string
 	textureMode?: TextureMode | undefined
@@ -21,9 +27,11 @@ type IconProps = UiBoxProps & {
  * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
  * `src` defaults to `atlasIconsFontAwesome.source` and inherits that atlas's
  * `wrapMode` / `filterMode` (override via `uiBackground.texture` — deep-merged).
+ * Tint with `color` (texture × color multiply).
  */
 export const Icon = ({
 	children,
+	color,
 	src         = atlasIconsFontAwesome.source,
 	textureMode,
 	uvs,
@@ -41,6 +49,7 @@ export const Icon = ({
 	return (
 		<UiBox
 			{...props}
+			backgroundColor={color}
 			uiTransform={{
 				width     : width,
 				height    : height,

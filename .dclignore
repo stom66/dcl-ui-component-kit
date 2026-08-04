@@ -15,6 +15,11 @@ dist
 README.md
 *.af
 *.af~lock~
+**/*.af
+**/*.af~lock~
+**/*~lock~
+design
+design/**
 *.blend
 *.fbx
 *.zip

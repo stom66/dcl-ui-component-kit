@@ -35,6 +35,11 @@ type BackgroundGradientProps = Omit<UiBoxProps, 'backgroundColor'> & {
 	gradientEnd?   : number
 	/** Gradient texture path. Defaults to the bundled horizontal gradient. */
 	textureSrc?    : string
+	/**
+	 * When true, sizes to children instead of filling the parent.
+	 * Forwarded to `Background` — required for Layer `height: 'auto'`.
+	 */
+	fitContent?    : boolean
 }
 
 

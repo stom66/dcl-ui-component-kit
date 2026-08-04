@@ -3,22 +3,13 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
-import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: ShakeProps Type
-export type ShakeProps = UiBoxProps & {
-	/** Unique playback instance key. */
-	id              : string
-	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** When true, advances local time. Defaults to `true`. */
-	playing?        : boolean
-	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
-	looping?        : boolean
-	/** Seconds for one full shake sequence (all left/right moves + return). */
-	speed?          : number
-	burstCount?     : number
-	burstInterval?  : number
+export type ShakeProps = UiBoxProps & BurstAnimationProps & {
+	/** Seconds for one full shake sequence (all left/right moves + return). Not the full burst — see `burstCount`. */
+	duration?       : number
 	/** Number of left/right moves per sequence. Defaults to `3` (left, right, left). */
 	count?          : number
 	/** Leftmost `position.left` during a shake. */
@@ -47,9 +38,10 @@ export const Shake = ({
 	children,
 	playing,
 	looping,
-	speed          = theme.animation.shakeDurationDefault,
+	duration       = theme.animation.shakeDurationDefault,
 	burstCount     = theme.animation.shakeBurstCountDefault,
 	burstInterval  = theme.animation.shakeBurstIntervalDefault,
+	burstOffset    = 0,
 	count          = theme.animation.shakeCountDefault,
 	offsetMin      = theme.animation.shakeOffsetMinDefault,
 	offsetMax      = theme.animation.shakeOffsetMaxDefault,
@@ -71,7 +63,7 @@ export const Shake = ({
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
 		state,
-		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+		sampleBurstTime(state.elapsed, duration, burstCount, burstInterval, state.looping, burstOffset),
 	)
 
 	let offset = 0

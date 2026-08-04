@@ -2,14 +2,18 @@ export type ThemeAnimation = {
 	showDuration: number
 	hideDuration: number
 
-	/** Rotation speed in degrees per second. Defaults to `720`. */
-	spinnerSpeedDefault   : number
-	/** Seconds to rest after each full revolution. Defaults to `0` (continuous). */
-	spinnerIntervalDefault: number
+	/** Seconds for one spin of `spinnerDegreesDefault`. Defaults to `1`. */
+	spinnerDurationDefault     : number
+	/** Degrees rotated during one `spinnerDurationDefault`. Defaults to `180`. Negative = reverse. */
+	spinnerDegreesDefault      : number
+	/** Number of spins before the pause. Defaults to `1`. */
+	spinnerBurstCountDefault   : number
+	/** Seconds to rest between bursts. Defaults to `0` (continuous). */
+	spinnerBurstIntervalDefault: number
 
-	/** Seconds for one full pulse (grow + shrink). Defaults to `0.5`. */
+	/** Seconds for one pulse instance (grow + shrink). Defaults to `0.5`. */
 	pulseDurationDefault     : number
-	/** Number of pulses before the pause. Defaults to `2`. */
+	/** Number of pulse instances before the pause. Defaults to `2`. */
 	pulseBurstCountDefault   : number
 	/** Seconds to rest between bursts. Defaults to `1`. */
 	pulseBurstIntervalDefault: number
@@ -18,9 +22,9 @@ export type ThemeAnimation = {
 	/** Maximum scale during a pulse. Defaults to `1.2`. */
 	pulseScaleMaxDefault     : number
 
-	/** Seconds for one full bounce (up + down). Defaults to `0.5`. */
+	/** Seconds for one bounce instance (up + down). Defaults to `0.5`. */
 	bounceDurationDefault     : number
-	/** Number of bounces before the pause. Defaults to `2`. */
+	/** Number of bounce instances before the pause. Defaults to `2`. */
 	bounceBurstCountDefault   : number
 	/** Seconds to rest between bursts. Defaults to `1`. */
 	bounceBurstIntervalDefault: number
@@ -29,9 +33,9 @@ export type ThemeAnimation = {
 	/** Maximum `position.top` during a bounce. Defaults to `-16`. */
 	bounceOffsetMaxDefault    : number
 
-	/** Seconds for one full shake sequence. Defaults to `0.4`. */
+	/** Seconds for one shake-sequence instance. Defaults to `0.4`. */
 	shakeDurationDefault     : number
-	/** Number of shake sequences before the pause. Defaults to `2`. */
+	/** Number of shake-sequence instances before the pause. Defaults to `2`. */
 	shakeBurstCountDefault   : number
 	/** Seconds to rest between bursts. Defaults to `1`. */
 	shakeBurstIntervalDefault: number
@@ -42,23 +46,23 @@ export type ThemeAnimation = {
 	/** Rightmost `position.left` during a shake. Defaults to `8`. */
 	shakeOffsetMaxDefault    : number
 
-	/** Seconds for one full color flash (to target + back). Defaults to `0.5`. */
+	/** Seconds for one color-flash instance (to target + back). Defaults to `0.5`. */
 	flashColorDurationDefault     : number
-	/** Number of flashes before the pause. Defaults to `2`. */
+	/** Number of flash instances before the pause. Defaults to `2`. */
 	flashColorBurstCountDefault   : number
 	/** Seconds to rest between bursts. Defaults to `1`. */
 	flashColorBurstIntervalDefault: number
 
-	/** Seconds for one full border flash (to target + back). Defaults to `0.5`. */
+	/** Seconds for one border-flash instance (to target + back). Defaults to `0.5`. */
 	flashBorderDurationDefault     : number
-	/** Number of border flashes before the pause. Defaults to `2`. */
+	/** Number of border-flash instances before the pause. Defaults to `2`. */
 	flashBorderBurstCountDefault   : number
 	/** Seconds to rest between border-flash bursts. Defaults to `1`. */
 	flashBorderBurstIntervalDefault: number
 
-	/** Seconds for one full wiggle sequence. Defaults to `0.5`. */
+	/** Seconds for one wiggle-sequence instance. Defaults to `0.5`. */
 	wiggleDurationDefault     : number
-	/** Number of wiggle sequences before the pause. Defaults to `2`. */
+	/** Number of wiggle-sequence instances before the pause. Defaults to `2`. */
 	wiggleBurstCountDefault   : number
 	/** Seconds to rest between bursts. Defaults to `1`. */
 	wiggleBurstIntervalDefault: number
@@ -75,8 +79,10 @@ export const animation: ThemeAnimation = {
 	showDuration: 0.35,
 	hideDuration: 0.35,
 
-	spinnerSpeedDefault   : 180,
-	spinnerIntervalDefault: 0,
+	spinnerDurationDefault     : 1,
+	spinnerDegreesDefault      : 180,
+	spinnerBurstCountDefault   : 1,
+	spinnerBurstIntervalDefault: 0,
 
 	pulseDurationDefault     : 0.5,
 	pulseBurstCountDefault   : 2,

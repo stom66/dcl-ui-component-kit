@@ -34,6 +34,9 @@
   "bin": {
     "dcl-ui-component-kit": "scripts/cli.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "sdk-commands start",
     "deploy": "sdk-commands deploy",
@@ -42,7 +45,10 @@
     "copy-assets": "node scripts/cli.js copy-assets",
     "init-theme": "node scripts/cli.js init-theme",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
-    "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next"
+    "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
+    "bump:patch": "npm version patch",
+    "bump:minor": "npm version minor",
+    "bump:major": "npm version major"
   },
   "peerDependencies": {
     "@dcl/sdk": ">=7.0.0"

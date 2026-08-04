@@ -3,22 +3,13 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
-import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: BounceProps Type
-export type BounceProps = UiBoxProps & {
-	/** Unique playback instance key. */
-	id              : string
-	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** When true, advances local time. Defaults to `true`. */
-	playing?        : boolean
-	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
-	looping?        : boolean
-	/** Seconds for one full bounce (up + down). */
-	speed?          : number
-	burstCount?     : number
-	burstInterval?  : number
+export type BounceProps = UiBoxProps & BurstAnimationProps & {
+	/** Seconds for one full bounce (up + down). Not the full burst — see `burstCount`. */
+	duration?       : number
 	/** Minimum `position.top` during a bounce. */
 	offsetMin?      : number
 	/** Maximum `position.top` during a bounce. */
@@ -52,9 +43,10 @@ export const Bounce = ({
 	children,
 	playing,
 	looping,
-	speed          = theme.animation.bounceDurationDefault,
+	duration       = theme.animation.bounceDurationDefault,
 	burstCount     = theme.animation.bounceBurstCountDefault,
 	burstInterval  = theme.animation.bounceBurstIntervalDefault,
+	burstOffset    = 0,
 	offsetMin      = theme.animation.bounceOffsetMinDefault,
 	offsetMax      = theme.animation.bounceOffsetMaxDefault,
 	easingFunction,
@@ -80,7 +72,7 @@ export const Bounce = ({
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
 		state,
-		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+		sampleBurstTime(state.elapsed, duration, burstCount, burstInterval, state.looping, burstOffset),
 	)
 
 	let offset = offsetMin

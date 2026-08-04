@@ -3,22 +3,13 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
-import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimContentSize } from './animationChild'
 
 //MARK: PulseProps Type
-export type PulseProps = UiBoxProps & {
-	/** Unique playback instance key. */
-	id              : string
-	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** When true, advances local time. Defaults to `true`. */
-	playing?        : boolean
-	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
-	looping?        : boolean
-	/** Seconds for one full pulse (grow + shrink). */
-	speed?          : number
-	burstCount?     : number
-	burstInterval?  : number
+export type PulseProps = UiBoxProps & BurstAnimationProps & {
+	/** Seconds for one full pulse (grow + shrink). Not the full burst — see `burstCount`. */
+	duration?       : number
 	scaleMin?       : number
 	scaleMax?       : number
 	/**
@@ -52,9 +43,10 @@ export const Pulse = ({
 	children,
 	playing,
 	looping,
-	speed          = theme.animation.pulseDurationDefault,
+	duration       = theme.animation.pulseDurationDefault,
 	burstCount     = theme.animation.pulseBurstCountDefault,
 	burstInterval  = theme.animation.pulseBurstIntervalDefault,
+	burstOffset    = 0,
 	scaleMin       = theme.animation.pulseScaleMinDefault,
 	scaleMax       = theme.animation.pulseScaleMaxDefault,
 	easingFunction,
@@ -77,7 +69,7 @@ export const Pulse = ({
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
 		state,
-		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+		sampleBurstTime(state.elapsed, duration, burstCount, burstInterval, state.looping, burstOffset),
 	)
 
 	let scale = scaleMin

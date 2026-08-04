@@ -13,7 +13,7 @@ When a family has both, docs mark it: **Variants:** procedural (`Foo`) · image-
 
 The kit ships a full Affinity source with every default atlas and progress-bar artboard:
 
-**[`assets/images/ui-component-kit-assets.af`](../assets/images/ui-component-kit-assets.af)** (in this repo)
+**[`design/ui-component-kit-assets.af`](../design/ui-component-kit-assets.af)** (in this repo — kept outside `assets/` so Affinity autosave does not reload the scene)
 
 1. Open the `.af` file in Affinity.
 2. Duplicate the artboard closest to what you need.

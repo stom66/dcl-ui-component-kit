@@ -217,18 +217,20 @@ export class DemoProgressLayer extends Layer {
 									border    : 'assets/images/ui-component-kit/progressBar-horizontal-border.png',
 								}}
 							>
-								<Label
-									cols            = {2}
-									color           = {alpha(theme.colors.body, 0.5)}
-									uiTransform={{
+							{/* 	<Label
+									cols        = {2}
+									//color       = {alpha(theme.colors.body, 0.5)}
+									uiTransform = {{
 										height        : '50%',
+										width         : '20%',
 										justifyContent: 'center',
 										alignItems    : 'center',
+										alignSelf     : 'center',
 										padding       : 0,
 									}}
-								>
+								> */}
 									<IconNumber value={randomValue2} height={32} />
-								</Label>
+								{/* </Label> */}
 							</ProgressBarImage>
 
 							{/* MARK: Img border-2, orange */}

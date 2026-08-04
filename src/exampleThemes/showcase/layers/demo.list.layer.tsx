@@ -47,7 +47,7 @@ export class DemoListLayer extends Layer {
 			showCloseButton: true,
 			uiTransform    : {
 				width : '42vw',
-				height: '70vh',
+				height: 'auto',
 			},
 		})
 	}
@@ -58,12 +58,11 @@ export class DemoListLayer extends Layer {
 		const theme = getTheme()
 
 		return (
-			<Background>
+			<Background fitContent>
 				<Column
 					cols        = {12}
 					spacing     = {8}
 					uiTransform = {{
-						height        : '100%',
 						alignItems    : 'stretch',
 						justifyContent: 'flex-start',
 						padding       : { top: 16, right: 20, bottom: 16, left: 20 },
@@ -116,10 +115,10 @@ export class DemoListLayer extends Layer {
 				>
 					{entry.icon ? (
 						<Icon
-							uvs             = {atlasIconsFontAwesome.uv[entry.icon]}
-							width           = {ICON_SIZE}
-							height          = {ICON_SIZE}
-							backgroundColor = {rank === 1 ? theme.colors.primary : undefined}
+							uvs    = {atlasIconsFontAwesome.uv[entry.icon]}
+							width  = {ICON_SIZE}
+							height = {ICON_SIZE}
+							color  = {rank === 1 ? theme.colors.primary : undefined}
 						/>
 					) : undefined}
 				</Column>
@@ -183,7 +182,7 @@ export class DemoListLayer extends Layer {
 			<FlashBorder
 				key           = {`score-row-flash-${rank}`}
 				id            = {`score-row-flash-${rank}`}
-				speed         = {0.5}
+				duration      = {0.5}
 				burstCount    = {2}
 				burstInterval = {1}
 				color         = {theme.colors.primary}

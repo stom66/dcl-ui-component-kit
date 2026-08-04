@@ -27,7 +27,7 @@ export { buildTheme, defaultTheme, getTheme, setTheme, theme } from './styles/th
 export { TextureAtlas, atlasBtnIcons, atlasBtnIconsStyled, atlasCharsAlphaNumeric, atlasCharsNumbers, atlasCharsSymbols, atlasGradientColors, atlasIconsFontAwesome, findAtlasCell } from './atlases'
 export type { AtlasCell, AtlasLayout, AtlasTexture, AtlasTextureFilterMode, AtlasTextureWrapMode, TextureAtlasCellOptions, TextureAtlasCharInset, TextureAtlasNamedCell, TextureAtlasOptions } from './atlases'
 
-export type { AnimationPlaybackState, AvatarIconProps, BounceProps, BurstSample, FillFrom, FlashBorderProps, FlashColorProps, GradientDirection, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, PulseProps, ShakeProps, SpinnerProps, TextureSlices, ToggleProps, WiggleProps } from './components'
+export type { AnimationPlaybackState, AvatarIconProps, BounceProps, BurstAnimationProps, BurstSample, FillFrom, FlashBorderProps, FlashColorProps, GradientDirection, IconProps, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, PulseProps, ShakeProps, SpinnerProps, TextureSlices, ToggleProps, WiggleProps } from './components'
 export type { Theme, ThemeCustomize }
 export type SetupUiComponentKitOptions = {
 	theme? : ThemeCustomize

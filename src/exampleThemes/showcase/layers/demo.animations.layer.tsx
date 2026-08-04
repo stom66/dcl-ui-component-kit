@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Text, UiBox, Wiggle, ZoneType } from '../../../ui-component-kit'
-import { alpha, easingFunctions, vwToPixels } from '../../../ui-component-kit/utils'
+import { alpha, easingFunctions, vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
 
 const CELL = {
 	height: '128',
@@ -25,6 +25,11 @@ const ID = {
 	hoverPulse          : 'demo-anim-hover-pulse',
 	clickFlash          : 'demo-anim-click-flash',
 	clickWiggle         : 'demo-anim-click-wiggle',
+	spinner             : 'demo-anim-spinner',
+	spinnerBeamsVaried  : 'demo-anim-spinner-beams-varied',
+	spinnerBeamsOuter   : 'demo-anim-spinner-beams-outer',
+	spinnerBeamsInner   : 'demo-anim-spinner-beams-inner',
+	spinnerPulseChild   : 'demo-anim-spinner-pulse-child',
 } as const
 
 
@@ -36,11 +41,11 @@ export class DemoAnimationsLayer extends Layer {
 			id             : 'demo-animations',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : false,
+			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
-				width : '50vw',
-				height: '75vh',
+				width : vwToPixels(50),
+				height: vhToPixels(75),
 			},
 		})
 	}
@@ -68,7 +73,8 @@ export class DemoAnimationsLayer extends Layer {
 
 						{this.renderAnimCell('Spinner', theme.colors.warning, (
 							<Spinner
-								uiTransform={{
+								id          = {ID.spinner}
+								uiTransform = {{
 									positionType: 'absolute',
 									position    : { top: 0, left: 0 },
 								}}
@@ -143,7 +149,9 @@ export class DemoAnimationsLayer extends Layer {
 
 						{this.renderAnimCell('Spinner + \nPulse > FlashColor', theme.colors.info, [
 							<Spinner
-								speed       = {25}
+								id          = {ID.spinnerBeamsVaried}
+								duration    = {1}
+								degrees     = {25}
 								uiTransform = {{
 									positionType: 'absolute',
 									position    : { top: 0, left: 0 },
@@ -159,54 +167,103 @@ export class DemoAnimationsLayer extends Layer {
 								id             = {ID.pulseBeamsVaried}
 								easingFunction = {easingFunctions.easeCirc}
 								burstInterval  = {0}
-								speed          = {1}
+								duration       = {1}
 							>
 								<FlashColor 
 									id            = "skadjfhksjdf" 
 									color         = {theme.colors.success} 
-									speed         = {2} 
+									duration      = {2} 
 									burstInterval = {0}
 								>
 									<Icon
-										uvs             = {ICON_UVS}
-										width           = {64}
-										height          = {64}
-										backgroundColor = {theme.colors.primary}
+										uvs    = {ICON_UVS}
+										width  = {64}
+										height = {64}
+										color  = {theme.colors.primary}
 									/>
 								</FlashColor>
 							</Pulse>,
 						])}
 
-						{this.renderAnimCell('Spinner + \nSpinner > Pulse', theme.colors.primary, [
+						{this.renderAnimCell('Spinner > Spinner + \nSpinner > Pulse', theme.colors.warning, [
 							<Spinner
-								speed          = {360}
-								interval       = {1.5}
+								id             = {ID.spinnerBeamsOuter}
+								duration       = {1}
+								degrees        = {180}
+								burstCount     = {1}
+								burstInterval  = {1.5}
 								easingFunction = {easingFunctions.easeBack}
 								uiTransform    = {{
 									positionType: 'absolute',
 									position    : { top: 0, left: 0 },
 								}}
 							>
-								<Icon
-									src    = {BEAMS_EVEN}
-									width  = {128}
-									height = {128}
-								/>
+								<Spinner
+									id             = {ID.spinnerBeamsInner}
+									duration       = {1}
+									degrees        = {-180}
+									burstCount     = {1}
+									burstInterval  = {1.5}
+									burstOffset    = {1.25}
+									easingFunction = {easingFunctions.easeBack}
+									uiTransform    = {{
+										positionType: 'absolute',
+										position    : { top: 0, left: 0 },
+									}}
+								>
+									<Icon
+										src    = {BEAMS_EVEN}
+										width  = {128}
+										height = {128}
+									/>
+								</Spinner>
 							</Spinner>,
-							<Spinner
-							>
+							<Spinner id={ID.spinnerPulseChild}>
 								<Pulse
 									id             = {ID.pulseBeamsEven}
 									easingFunction = {easingFunctions.easeSine}
 									burstInterval  = {0}
-									>
+								>
 									<Icon
 										uvs    = {atlasIconsFontAwesome.uv.rotateRight}
 										width  = {64}
 										height = {64}
-										/>
-								</Pulse>,
-							</Spinner>
+									/>
+								</Pulse>
+							</Spinner>,
+						])}
+
+						{this.renderAnimCell('Pulse, Shake, and Wiggle', theme.colors.primary, [
+							<Pulse
+								id             = {ID.pulseBeamsEven}
+								easingFunction = {easingFunctions.easeSine}
+								burstCount     = {2}
+								burstInterval  = {2}
+								burstOffset    = {0}
+								duration       = {0.5}
+								>
+									<Shake 
+										id            = "alskjd" 
+										burstCount     = {2}
+										burstInterval  = {2}
+										burstOffset    = {1}
+										duration       = {0.5}
+									>
+										<Wiggle 
+											id            = "alskjdaa" 
+											burstCount     = {2}
+											burstInterval  = {2}
+											burstOffset    = {2}
+											duration       = {0.5}
+										>
+											<Icon
+												uvs    = {atlasIconsFontAwesome.uv.cat}
+												width  = {64}
+												height = {64}
+												/>
+										</Wiggle>
+									</Shake>
+							</Pulse>,
 						])}
 					</Row>
 
@@ -214,7 +271,7 @@ export class DemoAnimationsLayer extends Layer {
 					*/}
 					<Row cols={12} uiTransform={{ justifyContent: 'center' }}>
 						{this.renderAnimCell(
-							'Hover\nShake once',
+							'onHover | One-shot\nShake',
 							theme.colors.danger,
 							(
 								<Shake
@@ -236,7 +293,7 @@ export class DemoAnimationsLayer extends Layer {
 						)}
 
 						{this.renderAnimCell(
-							'Hover\nPulse loop',
+							'onHover | Loop\nPulse',
 							theme.colors.primary,
 							(
 								<Pulse
@@ -259,7 +316,7 @@ export class DemoAnimationsLayer extends Layer {
 						)}
 
 						{this.renderAnimCell(
-							'Click\nFlashColor',
+							'onClick\nFlashColor',
 							theme.colors.info,
 							(
 								<FlashColor
@@ -281,7 +338,7 @@ export class DemoAnimationsLayer extends Layer {
 						)}
 
 						{this.renderAnimCell(
-							'Click\nWiggle once',
+							'onClick\nWiggle once',
 							theme.colors.warning,
 							(
 								<Wiggle

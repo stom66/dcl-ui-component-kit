@@ -5,22 +5,13 @@ import { getTheme } from '../../styles'
 import { darken } from '../../utils/colors'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
-import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 
 
 //MARK: FlashBorderProps Type
-export type FlashBorderProps = UiBoxProps & {
-	/** Unique playback instance key. */
-	id              : string
-	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** When true, advances local time. Defaults to `true`. */
-	playing?        : boolean
-	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
-	looping?        : boolean
-	/** Seconds for one full flash (to target + back). */
-	speed?          : number
-	burstCount?     : number
-	burstInterval?  : number
+export type FlashBorderProps = UiBoxProps & BurstAnimationProps & {
+	/** Seconds for one full flash (to target + back). Not the full burst — see `burstCount`. */
+	duration?       : number
 	/** Color to flash toward. Defaults to `theme.colors.primary`. */
 	color?          : Color4
 	/**
@@ -85,9 +76,10 @@ export const FlashBorder = ({
 	children,
 	playing,
 	looping,
-	speed          = theme.animation.flashBorderDurationDefault,
+	duration       = theme.animation.flashBorderDurationDefault,
 	burstCount     = theme.animation.flashBorderBurstCountDefault,
 	burstInterval  = theme.animation.flashBorderBurstIntervalDefault,
+	burstOffset    = 0,
 	color          = theme.colors.primary,
 	easingFunction,
 	easingFlash,
@@ -106,7 +98,7 @@ export const FlashBorder = ({
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
 		state,
-		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+		sampleBurstTime(state.elapsed, duration, burstCount, burstInterval, state.looping, burstOffset),
 	)
 
 	let currentColor = baseColor

@@ -1,4 +1,5 @@
 import { engine } from '@dcl/sdk/ecs'
+import type ReactEcs from '@dcl/sdk/react-ecs'
 
 
 export type AnimationPlaybackState = {
@@ -14,6 +15,36 @@ export type BurstSample = {
 	cycleT  : number
 	/** True when a non-looping run has completed. */
 	finished: boolean
+}
+
+/**
+ * Shared playback props for burst motion wrappers (`Pulse`, `Bounce`, `Shake`,
+ * `Wiggle`, `FlashColor`, `FlashBorder`, `Spinner`).
+ */
+export type BurstAnimationProps = {
+	/** Unique playback instance key. */
+	id            : string
+	children?     : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** When true, advances local time. Defaults to `true`. */
+	playing?      : boolean
+	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
+	looping?      : boolean
+	/**
+	 * Seconds for one animation instance (one pulse, bounce, shake sequence, etc.).
+	 * Not the duration of the whole burst — that is `duration * burstCount`.
+	 */
+	duration?     : number
+	/** Number of instances per burst before the pause. */
+	burstCount?   : number
+	/** Seconds to rest between bursts. */
+	burstInterval?: number
+	/**
+	 * Seconds to wait before the burst timeline starts (initial delay).
+	 * Pair with a sibling that shares `duration` / `burstInterval` and no offset
+	 * to alternate — e.g. both `duration={D}`, `burstInterval={D}`, one with
+	 * `burstOffset={D}`. Defaults to `0`.
+	 */
+	burstOffset?  : number
 }
 
 type SyncProps = {
@@ -91,40 +122,47 @@ export function syncAnimationPlayback(
 /**
  * Maps elapsed playback time onto the burst / pause timeline used by motion wrappers.
  * Looping keeps the existing burst + interval cycle; one-shot runs `burstCount` cycles then finishes.
+ * `burstOffset` delays the start of that timeline (rest until the offset elapses).
  */
 export function sampleBurstTime(
 	elapsed      : number,
-	speed        : number,
+	duration     : number,
 	burstCount   : number,
 	burstInterval: number,
 	looping      : boolean,
+	burstOffset  : number = 0,
 ): BurstSample {
-	if (speed <= 0 || burstCount <= 0) {
+	if (duration <= 0 || burstCount <= 0) {
 		return { inBurst: false, cycleT: 0, finished: !looping }
 	}
 
-	const burstDuration = burstCount * speed
+	const shifted = elapsed - Math.max(0, burstOffset)
+	if (shifted < 0) {
+		return { inBurst: false, cycleT: 0, finished: false }
+	}
+
+	const burstDuration = burstCount * duration
 
 	if (looping) {
 		const period = burstDuration + Math.max(0, burstInterval)
-		const t      = period > 0 ? elapsed % period : 0
+		const t      = period > 0 ? shifted % period : 0
 		if (t < burstDuration) {
 			return {
 				inBurst : true,
-				cycleT  : (t % speed) / speed,
+				cycleT  : (t % duration) / duration,
 				finished: false,
 			}
 		}
 		return { inBurst: false, cycleT: 0, finished: false }
 	}
 
-	if (elapsed >= burstDuration) {
+	if (shifted >= burstDuration) {
 		return { inBurst: false, cycleT: 0, finished: true }
 	}
 
 	return {
 		inBurst : true,
-		cycleT  : (elapsed % speed) / speed,
+		cycleT  : (shifted % duration) / duration,
 		finished: false,
 	}
 }

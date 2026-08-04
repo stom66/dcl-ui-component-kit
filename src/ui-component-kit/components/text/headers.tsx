@@ -3,6 +3,7 @@ import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
+import { textMinHeight } from './textLayout'
 
 
 type HeaderLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
@@ -18,7 +19,11 @@ export type HeadingProps = Omit<UiBoxProps, 'uiText'> & {
 
 
 // MARK: Heading
-/** Shared H1–H6 renderer — theme size/family per level, optional `color` shorthand. */
+/**
+ * Shared H1–H6 renderer — theme size/family per level, optional `color` shorthand.
+ * Uses `flexShrink: 0` + `minHeight` so height-capped columns cannot crush text
+ * (default Yoga `flexShrink: 1` was collapsing `height: 'auto'` boxes to 0).
+ */
 function Heading({
 	level,
 	children,
@@ -28,19 +33,22 @@ function Heading({
 	uiTransform,
 	...props
 }: HeadingProps & { level: HeaderLevel }) {
-	const theme = getTheme()
+	const theme    = getTheme()
+	const fontSize = scaleFontSize(theme.typography.size[level])
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
+				width     : '100%',
+				height    : 'auto',
+				minHeight : textMinHeight(fontSize),
+				alignSelf : 'flex-start',
+				flexShrink: 0,
 				...uiTransform,
 			}}
 			uiText={{
-				fontSize : scaleFontSize(theme.typography.size[level]),
+				fontSize,
 				font     : theme.typography.family[level],
 				color    : theme.colors.light,
 				textAlign: 'middle-left',

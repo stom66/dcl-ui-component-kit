@@ -173,7 +173,7 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `assets/images/ui-component-kit-assets.af` → export under `assets/images/example-themes/showcase/`, declare in `src/exampleThemes/showcase/`):
+`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `design/ui-component-kit-assets.af` → export under `assets/images/example-themes/showcase/`, declare in `src/exampleThemes/showcase/`):
 
 ```tsx
 import { exampleBtnIconsAtlas } from '../../exampleThemes/showcase'
@@ -231,9 +231,11 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 
 ```tsx
 import { exampleIconsAtlas, exampleNumbersAtlas } from '../../exampleThemes/showcase'
-import { AvatarIcon, DEFAULT_AVATAR_USER_ID } from '../../components'
+import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconNumber } from '../../components'
+import { getTheme } from '../../styles'
 
 <Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
+<Icon uvs={exampleIconsAtlas.uv.star} color={getTheme().colors.primary} />
 <IconNumber value={42} atlas={exampleNumbersAtlas} />
 <AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
 ```

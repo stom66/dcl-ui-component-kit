@@ -189,8 +189,8 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 			maxWidth    : vwToPixels(25)   - LEFT_ZONE_INSET,
 			positionType: 'absolute',
 			position    : {
-				top   : '12vh',
-				bottom: '25vh',
+				top   : isMobile() ? '25vh' : '12vh',
+				bottom: isMobile() ? '40vh' : '25vh',
 				left  : LEFT_ZONE_INSET,
 			},
 		}),

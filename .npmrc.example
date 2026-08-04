@@ -1,0 +1,2 @@
+# Copy to .npmrc and paste your token, or set NPM_TOKEN in the environment.
+//registry.npmjs.org/:_authToken=${NPM_TOKEN}

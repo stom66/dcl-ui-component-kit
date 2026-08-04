@@ -3,6 +3,7 @@ import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../styles'
 import { UiBox, type UiBoxProps } from './base'
+import { textMinHeight } from './text/textLayout'
 
 
 export type HeaderProps = Omit<UiBoxProps, 'uiText'> & {
@@ -27,20 +28,23 @@ export const Header = ({
 	uiTransform,
 	...props
 }: HeaderProps) => {
-	const theme = getTheme()
+	const theme    = getTheme()
+	const fontSize = scaleFontSize(theme.typography.size.h2)
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
-				padding  : { top: 10, bottom: 5 },
+				width     : '100%',
+				height    : 'auto',
+				minHeight : textMinHeight(fontSize),
+				alignSelf : 'flex-start',
+				flexShrink: 0,
+				padding   : { top: 10, bottom: 5 },
 				...uiTransform,
 			}}
 			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.h2),
+				fontSize,
 				color    : theme.colors.light,
 				textAlign: 'middle-left',
 				...uiText,

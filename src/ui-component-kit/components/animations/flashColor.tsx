@@ -4,22 +4,13 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
-import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: FlashColorProps Type
-export type FlashColorProps = UiBoxProps & {
-	/** Unique playback instance key. */
-	id              : string
-	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** When true, advances local time. Defaults to `true`. */
-	playing?        : boolean
-	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
-	looping?        : boolean
-	/** Seconds for one full flash (to target + back). */
-	speed?          : number
-	burstCount?     : number
-	burstInterval?  : number
+export type FlashColorProps = UiBoxProps & BurstAnimationProps & {
+	/** Seconds for one full flash (to target + back). Not the full burst — see `burstCount`. */
+	duration?       : number
 	/** Color to flash toward. Defaults to `theme.colors.primary`. */
 	color?          : Color4
 	/**
@@ -39,11 +30,12 @@ const theme = getTheme()
 
 // MARK: resolveChildBaseColor
 /**
- * Reads the child's tint from `backgroundColor` or `uiBackground.color`.
- * Falls back to white so textured children (e.g. Icon) keep a neutral multiply.
+ * Reads the child's tint from `color` (Icon shorthand), `backgroundColor`, or
+ * `uiBackground.color`. Falls back to white so textured children keep a neutral multiply.
  */
 function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 {
-	return child?.props?.backgroundColor
+	return child?.props?.color
+		?? child?.props?.backgroundColor
 		?? child?.props?.uiBackground?.color
 		?? Color4.White()
 }
@@ -51,8 +43,8 @@ function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 
 
 // MARK: FlashColor
 /**
- * Flashes a single child's background color toward `color` and back.
- * The child's original `backgroundColor` / `uiBackground.color` is used as the base.
+ * Flashes a single child's tint toward `color` and back.
+ * The child's original `color` / `backgroundColor` / `uiBackground.color` is the base.
  * Forwards `width` / `height` (including scaled sizes from an outer `Pulse`) to
  * the child so nested animation stacks keep sizing in sync.
  *
@@ -65,9 +57,10 @@ export const FlashColor = ({
 	children,
 	playing,
 	looping,
-	speed          = theme.animation.flashColorDurationDefault,
+	duration       = theme.animation.flashColorDurationDefault,
 	burstCount     = theme.animation.flashColorBurstCountDefault,
 	burstInterval  = theme.animation.flashColorBurstIntervalDefault,
+	burstOffset    = 0,
 	color          = theme.colors.primary,
 	easingFunction,
 	easingFlash,
@@ -93,7 +86,7 @@ export const FlashColor = ({
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
 		state,
-		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+		sampleBurstTime(state.elapsed, duration, burstCount, burstInterval, state.looping, burstOffset),
 	)
 
 	let currentColor = baseColor
@@ -123,6 +116,7 @@ export const FlashColor = ({
 			{child && cloneAnimChild(child, {
 				width          : w,
 				height         : h,
+				color          : currentColor,
 				backgroundColor: currentColor,
 				uiBackground   : mergeUiBackground(child.props?.uiBackground, {
 					color: currentColor,

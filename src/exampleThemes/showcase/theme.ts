@@ -12,7 +12,7 @@ import type { ThemeCustomize } from '../../ui-component-kit'
  *
  * Put project art under `assets/images/example-themes/showcase/` and define
  * atlases / texture sets in `./atlases.ts`. Start custom art from the Affinity
- * template at `assets/images/ui-component-kit-assets.af` (duplicate artboards, keep
+ * template at `design/ui-component-kit-assets.af` (duplicate artboards, keep
  * grids/margins). Cell coords on `TextureAtlas` are 1-based.
  */
 export const theme: ThemeCustomize = {

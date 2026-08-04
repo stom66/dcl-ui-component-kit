@@ -63,6 +63,7 @@ super({
 |---|---|
 | Top / corner / etc. | `zone: ZoneType.*` |
 | Narrower / shorter than preset | `uiTransform: { width, height }` |
+| Height from children | `uiTransform: { height: 'auto' }` **and** `<Background fitContent>` |
 | Flex alignment | `uiTransform: { alignItems, justifyContent, … }` |
 | Fill / border on content | `<Background>` in `body()` |
 | Close control | `showCloseButton: true` (Layer option → Zone inserts button) |
@@ -179,6 +180,8 @@ export const myLayer = new MyLayer()
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | Bare `fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` |
 | `Row` / `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**) |
+| Text/`H*`/`Code` crushed / overlapping in a height-capped `Column` | Keep kit defaults: `flexShrink: 0`, `minHeight` from font size, `alignSelf: 'flex-start'` — Yoga’s default `flexShrink: 1` collapses `height: 'auto'` text to 0 |
+| Layer `height: 'auto'` with default `<Background>` (absolute) | `<Background fitContent>` so chrome contributes in-flow height |
 
 ## Procedural vs image-based
 
@@ -195,13 +198,13 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` | `textures?` (per-layer optional) / `atlas` + `uvCell` |
-| Icons | — | `Icon` / `IconNumber` / `AvatarIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); `atlas` on `IconNumber`; `userId` on `AvatarIcon` |
+| Icons | — | `Icon` / `IconNumber` / `AvatarIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); tint with `color` (not `backgroundColor`); `atlas` on `IconNumber`; `userId` on `AvatarIcon` |
 
 ## Custom textures / atlases (agent checklist)
 
 When a user wants **their own images, atlases, or styles**, walk them through this — do not invent a parallel path:
 
-1. **Open the Affinity template** at `assets/images/ui-component-kit-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
+1. **Open the Affinity template** at `design/ui-component-kit-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
 2. **Export PNGs** into `assets/images/example-themes/<theme>/` (never into `assets/images/ui-component-kit/` unless they intend to replace framework defaults).
 3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleThemes/<theme>/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, `exampleNumbersAtlas`, progress-bar sets).
 4. **Sample UVs only via framework APIs** — never hand-write UV arrays:
@@ -450,9 +453,40 @@ export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: 
 
 Defaults: fills parent via absolute insets, theme body fill, theme border width/radius, no padding.
 
+### Auto-height layers (`height: 'auto'`)
+
+Default `Background` is **absolutely positioned** (out of flex flow). That is correct for fixed-size zones, but with Layer `uiTransform.height: 'auto'` the Zone collapses to ~0 because nothing in-flow contributes height — content then clips under `overflow: 'hidden'`.
+
+Use **`fitContent`** so Background participates in layout (`width: 100%`, `height: 'auto'`):
+
+```tsx
+super({
+	id         : 'panel',
+	zone       : ZoneType.Default,
+	uiTransform: {
+		width : '42vw',
+		height: 'auto',
+	},
+})
+
+// in body():
+<Background fitContent>
+	<Column cols={12} spacing={8} uiTransform={{ padding: 16 }}>
+		{/* … */}
+	</Column>
+</Background>
+```
+
+| Wrong | Right |
+|---|---|
+| `height: 'auto'` + `<Background>` (absolute fill) | `height: 'auto'` + `<Background fitContent>` |
+| Inner `Column` with `height: '100%'` under auto Zone | Omit height (Column defaults to `'auto'`) |
+
+If the panel must stay inside a fixed viewport budget instead of growing, keep a definite Zone `height` and let children `flexShrink` — do not use `height: 'auto'`.
+
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `assets/images/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasCharsNumbers`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `design/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
 
 `TextureAtlas` defaults `wrapMode` to `'clamp'` (avoids neighbour-cell bleed). Optional `filterMode` (`'point'` | `'bi-linear'` | `'tri-linear'`) applies to the whole sheet. Use `atlas.texture` (or `mergeUiBackground`) instead of `{ src: atlas.source }` alone. `Spinner` is an animation wrapper around a child `Icon` — there are no dedicated spinner presets / atlas.
 

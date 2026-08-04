@@ -2,8 +2,21 @@
 
 `@stom66/dcl-ui-component-kit` (aka **DUCK**) is a reusable UI toolkit for Decentraland SDK7. Layers, zones, and shared components — so you can build HUDs and panels without hand-placing every `UiEntity`.
 
+<!-- Drop a short looped recording at docs/media/showcase.gif — GIF is the best format for GitHub README embeds. -->
+![Component showcase](docs/media/showcase.gif)
+
+*Placeholder — add `docs/media/showcase.gif` (see [docs/media](docs/media/README.md)).*
+
+## Features
+
+- **Layers system** — each UI surface is a `Layer` pinned to a zone (top bar, corner HUD, popup, …). Attach a **VisibilityController** to show/hide layers cleanly, and a **PropsController** to drive dynamic values into the UI.
+- **Stackable components** — buttons, text, icons, progress bars, toggles, toasts, layout helpers, and more. Drop them into a layer’s `body()` and they look good out of the box with sensible defaults.
+- **Animation** — built-in motion helpers (pulse, bounce, shake, spinner, …) for feedback and polish.
+- **Themes** — ships with a default theme aimed at Decentraland’s look. Pass small overrides (e.g. colors only) or a full custom theme.
+- **Simple style or full image variants** — most major components take basic styling (colors, border width, background color, …) *or* texture/image variants when you want a completely custom look.
+
 ```tsx
-import { atlasIconsFontAwesome, Background, Column, Icon, Layer, Row, SetupUiComponentKit, Text, ZoneType } from '@stom66/dcl-ui-component-kit'
+import { atlasIconsFontAwesome, Background, Column, getTheme, Icon, Layer, Row, SetupUiComponentKit, Text, ZoneType } from '@stom66/dcl-ui-component-kit'
 
 class HelloLayer extends Layer {
     constructor() {
@@ -18,7 +31,7 @@ class HelloLayer extends Layer {
                         <Text value="Hello World" />
                     </Column>
                     <Column>
-                        <Icon uvs={atlasIconsFontAwesome.uv.star} />
+                        <Icon uvs={atlasIconsFontAwesome.uv.star} color={getTheme().colors.primary} />
                     </Column>
                 </Row>
             </Background>
@@ -31,13 +44,9 @@ export function main() {
 }
 ```
 
-<!-- Drop a short looped recording at docs/media/showcase.gif — GIF is the best format for GitHub README embeds. -->
-![Component showcase](docs/media/showcase.gif)
-
-*Placeholder — add `docs/media/showcase.gif` (see [docs/media](docs/media/README.md)).*
-
 ## Table of contents
 
+- [Features](#features)
 - [Install](#install)
 - [Quick start](#quick-start)
     - [Add it to your project](#add-it-to-your-project)

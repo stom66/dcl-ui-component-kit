@@ -3,6 +3,7 @@ import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
+import { textMinHeight } from './textLayout'
 
 
 type TextProps = Omit<UiBoxProps, 'uiText'> & {
@@ -19,8 +20,12 @@ type TextProps = Omit<UiBoxProps, 'uiText'> & {
 /**
  * Default body text block. Pass copy via `value` (or `uiText.value`); nest element children as needed.
  *
- * Uses `alignSelf: 'stretch'` (not `width: '100%'`) so wrap width tracks the parent even when
- * that parent is a `Row` `cols` child sized via `flexGrow` / `width: 0` (Yoga % would be wrong).
+ * Layout notes (DCL / Yoga):
+ * - `alignSelf: 'flex-start'` so `height: 'auto'` can measure text (not `stretch`)
+ * - `flexShrink: 0` so a height-capped parent `Column` cannot crush the box to 0
+ * - `minHeight` one-line floor only — wrap height comes from `height: 'auto'`
+ * - `width: '100%'` for wrap width inside sized columns (prefer nesting under
+ *   `Column`/`cols`, not as a direct `Row` `cols` child with `width: 0`)
  */
 export const Text = ({
 	children,
@@ -30,19 +35,22 @@ export const Text = ({
 	uiTransform,
 	...props
 }: TextProps) => {
-	const theme = getTheme()
+	const theme    = getTheme()
+	const fontSize = scaleFontSize(theme.typography.size.default)
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
-				width    : 'auto',
-				height   : 'auto',
-				alignSelf: 'stretch',
+				width     : '100%',
+				height    : 'auto',
+				minHeight : textMinHeight(fontSize),
+				alignSelf : 'flex-start',
+				flexShrink: 0,
 				...uiTransform,
 			}}
 			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.default),
+				fontSize,
 				font     : theme.typography.family.default,
 				color    : theme.colors.light,
 				textAlign: 'middle-left',

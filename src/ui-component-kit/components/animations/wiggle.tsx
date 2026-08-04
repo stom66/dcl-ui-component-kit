@@ -4,22 +4,13 @@ import { getTheme } from '../../styles'
 import { getRotatedUVs, getUVCell } from '../../utils'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
-import { applyBurstSample, sampleBurstTime, syncAnimationPlayback } from './animationPlayback'
+import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChildDeep, resolveAnimBoxSize } from './animationChild'
 
 //MARK: WiggleProps Type
-export type WiggleProps = UiBoxProps & {
-	/** Unique playback instance key. */
-	id              : string
-	children?       : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** When true, advances local time. Defaults to `true`. */
-	playing?        : boolean
-	/** When true, repeats burst + pause. When false, one-shot then stops. Defaults to `true`. */
-	looping?        : boolean
-	/** Seconds for one full wiggle sequence (all rotations + return). */
-	speed?          : number
-	burstCount?     : number
-	burstInterval?  : number
+export type WiggleProps = UiBoxProps & BurstAnimationProps & {
+	/** Seconds for one full wiggle sequence (all rotations + return). Not the full burst — see `burstCount`. */
+	duration?       : number
 	/** Number of alternating rotations per sequence. Defaults to `3` (-max, +max, -max). */
 	count?          : number
 	/** Maximum rotation in degrees from center. Defaults to `45`. */
@@ -59,9 +50,10 @@ export const Wiggle = ({
 	children,
 	playing,
 	looping,
-	speed          = theme.animation.wiggleDurationDefault,
+	duration       = theme.animation.wiggleDurationDefault,
 	burstCount     = theme.animation.wiggleBurstCountDefault,
 	burstInterval  = theme.animation.wiggleBurstIntervalDefault,
+	burstOffset    = 0,
 	count          = theme.animation.wiggleCountDefault,
 	maxRotation    = theme.animation.wiggleMaxRotationDefault,
 	easingFunction = easingFunctions.easeOutCubic,
@@ -83,7 +75,7 @@ export const Wiggle = ({
 	const state  = syncAnimationPlayback(id, { playing, looping })
 	const sample = applyBurstSample(
 		state,
-		sampleBurstTime(state.elapsed, speed, burstCount, burstInterval, state.looping),
+		sampleBurstTime(state.elapsed, duration, burstCount, burstInterval, state.looping, burstOffset),
 	)
 
 	let angle = 0

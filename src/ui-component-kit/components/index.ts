@@ -1,6 +1,6 @@
 // Animations
 export { Bounce, FlashBorder, FlashColor, isPlaying, playOnce, Pulse, setLooping, setPlaying, Shake, Spinner, Wiggle } from './animations'
-export type { AnimationPlaybackState, BounceProps, BurstSample, FlashBorderProps, FlashColorProps, PulseProps, ShakeProps, SpinnerProps, WiggleProps } from './animations'
+export type { AnimationPlaybackState, BounceProps, BurstAnimationProps, BurstSample, FlashBorderProps, FlashColorProps, PulseProps, ShakeProps, SpinnerProps, WiggleProps } from './animations'
 
 
 // Base
@@ -32,7 +32,7 @@ export { RowReverse }             from './helpers'
 
 // Icons
 export { AvatarIcon, DEFAULT_AVATAR_USER_ID } from './icons'
-export type { AvatarIconProps }   from './icons'
+export type { AvatarIconProps, IconProps } from './icons'
 export { Icon }                   from './icons'
 export { IconNumber }             from './icons'
 

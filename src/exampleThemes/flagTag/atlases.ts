@@ -6,7 +6,7 @@
 // Flag Tag textures
 //
 // Export PNGs into `assets/images/example-themes/flagTag/` and declare
-// atlases / texture sets here. Start from `assets/images/ui-component-kit-assets.af`.
+// atlases / texture sets here. Start from `design/ui-component-kit-assets.af`.
 //
 // Example:
 //

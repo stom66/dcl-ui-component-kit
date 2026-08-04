@@ -4,6 +4,7 @@ import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
 import { getColSelfTransform } from '../../utils'
+import { textMinHeight } from '../text/textLayout'
 
 
 type LabelProps = Omit<UiBoxProps, 'uiText'> & {
@@ -41,18 +42,21 @@ export function Label({
 	const col           = getColSelfTransform(cols, colsDesktop, colsMobile)
 	const resolvedValue = value ?? uiText?.value ?? ''
 	const padding       = theme.border.radiusSmall
+	const fontSize      = scaleFontSize(theme.typography.size.default)
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
 				height        : "auto",
+				minHeight     : textMinHeight(fontSize),
 				width         : col.width,
 				display       : "flex",
 				flexGrow      : col.flexGrow,
-				flexShrink    : col.flexShrink,
+				flexShrink    : 0,
 				flexBasis     : col.flexBasis,
 				flexDirection : "row",
+				alignSelf     : "flex-start",
 				alignItems    : "center",
 				justifyContent: "space-between",
 				borderRadius  : theme.border.radiusSmall,
@@ -71,7 +75,7 @@ export function Label({
 				...(color !== undefined ? { color } : {}),
 			}}
 			uiText={{
-				fontSize : scaleFontSize(theme.typography.size.default),
+				fontSize,
 				font     : theme.typography.family.default,
 				color    : theme.colors.light,
 				textAlign: 'middle-center',

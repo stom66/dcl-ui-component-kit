@@ -9,3 +9,9 @@ bin/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.af~lock~
+**/*~lock~
+.npmrc
+.env
+.env.*
+!.env.example
