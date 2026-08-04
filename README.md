@@ -6,28 +6,28 @@
 import { atlasIconsFontAwesome, Background, Column, Icon, Layer, Row, SetupUiComponentKit, Text, ZoneType } from '@stom66/dcl-ui-component-kit'
 
 class HelloLayer extends Layer {
- constructor() {
-  super({ id: 'hello', zone: ZoneType.Default })
- }
+    constructor() {
+        super({ id: 'hello', zone: ZoneType.Default })
+    }
 
- body() {
-  return (
-   <Background>
-    <Row>
-     <Column>
-      <Text value="Hello World" />
-     </Column>
-     <Column>
-      <Icon uvs={atlasIconsFontAwesome.uv.star} />
-     </Column>
-    </Row>
-   </Background>
-  )
- }
+    body() {
+        return (
+            <Background>
+                <Row>
+                    <Column>
+                        <Text value="Hello World" />
+                    </Column>
+                    <Column>
+                        <Icon uvs={atlasIconsFontAwesome.uv.star} />
+                    </Column>
+                </Row>
+            </Background>
+        )
+    }
 }
 
 export function main() {
- SetupUiComponentKit({ layers: [new HelloLayer()] })
+    SetupUiComponentKit({ layers: [new HelloLayer()] })
 }
 ```
 
@@ -40,9 +40,9 @@ export function main() {
 
 - [Install](#install)
 - [Quick start](#quick-start)
- 	- [Add it to your project](#add-it-to-your-project)
- 	- [Use the defaults (add a layer)](#use-the-defaults-add-a-layer)
- 	- [Make your own theme (recommended overrides)](#make-your-own-theme-recommended-overrides)
+    - [Add it to your project](#add-it-to-your-project)
+    - [Use the defaults (add a layer)](#use-the-defaults-add-a-layer)
+    - [Make your own theme (recommended overrides)](#make-your-own-theme-recommended-overrides)
 - [Building blocks](#building-blocks)
 - [Docs](#docs)
 - [This repo as a demo scene](#this-repo-as-a-demo-scene)
@@ -74,10 +74,10 @@ import { SetupUiComponentKit } from '@stom66/dcl-ui-component-kit'
 import { myGame } from './themes/myGame'
 
 export function main() {
- SetupUiComponentKit({
-  theme : myGame.theme,
-  layers: myGame.layers,
- })
+    SetupUiComponentKit({
+        theme : myGame.theme,
+        layers: myGame.layers,
+    })
 }
 ```
 
@@ -89,24 +89,24 @@ You do **not** need a custom theme to start. Pick a zone, implement `body()`, re
 import { Background, Header, Layer, Row, SetupUiComponentKit, Text, ZoneType } from '@stom66/dcl-ui-component-kit'
 
 class ScoreboardLayer extends Layer {
- constructor() {
-  super({ id: 'scoreboard', zone: ZoneType.Top })
- }
+    constructor() {
+        super({ id: 'scoreboard', zone: ZoneType.Top })
+    }
 
- body() {
-  return (
-   <Background>
-    <Row>
-     <Header value="Score" />
-     <Text value="12" />
-    </Row>
-   </Background>
-  )
- }
+    body() {
+        return (
+            <Background>
+                <Row>
+                    <Header value="Score" />
+                    <Text value="12" />
+                </Row>
+            </Background>
+        )
+    }
 }
 
 export function main() {
- SetupUiComponentKit({ layers: [new ScoreboardLayer()] })
+    SetupUiComponentKit({ layers: [new ScoreboardLayer()] })
 }
 ```
 
@@ -129,16 +129,16 @@ import { Color4 } from '@dcl/sdk/math'
 import { SetupUiComponentKit, type ThemeCustomize } from '@stom66/dcl-ui-component-kit'
 
 const theme: ThemeCustomize = {
- colors: {
-  primary: Color4.fromHexString('#ff7538'),
- },
+    colors: {
+        primary: Color4.fromHexString('#ff7538'),
+    },
 }
 
 export function main() {
- SetupUiComponentKit({
-  theme,
-  layers: [/* your layers */],
- })
+    SetupUiComponentKit({
+        theme,
+        layers: [/* your layers */],
+    })
 }
 ```
 
@@ -149,7 +149,7 @@ Or keep overrides next to your game code:
 import type { ThemeCustomize } from '@stom66/dcl-ui-component-kit'
 
 export const theme: ThemeCustomize = {
- // colors: { primary: Color4.fromHexString('#…') },
+    // colors: { primary: Color4.fromHexString('#…') },
 }
 ```
 
