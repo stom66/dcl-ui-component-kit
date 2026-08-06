@@ -1,52 +1,45 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { getColSelfTransform } from '../../utils'
 
 import { UiBox, type UiBoxProps } from '../base'
 
-import { applyRowChildSpacing } from './childSpacing'
+import { applyRowChildSpacing, applyWrapRowGutters } from './childSpacing'
 
 
 type RowProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	cols?       : number
-	colsDesktop?: number
-	colsMobile? : number
 	/**
 	 * Gap between children. Defaults to `theme.spacing`. Pass `0` to disable.
-	 * Gutters are spacer entities; `cols` children use `flexGrow` so percentages
-	 * are not required (Yoga has no `calc()`).
+	 * Non-wrap rows use spacer entities. Wrap rows use padded cell wrappers so
+	 * sticky `%` cols still pack 12-wide without early wrap.
 	 */
 	spacing?    : number
 }
 
 
 // MARK: Row
-/** Horizontal flex stack with optional column-grid width and child `spacing`. */
+/** Horizontal flex stack; always full parent width. Narrow content with a `Column` child. */
 export function Row({
 	children,
 	uiTransform,
-	cols,
-	colsDesktop,
-	colsMobile,
 	spacing,
 	...props
 }: RowProps) {
-	const col  = getColSelfTransform(cols, colsDesktop, colsMobile)
-	const edge = uiTransform?.flexDirection === 'row-reverse' ? 'left' : 'right'
-	const gap  = spacing ?? getTheme().spacing
+	const edge   = uiTransform?.flexDirection === 'row-reverse' ? 'left' : 'right'
+	const isWrap = uiTransform?.flexWrap === 'wrap'
+	const gap    = spacing ?? getTheme().spacing
+	const body   = isWrap
+		? applyWrapRowGutters(children, gap)
+		: applyRowChildSpacing(children, gap, edge)
 
 	return (
 		<UiBox
 			{...props}
 			uiTransform={{
 				height        : 'auto',
-				width         : col.width,
+				width         : '100%',
 				display       : 'flex',
-				flexGrow      : col.flexGrow,
-				flexShrink    : col.flexShrink,
-				flexBasis     : col.flexBasis,
 				flexDirection : 'row',
 				alignItems    : 'center',
 				// flex-start so spacer gutters stay adjacent (space-between fights them)
@@ -54,7 +47,7 @@ export function Row({
 				...uiTransform,
 			}}
 		>
-			{applyRowChildSpacing(children, gap, edge)}
+			{body}
 		</UiBox>
 	)
 }

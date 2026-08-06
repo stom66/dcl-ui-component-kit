@@ -1,16 +1,94 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, ButtonText, Column, getTheme, Layer, ZoneType } from '../../../ui-component-kit'
+import { alpha, atlasIconsFontAwesome, Background, ButtonText, Column, getTheme, Icon, Layer, Text, ZoneType } from '../../../ui-component-kit'
 
 import { demoAnimationsLayer } from './demo.animations.layer'
 import { demoBackgroundsLayer } from './demo.backgrounds.layer'
 import { demoButtonsLayer } from './demo.buttons.layer'
+import { demoGridsLayer } from './demo.grids.layer'
 import { demoIconsLayer } from './demo.icons.layer'
+import { demoLayoutLayer } from './demo.layout.layer'
 import { demoListLayer } from './demo.list.layer'
 import { demoProgressLayer } from './demo.progress.layer'
+import { demoSafeZonesLayer } from './demo.safeZones.layer'
 import { demoTextLayer } from './demo.text.layer'
 import { demoToastsLayer } from './demo.toasts.layer'
 import { demoToggleLayer } from './demo.toggle.layer'
+
+type FaIconName = keyof typeof atlasIconsFontAwesome.uv
+
+type NavEntry = {
+	id   : string
+	label: string
+	icon : FaIconName
+	onClick: () => void
+}
+
+const NAV_ENTRIES: NavEntry[] = [
+	{ id: 'btn_demo_animations',  label: 'Animations',  icon: 'wandMagicSparkles', onClick: () => demoAnimationsLayer.toggle() },
+	{ id: 'btn_demo_backgrounds', label: 'Backgrounds', icon: 'image',             onClick: () => demoBackgroundsLayer.toggle() },
+	{ id: 'btn_demo_buttons',     label: 'Buttons',     icon: 'handPointer',       onClick: () => demoButtonsLayer.toggle() },
+	{ id: 'btn_demo_grids',       label: 'Grids',       icon: 'cubes',             onClick: () => demoGridsLayer.toggle() },
+	{ id: 'btn_demo_icons',       label: 'Icons',       icon: 'star',              onClick: () => demoIconsLayer.toggle() },
+	{ id: 'btn_demo_layout',      label: 'Cols / Rows', icon: 'bars',              onClick: () => demoLayoutLayer.toggle() },
+	{ id: 'btn_demo_list',        label: 'List',        icon: 'listUl',            onClick: () => demoListLayer.toggle() },
+	{ id: 'btn_demo_progress',    label: 'Progress',    icon: 'hourglassHalf',     onClick: () => demoProgressLayer.toggle() },
+	{ id: 'btn_demo_safe_zones',  label: 'Safe Zones',  icon: 'expand',            onClick: () => demoSafeZonesLayer.toggle() },
+	{ id: 'btn_demo_text',        label: 'Text',        icon: 'pencil',            onClick: () => demoTextLayer.toggle() },
+	{ id: 'btn_demo_toasts',      label: 'Toasts',      icon: 'bell',              onClick: () => demoToastsLayer.toggle() },
+	{ id: 'btn_demo_toggle',      label: 'Toggle',      icon: 'sliders',           onClick: () => demoToggleLayer.toggle() },
+]
+
+const NAV_ICON_SIZE = 22
+
+/** Showcase nav panel width (this layer only — does not change ZoneType.Left). */
+const NAV_BAR_WIDTH = 270
+
+
+// MARK: DemoNavButton
+/** Left-aligned text button with a Font Awesome icon for the showcase nav. */
+function DemoNavButton({ id, label, icon, onClick }: NavEntry) {
+	const theme = getTheme()
+
+	return (
+		<ButtonText
+			key       = {id}
+			id        = {id}
+			cols      = {12}
+			callback  = {onClick}
+			uiTransform={{
+				flexDirection : 'row',
+				justifyContent: 'flex-start',
+				alignItems    : 'center',
+				padding       : { left: 10, right: 12 },
+			}}
+			uiText={{ value: '' }}
+		>
+			<Icon
+				uvs    = {atlasIconsFontAwesome.uv[icon]}
+				width  = {NAV_ICON_SIZE}
+				height = {NAV_ICON_SIZE}
+				color  = {theme.colors.light}
+				uiTransform={{
+					margin: { right: 10 },
+				}}
+			/>
+			<Text
+				value = {label}
+				color = {theme.colors.light}
+				uiTransform={{
+					width    : 'auto',
+					alignSelf: 'center',
+				}}
+				uiText={{
+					fontSize : scaleFontSize(theme.typography.size.default),
+					textAlign: 'middle-left',
+				}}
+			/>
+		</ButtonText>
+	)
+}
+
 
 // MARK: DemoLeftBarLayer
 /**
@@ -19,8 +97,9 @@ import { demoToggleLayer } from './demo.toggle.layer'
 export class DemoLeftBarLayer extends Layer {
 	constructor() {
 		super({
-			id  : 'demo-left-bar',
-			zone: ZoneType.Left,
+			id    : 'demo-left-bar',
+			zone  : ZoneType.Left,
+			zIndex: 1000,
 			uiTransform: {
 				alignItems    : 'stretch',
 				justifyContent: 'flex-start',
@@ -38,12 +117,15 @@ export class DemoLeftBarLayer extends Layer {
 				backgroundColor = {alpha(theme.colors.body, 0.65)}
 				borderRadius    = {theme.border.radiusDefault}
 				uiTransform={{
-					// Relative + auto so the zone can shrink-wrap content
-					// (absolute edge insets do not contribute to parent width).
+					// In-flow panel inside the Left zone (preset stays 25%).
+					// Do NOT pin left+right (Background’s default absolute fill does) —
+					// that stretches to the full zone and ignores maxWidth.
 					positionType  : 'relative',
-					position      : { top: 0, right: 0, bottom: 0, left: 0 },
-					width         : 'auto',
+					position      : { top: 0, bottom: 0, left: 0 },
+					width         : '100%',
+					maxWidth      : NAV_BAR_WIDTH,
 					height        : '100%',
+					alignSelf     : 'flex-start',
 					alignItems    : 'stretch',
 					justifyContent: 'flex-start',
 					padding       : { top: 8, right: 8, bottom: 8, left: 8 },
@@ -51,76 +133,16 @@ export class DemoLeftBarLayer extends Layer {
 				}}
 			>
 				<Column
+					cols={12}
 					uiTransform={{
-						width         : 'auto',
 						height        : 'auto',
 						alignItems    : 'stretch',
 						justifyContent: 'flex-start',
 					}}
 				>
-					<ButtonText
-						key       = "btn_demo_animations"
-						id        = "btn_demo_animations"
-						textLabel = "Animations"
-						cols      = {12}
-						callback  = {() => demoAnimationsLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_backgrounds"
-						id        = "btn_demo_backgrounds"
-						textLabel = "Backgrounds"
-						cols      = {12}
-						callback  = {() => demoBackgroundsLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_buttons"
-						id        = "btn_demo_buttons"
-						textLabel = "Buttons"
-						cols      = {12}
-						callback  = {() => demoButtonsLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_icons"
-						id        = "btn_demo_icons"
-						textLabel = "Icons"
-						cols      = {12}
-						callback  = {() => demoIconsLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_list"
-						id        = "btn_demo_list"
-						textLabel = "List"
-						cols      = {12}
-						callback  = {() => demoListLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_progress"
-						id        = "btn_demo_progress"
-						textLabel = "Progress"
-						cols      = {12}
-						callback  = {() => demoProgressLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_text"
-						id        = "btn_demo_text"
-						textLabel = "Text"
-						cols      = {12}
-						callback  = {() => demoTextLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_toasts"
-						id        = "btn_demo_toasts"
-						textLabel = "Toasts"
-						cols      = {12}
-						callback  = {() => demoToastsLayer.toggle()}
-					/>
-					<ButtonText
-						key       = "btn_demo_toggle"
-						id        = "btn_demo_toggle"
-						textLabel = "Toggle"
-						cols      = {12}
-						callback  = {() => demoToggleLayer.toggle()}
-					/>
+					{NAV_ENTRIES.map((entry) => (
+						DemoNavButton(entry)
+					))}
 				</Column>
 			</Background>
 		)

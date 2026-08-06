@@ -1,5 +1,7 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
+import { getColSelfTransform } from '../../utils'
+
 import { UiBox } from '../base'
 
 
@@ -87,9 +89,9 @@ export function applySpacingToChildren(
 
 // MARK: applyRowChildSpacing
 /**
- * Horizontal gutters via spacer entities. `cols` children size themselves with
- * `flexGrow` (`getColSelfTransform`) so gutters do not overflow and no
- * `createElement` prop rewrite is required.
+ * Horizontal gutters via spacer entities. Partial `cols` children use sticky
+ * `%` widths (`getColSelfTransform`). Do not use with `flexWrap` — use
+ * `applyWrapRowGutters` instead.
  */
 export function applyRowChildSpacing(
 	children: ChildList,
@@ -106,4 +108,84 @@ export function applyRowChildSpacing(
 	}
 
 	return insertSpacers(list, gap, edge)
+}
+
+
+// MARK: applyWrapRowGutters
+/**
+ * Gutters for `flexWrap` rows without sibling spacers (spacers break sticky `%`
+ * cols and wrap early).
+ *
+ * Each child is wrapped in a stably keyed box that owns the `cols` width and
+ * applies half-`spacing` horizontal padding + bottom margin. The child is
+ * re-created at `width: 100%` with `cols` cleared so chrome fills the inner
+ * area and gaps show between cells.
+ */
+export function applyWrapRowGutters(
+	children: ChildList,
+	spacing : number | undefined,
+): ReactEcs.JSX.Element[] {
+	const list = flattenChildren(children)
+	const gap  = spacing ?? 0
+
+	if (!gap) {
+		return list
+	}
+
+	const pad = gap / 2
+
+	return list.map((child, i) => {
+		const key   = (child.key as string | undefined) ?? `__wrapgutter_${i}`
+		const props = child.props ?? {}
+		const hasCols =
+			props.cols !== undefined ||
+			props.colsDesktop !== undefined ||
+			props.colsMobile !== undefined
+		const colSelf = hasCols
+			? getColSelfTransform(props.cols, props.colsDesktop, props.colsMobile, 'none')
+			: undefined
+
+		const inner = colSelf
+			? ReactEcs.createElement(child.type, {
+				...props,
+				key         : `${key}__fill`,
+				cols        : undefined,
+				colsDesktop : undefined,
+				colsMobile  : undefined,
+				uiTransform : {
+					...props.uiTransform,
+					width     : '100%',
+					flexGrow  : 0,
+					flexShrink: 0,
+					maxWidth  : undefined,
+					flexBasis : undefined,
+				},
+			})
+			: child
+
+		return (
+			<UiBox
+				key={key}
+				uiTransform={{
+					...(colSelf !== undefined ? {
+						width     : colSelf.width,
+						flexGrow  : colSelf.flexGrow,
+						flexShrink: colSelf.flexShrink,
+						...(colSelf.flexBasis !== undefined ? { flexBasis: colSelf.flexBasis } : {}),
+					} : {
+						flexGrow  : 0,
+						flexShrink: 0,
+					}),
+					padding       : { left: pad, right: pad },
+					margin        : { bottom: gap },
+					display       : 'flex',
+					flexDirection : 'column',
+					alignItems    : 'stretch',
+					justifyContent: 'flex-start',
+				}}
+			>
+				{inner}
+			</UiBox>
+		)
+	})
 }

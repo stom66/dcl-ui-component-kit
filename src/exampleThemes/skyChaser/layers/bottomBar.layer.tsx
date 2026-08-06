@@ -66,7 +66,6 @@ export class BottomBarLayer extends Layer {
 
 		return (
 			<Row
-				cols={12}
 				uiTransform={{
 					height        : '100%',
 					alignItems    : 'center',

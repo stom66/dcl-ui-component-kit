@@ -55,7 +55,6 @@ export class DemoBackgroundsLayer extends Layer {
 				}}
 			>
 				<Row
-					cols={12}
 					uiTransform={{
 						height        : '100%',
 						alignItems    : 'flex-start',
@@ -71,7 +70,7 @@ export class DemoBackgroundsLayer extends Layer {
 							padding       : { right: 8 },
 						}}
 					>
-						<Row cols={12} uiTransform={{ margin: { bottom: 4 } }}>
+						<Row uiTransform={{ margin: { bottom: 4 } }}>
 							<Label cols={12} value="Backgrounds" />
 						</Row>
 
@@ -101,7 +100,7 @@ export class DemoBackgroundsLayer extends Layer {
 							padding       : { left: 8 },
 						}}
 					>
-						<Row cols={12} uiTransform={{ margin: { bottom: 4 } }}>
+						<Row uiTransform={{ margin: { bottom: 4 } }}>
 							<Label cols={12} value="Background gradients" />
 						</Row>
 

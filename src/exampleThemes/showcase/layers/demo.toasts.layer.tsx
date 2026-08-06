@@ -76,7 +76,7 @@ export class DemoToastsLayer extends Layer {
 					<Text value="Dock positions, slide edges, scale, and group policies." />
 
 					<Label cols={12} value="Positions" uiTransform={{ margin: { bottom: 4 } }} color={theme.colors.primary} />
-					<Row cols={12} spacing={4}>
+					<Row spacing={4}>
 						{POSITIONS.slice(0, 3).map((position) => (
 							<ButtonText
 								key             = {`btn_toast_pos_${position}`}
@@ -99,7 +99,7 @@ export class DemoToastsLayer extends Layer {
 							/>
 						))}
 					</Row>
-					<Row cols={12} spacing={4}>
+					<Row spacing={4}>
 						{POSITIONS.slice(3).map((position) => (
 							<ButtonText
 								key       = {`btn_toast_pos_${position}`}
@@ -124,7 +124,7 @@ export class DemoToastsLayer extends Layer {
 					</Row>
 
 					<Label cols={12} value="Motion" uiTransform={{ margin: { bottom: 4 } }} color={theme.colors.primary}  />
-					<Row cols={12} spacing={4}>
+					<Row spacing={4}>
 						<ButtonText
 							id        = "btn_toast_slide_cross"
 							textLabel = "In top / out bottom"
@@ -178,7 +178,7 @@ export class DemoToastsLayer extends Layer {
 					</Row>
 
 					<Label cols={12} value="Hint group" uiTransform={{ margin: { bottom: 4 } }} color={theme.colors.primary}  />
-					<Row cols={12} spacing={4}>
+					<Row spacing={4}>
 						<ButtonText
 							id        = "btn_toast_hint_queue"
 							textLabel = "Queue hint"

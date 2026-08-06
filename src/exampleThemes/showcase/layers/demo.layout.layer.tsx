@@ -1,0 +1,210 @@
+import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+
+import { alpha, Background, Column, Divider, getTheme, H2, H3, Layer, Row, Text, ZoneType, type Theme } from '../../../ui-component-kit'
+
+
+// MARK: DemoCell
+/** Coloured swatch used to make column spans obvious in the layout demo. */
+function DemoCell({
+	label,
+	color,
+	theme,
+}: {
+	label: string
+	color: Color4
+	theme: Theme
+}) {
+	return (
+		<Background
+			fitContent
+			backgroundColor = {color}
+			borderRadius    = {theme.border.radiusSmall}
+			uiTransform={{
+				padding       : { top: 8, right: 8, bottom: 8, left: 8 },
+				alignItems    : 'center',
+				justifyContent: 'center',
+			}}
+		>
+			<Text
+				value = {label}
+				uiText={{
+					fontSize : scaleFontSize(theme.typography.size.small),
+					textAlign: 'middle-center',
+				}}
+			/>
+		</Background>
+	)
+}
+
+
+// MARK: DemoLayoutLayer
+/**
+ * Showcase for Row / Column grid behaviour: explicit `cols` spans stay fixed,
+ * `cols="auto"` fills leftover row space (equal share among siblings), omitting
+ * `cols` applies no grid sizing, and Rows are always full parent width.
+ */
+export class DemoLayoutLayer extends Layer {
+	constructor() {
+		super({
+			id             : 'demo-layout',
+			zone           : ZoneType.Default,
+			canBeHidden    : true,
+			startHidden    : true,
+			showCloseButton: true,
+			uiTransform    : {
+				width : '48vw',
+				height: 'auto',
+			},
+		})
+	}
+
+
+	// MARK: body
+	protected body() {
+		const theme  = getTheme()
+		const c4     = alpha(theme.colors.primary, 0.85)
+		const cFill  = alpha(theme.colors.info, 0.75)
+		const c8     = alpha(theme.colors.success, 0.75)
+		const cNest  = alpha(theme.colors.warning, 0.7)
+		const cMuted = alpha(theme.colors.secondary, 0.55)
+
+		return (
+			<Background fitContent>
+				<Column
+					cols        = {12}
+					spacing     = {10}
+					uiTransform = {{
+						alignItems    : 'stretch',
+						justifyContent: 'flex-start',
+						padding       : { top: 16, right: 20, bottom: 16, left: 20 },
+					}}
+				>
+					<H2 value="Rows & Columns" />
+					<Text value="Typically, Cols go inside Rows. Cols are sized by the number of columns they span, out of 12." />
+
+					<Divider uiTransform={{ margin: { top: 4, bottom: 4 } }} />
+
+					<Text value="Cols with auto expand to fill the space" />
+					<Row 
+						backgroundColor = {alpha(theme.colors.secondary, 0.25)}
+						borderRadius    = {theme.border.radiusSmall}
+						>
+						<Column cols={4}>
+							<DemoCell label="cols={4} (33%)" color={c4} theme={theme} />
+						</Column>
+						<Column cols="auto">
+							<DemoCell label='cols="auto" → fill' color={cFill} theme={theme} />
+						</Column>
+					</Row>
+
+
+					<Text value="Sibling autos share space evenly" />
+					<Row 
+						backgroundColor = {alpha(theme.colors.secondary, 0.25)}
+						borderRadius    = {theme.border.radiusSmall}
+						>
+						<Column cols={3}>
+							<DemoCell label="cols={3} (25%)" color={c4} theme={theme} />
+						</Column>
+						<Column cols="auto">
+							<DemoCell label='cols="auto"' color={cFill} theme={theme} />
+						</Column>
+						<Column cols="auto">
+							<DemoCell label='cols="auto"' color={cFill} theme={theme} />
+						</Column>
+					</Row>
+
+
+					<Text value="Explicit col sizes don't expand" />
+					<Row 
+						backgroundColor = {alpha(theme.colors.secondary, 0.25)}
+						borderRadius    = {theme.border.radiusSmall}
+						>
+						<Column cols={4}>
+							<DemoCell label="cols={4}" color={c4} theme={theme} />
+						</Column>
+						<Column cols={4}>
+							<DemoCell label="cols={4}" color={c4} theme={theme} />
+						</Column>
+					</Row>
+
+					<Divider uiTransform={{ margin: { top: 4, bottom: 4 } }} />
+
+					<H3 value="cols={4} + cols={8} with nested rows" />
+					<Text value="Rows are always 100% of their parent. Narrow a section with a Col" />
+					<Row
+						backgroundColor = {alpha(theme.colors.secondary, 0.25)}
+						borderRadius    = {theme.border.radiusSmall}
+					>
+						<Column
+							cols            = {4}
+							spacing         = {6}
+							uiTransform     = {{ alignItems: 'stretch' }}
+							backgroundColor = {alpha(theme.colors.primary, 0.15)}
+							borderRadius    = {theme.border.radiusSmall}
+						>
+							<DemoCell label="cols={4} parent" color={c4} theme={theme} />
+							<Row
+								backgroundColor = {alpha(theme.colors.body, 0.5)}
+								borderRadius    = {theme.border.radiusSmall}
+								uiTransform     = {{ margin: { top: 6, bottom: 6 } }}
+							>
+								<Column cols="auto">
+									<DemoCell label="nested → auto fill" color={cNest} theme={theme} />
+								</Column>
+							</Row>
+							<Row
+								backgroundColor = {alpha(theme.colors.body, 0.5)}
+								borderRadius    = {theme.border.radiusSmall}
+								uiTransform     = {{ margin: { top: 6, bottom: 6 } }}
+							>
+								<Column cols={6}>
+									<DemoCell label="6" color={cMuted} theme={theme} />
+								</Column>
+								<Column cols={6}>
+									<DemoCell label="6" color={cMuted} theme={theme} />
+								</Column>
+							</Row>
+						</Column>
+						<Column
+							cols            = {8}
+							spacing         = {6}
+							uiTransform     = {{ alignItems: 'stretch' }}
+							backgroundColor = {alpha(theme.colors.primary, 0.15)}
+							borderRadius    = {theme.border.radiusSmall}
+						>
+							<DemoCell label="cols={8} parent" color={c8} theme={theme} />
+							<Row
+								backgroundColor = {alpha(theme.colors.body, 0.5)}
+								borderRadius    = {theme.border.radiusSmall}
+								uiTransform     = {{ margin: { top: 6, bottom: 6 } }}
+							>
+								<Column cols={4}>
+									<DemoCell label="4" color={cNest} theme={theme} />
+								</Column>
+								<Column cols={4}>
+									<DemoCell label="4" color={cNest} theme={theme} />
+								</Column>
+								<Column cols={4}>
+									<DemoCell label="4" color={cNest} theme={theme} />
+								</Column>
+							</Row>
+							<Row
+								backgroundColor = {alpha(theme.colors.body, 0.5)}
+								borderRadius    = {theme.border.radiusSmall}
+								uiTransform     = {{ margin: { top: 6, bottom: 6 } }}
+							>
+								<Column cols={6}>
+									<DemoCell label="cols={6} half of parent" color={cFill} theme={theme} />
+								</Column>
+							</Row>
+						</Column>
+					</Row>
+				</Column>
+			</Background>
+		)
+	}
+}
+
+export const demoLayoutLayer = new DemoLayoutLayer()

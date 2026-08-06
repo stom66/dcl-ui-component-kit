@@ -3,7 +3,7 @@ import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { UiBox, type UiBoxProps } from '../base'
 import { getTheme } from '../../styles'
-import { getColSelfTransform } from '../../utils'
+import { getColSelfTransform, type ColSpanInput } from '../../utils'
 import { textMinHeight } from '../text/textLayout'
 
 
@@ -11,9 +11,9 @@ type LabelProps = Omit<UiBoxProps, 'uiText'> & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	value?      : string
 	color?      : Color4
-	cols?       : number
-	colsDesktop?: number
-	colsMobile? : number
+	cols?       : ColSpanInput
+	colsDesktop?: ColSpanInput
+	colsMobile? : ColSpanInput
 	uiText?     : Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
@@ -39,7 +39,7 @@ export function Label({
 	...props
 }: LabelProps) {
 	const theme         = getTheme()
-	const col           = getColSelfTransform(cols, colsDesktop, colsMobile)
+	const col           = getColSelfTransform(cols, colsDesktop, colsMobile)!
 	const resolvedValue = value ?? uiText?.value ?? ''
 	const padding       = theme.border.radiusSmall
 	const fontSize      = scaleFontSize(theme.typography.size.default)
@@ -55,6 +55,7 @@ export function Label({
 				flexGrow      : col.flexGrow,
 				flexShrink    : 0,
 				flexBasis     : col.flexBasis,
+				maxWidth      : col.maxWidth,
 				flexDirection : "row",
 				alignSelf     : "flex-start",
 				alignItems    : "center",

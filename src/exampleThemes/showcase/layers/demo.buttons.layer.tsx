@@ -45,7 +45,6 @@ export class DemoButtonsLayer extends Layer {
 						uiTransform = {{ margin: { bottom: 8 } }}
 					/>
 					<Row
-						cols={12}
 						uiTransform={{
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
@@ -74,7 +73,6 @@ export class DemoButtonsLayer extends Layer {
 					</Row>
 
 					<Row
-						cols={12}
 						uiTransform={{
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
@@ -112,7 +110,6 @@ export class DemoButtonsLayer extends Layer {
 						uiTransform = {{ margin: { bottom: 8 } }}
 					/>
 					<Row
-						cols={12}
 						uiTransform={{
 							height        : 80,
 							justifyContent: 'flex-start',

@@ -69,7 +69,7 @@ export class DemoAnimationsLayer extends Layer {
 					<H1 value="Animations" color={theme.colors.light} />
 					{/* MARK: Row 1 
 					*/}
-					<Row cols={12} uiTransform={{ justifyContent: 'center' }}>
+					<Row uiTransform={{ justifyContent: 'center' }}>
 
 						{this.renderAnimCell('Spinner', theme.colors.warning, (
 							<Spinner
@@ -145,7 +145,7 @@ export class DemoAnimationsLayer extends Layer {
 
 					{/* MARK: Row 2 
 					*/}
-					<Row cols={12} uiTransform={{ justifyContent: 'center' }}>
+					<Row uiTransform={{ justifyContent: 'center' }}>
 
 						{this.renderAnimCell('Spinner + \nPulse > FlashColor', theme.colors.info, [
 							<Spinner
@@ -269,7 +269,7 @@ export class DemoAnimationsLayer extends Layer {
 
 					{/* MARK: Row 3 — event
 					*/}
-					<Row cols={12} uiTransform={{ justifyContent: 'center' }}>
+					<Row uiTransform={{ justifyContent: 'center' }}>
 						{this.renderAnimCell(
 							'onHover | One-shot\nShake',
 							theme.colors.danger,

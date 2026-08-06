@@ -21,7 +21,7 @@ export class DemoIconsLayer extends Layer {
 			id             : 'demo-icons',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : false,
+			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
 				width : vwToPixels(50),
@@ -58,7 +58,6 @@ export class DemoIconsLayer extends Layer {
 						uiTransform = {{ margin: { bottom: 8 } }}
 					/>
 					<Row
-						cols = {12}
 						uiTransform={{
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
@@ -77,7 +76,6 @@ export class DemoIconsLayer extends Layer {
 					{/* MARK: Colors 
 					*/}
 					<Row
-						cols={12}
 						uiTransform={{
 							justifyContent: 'flex-start',
 							alignItems    : 'flex-start',
@@ -98,7 +96,6 @@ export class DemoIconsLayer extends Layer {
 								uiTransform = {{ margin: { bottom: 8 } }}
 							/>
 							<Row
-								cols={12}
 								uiTransform={{
 									justifyContent: 'flex-start',
 									alignItems    : 'center',
@@ -151,7 +148,6 @@ export class DemoIconsLayer extends Layer {
 								uiTransform = {{ margin: { bottom: 8 } }}
 							/>
 							<Row
-								cols={12}
 								uiTransform={{
 									justifyContent: 'flex-start',
 									alignItems    : 'center',
@@ -259,7 +255,6 @@ export class DemoIconsLayer extends Layer {
 			rows.push(
 				<Row
 					key         = {`icon-row-${row}`}
-					cols        = {12}
 					uiTransform = {{
 						justifyContent: 'flex-start',
 						alignItems    : 'flex-start',

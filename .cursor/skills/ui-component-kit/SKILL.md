@@ -14,7 +14,9 @@ Lightweight reusable UI for Decentraland SDK7. Prefer framework primitives over 
 
 **Before creating or editing a Layer:** read this skill and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`. Do not invent a parallel mount path or new Layer option fields for props Zone already accepts.
 
-**Layout widths:** for every `Row` / `Column` / `Label` / `ButtonText` that needs a fractional or full width, set **`cols`** (`cols={12}` = full width). Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
+**Build check (required):** after any layout / Layer / `Row` / `Column` / `cols` / zone change, run **`npm run build`** and fix errors before finishing. Do not rely on the IDE linter alone — the SDK build catches ReactEcs prop and type issues the editor may miss.
+
+**Layout widths:** for every `Column` / `Label` / `ButtonText` that needs a fractional or full width, set **`cols`** (`cols={12}` = full width). `Row` is always full parent width (no `cols` — wrap in a `Column` to narrow). Use `cols="auto"` to fill leftover row space (sibling autos share equally). Omit `cols` on `Column` for no grid sizing. Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
 
 ## Core model
 
@@ -72,27 +74,39 @@ super({
 
 ### Row / Column width (`cols` — required for grid widths)
 
-`Row`, `Column`, `Label`, and `ButtonText` share a **12-column** grid (`theme.cols.COL_COUNT`). **`cols` is the width API.** Never set fractional/full widths via `width` / `uiTransform.width` when a span will do — including the common habit of `width: '100%'`.
+`Column`, `Label`, and `ButtonText` share a **12-column** grid (`theme.cols.COL_COUNT`). **`cols` is the width API** on those components. **`Row` is always `width: 100%`** of its parent — it does not take `cols`. To make a half-width band, put a `Column cols={6}` inside the Row. Never set fractional/full widths via `width` / `uiTransform.width` when a span will do — including the common habit of `width: '100%'`.
 
 | Need | Use |
 |---|---|
-| Full width of parent | `cols={12}` |
-| Half / quarter / custom span | `cols={6}` / `cols={3}` / `cols={n}` |
-| Shrink-to-content | omit `cols` (→ `"auto"`) — only when you truly want auto |
+| Full-width horizontal stack | `<Row>` (always 100% — no `cols`) |
+| Full width of parent (Column / Label / Button) | `cols={12}` |
+| Half / quarter / custom span | `cols={6}` / `cols={3}` / `cols={n}` on **`Column`** (or Label / ButtonText) |
+| Fill leftover row space | `cols="auto"` (equal share among sibling autos — two autos → half each) |
+| No grid sizing | omit `cols` on **`Column`** (also omit on **`Label`** / **`ButtonText`** for shrink-to-content) |
 | Non-grid size (`vw` / `vh` / px) | `uiTransform.width` (Zone / Layer chrome, fixed icon boxes, etc.) |
 
-| `cols` | Width |
+| `cols` (Column / Label / ButtonText) | Width |
 |---|---|
-| omitted | `"auto"` (shrink-to-content — **unsafe** as a parent of `%` / nested `cols`) |
-| `1` … `11` | `n / 12` of the parent (e.g. `cols={3}` → `25%`, `cols={6}` → `50%`) |
-| `12` | `100%` — use this for full-bleed stacks / rows |
+| omitted on `Column` | no grid sizing (does not fill or span) |
+| omitted on `Label` / `ButtonText` | shrink-to-content |
+| `"auto"` | fill leftover space in the parent `Row`; sibling autos share equally |
+| `1` … `11` | sticky `n / 12` of the parent — does **not** expand when the row is under-filled (e.g. two `cols={4}` stay ~⅓ each, not half) |
+| `12` | `100%` — use this for full-bleed stacks / vertical `Column` parents of nested `%` / `cols` |
 
 ```tsx
-// GOOD — grid spans
+// GOOD — grid spans + fill
 <Column cols={12}>
-	<Row cols={12}>
-		<Column cols={3}>{/* … */}</Column>
-		<Column cols={9}>{/* … */}</Column>
+	<Row>
+		<Column cols={4}>{/* sticky 4/12 */}</Column>
+		<Column cols="auto">{/* fills remainder (~8/12) */}</Column>
+	</Row>
+	<Row>
+		<Column cols="auto">{/* half */}</Column>
+		<Column cols="auto">{/* half */}</Column>
+	</Row>
+	<Row>
+		<Column cols={4}>{/* … */}</Column>
+		<Column cols={8}>{/* … */}</Column>
 	</Row>
 </Column>
 
@@ -104,9 +118,9 @@ super({
 
 **Agent trap:** older demo layers and muscle-memory CSS often use `width: '100%'`. That is **not** more reliable than `cols={12}` — it bypasses the grid and is wrong here. Prefer `cols` even when a nearby file still uses percentages.
 
-**Nesting rule:** any `Column` / `Row` that hosts children with `cols={…}` (or `width: '…%'`) must itself have a **definite** width — typically `cols={12}` (or a parent that already spans). If the parent is `cols`-omitted (`auto`), nested percentage widths collapse and content can vanish (fixed-`px` children may still show).
+**Nesting rule:** any `Column` that hosts children with `cols={…}` (or `width: '…%'`) must itself have a **definite** width — typically `cols={12}` on a vertical stack, or a parent that already spans / fills. A `Column` with `cols="auto"` only gets a definite width when it is a `Row` child. Nested `Row`s are always 100% of that parent Column.
 
-**Row spacing + `cols`:** Yoga has no `calc()`. A `Row` defaults to `theme.spacing` gutters (spacer entities between children — never `createElement` clones; those leak UiEntities in ReactEcs). Partial `cols` (1–11) size via `flexGrow: span` so gutters do not overflow. `cols={12}` stays `width: 100%`. Pass `spacing={0}` to disable gutters. Do **not** add extra horizontal `margin` on `cols` children inside a spaced `Row`.
+**Row spacing + `cols`:** A `Row` defaults to `theme.spacing` gutters. Partial `cols` (1–11) use sticky **`width: n/12%`** so `flexWrap` works and under-filled rows leave empty space. Non-wrap rows use spacer entities between children. When `flexWrap: 'wrap'`, `Row` uses **padded cell wrappers** instead (spacers would add px on top of 100% and wrap early) — `spacing` still controls the gutter. Do **not** add extra horizontal `margin` on `cols` children inside a spaced non-wrap `Row`.
 
 Optional platform overrides: `colsDesktop` / `colsMobile`. `uiTransform.height` is unrelated — keep using it for vertical size.
 
@@ -179,7 +193,7 @@ export const myLayer = new MyLayer()
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | Bare `fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` |
-| `Row` / `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**) |
+| `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**); `Row` is always full width |
 | Text/`H*`/`Code` crushed / overlapping in a height-capped `Column` | Keep kit defaults: `flexShrink: 0`, `minHeight` from font size, `alignSelf: 'flex-start'` — Yoga’s default `flexShrink: 1` collapses `height: 'auto'` text to 0 |
 | Layer `height: 'auto'` with default `<Background>` (absolute) | `<Background fitContent>` so chrome contributes in-flow height |
 

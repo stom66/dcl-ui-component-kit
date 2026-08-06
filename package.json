@@ -51,7 +51,12 @@
     "bump:major": "npm version major"
   },
   "peerDependencies": {
-    "@dcl/sdk": ">=7.0.0"
+    "@dcl/sdk": "*"
+  },
+  "peerDependenciesMeta": {
+    "@dcl/sdk": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@dcl/asset-packs": "latest",

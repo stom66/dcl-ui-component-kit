@@ -95,7 +95,6 @@ export class DemoListLayer extends Layer {
 		const row = (
 			<Row
 				key             = {`score-row-${rank}`}
-				cols            = {12}
 				backgroundColor = {fill}
 				borderRadius    = {theme.border.radiusDefault}
 				borderWidth     = {flashBorder ? theme.border.width : 0}
@@ -120,7 +119,7 @@ export class DemoListLayer extends Layer {
 							height = {ICON_SIZE}
 							color  = {rank === 1 ? theme.colors.primary : undefined}
 						/>
-					) : undefined}
+					) : null}
 				</Column>
 
 				{/* Rank — cols 1 */}

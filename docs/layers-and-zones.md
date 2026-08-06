@@ -38,7 +38,7 @@ export class ScoreboardLayer extends Layer {
 	body() {
 		return (
 			<Background>
-				<Row cols={12} uiTransform={{ alignItems: 'center', justifyContent: 'space-between', padding: 12 }}>
+				<Row uiTransform={{ alignItems: 'center', justifyContent: 'space-between', padding: 12 }}>
 					<Header value="Score" />
 					<Text value="12" />
 				</Row>
@@ -94,8 +94,10 @@ Zones are preset layout slots on the virtual canvas. Layers pick one via `zone: 
 | `Default` | Centered modal / panel |
 | `FullScreen` | Full canvas overlay (Layer constructor default) |
 | `InteractableArea` | Fits the explorer interactable area |
-| `Top` / `Bottom` / `Left` / `Right` | Edge chrome |
-| `TopLeft` / `TopRight` / `BottomLeft` / `BottomRight` | Corner HUD slots |
+| `Top` / `Bottom` | Edge chrome |
+| `TopLeft` / `TopRight` / `BottomLeft` / `BottomRight` | Corner HUD slots (`TopLeft`/`TopRight` `20vw` side inset; `BottomLeft` `25vw`) |
+| `LeftTop` / `Left` / `LeftBottom` | Left strip (same insets; content `flex-start` / center / `flex-end`) |
+| `RightTop` / `Right` / `RightBottom` | Right strip (mirror of left) |
 | `None` | Raw content (no zone wrapper) |
 
 Zone merges transforms as: **flex defaults → zone preset → `uiTransform` overrides**.

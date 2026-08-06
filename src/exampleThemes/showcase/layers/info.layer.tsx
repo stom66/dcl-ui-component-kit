@@ -50,8 +50,10 @@ function formatCanvasDebugInfo(): string {
 export class InfoLayer extends Layer {
 	constructor() {
 		super({
-			id  : 'info',
-			zone: ZoneType.BottomRight,
+			id    : 'info',
+			zone  : ZoneType.BottomRight,
+			// Above demo safe-zone overlays (zIndex 0) and the safe-zones panel (100).
+			zIndex: 200,
 		})
 	}
 

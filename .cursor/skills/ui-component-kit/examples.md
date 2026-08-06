@@ -63,12 +63,20 @@ super({
 
 ## Row / Column widths (`cols`)
 
-**Required for grid widths.** Use `cols` on `Row` / `Column` / `Label` / `ButtonText` — never `width: '100%'` / `'50%'` / `'25%'` when a span will do. Grid is 12-wide; `cols={12}` = full width. Parents of nested `cols` children need a definite width (usually `cols={12}`).
+**Required for grid widths.** Use `cols` on `Column` / `Label` / `ButtonText` — never `width: '100%'` / `'50%'` / `'25%'` when a span will do. Grid is 12-wide; `cols={12}` = full width. `Row` is always full parent width (no `cols` — wrap content in a `Column` to narrow). `cols="auto"` **fills** leftover row space (sibling autos share equally); omit `cols` on `Column` for no grid sizing. Explicit partial spans stay sticky (two `cols={4}` do not become half-width). Parents of nested `cols` children need a definite width (usually `cols={12}` on a vertical stack).
 
 ```tsx
 // GOOD
 <Column cols={12}>
-	<Row cols={12}>
+	<Row>
+		<Column cols={4}>{/* sticky 4/12 */}</Column>
+		<Column cols="auto">{/* fill remainder */}</Column>
+	</Row>
+	<Row>
+		<Column cols="auto">{/* half */}</Column>
+		<Column cols="auto">{/* half */}</Column>
+	</Row>
+	<Row>
 		<Column cols={3}>{/* sidebar */}</Column>
 		<Column cols={9}>{/* main */}</Column>
 	</Row>
@@ -81,7 +89,9 @@ super({
 
 Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is unaffected — keep using `uiTransform.height` as needed.
 
-`Row` applies default `theme.spacing` gutters. Yoga has no `calc()`, so when `spacing > 0` it lays out `cols` children with `flexGrow` (not raw `%`) so columns stay inside the parent. Avoid extra horizontal margins on those children; use `spacing={0}` only for gapless exact percentages.
+`Row` applies default `theme.spacing` gutters. Partial `cols` use sticky `%` widths (so `flexWrap` works). Wrap rows use padded cell wrappers for gutters; non-wrap rows use spacer entities. Avoid extra horizontal margins on `cols` children inside a spaced non-wrap `Row`.
+
+See `demo.layout.layer.tsx` for a full showcase.
 
 ## Close button / framed panel
 

@@ -223,7 +223,8 @@ function syncToggleColors(
 // MARK: Toggle
 /**
  * Classic on/off switch: pill track (`height × 2`, 2px padding) with a circular
- * thumb that slides left ↔ right. Click is on the whole track, not just the thumb.
+ * thumb that slides left ↔ right. Click is on the whole track (thumb/row use
+ * `pointerFilter: 'none'` so they do not steal hits from the track).
  *
  * Pass `backgroundColor` / `toggleColor` for track / thumb fills — both lerp over
  * `lerpDuration` when they change (in sync with the thumb slide). Borders and other
@@ -308,6 +309,7 @@ export function Toggle({
 				onMouseUp?.()
 			}}
 		>
+			{/* Visuals only — pointerFilter none so the track receives all clicks (thumb would otherwise steal hits). */}
 			<Row
 				spacing = {0}
 				uiTransform={{
@@ -315,18 +317,20 @@ export function Toggle({
 					height        : '100%',
 					alignItems    : 'center',
 					justifyContent: 'flex-start',
+					pointerFilter : 'none',
 				}}
 			>
 				<UiBox
 					key             = {`${id}_thumb`}
 					backgroundColor = {colors.toggleColor}
 					uiTransform={{
-						width       : thumbSize,
-						height      : thumbSize,
-						flexGrow    : 0,
-						flexShrink  : 0,
-						borderRadius: thumbRadius,
-						margin      : { left: slide * travel },
+						width         : thumbSize,
+						height        : thumbSize,
+						flexGrow      : 0,
+						flexShrink    : 0,
+						borderRadius  : thumbRadius,
+						margin        : { left: slide * travel },
+						pointerFilter : 'none',
 					}}
 				/>
 			</Row>

@@ -88,18 +88,32 @@ export function Zone({
 			: presetTransform.position && typeof presetTransform.position === 'object'
 				? presetTransform.position
 				: {}
-	)
+	) as Record<string, unknown>
 
 	const activeEdge = hideable && visibilityController
 		? visibilityController.activeEdge
 		: (showFrom ?? hideTo ?? visibilityPosition ?? preset.visibilityPosition)
 
+	// Hideable edge zones must keep non-animated anchors (e.g. TopLeft keeps
+	// `left` while `top` slides). Visibility position is an offset from the
+	// preset inset (0 = settled); relative Default modals have no inset.
 	const animatedPosition = hideable && visibilityController
 		? (() => {
-			const { top: _t, bottom: _b, left: _l, right: _r, ...rest } = basePosition as Record<string, unknown>
-			return { ...rest, [activeEdge]: visibilityController.position }
+			const presetEdge = basePosition[activeEdge]
+			const inset      = typeof presetEdge === 'number' ? presetEdge : 0
+			return {
+				...basePosition,
+				[activeEdge]: inset + visibilityController.position,
+			}
 		})()
 		: (uiTransform.position ?? presetTransform.position)
+
+	// Absolute presets (Top / Left / …) must stay absolute when hideable —
+	// forcing relative parks them in the centered layer stack. Default /
+	// FullScreen presets have no positionType and stay relative for slides.
+	const positionType = uiTransform.positionType
+		?? presetTransform.positionType
+		?? (hideable ? 'relative' as const : undefined)
 
 	return (
 		<UiBox
@@ -115,9 +129,7 @@ export function Zone({
 				borderWidth   : 0,
 				...presetTransform,
 				...uiTransform,
-				positionType  : hideable
-					? 'relative'
-					: (uiTransform.positionType ?? presetTransform.positionType),
+				positionType,
 				position      : animatedPosition,
 			}}
 			uiBackground={uiBackground}

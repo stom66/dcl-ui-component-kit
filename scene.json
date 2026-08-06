@@ -55,5 +55,6 @@
   "source": {
     "origin": "creator-hub",
     "projectId": "0506ce0b-5f3e-4e33-9ed3-3ff39f045d67"
-  }
+  },
+  "landscapeTerrain": true
 }

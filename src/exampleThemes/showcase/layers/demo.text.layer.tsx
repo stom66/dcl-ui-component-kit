@@ -46,7 +46,6 @@ export class DemoTextLayer extends Layer {
 					<Divider />
 
 					<Row
-						cols={12}
 						uiTransform={{
 							justifyContent: 'flex-start',
 							alignItems    : 'center',
@@ -69,7 +68,6 @@ export class DemoTextLayer extends Layer {
 					</Row>
 
 					<Row
-						cols={12}
 						uiTransform={{
 							justifyContent: 'flex-start',
 							alignItems    : 'center',

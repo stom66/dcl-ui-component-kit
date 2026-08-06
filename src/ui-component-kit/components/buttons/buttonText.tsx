@@ -4,7 +4,7 @@ import ReactEcs, { PositionUnit, scaleFontSize, UiTransformProps } from '@dcl/sd
 
 import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
-import { getColSelfTransform, getColSpan } from '../../utils'
+import { getColSelfTransform, getColSpan, type ColSpanInput } from '../../utils'
 import { resolveAspectDimensions } from '../../utils/aspect'
 import { lighten } from '../../utils/colors'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
@@ -26,10 +26,10 @@ type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio'> & {
 	textLabel?   : string | undefined
 	width?       : PositionUnit | 'auto' | undefined
 	height?      : PositionUnit | 'auto' | undefined
-	/** 12-column grid span. Prefer over `width: '100%'` / `'50%'` / …. */
-	cols?        : number
-	colsDesktop? : number
-	colsMobile?  : number
+	/** 12-column grid span, or `'auto'` to fill leftover row space. Prefer over `%` widths. */
+	cols?        : ColSpanInput
+	colsDesktop? : ColSpanInput
+	colsMobile?  : ColSpanInput
 	/** Width ÷ height. Defaults to `theme.buttons.aspectRatio` (2.6). */
 	aspectRatio? : number
 	textureSrc?  : string
@@ -101,13 +101,13 @@ export const ButtonText = ({
 	const hoverColor   = lighten(defaultColor, 0.1)
 	const button       = getButtonProps(id, defaultColor)
 	const color        = button.get('backgroundColor')
-	const col          = getColSelfTransform(cols, colsDesktop, colsMobile)
+	const col          = getColSelfTransform(cols, colsDesktop, colsMobile)!
 	const span         = getColSpan(cols, colsDesktop, colsMobile)
 	const colCount     = theme.cols.COL_COUNT
-	// Partial cols share a Row via flexGrow; full / none keep aspect-ratio sizing.
-	const useFlexCols  = span !== undefined && span < colCount
+	// Partial sticky `%` / auto-fill use col sizing; full / omitted keep aspect-ratio sizing.
+	const useColWidth  = col.flexGrow > 0 || (span !== undefined && span < colCount)
 
-	const size = useFlexCols
+	const size = useColWidth
 		? {
 			width : col.width,
 			height: height ?? theme.buttons.heightDefault,
@@ -127,9 +127,10 @@ export const ButtonText = ({
 			uiTransform     = {{
 				width         : size.width,
 				height        : size.height,
-				flexGrow      : useFlexCols ? col.flexGrow : 0,
-				flexShrink    : useFlexCols ? col.flexShrink : 0,
-				flexBasis     : useFlexCols ? 0 : undefined,
+				flexGrow      : useColWidth ? col.flexGrow : 0,
+				flexShrink    : useColWidth ? col.flexShrink : 0,
+				flexBasis     : useColWidth ? col.flexBasis : undefined,
+				maxWidth      : useColWidth ? col.maxWidth : undefined,
 				borderRadius  : scaleFontSize(theme.border.radiusSmall),
 				alignItems    : 'center',
 				justifyContent: 'center',

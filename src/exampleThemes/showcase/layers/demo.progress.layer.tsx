@@ -91,7 +91,7 @@ export class DemoProgressLayer extends Layer {
 				{/* cols={12} = 100% width — nested cols={3}/{9} need a definite parent width */}
 				<Column cols={12} uiTransform={{ height: '100%', alignItems: 'stretch' }}>
 					<H2 value="Progress Bars" />
-					<Row cols={12} uiTransform={{ alignItems: 'flex-start' }}>
+					<Row uiTransform={{ alignItems: 'flex-start' }}>
 						<Column cols={3}
 							uiTransform={{
 								padding       : { top: 16, right: 20, bottom: 16, left: 20 },

@@ -54,17 +54,45 @@ export function ZoneBottomLeft(props: NamedZoneProps) {
 }
 
 
+// MARK: ZoneLeftTop
+/** Left strip, content aligned to the top (`flex-start`). */
+export function ZoneLeftTop(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.LeftTop })
+}
+
+
 // MARK: ZoneLeft
-/** Left edge zone preset. */
+/** Left strip, content vertically centered. */
 export function ZoneLeft(props: NamedZoneProps) {
 	return Zone({ ...props, type: ZoneType.Left })
 }
 
 
+// MARK: ZoneLeftBottom
+/** Left strip, content aligned to the bottom (`flex-end`). */
+export function ZoneLeftBottom(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.LeftBottom })
+}
+
+
+// MARK: ZoneRightTop
+/** Right strip, content aligned to the top (`flex-start`). */
+export function ZoneRightTop(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.RightTop })
+}
+
+
 // MARK: ZoneRight
-/** Right edge zone preset. */
+/** Right strip, content vertically centered. */
 export function ZoneRight(props: NamedZoneProps) {
 	return Zone({ ...props, type: ZoneType.Right })
+}
+
+
+// MARK: ZoneRightBottom
+/** Right strip, content aligned to the bottom (`flex-end`). */
+export function ZoneRightBottom(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.RightBottom })
 }
 
 
