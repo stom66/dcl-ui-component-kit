@@ -7,6 +7,7 @@ alwaysApply: true
 
 - Decentraland SDK7 reference lives under `/dclcontext` and via `cursor.config`.
 - **UI Component Kit:** before creating or editing any `Layer` / zone UI, read and follow `.cursor/skills/ui-component-kit/SKILL.md`.
+- **Stock assets:** after installing/upgrading `@stom66/dcl-ui-component-kit` in any project, ensure `assets/images/ui-component-kit/` exists (run `npx @stom66/dcl-ui-component-kit copy-assets` if not). npm may block dependency `postinstall` (`allow-scripts`) — that is expected; see `INSTALL.md`.
 - Hard rules: one Layer = one Zone; implement `body()` only; forward size/align through `uiTransform` and `uiBackground` only — never Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`, …); panel chrome via `<Background>` in `body()`; do not re-mount `ScreenInsetArea`/`ZoneRoot`/`Zone` in `render()`.
 - **Widths:** on `Column` / `Label` / `ButtonText`, use **`cols`** for fractional/full width (`cols={12}` = full). `Row` is always full parent width (no `cols`). `cols="auto"` fills leftover row space (equal share among sibling autos); omit `cols` on `Column` for no grid sizing. Do **not** use `width: '100%'` / `'50%'` / … when a span will do — even if an older demo still does.
 - **Imports:** always relative (`./`, `../`) under `src/` — never absolute `src/...` paths. Inside `ui-component-kit/`, stay package-internal (do not `../../ui-component-kit/...`). See `.cursor/rules/relative-imports.mdc`.

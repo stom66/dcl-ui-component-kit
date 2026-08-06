@@ -24,6 +24,7 @@ npm allow-scripts:
   Dependency postinstall may be blocked (npm 11.16+ warn / npm 12+ deny).
   Prefer:  npx @stom66/dcl-ui-component-kit copy-assets
   Or:      npm approve-scripts @stom66/dcl-ui-component-kit && npm rebuild @stom66/dcl-ui-component-kit
+  Docs:    INSTALL.md (shipped with this package)
 
 Opt out of postinstall asset copy:
   UI_COMPONENT_KIT_SKIP_ASSETS=1

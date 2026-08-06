@@ -16,6 +16,21 @@ Lightweight reusable UI for Decentraland SDK7. Prefer framework primitives over 
 
 **Build check (required):** after any layout / Layer / `Row` / `Column` / `cols` / zone change, run **`npm run build`** and fix errors before finishing. Do not rely on the IDE linter alone — the SDK build catches ReactEcs prop and type issues the editor may miss.
 
+## Stock assets after install (critical — agents)
+
+When `@stom66/dcl-ui-component-kit` is **installed or upgraded in a consumer project** (or this package is used as a dependency), agents **must** ensure stock textures exist:
+
+1. Check that `assets/images/ui-component-kit/` exists and contains PNG files.
+2. If missing/empty: **warn the user** that textured UI will not work, then run  
+   `npx @stom66/dcl-ui-component-kit copy-assets` (or instruct them to).
+3. Treat npm’s `allow-scripts` / postinstall warning as **normal**. Do not promise that `npm install` copied assets — dependency `postinstall` is often blocked for security.
+4. Optional helper if the user wants auto-copy:  
+   `npm approve-scripts @stom66/dcl-ui-component-kit` then `npm rebuild @stom66/dcl-ui-component-kit`,  
+   and/or add `"postinstall": "dcl-ui-component-kit copy-assets"` to the **consumer** `package.json`.
+5. Full checklist: package root **`INSTALL.md`** (also linked from the README).
+
+Do not mark install/setup complete until `assets/images/ui-component-kit/` is populated.
+
 **Layout widths:** for every `Column` / `Label` / `ButtonText` that needs a fractional or full width, set **`cols`** (`cols={12}` = full width). `Row` is always full parent width (no `cols` — wrap in a `Column` to narrow). Use `cols="auto"` to fill leftover row space (sibling autos share equally). Omit `cols` on `Column` for no grid sizing. Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
 
 ## Core model

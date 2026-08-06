@@ -1,6 +1,6 @@
 {
   "name": "@stom66/dcl-ui-component-kit",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DCL UI Component Kit — reusable Decentraland SDK7 UI components, layers, zones, and themes",
   "keywords": [
     "decentraland",
@@ -29,7 +29,8 @@
   "files": [
     "src/ui-component-kit",
     "assets/images/ui-component-kit",
-    "scripts"
+    "scripts",
+    "INSTALL.md"
   ],
   "bin": {
     "dcl-ui-component-kit": "scripts/cli.js"
