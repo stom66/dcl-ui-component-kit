@@ -13,11 +13,17 @@ Usage:
 
 Commands:
   copy-assets              Copy stock textures into ./assets/images/ui-component-kit
+                           (required after npm install — postinstall may be blocked)
   init-theme [name]        Scaffold a theme folder under src/themes/<name>
   help                     Show this help
 
 Options:
   --force                  Overwrite an existing theme (init-theme only)
+
+npm allow-scripts:
+  Dependency postinstall may be blocked (npm 11.16+ warn / npm 12+ deny).
+  Prefer:  npx @stom66/dcl-ui-component-kit copy-assets
+  Or:      npm approve-scripts @stom66/dcl-ui-component-kit && npm rebuild @stom66/dcl-ui-component-kit
 
 Opt out of postinstall asset copy:
   UI_COMPONENT_KIT_SKIP_ASSETS=1

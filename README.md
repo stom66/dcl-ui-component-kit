@@ -60,12 +60,42 @@ export function main() {
 
 ```bash
 npm install @stom66/dcl-ui-component-kit
+npx @stom66/dcl-ui-component-kit copy-assets
 ```
 
-On install, stock textures are copied into your scene at `assets/images/ui-component-kit/` (DCL only loads textures from the scene `assets/` tree). Opt out with `UI_COMPONENT_KIT_SKIP_ASSETS=1` or `"config": { "dcl-ui-component-kit": { "skipAssets": true } }` in your `package.json`.
+Stock textures must live under your scene at `assets/images/ui-component-kit/` (DCL only loads textures from the scene `assets/` tree). **`copy-assets` is required** — do not skip it.
+
+### Why `copy-assets` (and the `allow-scripts` warning)
+
+npm 11.16+ prints an `allow-scripts` advisory for dependency install scripts; npm 12+ will block them unless approved. This package’s `postinstall` may therefore **not** run, so assets are not copied automatically.
+
+After install, either:
 
 ```bash
+# Recommended — always works
 npx @stom66/dcl-ui-component-kit copy-assets
+```
+
+or approve this package’s install script once, then reinstall / rebuild so `postinstall` can run:
+
+```bash
+npm approve-scripts @stom66/dcl-ui-component-kit
+npm rebuild @stom66/dcl-ui-component-kit
+```
+
+Optional: wire it into your project so every install refreshes assets:
+
+```json
+"scripts": {
+  "postinstall": "dcl-ui-component-kit copy-assets"
+}
+```
+
+(Your project’s own `postinstall` always runs; only *dependency* install scripts are gated by `allowScripts`.)
+
+Opt out of automatic copy with `UI_COMPONENT_KIT_SKIP_ASSETS=1` or `"config": { "dcl-ui-component-kit": { "skipAssets": true } }` in your `package.json`.
+
+```bash
 npx @stom66/dcl-ui-component-kit init-theme myTheme
 ```
 
@@ -74,7 +104,7 @@ npx @stom66/dcl-ui-component-kit init-theme myTheme
 ### Add it to your project
 
 1. `npm install @stom66/dcl-ui-component-kit`
-2. Confirm `assets/images/ui-component-kit/` appeared (or run `copy-assets`)
+2. `npx @stom66/dcl-ui-component-kit copy-assets` — confirm `assets/images/ui-component-kit/` exists
 3. Scaffold a theme (optional): `npx @stom66/dcl-ui-component-kit init-theme myGame`
 4. Call `SetupUiComponentKit` from your scene `main()`
 
