@@ -19,7 +19,11 @@ type ColumnProps = UiBoxProps & {
 
 
 // MARK: Column
-/** Vertical flex stack. Pass `cols="auto"` to fill leftover row space; omit `cols` for no grid sizing. */
+/**
+ * Vertical flex stack. Pass `cols="auto"` to fill leftover row space; omit `cols` for no grid sizing.
+ * Prefer layout shorthands (`alignItems`, `justifyContent`, `padding`, `margin`, …)
+ * over nesting `uiTransform`.
+ */
 export function Column({
 	children,
 	uiTransform,

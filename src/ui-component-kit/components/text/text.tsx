@@ -1,17 +1,13 @@
-import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
 import { textMinHeight } from './textLayout'
+import { mergeTextShorthands, type TextShorthandProps } from './textShorthands'
 
 
-type TextProps = Omit<UiBoxProps, 'uiText'> & {
+export type TextProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** Body copy. Prefer this over JSX text children (DCL `uiText` needs `value`). */
-	value?  : string
-	/** Font color. Defaults to `theme.colors.light`. Overrides `uiText.color`. */
-	color?  : Color4
 	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
@@ -19,6 +15,9 @@ type TextProps = Omit<UiBoxProps, 'uiText'> & {
 // MARK: Text
 /**
  * Default body text block. Pass copy via `value` (or `uiText.value`); nest element children as needed.
+ *
+ * Prefer text shorthands (`value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * over nesting `uiText`. `fontSize` takes a theme base px number and is auto-scaled.
  *
  * Layout notes (DCL / Yoga):
  * - `alignSelf: 'flex-start'` so `height: 'auto'` can measure text (not `stretch`)
@@ -31,12 +30,28 @@ export const Text = ({
 	children,
 	value,
 	color,
+	fontSize: fontSizeProp,
+	font,
+	textAlign,
+	textWrap,
 	uiText,
 	uiTransform,
 	...props
 }: TextProps) => {
-	const theme    = getTheme()
-	const fontSize = scaleFontSize(theme.typography.size.default)
+	const theme          = getTheme()
+	const defaultFontSize = scaleFontSize(theme.typography.size.default)
+	const uiTextMerged   = mergeTextShorthands(
+		{
+			fontSize : defaultFontSize,
+			font     : theme.typography.family.default,
+			color    : theme.colors.light,
+			textAlign: 'middle-left',
+			value    : '',
+		},
+		uiText,
+		{ value, color, fontSize: fontSizeProp, font, textAlign, textWrap },
+	)
+	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
 
 	return (
 		<UiBox
@@ -44,20 +59,12 @@ export const Text = ({
 			uiTransform={{
 				width     : '100%',
 				height    : 'auto',
-				minHeight : textMinHeight(fontSize),
+				minHeight : textMinHeight(typeof fontSize === 'number' ? fontSize : defaultFontSize),
 				alignSelf : 'flex-start',
 				flexShrink: 0,
 				...uiTransform,
 			}}
-			uiText={{
-				fontSize,
-				font     : theme.typography.family.default,
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				...(color !== undefined ? { color } : {}),
-				value: value ?? uiText?.value ?? '',
-			}}
+			uiText={uiTextMerged}
 		>
 			{children}
 		</UiBox>

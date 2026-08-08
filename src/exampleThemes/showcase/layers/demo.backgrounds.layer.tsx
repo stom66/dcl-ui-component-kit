@@ -14,11 +14,9 @@ function DemoSample({
 }) {
 	return (
 		<Column
-			cols={12}
-			uiTransform={{
-				height: SAMPLE_HEIGHT,
-				margin: SAMPLE_MARGIN,
-			}}
+			cols   = {12}
+			height = {SAMPLE_HEIGHT}
+			margin = {SAMPLE_MARGIN}
 		>
 			{children}
 		</Column>
@@ -50,27 +48,21 @@ export class DemoBackgroundsLayer extends Layer {
 
 		return (
 			<Background
-				uiTransform={{
-					padding: { top: 16, right: 16, bottom: 16, left: 16 },
-				}}
+				padding={{ top: 16, right: 16, bottom: 16, left: 16 }}
 			>
 				<Row
-					uiTransform={{
-						height        : '100%',
-						alignItems    : 'flex-start',
-						justifyContent: 'flex-start',
-					}}
+					height         = "100%"
+					alignItems     = "flex-start"
+					justifyContent = "flex-start"
 				>
 					<Column
-						cols={4}
-						uiTransform={{
-							height        : '100%',
-							alignItems    : 'stretch',
-							justifyContent: 'flex-start',
-							padding       : { right: 8 },
-						}}
+						cols           = {4}
+						height         = "100%"
+						alignItems     = "stretch"
+						justifyContent = "flex-start"
+						padding        = {{ right: 8 }}
 					>
-						<Row uiTransform={{ margin: { bottom: 4 } }}>
+						<Row margin={{ bottom: 4 }}>
 							<Label cols={12} value="Backgrounds" />
 						</Row>
 
@@ -82,9 +74,9 @@ export class DemoBackgroundsLayer extends Layer {
 
 						<DemoSample>
 							<Background
-								backgroundColor = {theme.colors.primary}
-								borderRadius    = {theme.border.radiusLarge}
-								borderWidth     = {theme.border.width}
+								color        = {theme.colors.primary}
+								borderRadius = {theme.border.radiusLarge}
+								borderWidth  = {theme.border.width}
 							>
 								<Label value="Custom color" />
 							</Background>
@@ -92,15 +84,13 @@ export class DemoBackgroundsLayer extends Layer {
 					</Column>
 
 					<Column
-						cols={8}
-						uiTransform={{
-							height        : '100%',
-							alignItems    : 'stretch',
-							justifyContent: 'flex-start',
-							padding       : { left: 8 },
-						}}
+						cols           = {8}
+						height         = "100%"
+						alignItems     = "stretch"
+						justifyContent = "flex-start"
+						padding        = {{ left: 8 }}
 					>
-						<Row uiTransform={{ margin: { bottom: 4 } }}>
+						<Row margin={{ bottom: 4 }}>
 							<Label cols={12} value="Background gradients" />
 						</Row>
 

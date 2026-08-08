@@ -22,13 +22,11 @@ export class DemoTextLayer extends Layer {
 		return (
 			<Background>
 				<Column
-					cols={12}
-					uiTransform={{
-						height        : '100%',
-						alignItems    : 'flex-start',
-						justifyContent: 'flex-start',
-						padding       : { top: 16, right: 16, bottom: 16, left: 16 },
-					}}
+					cols           = {12}
+					height         = "100%"
+					alignItems     = "flex-start"
+					justifyContent = "flex-start"
+					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
 				>
 					<H1 value="Header 1" />
 					<H2 value="Header 2" />
@@ -45,44 +43,32 @@ export class DemoTextLayer extends Layer {
 
 					<Divider />
 
-					<Row
-						uiTransform={{
-							justifyContent: 'flex-start',
-							alignItems    : 'center',
-							margin        : { top: 8 },
-						}}
-					>
+					<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
 						<Label
-							value       = "Sample label"
-							uiTransform = {{ margin: { right: 8 } }}
+							value  = "Sample label"
+							margin = {{ right: 8 }}
 						/>
 						<Label
-							value           = "Success"
-							backgroundColor = {theme.colors.success}
-							uiTransform     = {{ margin: { right: 8 } }}
+							value  = "Success"
+							color  = {theme.colors.success}
+							margin = {{ right: 8 }}
 						/>
 						<Label
-							value           = "Warning"
-							backgroundColor = {theme.colors.warning}
+							value = "Warning"
+							color = {theme.colors.warning}
 						/>
 					</Row>
 
-					<Row
-						uiTransform={{
-							justifyContent: 'flex-start',
-							alignItems    : 'center',
-							margin        : { top: 16 },
-						}}
-					>
+					<Row justifyContent="flex-start" alignItems="center" margin={{ top: 16 }}>
 						<Icon
 							uvs    = {atlasIconsFontAwesome.uv.gift}
 							width  = "48"
 							height = "48"
-							uiTransform={{ margin: { right: 12 } }}
+							margin = {{ right: 12 }}
 						/>
 						<Text
-							value       = "Icon + atlas number font:"
-							uiTransform = {{ margin: { right: 8 } }}
+							value  = "Icon + atlas number font (see Icons demo for more):"
+							margin = {{ right: 8 }}
 						/>
 						<IconNumber value="+120/2=60" />
 					</Row>

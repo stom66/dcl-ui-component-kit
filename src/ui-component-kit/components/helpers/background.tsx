@@ -1,3 +1,4 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
@@ -30,11 +31,17 @@ type BackgroundProps = UiBoxProps & {
  * otherwise sizes to children). Absolute fill is out of flex flow and would
  * leave the parent with no in-flow height.
  *
- * Shorthands: `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`,
- * `textureSrc`. Override size, padding, or flex via `uiTransform`.
+ * Shorthands (prefer over nesting):
+ * - Fill: `color` or `backgroundColor` → `uiBackground.color` (`backgroundColor` wins if both)
+ * - Border: `borderColor` / `borderWidth` / `borderRadius`
+ * - Texture: `textureSrc`
+ * - Layout: `padding`, `alignItems`, `justifyContent`, … (UiBox transform shorthands)
+ *
+ * Override anything else via `uiTransform` / `uiBackground`.
  */
 export function Background({
 	children,
+	color,
 	backgroundColor,
 	borderColor,
 	borderRadius,
@@ -46,7 +53,7 @@ export function Background({
 	...props
 }: BackgroundProps) {
 	const theme = getTheme()
-	const fill  = backgroundColor ?? theme.colors.body
+	const fill: Color4 = backgroundColor ?? color ?? theme.colors.body
 
 	const layout = fitContent
 		? {
@@ -73,6 +80,7 @@ export function Background({
 	return (
 		<UiBox
 			{...props}
+			color           = {fill}
 			backgroundColor = {fill}
 			borderColor     = {borderColor}
 			borderRadius    = {borderRadius ?? theme.border.radiusDefault}

@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
-import { alpha, atlasGradientColors, Background, Column, Divider, getTheme, H2, IconNumber, Label, Layer, ProgressBar, ProgressBarImage, PropsController, Row, ZoneType } from '../../../ui-component-kit'
+import ReactEcs from '@dcl/sdk/react-ecs'
+import { alpha, atlasGradientColors, Background, Column, getTheme, H2, IconNumber, Label, Layer, ProgressBar, ProgressBarImage, PropsController, Row, ZoneType } from '../../../ui-component-kit'
 import { timers } from '../../../ui-component-kit/utils/timers'
 
 const DANGER_MIN_VALUE = 0
@@ -89,15 +89,13 @@ export class DemoProgressLayer extends Layer {
 		return (
 			<Background>
 				{/* cols={12} = 100% width — nested cols={3}/{9} need a definite parent width */}
-				<Column cols={12} uiTransform={{ height: '100%', alignItems: 'stretch' }}>
+				<Column cols={12} height="100%" alignItems="stretch">
 					<H2 value="Progress Bars" />
-					<Row uiTransform={{ alignItems: 'flex-start' }}>
-						<Column cols={3}
-							uiTransform={{
-								padding       : { top: 16, right: 20, bottom: 16, left: 20 },
-							}}
+					<Row alignItems="flex-start">
+						<Column
+							cols    = {3}
+							padding = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 						>
-
 						{/* MARK: Vertical
 						*/}
 							<Row>
@@ -146,14 +144,12 @@ export class DemoProgressLayer extends Layer {
 
 						{/* MARK: Horizontal
 						*/}
-						<Column cols={9}
-							uiTransform={{
-								alignItems    : 'stretch',
-								justifyContent: 'flex-start',
-								padding       : { top: 16, right: 20, bottom: 16, left: 20 },
-							}}
-						>
-							<ProgressBar
+						<Column
+							cols           = {9}
+							alignItems     = "stretch"
+							justifyContent = "flex-start"
+							padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
+						>							<ProgressBar
 								key       = "demo_progress_custom_range"
 								id        = "demo_progress_custom_range"
 								value     = {Math.round(randomValue1/10)}
@@ -191,19 +187,14 @@ export class DemoProgressLayer extends Layer {
 								height    = {32}
 							>
 								<Label
-									cols            = {12}
-									value           = {dangerLabel1}
-									backgroundColor = {Color4.create(0, 0, 0, 0)}
-									uiTransform={{
-										height : '100%',
-										padding: 0,
-									}}
-									uiText={{
-										fontSize : scaleFontSize(theme.typography.size.default),
-										textAlign: 'middle-center',
-									}}
-								/>
-							</ProgressBar>
+									cols       = {12}
+									value      = {dangerLabel1}
+									color      = {Color4.create(0, 0, 0, 0)}
+									height     = "100%"
+									padding    = {0}
+									fontSize   = {theme.typography.size.default}
+									textAlign  = "middle-center"
+								/>							</ProgressBar>
 
 
 							<ProgressBarImage

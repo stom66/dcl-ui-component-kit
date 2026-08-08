@@ -25,6 +25,8 @@ export type { GradientDirection } from './helpers'
 export { Column }                 from './helpers'
 export { ColumnReverse }          from './helpers'
 export { Divider }                from './helpers'
+export { Grid }                   from './helpers'
+export type { GridDirection, GridProps } from './helpers'
 export { Label }                  from './helpers'
 export { Row }                    from './helpers'
 export { RowReverse }             from './helpers'
@@ -32,9 +34,13 @@ export { RowReverse }             from './helpers'
 
 // Icons
 export { AvatarIcon, DEFAULT_AVATAR_USER_ID } from './icons'
-export type { AvatarIconProps, IconProps } from './icons'
+export type { AvatarIconProps, IconProps, SpriteIconProps } from './icons'
 export { Icon }                   from './icons'
+export { IconCharacter }          from './icons'
 export { IconNumber }             from './icons'
+export { IconString }             from './icons'
+export { IconSymbol }             from './icons'
+export { resolveSpriteLocalFrame, spriteCycleFrameCount, spriteFrameToUvCell, SpriteIcon } from './icons'
 
 
 // Layers

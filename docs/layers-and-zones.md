@@ -38,7 +38,7 @@ export class ScoreboardLayer extends Layer {
 	body() {
 		return (
 			<Background>
-				<Row uiTransform={{ alignItems: 'center', justifyContent: 'space-between', padding: 12 }}>
+				<Row alignItems="center" justifyContent="space-between" padding={12}>
 					<Header value="Score" />
 					<Text value="12" />
 				</Row>

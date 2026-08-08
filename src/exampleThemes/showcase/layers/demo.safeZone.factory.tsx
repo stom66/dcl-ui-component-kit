@@ -1,5 +1,5 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { alpha, Background, getTheme, Layer, Text, ZoneType, type Theme } from '../../../ui-component-kit'
 
@@ -20,37 +20,34 @@ function DemoChildBox({
 	label,
 	fill,
 	theme,
+	margin,
 }: {
-	id   : string
-	label: string
-	fill : Color4
-	theme: Theme
+	id    : string
+	label : string
+	fill  : Color4
+	theme : Theme
+	margin?: { top?: number; right?: number; bottom?: number; left?: number }
 }) {
 	return (
 		<Background
-			key             = {id}
+			key            = {id}
 			fitContent
-			backgroundColor = {fill}
-			borderColor     = {theme.colors.dark}
-			borderRadius    = {0}
-			borderWidth     = {1}
-			uiTransform={{
-				width         : 'auto',
-				padding       : { top: 10, right: 14, bottom: 10, left: 14 },
-				alignItems    : 'center',
-				justifyContent: 'center',
-			}}
+			color          = {fill}
+			borderColor    = {theme.colors.dark}
+			borderRadius   = {theme.border.radiusSmall}
+			borderWidth    = {1}
+			width          = "auto"
+			margin         = {margin}
+			padding        = {{ top: 10, right: 14, bottom: 10, left: 14 }}
+			alignItems     = "center"
+			justifyContent = "center"
 		>
 			<Text
-				value = {label}
-				uiTransform={{
-					width    : 'auto',
-					alignSelf: 'center',
-				}}
-				uiText={{
-					fontSize : scaleFontSize(theme.typography.size.h3),
-					textAlign: 'middle-center',
-				}}
+				value     = {label}
+				width     = "auto"
+				alignSelf = "center"
+				fontSize  = {theme.typography.size.h3}
+				textAlign = "middle-center"
 			/>
 		</Background>
 	)
@@ -60,7 +57,7 @@ function DemoChildBox({
 // MARK: createSafeZoneDemoLayer
 /**
  * Builds a hideable showcase layer for one ZoneType: a translucent primary fill
- * shows the zone bounds; three labelled boxes float per the zone’s flex
+ * shows the zone bounds; three labelled boxes float per the zone's flex
  * alignment so multi-child flow is obvious.
  */
 export function createSafeZoneDemoLayer(
@@ -87,11 +84,11 @@ export function createSafeZoneDemoLayer(
 
 			return [
 				<Background
-					key             = {`${id}_bounds`}
-					backgroundColor = {alpha(theme.colors.primary, 0.35)}
-					borderColor     = {theme.colors.dark}
-					borderRadius    = {0}
-					borderWidth     = {1}
+					key          = {`${id}_bounds`}
+					color        = {alpha(theme.colors.primary, 0.35)}
+					borderColor  = {theme.colors.dark}
+					borderRadius = {0}
+					borderWidth  = {1}
 				/>,
 				<DemoChildBox
 					id    = {`${id}_child_1`}
@@ -100,15 +97,16 @@ export function createSafeZoneDemoLayer(
 					theme = {theme}
 				/>,
 				<DemoChildBox
-					id    = {`${id}_child_2`}
-					label = "second child"
-					fill  = {theme.colors.body}
-					theme = {theme}
+					id     = {`${id}_child_2`}
+					label  = "second child"
+					fill   = {alpha(theme.colors.body, 0.1)}
+					theme  = {theme}
+					margin = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 				/>,
 				<DemoChildBox
 					id    = {`${id}_child_3`}
 					label = "third child"
-					fill  = {theme.colors.body}
+					fill  = {alpha(theme.colors.body, 0.1)}
 					theme = {theme}
 				/>,
 			]

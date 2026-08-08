@@ -11,23 +11,32 @@ type RowProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/**
 	 * Gap between children. Defaults to `theme.spacing`. Pass `0` to disable.
-	 * Non-wrap rows use spacer entities. Wrap rows use padded cell wrappers so
-	 * sticky `%` cols still pack 12-wide without early wrap.
+	 * Rows with `cols` children use padded cell wrappers so sticky `%` spans
+	 * pack 12-wide without overflow. Content-sized (no `cols`) non-wrap rows
+	 * use spacer entities; wrap rows always use padded wrappers.
 	 */
 	spacing?    : number
 }
 
 
 // MARK: Row
-/** Horizontal flex stack; always full parent width. Narrow content with a `Column` child. */
+/**
+ * Horizontal flex stack; always full parent width. Narrow content with a `Column` child.
+ *
+ * Prefer layout shorthands (`flexWrap`, `alignItems`, `justifyContent`, `padding`,
+ * `margin`, …) over nesting `uiTransform`. Default `flexWrap` is Yoga/`nowrap` —
+ * children stay on one line and overflow rather than wrapping; set `flexWrap="wrap"`
+ * for inventory-style grids.
+ */
 export function Row({
 	children,
 	uiTransform,
 	spacing,
+	flexWrap,
 	...props
 }: RowProps) {
 	const edge   = uiTransform?.flexDirection === 'row-reverse' ? 'left' : 'right'
-	const isWrap = uiTransform?.flexWrap === 'wrap'
+	const isWrap = (flexWrap ?? uiTransform?.flexWrap) === 'wrap'
 	const gap    = spacing ?? getTheme().spacing
 	const body   = isWrap
 		? applyWrapRowGutters(children, gap)
@@ -36,6 +45,7 @@ export function Row({
 	return (
 		<UiBox
 			{...props}
+			flexWrap={flexWrap}
 			uiTransform={{
 				height        : 'auto',
 				width         : '100%',

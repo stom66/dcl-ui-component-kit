@@ -1,20 +1,31 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, type UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { lighten } from '../../utils'
+import { alpha } from '../../utils/colors'
 import { UiBox, type UiBoxProps } from '../base'
 
 
-type DividerProps = UiBoxProps & {
-	children? : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	color?    : Color4
-	margin?   : { top?: number, bottom?: number, left?: number, right?: number }
-	thickness?: number
-	width?    : PositionUnit | "auto" | undefined
+type DividerMargin = {
+	top?   : number
+	bottom?: number
+	left?  : number
+	right? : number
 }
 
+type DividerProps = Omit<UiBoxProps, 'margin' | 'color' | 'width' | 'uiTransform'> & {
+	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+	/** Line fill color. Defaults to `theme.colors.light` at 0.5 alpha. */
+	color?      : Color4
+	margin?     : DividerMargin
+	thickness?  : number
+	width?      : PositionUnit | 'auto' | undefined
+	uiTransform?: UiTransformProps
+}
+
+
 // MARK: Divider
+/** Horizontal rule. Prefer `color` / `margin` / `thickness` / `width` shorthands. */
 export const Divider = ({
 	children,
 	color,
@@ -25,24 +36,26 @@ export const Divider = ({
 	uiTransform,
 	...props
 }: DividerProps) => {
-	const theme         = getTheme()
-	const dividerColor  = color ?? theme.colors.light
+	const theme        = getTheme()
+	const dividerColor = color ?? alpha(theme.colors.light, 0.25)
+
+	const transform: UiTransformProps = {
+		width,
+		height      : thickness,
+		margin,
+		borderRadius: thickness / 2,
+		flexShrink  : 0,
+		flexGrow    : 0,
+		...uiTransform,
+	}
 
 	return (
 		<UiBox
 			{...props}
-			uiTransform={{
-				width     : width,
-				height    : thickness,
-				margin    : margin,
-				borderRadius: thickness / 2,
-				flexShrink: 0,
-				flexGrow  : 0,
-				...uiTransform
-			}}
-			uiBackground={{
+			uiTransform  = {transform}
+			uiBackground = {{
 				...uiBackground,
-				color: dividerColor
+				color: dividerColor,
 			}}
 		>
 			{children}

@@ -29,6 +29,8 @@ export const atlasBtnIconsStyled = new TextureAtlas({
 /**
  * Number / operator atlas (`atlas-chars-numbers.png`), top → bottom in the PNG.
  * UV Y is bottom → top, so `char()` inverts row index via `findAtlasCell`.
+ * Default sheet for `IconNumber` — prefer that over `IconString` / `IconCharacter`
+ * when only digits and operators are needed (smaller texture, less overhead).
  *
  * Grid (PNG top → bottom):
  *   / + - ×
@@ -61,9 +63,11 @@ export const atlasCharsNumbers = new TextureAtlas({
 // MARK: atlasCharsSymbols
 /**
  * Symbol atlas (`atlas-chars-symbols.png`), top → bottom in the PNG.
+ * Used by `IconSymbol`, as `IconNumber`'s punctuation fallback, and in the
+ * `IconString` cascade.
  *
  * Grid (PNG top → bottom):
- *   - ' " ;
+ *   . ' " ;
  *   ( ) ! ?
  *   & % @ #
  *   ÷ = $ _
@@ -82,7 +86,11 @@ export const atlasCharsSymbols = new TextureAtlas({
 
 
 // MARK: atlasCharsAlphaNumeric
-/** Alphanumeric atlas (`atlas-chars-alphaNumeric.png`) — 8×8. */
+/**
+ * Alphanumeric atlas (`atlas-chars-alphaNumeric.png`) — 8×8.
+ * Used by `IconCharacter` and as the first cascade sheet for `IconString`
+ * (`a–z`, `A–Z`, `0–9`). Prefer `IconNumber` when digits/operators alone suffice.
+ */
 export const atlasCharsAlphaNumeric = new TextureAtlas({
 	source : 'assets/images/ui-component-kit/atlas-chars-alphaNumeric.png',
 	columns: 8,

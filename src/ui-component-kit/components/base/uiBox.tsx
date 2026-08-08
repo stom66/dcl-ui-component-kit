@@ -5,12 +5,19 @@ import { getTheme } from '../../styles'
 import { resolveAspectDimensions } from '../../utils/aspect'
 import { darken } from '../../utils/colors'
 
+import { mergeTransformShorthands, type UiTransformShorthandProps } from './transformShorthands'
+
 
 type UiEntityBackground = Parameters<typeof UiEntity>[0]['uiBackground']
 type UiEntityTransform  = Parameters<typeof UiEntity>[0]['uiTransform']
 type UiEntityProps      = Parameters<typeof UiEntity>[0]
 
-export type UiComponentKitProps = {
+export type UiComponentKitProps = UiTransformShorthandProps & {
+	/**
+	 * Fill color shorthand → `uiBackground.color`.
+	 * Alias of `backgroundColor` (either works; `backgroundColor` wins if both set).
+	 */
+	color          ?: Color4
 	backgroundColor?: Color4
 	borderColor    ?: Color4
 	borderRadius   ?: number
@@ -174,6 +181,10 @@ function resolveBoxSize(
  *
  * Pass `aspectRatio` with a single axis (`width` / `height` or via `uiTransform`)
  * to derive the other axis in virtual pixels (`vw`/`vh` are converted).
+ *
+ * Layout shorthands (`padding`, `alignItems`, `flexWrap`, …) and fill (`color` /
+ * `backgroundColor`) are preferred over nesting `uiTransform` / `uiBackground`
+ * when a single field is enough. Nested objects remain escape hatches; shorthands win.
  */
 export function UiBox({
 	aspectRatio,
@@ -182,6 +193,7 @@ export function UiBox({
 	borderRadius,
 	borderWidth,
 	children,
+	color,
 	height,
 	onMouseDown,
 	onMouseEnter,
@@ -191,24 +203,76 @@ export function UiBox({
 	uiText,
 	uiTransform,
 	width,
+	// transform shorthands (lifted from uiTransform)
+	display,
+	flex,
+	justifyContent,
+	positionType,
+	alignItems,
+	alignSelf,
+	alignContent,
+	position,
+	padding,
+	margin,
+	minWidth,
+	maxWidth,
+	minHeight,
+	maxHeight,
+	flexWrap,
+	flexBasis,
+	flexGrow,
+	flexShrink,
+	overflow,
+	pointerFilter,
+	opacity,
+	zIndex,
 }: UiBoxProps) {
+	const fill = backgroundColor ?? color
 	const size = resolveBoxSize(width, height, aspectRatio, uiTransform)
+	const mergedTransform = mergeTransformShorthands(
+		undefined,
+		uiTransform,
+		{
+			display,
+			flex,
+			justifyContent,
+			positionType,
+			alignItems,
+			alignSelf,
+			alignContent,
+			position,
+			padding,
+			margin,
+			minWidth,
+			maxWidth,
+			minHeight,
+			maxHeight,
+			flexWrap,
+			flexBasis,
+			flexGrow,
+			flexShrink,
+			overflow,
+			pointerFilter,
+			opacity,
+			zIndex,
+		},
+	)
 
 	return (
 		<UiEntity
 			uiTransform={resolveUiTransform(
 				{
-					...uiTransform,
+					...mergedTransform,
 					...(size.width  !== undefined ? { width : size.width  } : {}),
 					...(size.height !== undefined ? { height: size.height } : {}),
 				},
-				backgroundColor,
+				fill,
 				borderColor,
 				borderRadius,
 				borderWidth,
 				uiBackground
 			)}
-			uiBackground = {resolveUiBackground(uiBackground, backgroundColor)}
+			uiBackground = {resolveUiBackground(uiBackground, fill)}
 			uiText       = {uiText}
 			onMouseDown  = {onMouseDown}
 			onMouseUp    = {onMouseUp}

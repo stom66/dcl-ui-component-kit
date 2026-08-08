@@ -4,16 +4,15 @@
 
 - One layer → one zone (`zone: ZoneType.*`)
 - Implement `body()` only
-- Size / align via forwarded native props (`uiTransform`, `uiBackground`)
+- Size / align via forwarded native props (`uiTransform`, `uiBackground`) on **Layer / Zone**
+- Inside `body()`, prefer component **shorthands** (`color`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
 - Panel chrome via `<Background>` inside `body()`
 
-Real references: `simple.layer.tsx`, `timer.layer.tsx`, `info.layer.tsx`
+Real references: `simple.layer.tsx`, `timer.layer.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`
 
 ## Top-bar timer (preset + uiTransform + Background)
 
 ```tsx
-import { scaleFontSize } from '@dcl/sdk/react-ecs'
-
 export class TimerLayer extends Layer {
 	constructor() {
 		super({
@@ -34,13 +33,12 @@ export class TimerLayer extends Layer {
 		const theme   = getTheme()
 		const seconds = this.props!.get('secondsRemaining') as number
 		return (
-			<Background backgroundColor={theme.colors.primary} borderRadius={8}>
-				<UiBox
-					key="timer-value"
-					uiText={{
-						value   : String(seconds),
-						fontSize: scaleFontSize(theme.typography.size.h1),
-					}}
+			<Background color={theme.colors.primary} borderRadius={8}>
+				<Text
+					key      = "timer-value"
+					value    = {String(seconds)}
+					fontSize = {theme.typography.size.h1}
+					textAlign = "middle-center"
 				/>
 			</Background>
 		)
@@ -89,9 +87,39 @@ super({
 
 Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is unaffected — keep using `uiTransform.height` as needed.
 
-`Row` applies default `theme.spacing` gutters. Partial `cols` use sticky `%` widths (so `flexWrap` works). Wrap rows use padded cell wrappers for gutters; non-wrap rows use spacer entities. Avoid extra horizontal margins on `cols` children inside a spaced non-wrap `Row`.
+`Row` applies default `theme.spacing` gutters. Partial `cols` use sticky `%` widths (so `flexWrap` works). When any child uses `cols`, `Row` applies padded cell wrappers for gutters; content-sized (no `cols`) non-wrap rows use spacer entities. Avoid extra horizontal margins on `cols` children inside a spaced `Row`.
 
-See `demo.layout.layer.tsx` for a full showcase.
+**Equal-cell inventories** — prefer `Grid` (not `flexWrap` + `cols`):
+
+```tsx
+<Grid limit={4} spacing={8}>
+	{items.map((item) => (
+		<Column key={item.id} alignItems="center" justifyContent="center" minHeight={48}>
+			{/* cell content — do not set cols on cells */}
+		</Column>
+	))}
+</Grid>
+```
+
+`limit` = items per row (`direction="horizontal"`, default) or per column (`direction="vertical"`). See `demo.grids.layer.tsx`. For mixed 12-col spans, keep using `Row` / `Column` + `cols` (`demo.layout.layer.tsx`).
+
+## Text / Background shorthands
+
+```tsx
+<Background color={theme.colors.primary} padding={16}>
+	<Column cols={12} alignItems="stretch">
+		<H2 value="Title" />
+		<Text
+			value    = "Body copy"
+			fontSize = {theme.typography.size.small}
+			color    = {theme.colors.light}
+		/>
+		<Code value="const x = 1" />
+	</Column>
+</Background>
+```
+
+`fontSize` takes the theme base number (auto-scaled). `color` on text = font; on `Background` = fill.
 
 ## Close button / framed panel
 
@@ -241,12 +269,17 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 
 ```tsx
 import { exampleIconsAtlas, exampleNumbersAtlas } from '../../exampleThemes/showcase'
-import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconNumber } from '../../components'
+import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconCharacter, IconNumber, IconString, IconSymbol } from '../../components'
 import { getTheme } from '../../styles'
 
 <Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
 <Icon uvs={exampleIconsAtlas.uv.star} color={getTheme().colors.primary} />
+{/* Prefer IconNumber for scores/timers — smallest atlas, least overhead */}
 <IconNumber value={42} atlas={exampleNumbersAtlas} />
+<IconSymbol value="$%#" />
+<IconCharacter value="HELLO" />
+{/* Mixed letters + symbols + numbers — cascades alphanumeric → symbols → numbers */}
+<IconString value="HI $120!" />
 <AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
 ```
 

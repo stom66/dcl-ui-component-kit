@@ -1,5 +1,5 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 import { ButtonImage, Column, getTheme, IconNumber, Label, Layer, ProgressBarImage, Row, ZoneType } from '../../../ui-component-kit'
 import { timers } from '../../../ui-component-kit/utils/timers'
 import { skyChaserProgressBarTextures, startButtonAtlas } from '../atlases'
@@ -66,20 +66,16 @@ export class BottomBarLayer extends Layer {
 
 		return (
 			<Row
-				uiTransform={{
-					height        : '100%',
-					alignItems    : 'center',
-					justifyContent: 'center',
-				}}
+				height         = "100%"
+				alignItems     = "center"
+				justifyContent = "center"
 			>
 				{gameInProgress ? (
 					<Column
-						cols={6}
-						uiTransform={{
-							height        : 'auto',
-							alignItems    : 'stretch',
-							justifyContent: 'center',
-						}}
+						cols           = {6}
+						height         = "auto"
+						alignItems     = "stretch"
+						justifyContent = "center"
 					>
 						<ProgressBarImage
 							key      = "sky_chaser_bottom_timer"
@@ -112,19 +108,13 @@ export class BottomBarLayer extends Layer {
 						}}
 					>
 						<Label
-							value           = "Start Game"
-							backgroundColor = {Color4.create(0, 0, 0, 0)}
-							uiTransform={{
-								height        : '100%',
-								padding       : 0,
-								justifyContent: 'center',
-								alignItems    : 'center',
-							}}
-							uiText={{
-								fontSize : scaleFontSize(theme.typography.size.default),
-								textAlign: 'middle-center',
-								color    : theme.colors.light,
-							}}
+							value     = "Start Game"
+							color     = {Color4.create(0, 0, 0, 0)}
+							height    = "100%"
+							padding   = {0}
+							fontSize  = {theme.typography.size.default}
+							textAlign = "middle-center"
+							uiText    = {{ color: theme.colors.light }}
 						/>
 					</ButtonImage>
 				)}

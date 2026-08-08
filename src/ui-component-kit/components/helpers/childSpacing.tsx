@@ -13,7 +13,7 @@ type ChildList = ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | undefined
  * Flattens nested child arrays (e.g. `{items.map(...)}` next to sibling JSX)
  * so spacing / gutters apply between the real elements, not the array wrapper.
  */
-function flattenChildren(children: ChildList): ReactEcs.JSX.Element[] {
+export function flattenChildren(children: ChildList): ReactEcs.JSX.Element[] {
 	if (children == null) return []
 
 	const list   = Array.isArray(children) ? children : [children]
@@ -29,6 +29,25 @@ function flattenChildren(children: ChildList): ReactEcs.JSX.Element[] {
 	}
 
 	return result
+}
+
+
+// MARK: childHasCols
+/** True when the element opts into the 12-column grid via `cols` / platform overrides. */
+function childHasCols(child: ReactEcs.JSX.Element): boolean {
+	const props = child.props ?? {}
+	return (
+		props.cols !== undefined ||
+		props.colsDesktop !== undefined ||
+		props.colsMobile !== undefined
+	)
+}
+
+
+// MARK: listHasCols
+/** True when any flattened child uses `cols`. */
+function listHasCols(list: ReactEcs.JSX.Element[]): boolean {
+	return list.some(childHasCols)
 }
 
 
@@ -72,6 +91,84 @@ function insertSpacers(
 }
 
 
+// MARK: applyPaddedRowGutters
+/**
+ * Horizontal gutters via padded cell wrappers (not sibling spacers).
+ *
+ * Sticky `%` cols already sum toward 100%; spacer entities would add px on top
+ * and overflow / wrap early. Each child is wrapped in a stably keyed box that
+ * owns the `cols` width and applies half-`spacing` horizontal padding. Cols
+ * children are re-created at `width: 100%` with `cols` cleared so chrome fills
+ * the inner area.
+ *
+ * When `lineGap` is true (wrap rows), also applies `margin.bottom = gap` between
+ * wrapped lines.
+ */
+function applyPaddedRowGutters(
+	list   : ReactEcs.JSX.Element[],
+	gap    : number,
+	lineGap: boolean,
+): ReactEcs.JSX.Element[] {
+	const pad = gap / 2
+
+	return list.map((child, i) => {
+		const key     = (child.key as string | undefined) ?? `__rowgutter_${i}`
+		const props   = child.props ?? {}
+		const hasCols = childHasCols(child)
+		const colSelf = hasCols
+			? getColSelfTransform(props.cols, props.colsDesktop, props.colsMobile, 'none')
+			: undefined
+
+		// Fill the padded cell. Set both `width` (shorthand) and `uiTransform.width`
+		// so ButtonText / Label / Column pick up 100% whether they read either path.
+		// Direct kit primitives only — intermediate wrappers must forward these props.
+		const inner = colSelf
+			? ReactEcs.createElement(child.type, {
+				...props,
+				key         : `${key}__fill`,
+				cols        : undefined,
+				colsDesktop : undefined,
+				colsMobile  : undefined,
+				width       : '100%',
+				uiTransform : {
+					...props.uiTransform,
+					width     : '100%',
+					flexGrow  : 0,
+					flexShrink: 0,
+					maxWidth  : undefined,
+					flexBasis : undefined,
+				},
+			})
+			: child
+
+		return (
+			<UiBox
+				key={key}
+				uiTransform={{
+					...(colSelf !== undefined ? {
+						width     : colSelf.width,
+						flexGrow  : colSelf.flexGrow,
+						flexShrink: colSelf.flexShrink,
+						...(colSelf.flexBasis !== undefined ? { flexBasis: colSelf.flexBasis } : {}),
+					} : {
+						flexGrow  : 0,
+						flexShrink: 0,
+					}),
+					padding       : { left: pad, right: pad },
+					...(lineGap ? { margin: { bottom: gap } } : {}),
+					display       : 'flex',
+					flexDirection : 'column',
+					alignItems    : 'stretch',
+					justifyContent: 'flex-start',
+				}}
+			>
+				{inner}
+			</UiBox>
+		)
+	})
+}
+
+
 // MARK: applySpacingToChildren
 /**
  * Gap between stacked children via spacer entities (not child margin clones).
@@ -89,9 +186,12 @@ export function applySpacingToChildren(
 
 // MARK: applyRowChildSpacing
 /**
- * Horizontal gutters via spacer entities. Partial `cols` children use sticky
- * `%` widths (`getColSelfTransform`). Do not use with `flexWrap` — use
- * `applyWrapRowGutters` instead.
+ * Horizontal gutters for non-wrap rows.
+ *
+ * When any child uses `cols`, applies padded cell wrappers so sticky `%` spans
+ * that sum to 12 stay inside the parent (sibling spacers would overflow).
+ * Otherwise inserts spacer entities between content-sized children.
+ * Do not use with `flexWrap` — use `applyWrapRowGutters` instead.
  */
 export function applyRowChildSpacing(
 	children: ChildList,
@@ -105,6 +205,10 @@ export function applyRowChildSpacing(
 
 	if (!gap) {
 		return list
+	}
+
+	if (listHasCols(list)) {
+		return applyPaddedRowGutters(list, gap, false)
 	}
 
 	return insertSpacers(list, gap, edge)
@@ -132,60 +236,5 @@ export function applyWrapRowGutters(
 		return list
 	}
 
-	const pad = gap / 2
-
-	return list.map((child, i) => {
-		const key   = (child.key as string | undefined) ?? `__wrapgutter_${i}`
-		const props = child.props ?? {}
-		const hasCols =
-			props.cols !== undefined ||
-			props.colsDesktop !== undefined ||
-			props.colsMobile !== undefined
-		const colSelf = hasCols
-			? getColSelfTransform(props.cols, props.colsDesktop, props.colsMobile, 'none')
-			: undefined
-
-		const inner = colSelf
-			? ReactEcs.createElement(child.type, {
-				...props,
-				key         : `${key}__fill`,
-				cols        : undefined,
-				colsDesktop : undefined,
-				colsMobile  : undefined,
-				uiTransform : {
-					...props.uiTransform,
-					width     : '100%',
-					flexGrow  : 0,
-					flexShrink: 0,
-					maxWidth  : undefined,
-					flexBasis : undefined,
-				},
-			})
-			: child
-
-		return (
-			<UiBox
-				key={key}
-				uiTransform={{
-					...(colSelf !== undefined ? {
-						width     : colSelf.width,
-						flexGrow  : colSelf.flexGrow,
-						flexShrink: colSelf.flexShrink,
-						...(colSelf.flexBasis !== undefined ? { flexBasis: colSelf.flexBasis } : {}),
-					} : {
-						flexGrow  : 0,
-						flexShrink: 0,
-					}),
-					padding       : { left: pad, right: pad },
-					margin        : { bottom: gap },
-					display       : 'flex',
-					flexDirection : 'column',
-					alignItems    : 'stretch',
-					justifyContent: 'flex-start',
-				}}
-			>
-				{inner}
-			</UiBox>
-		)
-	})
+	return applyPaddedRowGutters(list, gap, true)
 }

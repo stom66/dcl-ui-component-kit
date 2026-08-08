@@ -50,7 +50,7 @@ Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them 
 
 - Zone size / flex → `uiTransform: { width, height, alignItems, justifyContent, … }`
 - Panel fill / border → `<Background>` inside `body()` (not Layer options)
-- Background fill shorthand → `backgroundColor`
+- Background fill shorthand → `color` (or `backgroundColor`)
 - Background border → `borderColor` / `borderWidth` / `borderRadius`
 - Background texture → `textureSrc`
 
@@ -71,7 +71,7 @@ super({
 })
 
 // in body():
-<Background backgroundColor={getTheme().colors.primary} borderRadius={8}>
+<Background color={getTheme().colors.primary} borderRadius={8}>
 	{/* … */}
 </Background>
 ```
@@ -86,6 +86,38 @@ super({
 | Close control | `showCloseButton: true` (Layer option → Zone inserts button) |
 
 **Anti-pattern:** adding Layer shorthand fields (`backgroundColor`, `borderRadius`, `themeBackground`, `widthVw`, `showFrame`, …). Use `uiTransform` / `uiBackground` on the Zone, and `Background` for panel chrome.
+
+### Component shorthands (prefer over nesting)
+
+On kit components built on `UiBox`, **prefer top-level shorthands** over nesting `uiTransform` / `uiBackground` / `uiText` when a single field is enough. Nested objects remain escape hatches; shorthands win on conflict.
+
+| Component | Prefer | Instead of |
+|---|---|---|
+| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize: scaleFontSize(…), … }}` |
+| `Background` / `Row` / `Column` / `UiBox` fill | `color` (or `backgroundColor`) | `uiBackground={{ color }}` |
+| Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
+| Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
+| `Label` | `value`, `fontSize`, `font`, `textAlign`, `textWrap`; **`color` = chip fill** (not font) | nesting `uiText` for size/align; use `uiText.color` for font tint |
+
+**`fontSize` shorthand** takes a **theme base px** number (e.g. `theme.typography.size.small`) and auto-wraps `scaleFontSize` inside the component. Do **not** pre-scale when using the shorthand. If you nest `uiText.fontSize`, you must still call `scaleFontSize` yourself.
+
+```tsx
+// GOOD
+<Text value="Hello" fontSize={theme.typography.size.small} color={theme.colors.light} />
+<Background color={theme.colors.primary} borderRadius={8} padding={16}>
+	<Column cols={12} alignItems="stretch" spacing={8}>
+		<Row flexWrap="wrap" alignItems="flex-start">
+			{/* … */}
+		</Row>
+	</Column>
+</Background>
+
+// AVOID when a shorthand exists
+<Text value="Hello" uiText={{ fontSize: scaleFontSize(theme.typography.size.small) }} />
+<Background uiBackground={{ color: theme.colors.primary }} uiTransform={{ padding: 16 }}>
+```
+
+**`color` context:** on text components → font color; on `Background` / `Row` / `Column` / `UiBox` → fill (`uiBackground.color`); on `Label` → chip fill; on `Icon` → texture tint.
 
 ### Row / Column width (`cols` — required for grid widths)
 
@@ -135,7 +167,23 @@ super({
 
 **Nesting rule:** any `Column` that hosts children with `cols={…}` (or `width: '…%'`) must itself have a **definite** width — typically `cols={12}` on a vertical stack, or a parent that already spans / fills. A `Column` with `cols="auto"` only gets a definite width when it is a `Row` child. Nested `Row`s are always 100% of that parent Column.
 
-**Row spacing + `cols`:** A `Row` defaults to `theme.spacing` gutters. Partial `cols` (1–11) use sticky **`width: n/12%`** so `flexWrap` works and under-filled rows leave empty space. Non-wrap rows use spacer entities between children. When `flexWrap: 'wrap'`, `Row` uses **padded cell wrappers** instead (spacers would add px on top of 100% and wrap early) — `spacing` still controls the gutter. Do **not** add extra horizontal `margin` on `cols` children inside a spaced non-wrap `Row`.
+**Row spacing + `cols`:** A `Row` defaults to `theme.spacing` gutters. Partial `cols` (1–11) use sticky **`width: n/12%`** so `flexWrap` works and under-filled rows leave empty space. When any child uses `cols` (wrap or not), `Row` applies **padded cell wrappers** so a full 12-wide line stays inside the parent — sibling spacers would add px on top of 100% and overflow / wrap early. Content-sized (no `cols`) non-wrap rows still use spacer entities. Do **not** add extra horizontal `margin` on `cols` children inside a spaced `Row`.
+
+**Agent trap — wrapper components in a `cols` Row:** padded gutters re-create each child with `cols` cleared and `width: '100%'` / `uiTransform.width: '100%'` so chrome fills the cell. Put `ButtonText` / `Column` / `Label` **directly** in the `Row`, or any custom wrapper **must forward** `cols`, `width`, and `uiTransform`. A wrapper that only passes `cols` alone will drop the fill and fall back to aspect-ratio / content sizing (buttons look tiny with huge side gaps).
+
+**`flexWrap` default:** Yoga / DCL default is **`nowrap`**. Without `flexWrap="wrap"`, children stay on one line — with sticky `cols` + `flexShrink: 0` they **overflow / spill past the end** rather than wrapping or shrinking into place.
+
+**Equal-cell inventories — prefer `Grid`:** For icon boards / inventories where every cell is the same size, use **`<Grid limit={n}>`** instead of `Row` + `flexWrap` + sticky `cols`. `Grid` chunks children into tracks of `limit`, shares width with `flexGrow`, and uses normal spacer gutters (no padded `cols` wrappers). Optional `direction="vertical"` fills columns top-to-bottom; `padIncomplete={false}` lets a short final track share space among leftover items. Optional `cols` sizes the whole grid inside a parent `Row` (same as `Column`).
+
+```tsx
+<Grid limit={4} spacing={8}>
+	{items.map((item) => (
+		<Column key={item.id} /* cell chrome — no cols */ />
+	))}
+</Grid>
+```
+
+Reserve `Row` + `flexWrap` + `cols` for mixed 12-col spans (unequal cell widths). DCL has no CSS `gap`, so sticky `%` widths that sum to 100% still need padded wrappers when spaced.
 
 Optional platform overrides: `colsDesktop` / `colsMobile`. `uiTransform.height` is unrelated — keep using it for vertical size.
 
@@ -151,8 +199,15 @@ travel). They convert against the **virtual** canvas — never the physical scre
 Theme `typography.size.*` values are **base pixel numbers only**. They must never call
 `scaleFontSize` — theme / `buildTheme` run once at load, before canvas size is known.
 
-**Every `fontSize` assignment in TSX must wrap the base size with `scaleFontSize` at
-render time** (when the UI function / `body()` runs and canvas info exists):
+**Prefer the `fontSize` shorthand** on `Text` / `H*` / `Code` / `Label` / etc. Pass the
+theme base number; the component calls `scaleFontSize` for you:
+
+```tsx
+<Text value="Hello" fontSize={theme.typography.size.default} />
+```
+
+If you nest `uiText.fontSize` (escape hatch), you **must** wrap with `scaleFontSize` at
+render time (when the UI function / `body()` runs and canvas info exists):
 
 ```tsx
 import { scaleFontSize } from '@dcl/sdk/react-ecs'
@@ -169,9 +224,10 @@ arg is an optional `ScaleContext` object, not a unit.
 
 | Wrong | Right |
 |---|---|
-| `fontSize: theme.typography.size.h1` | `fontSize: scaleFontSize(theme.typography.size.h1)` |
-| `scaleFontSize(...)` inside `defaultTheme` / `buildTheme` | Keep theme sizes as plain numbers; wrap only in TSX |
-| Raw `fontSize` in a Layer `body()` or `uiText` override | Always `scaleFontSize(...)` |
+| `fontSize={scaleFontSize(theme.typography.size.h1)}` on Text shorthand | `fontSize={theme.typography.size.h1}` (auto-scaled) |
+| `uiText={{ fontSize: theme.typography.size.h1 }}` | `uiText={{ fontSize: scaleFontSize(theme.typography.size.h1) }}` or use shorthand |
+| `scaleFontSize(...)` inside `defaultTheme` / `buildTheme` | Keep theme sizes as plain numbers |
+| Pre-scaling the shorthand | Pass the raw theme number |
 
 If a caller overrides `uiText.fontSize`, that override must also use `scaleFontSize`.
 
@@ -207,8 +263,12 @@ export const myLayer = new MyLayer()
 | Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / `<Background>` |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
-| Bare `fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` |
+| Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `color`, `flexWrap`, `padding`, …) |
+| `fontSize={scaleFontSize(theme.typography.size.*)}` on Text shorthand | `fontSize={theme.typography.size.*}` (component scales) |
+| Bare `uiText.fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` or use the shorthand |
 | `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**); `Row` is always full width |
+| Inventory / equal-cell board built with `Row` + `flexWrap` + `cols` | Prefer `<Grid limit={n}>` — equal cells, spacer gutters, no padded wrappers |
+| Inventory `Row` without `flexWrap` expecting multi-line layout | Use `Grid`, or set `flexWrap="wrap"` — default is `nowrap` (overflow / spill) |
 | Text/`H*`/`Code` crushed / overlapping in a height-capped `Column` | Keep kit defaults: `flexShrink: 0`, `minHeight` from font size, `alignSelf: 'flex-start'` — Yoga’s default `flexShrink: 1` collapses `height: 'auto'` text to 0 |
 | Layer `height: 'auto'` with default `<Background>` (absolute) | `<Background fitContent>` so chrome contributes in-flow height |
 
@@ -227,7 +287,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` | `textures?` (per-layer optional) / `atlas` + `uvCell` |
-| Icons | — | `Icon` / `IconNumber` / `AvatarIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); tint with `color` (not `backgroundColor`); `atlas` on `IconNumber`; `userId` on `AvatarIcon` |
+| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); tint with `color` (not `backgroundColor`); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -472,15 +532,17 @@ export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: 
 
 ```tsx
 <Background
-	backgroundColor = {theme.colors.primary}
-	borderRadius    = {8}
-	textureSrc      = "assets/images/panel.png"
+	color        = {theme.colors.primary}
+	borderRadius = {8}
+	textureSrc   = "assets/images/panel.png"
+	padding      = {16}
 >
 	{children}
 </Background>
 ```
 
 Defaults: fills parent via absolute insets, theme body fill, theme border width/radius, no padding.
+Prefer `color` over `backgroundColor` / `uiBackground.color`; prefer layout shorthands (`padding`, `alignItems`, …) over nesting `uiTransform`.
 
 ### Auto-height layers (`height: 'auto'`)
 
@@ -530,6 +592,26 @@ atlasIconsFontAwesome.cell({ xStart: 1, yStart: 1 }) // first cell
 atlasIconsFontAwesome.row(1)                         // full bottom row
 atlasIconsFontAwesome.column(1)                      // full first column
 atlasCharsNumbers.char('5', { insetX: 0.15 })
+```
+
+### Atlas glyph text (`IconNumber` / `IconSymbol` / `IconCharacter` / `IconString`)
+
+Image-based “font” rows from the bundled char atlases. Prefer the **narrowest** component that covers the charset — larger sheets cost more texture overhead:
+
+| Component | Default atlas | Use when |
+|---|---|---|
+| `IconNumber` | `atlasCharsNumbers` (+ symbols fallback for punctuation like `=`) | Scores, timers, formulas — **prefer this** when digits/operators are enough |
+| `IconSymbol` | `atlasCharsSymbols` | Punctuation / symbols only |
+| `IconCharacter` | `atlasCharsAlphaNumeric` | Letters (`a–z` / `A–Z`) and digits from that sheet |
+| `IconString` | Cascade: alphanumeric → symbols → numbers | Arbitrary mixed strings |
+
+Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols, numbers }}` on `IconString`.
+
+```tsx
+<IconNumber value={1250} height={32} />
+<IconSymbol value="$%#" height={32} />
+<IconCharacter value="HELLO" height={32} />
+<IconString value="Score: 120/2=60!" height={32} />
 ```
 
 `ProgressBarImage` can use full nine-slice textures (`textures.*`), an atlas UV fill (`atlas` + `uvCell`), or procedural colours per layer. Omit both `textures` and `atlas` for the built-in horizontal/vertical sets from `fillFrom` / `orientation`.

@@ -26,29 +26,25 @@ export class DemoButtonsLayer extends Layer {
 		return (
 			<Background>
 				<Column
-					cols={12}
-					uiTransform={{
-						height        : '100%',
-						alignItems    : 'stretch',
-						justifyContent: 'flex-start',
-						padding       : { top: 16, right: 20, bottom: 16, left: 20 },
-					}}
+					cols           = {12}
+					height         = "100%"
+					alignItems     = "stretch"
+					justifyContent = "flex-start"
+					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 				>
 					<H2 value="Buttons" />
 					<Text value="ButtonText for labelled controls; ButtonImage for atlas icons." />
 
-					<Divider uiTransform={{ margin: { top: 8, bottom: 8 } }} />
+					<Divider margin={{ top: 8, bottom: 8 }} />
 
 					<Label
-						cols        = {12}
-						value       = "ButtonText"
-						uiTransform = {{ margin: { bottom: 8 } }}
+						cols   = {12}
+						value  = "ButtonText"
+						margin = {{ bottom: 8 }}
 					/>
 					<Row
-						uiTransform={{
-							justifyContent: 'flex-start',
-							alignItems    : 'center',
-						}}
+						justifyContent = "flex-start"
+						alignItems     = "center"
 					>
 						<ButtonText
 							id        = "demo_btn_text_primary"
@@ -73,11 +69,9 @@ export class DemoButtonsLayer extends Layer {
 					</Row>
 
 					<Row
-						uiTransform={{
-							justifyContent: 'flex-start',
-							alignItems    : 'center',
-							margin        : { top: 4 },
-						}}
+						justifyContent = "flex-start"
+						alignItems     = "center"
+						margin         = {{ top: 4 }}
 					>
 						<ButtonText
 							id              = "demo_btn_text_info"
@@ -102,19 +96,17 @@ export class DemoButtonsLayer extends Layer {
 						/>
 					</Row>
 
-					<Divider uiTransform={{ margin: { top: 16, bottom: 8 } }} />
+					<Divider margin={{ top: 16, bottom: 8 }} />
 
 					<Label
-						cols        = {12}
-						value       = "ButtonImage (atlas columns)"
-						uiTransform = {{ margin: { bottom: 8 } }}
+						cols   = {12}
+						value  = "ButtonImage (atlas columns)"
+						margin = {{ bottom: 8 }}
 					/>
 					<Row
-						uiTransform={{
-							height        : 80,
-							justifyContent: 'flex-start',
-							alignItems    : 'center',
-						}}
+						height         = {80}
+						justifyContent = "flex-start"
+						alignItems     = "center"
 					>
 						<ButtonImage
 							id          = "demo_btn_image_0"
@@ -125,8 +117,8 @@ export class DemoButtonsLayer extends Layer {
 							uiTransform = {{
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
-								margin      : { left: 8, right: 8 },
 							}}
+							margin      = {{ left: 8, right: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_1"
@@ -137,8 +129,8 @@ export class DemoButtonsLayer extends Layer {
 							uiTransform = {{
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
-								margin      : { left: 8, right: 8 },
 							}}
+							margin      = {{ left: 8, right: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_2"
@@ -149,8 +141,8 @@ export class DemoButtonsLayer extends Layer {
 							uiTransform = {{
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
-								margin      : { left: 8, right: 8 },
 							}}
+							margin      = {{ left: 8, right: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_3"
@@ -161,8 +153,8 @@ export class DemoButtonsLayer extends Layer {
 							uiTransform = {{
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
-								margin      : { left: 8, right: 8 },
 							}}
+							margin      = {{ left: 8, right: 8 }}
 						/>
 					</Row>
 				</Column>

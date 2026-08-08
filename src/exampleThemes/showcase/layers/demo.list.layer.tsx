@@ -60,18 +60,16 @@ export class DemoListLayer extends Layer {
 		return (
 			<Background fitContent>
 				<Column
-					cols        = {12}
-					spacing     = {8}
-					uiTransform = {{
-						alignItems    : 'stretch',
-						justifyContent: 'flex-start',
-						padding       : { top: 16, right: 20, bottom: 16, left: 20 },
-					}}
+					cols           = {12}
+					spacing        = {8}
+					alignItems     = "stretch"
+					justifyContent = "flex-start"
+					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 				>
 					<H2 value="List / Scoreboard" />
 					<Text
-						value       = "Column of rows — cols 1 + 1 + 1 + 6 + 3. Avatar after rank; ranks and scores use IconNumber. Row 4 uses FlashBorder."
-						uiTransform = {{ margin: { bottom: 12 } }}
+						value  = "Column of rows — cols 1 + 1 + 1 + 6 + 3. Avatar after rank; ranks and scores use IconNumber. Row 4 uses FlashBorder."
+						margin = {{ bottom: 12 }}
 					/>
 					{SCOREBOARD.map((entry, index) => this.renderRow(entry, index, theme))}
 				</Column>
@@ -94,23 +92,19 @@ export class DemoListLayer extends Layer {
 
 		const row = (
 			<Row
-				key             = {`score-row-${rank}`}
-				backgroundColor = {fill}
-				borderRadius    = {theme.border.radiusDefault}
-				borderWidth     = {flashBorder ? theme.border.width : 0}
-				borderColor     = {flashBorder ? alpha(lighten(fill, 0.75), 0.5) : undefined}
-				uiTransform     = {{
-					alignItems: 'center',
-					padding   : { top: 6, right: 10, bottom: 6, left: 10 },
-				}}
+				key          = {`score-row-${rank}`}
+				color        = {fill}
+				borderRadius = {theme.border.radiusDefault}
+				borderWidth  = {flashBorder ? theme.border.width : 0}
+				borderColor  = {flashBorder ? alpha(lighten(fill, 0.75), 0.5) : undefined}
+				alignItems   = "center"
+				padding      = {{ top: 6, right: 10, bottom: 6, left: 10 }}
 			>
 				{/* Icon — cols 1; blank spacer keeps alignment for rows without an icon */}
 				<Column
-					cols={1}
-					uiTransform={{
-						alignItems    : 'flex-start',
-						justifyContent: 'center',
-					}}
+					cols           = {1}
+					alignItems     = "flex-start"
+					justifyContent = "center"
 				>
 					{entry.icon ? (
 						<Icon
@@ -124,22 +118,18 @@ export class DemoListLayer extends Layer {
 
 				{/* Rank — cols 1 */}
 				<Column
-					cols        = {1}
-					uiTransform = {{
-						alignItems    : 'flex-start',
-						justifyContent: 'center',
-					}}
+					cols           = {1}
+					alignItems     = "flex-start"
+					justifyContent = "center"
 				>
 					<IconNumber value={rank} height={ICON_SIZE} />
 				</Column>
 
 				{/* Avatar — cols 1 */}
 				<Column
-					cols        = {1}
-					uiTransform = {{
-						alignItems    : 'flex-start',
-						justifyContent: 'center',
-					}}
+					cols           = {1}
+					alignItems     = "flex-start"
+					justifyContent = "center"
 				>
 					<AvatarIcon
 						userId = {entry.userId}
@@ -150,25 +140,21 @@ export class DemoListLayer extends Layer {
 
 				{/* Name — cols 6; nowrap so short names stay on one line in the row */}
 				<Column
-					cols        = {6}
-					uiTransform = {{
-						alignItems    : 'flex-start',
-						justifyContent: 'center',
-					}}
+					cols           = {6}
+					alignItems     = "flex-start"
+					justifyContent = "center"
 				>
 					<Text
-						value  = {entry.name}
-						uiText = {{ textWrap: 'nowrap' }}
+						value    = {entry.name}
+						textWrap = "nowrap"
 					/>
 				</Column>
 
 				{/* Score — cols 3, right-aligned */}
 				<Column
-					cols        = {3}
-					uiTransform = {{
-						alignItems    : 'flex-end',
-						justifyContent: 'center',
-					}}
+					cols           = {3}
+					alignItems     = "flex-end"
+					justifyContent = "center"
 				>
 					<IconNumber value={formatScore(entry.score)} height={ICON_SIZE} />
 				</Column>

@@ -43,29 +43,50 @@ Primary layout primitive — themed `UiEntity` wrapper.
 
 | Option | Type | Description |
 |---|---|---|
-| `backgroundColor` | `Color4` | Fill shorthand |
+| `color` / `backgroundColor` | `Color4` | Fill shorthand → `uiBackground.color` (`backgroundColor` wins if both) |
 | `borderColor` / `borderWidth` / `borderRadius` | — | Border shorthands |
 | `aspectRatio` | `number` | Derive missing axis |
 | `width` / `height` | `PositionUnit` | Size |
-| `uiTransform` / `uiBackground` / `uiText` | native | Forwarded to `UiEntity` |
+| `flexWrap` / `alignItems` / `justifyContent` / `padding` / `margin` / … | — | Layout shorthands (lifted from `uiTransform`; shorthands win) |
+| `uiTransform` / `uiBackground` / `uiText` | native | Escape hatches |
 | `children` | JSX | Content |
 
-Also exported as type `UiComponentKitProps` for the shared shorthand subset.
+Prefer shorthands over nesting when a single field is enough. Also exported as type `UiComponentKitProps` for the shared shorthand subset.
 
 ---
 
 ## Layout & chrome
 
-Widths: prefer **`cols`** on `Row` / `Column` / `Label` / `ButtonText` (`cols={12}` = full). A parent that hosts nested `cols` children needs a definite width (usually `cols={12}`).
+Widths: prefer **`cols`** on `Column` / `Label` / `ButtonText` (`cols={12}` = full). **`Row` is always full parent width** (no `cols`). A parent that hosts nested `cols` children needs a definite width (usually `cols={12}`).
 
 ### `Row` / `RowReverse` / `Column` / `ColumnReverse`
 
 | Option | Type | Description |
 |---|---|---|
-| `cols` | `number` | 12-column span |
-| `colsDesktop` / `colsMobile` | `number` | Responsive spans |
-| `uiTransform` / `uiBackground` | native | Layout / fill |
+| `cols` | `number \| 'auto'` | 12-column span (`Column` only; omit = no grid sizing) |
+| `colsDesktop` / `colsMobile` | same | Responsive spans |
+| `spacing` | `number` | Gap between children (default `theme.spacing`) |
+| `flexWrap` / `alignItems` / `justifyContent` / `padding` / `margin` / … | — | Layout shorthands (prefer over `uiTransform`) |
+| `color` / `backgroundColor` | `Color4` | Fill shorthand |
+| `uiTransform` / `uiBackground` | native | Escape hatches |
 | `children` | JSX | Content |
+
+`Row` defaults to `flexWrap: nowrap` — children stay on one line and overflow. For **equal-cell** inventories prefer `Grid` (below). `flexWrap="wrap"` + sticky `cols` is for mixed 12-col spans only.
+
+### `Grid`
+
+Equal-cell grid (inventories / icon boards). Chunks children into tracks of `limit`; cells share size via `flexGrow` and use spacer gutters (no padded `cols` wrappers).
+
+| Option | Type | Description |
+|---|---|---|
+| `limit` | `number` | Items per row (`horizontal`) or per column (`vertical`) — required |
+| `direction` | `'horizontal' \| 'vertical'` | Flow axis (default `horizontal`) |
+| `padIncomplete` | `boolean` | Pad short final tracks so cell size matches a full track (default `true`) |
+| `spacing` | `number` | Gap between cells / tracks (default `theme.spacing`) |
+| `cols` / `colsDesktop` / `colsMobile` | `number \| 'auto'` | Size the whole grid in a parent `Row` (same as `Column`) |
+| `color` / `backgroundColor` | `Color4` | Fill shorthand |
+| `uiTransform` / `uiBackground` | native | Escape hatches |
+| `children` | JSX | Cell content — do **not** set `cols` on cells |
 
 ### `Background`
 
@@ -75,10 +96,11 @@ Default layout is absolute fill (for fixed-size Zones). Use `fitContent` when th
 
 | Option | Type | Description |
 |---|---|---|
-| `backgroundColor` | `Color4` | Fill |
+| `color` / `backgroundColor` | `Color4` | Fill (`color` preferred) |
 | `borderColor` / `borderWidth` / `borderRadius` | — | Border |
 | `textureSrc` | `string` | Optional texture |
 | `fitContent` | `boolean` | Size to children (required for Layer `height: 'auto'`) |
+| `padding` / `alignItems` / … | — | Layout shorthands |
 | `children` | JSX | Panel content |
 
 ### `BackgroundGradient`
@@ -216,17 +238,19 @@ Nine-slice note: corners keep absolute size from `texture size × slice fraction
 
 ## Text
 
-| Component | Options | Role |
+Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme base px** number and is auto-scaled inside the component. `color` here is **font color** (not fill).
+
+| Component | Shorthands | Role |
 |---|---|---|
-| `Text` | `value`, `color`, `fontSize`, … | Body text |
-| `Code` | `value`, … | Monospace |
-| `Header` | `value`, `color?` | Panel title (h2-sized) |
-| `SectionHeader` | `value`, `color?` | Section title in a panel |
-| `H1` … `H6` | `value`, `color?` | Heading levels from theme |
+| `Text` | `value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap` | Body text |
+| `Code` | same | Monospace |
+| `Header` | same | Panel title (h2-sized) |
+| `SectionHeader` | same | Section title in a panel |
+| `H1` … `H6` | same | Heading levels from theme |
 
 ```tsx
 <H2 value="Settings" />
-<Text value="Choose a difficulty." />
+<Text value="Choose a difficulty." fontSize={theme.typography.size.small} />
 <Code value="score = 42" />
 ```
 
@@ -234,7 +258,7 @@ Nine-slice note: corners keep absolute size from `texture size × slice fraction
 
 ## Icons
 
-**Variants:** `Icon` / `IconNumber` · `AvatarIcon`
+**Variants:** `Icon` / `IconNumber` · `AvatarIcon` · `SpriteIcon`
 
 ### `Icon`
 
@@ -258,6 +282,58 @@ import { Icon, atlasIconsFontAwesome, getTheme } from '@stom66/dcl-ui-component-
 |---|---|---|
 | `userId` | `string` | Player id (lowercased); omit → `DEFAULT_AVATAR_USER_ID` |
 | `width` / `height` | number | Size |
+
+### `SpriteIcon`
+
+Animated sprite-sheet icon. Plays cells left → right, top → bottom at `fps`.
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique playback key (required) |
+| `atlas` | `TextureAtlas` | Supplies `src` / `columns` / `rows` when omitted |
+| `src` | `string` | Sheet path (required without `atlas`) |
+| `columns` / `rows` | `number` | Grid size (required without `atlas`) |
+| `fps` | `number` | Frames per second (default `columns * rows`) |
+| `offset` | `number` | 0-based frames to skip from the start of the sheet |
+| `limit` | `number` | How many cells to play after `offset` |
+| `pingPong` | `boolean` | Reverse at the end of the window instead of wrapping |
+| `loopInterval` | `number` | Seconds to rest between loops (holds last frame; default `0`) |
+| `playing` / `looping` | `boolean` | Playback controls — `looping={false}` = one-shot |
+
+Trigger externally with `setPlaying(id, true|false)` or `playOnce(id)` (e.g. on hover). Keep `playing={false}` stable on the element so helpers are not overwritten each frame.
+
+```tsx
+import { playOnce, setPlaying, SpriteIcon } from '@stom66/dcl-ui-component-kit'
+
+<SpriteIcon
+	id           = "spin-full"
+	atlas        = {exampleSpriteSheetAtlas}
+	fps          = {12}
+	loopInterval = {0.5}
+	width        = {64}
+	height       = {64}
+/>
+
+<SpriteIcon
+	id           = "spin-hover"
+	atlas        = {exampleSpriteSheetAtlas}
+	playing      = {false}
+	onMouseEnter = {() => setPlaying('spin-hover', true)}
+	onMouseLeave = {() => setPlaying('spin-hover', false)}
+	width        = {64}
+	height       = {64}
+/>
+
+<SpriteIcon
+	id           = "spin-once"
+	atlas        = {exampleSpriteSheetAtlas}
+	playing      = {false}
+	looping      = {false}
+	onMouseEnter = {() => playOnce('spin-once')}
+	width        = {64}
+	height       = {64}
+/>
+```
 
 ### `IconNumber`
 

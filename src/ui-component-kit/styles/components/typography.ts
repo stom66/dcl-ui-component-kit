@@ -26,15 +26,15 @@ export type ThemeTypography = {
 
 export const typography: ThemeTypography = {
 	size: {
-		code   : 12,
-		default: 14,
-		small  : 10,
-		h1     : 48,
-		h2     : 36,
-		h3     : 18,
-		h4     : 16,
-		h5     : 14,
-		h6     : 12,
+		code   : 4,
+		default: 10,
+		small  : 8,
+		h1     : 40,
+		h2     : 28,
+		h3     : 16,
+		h4     : 14,
+		h5     : 12,
+		h6     : 10,
 	},
 	family: {
 		code   : 'monospace',

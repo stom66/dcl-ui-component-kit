@@ -1,5 +1,5 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Text, UiBox, Wiggle, ZoneType } from '../../../ui-component-kit'
 import { alpha, easingFunctions, vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
 
@@ -58,18 +58,16 @@ export class DemoAnimationsLayer extends Layer {
 		return (
 			<Background>
 				<Column
-					cols={12}
-					uiTransform={{
-						height        : '100%',
-						alignItems    : 'center',
-						justifyContent: 'center',
-						padding       : { top: 16, right: 16, bottom: 16, left: 16 },
-					}}
+					cols           = {12}
+					height         = "100%"
+					alignItems     = "center"
+					justifyContent = "center"
+					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
 				>
 					<H1 value="Animations" color={theme.colors.light} />
 					{/* MARK: Row 1 
 					*/}
-					<Row uiTransform={{ justifyContent: 'center' }}>
+					<Row justifyContent="center">
 
 						{this.renderAnimCell('Spinner', theme.colors.warning, (
 							<Spinner
@@ -145,7 +143,7 @@ export class DemoAnimationsLayer extends Layer {
 
 					{/* MARK: Row 2 
 					*/}
-					<Row uiTransform={{ justifyContent: 'center' }}>
+					<Row justifyContent="center">
 
 						{this.renderAnimCell('Spinner + \nPulse > FlashColor', theme.colors.info, [
 							<Spinner
@@ -269,7 +267,7 @@ export class DemoAnimationsLayer extends Layer {
 
 					{/* MARK: Row 3 — event
 					*/}
-					<Row uiTransform={{ justifyContent: 'center' }}>
+					<Row justifyContent="center">
 						{this.renderAnimCell(
 							'onHover | One-shot\nShake',
 							theme.colors.danger,
@@ -381,34 +379,29 @@ export class DemoAnimationsLayer extends Layer {
 
 		return (
 			<Column
-				uiTransform={{
-					alignItems: 'center',
-					margin    : { left: 8, right: 8, top: 8, bottom: 8 },
-				}}
+				alignItems = "center"
+				margin     = {{ left: 8, right: 8, top: 8, bottom: 8 }}
 			>
 				<UiBox
-					uiTransform  = {CELL}
+					width        = {CELL.width}
+					height       = {CELL.height}
 					onMouseEnter = {events?.onMouseEnter}
 					onMouseLeave = {events?.onMouseLeave}
 					onMouseDown  = {events?.onMouseDown}
 				>
-					<Background backgroundColor={bgColor}>
+					<Background color={bgColor}>
 						{children}
 					</Background>
 				</UiBox>
 				<Text
-					value       = {label}
-					uiTransform = {{
-						width       : CELL.width,
-						height      : 32,
-						margin      : { top: 4 },
-						borderRadius: theme.border.radiusSmall,
-					}}
-					uiText={{
-						fontSize : scaleFontSize(theme.typography.size.default, -0.15),
-						textAlign: 'middle-center',
-					}}
-					backgroundColor={alpha(bgColor, 0.5)}
+					value           = {label}
+					width           = {CELL.width}
+					height          = {32}
+					margin          = {{ top: 4 }}
+					borderRadius    = {theme.border.radiusSmall}
+					fontSize        = {theme.typography.size.default}
+					textAlign       = "middle-center"
+					backgroundColor = {alpha(bgColor, 0.5)}
 				/>
 			</Column>
 		)

@@ -1,40 +1,53 @@
-import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
 import { textMinHeight } from './textLayout'
+import { mergeTextShorthands, type TextShorthandProps } from './textShorthands'
 
 
 type HeaderLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
-export type HeadingProps = Omit<UiBoxProps, 'uiText'> & {
+export type HeadingProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	/** Heading copy. Prefer this over JSX text children (DCL `uiText` needs `value`). */
-	value?  : string
-	/** Font color. Defaults to `theme.colors.light`. Overrides `uiText.color`. */
-	color?  : Color4
 	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
 
 
 // MARK: Heading
 /**
- * Shared H1–H6 renderer — theme size/family per level, optional `color` shorthand.
- * Uses `flexShrink: 0` + `minHeight` so height-capped columns cannot crush text
- * (default Yoga `flexShrink: 1` was collapsing `height: 'auto'` boxes to 0).
+ * Shared H1–H6 renderer — theme size/family per level.
+ * Prefer text shorthands (`value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * over nesting `uiText`. Uses `flexShrink: 0` + `minHeight` so height-capped columns
+ * cannot crush text (default Yoga `flexShrink: 1` was collapsing `height: 'auto'` boxes to 0).
  */
 function Heading({
 	level,
 	children,
 	value,
 	color,
+	fontSize: fontSizeProp,
+	font,
+	textAlign,
+	textWrap,
 	uiText,
 	uiTransform,
 	...props
 }: HeadingProps & { level: HeaderLevel }) {
-	const theme    = getTheme()
-	const fontSize = scaleFontSize(theme.typography.size[level])
+	const theme           = getTheme()
+	const defaultFontSize = scaleFontSize(theme.typography.size[level])
+	const uiTextMerged    = mergeTextShorthands(
+		{
+			fontSize : defaultFontSize,
+			font     : theme.typography.family[level],
+			color    : theme.colors.light,
+			textAlign: 'middle-left',
+			value    : '',
+		},
+		uiText,
+		{ value, color, fontSize: fontSizeProp, font, textAlign, textWrap },
+	)
+	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
 
 	return (
 		<UiBox
@@ -42,20 +55,12 @@ function Heading({
 			uiTransform={{
 				width     : '100%',
 				height    : 'auto',
-				minHeight : textMinHeight(fontSize),
+				minHeight : textMinHeight(typeof fontSize === 'number' ? fontSize : defaultFontSize),
 				alignSelf : 'flex-start',
 				flexShrink: 0,
 				...uiTransform,
 			}}
-			uiText={{
-				fontSize,
-				font     : theme.typography.family[level],
-				color    : theme.colors.light,
-				textAlign: 'middle-left',
-				...uiText,
-				...(color !== undefined ? { color } : {}),
-				value: value ?? uiText?.value ?? '',
-			}}
+			uiText={uiTextMerged}
 		>
 			{children}
 		</UiBox>

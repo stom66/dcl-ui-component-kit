@@ -107,9 +107,8 @@ export function getColSizing(
  * - no `cols` → depends on `whenOmitted` (`content` / `full` / `none`)
  * - `cols={12}` (full) → `width: 100%`
  * - partial span → sticky `width: n/12%` (definite size so `flexWrap` works;
- *   two `cols={4}` stay ~⅓ each). Use `Row spacing={0}` when packing a full
- *   12-wide line — spacer gutters add px on top of 100% and can push the last
- *   cell onto the next wrap line.
+ *   two `cols={4}` stay ~⅓ each). `Row` applies padded cell gutters when any
+ *   child uses `cols`, so a full 12-wide line stays inside the parent.
  *
  * Returns `undefined` when `whenOmitted` is `'none'` and no `cols` is set —
  * callers should omit width / flexGrow props entirely.

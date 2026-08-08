@@ -1,20 +1,32 @@
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
-import { vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
+import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, IconCharacter, IconNumber, IconString, IconSymbol, Label, Layer, PropsController, Row, Text, ZoneType } from '../../../ui-component-kit'
+import { timers } from '../../../ui-component-kit/utils/timers'
 
-/** Curated sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
+/** 4×2 sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
 const SAMPLE_ICONS = [
-	'cat', 'check', 'coins', 'crown', 'dice', 'gift',
-	'ghost', 'heart', 'play', 'flagCheckered', 'star', 'meteor', 'bolt',
-	'rocket', 'shield', 'trophy', 'caretLeft', 'ban', 'crosshairs', 'stopwatch', 'fireFlameCurved', 'caretRight'
+	'cat', 'star', 'heart', 'coins',
+	'crown', 'dice', 'rocket', 'trophy',
 ] as const
 
-const GRID_COLS = 8
+const COUNTDOWN_SECONDS = 3 * 60
+
+
+// MARK: formatClock
+/** Formats total seconds as `MM:SS` with leading zeros (always 5 glyphs). */
+function formatClock(totalSeconds: number): string {
+	const clamped = Math.max(0, Math.floor(totalSeconds))
+	const minutes = Math.floor(clamped / 60)
+	const seconds = clamped % 60
+	return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
 
 
 // MARK: DemoIconsLayer
-/** Demo panel for named Font Awesome atlas icons (`atlasIconsFontAwesome`). */
+/**
+ * Demo panel for Font Awesome icons, AvatarIcon, and atlas glyph text
+ * (`IconNumber` / `IconCharacter` / `IconSymbol` / `IconString`).
+ */
 export class DemoIconsLayer extends Layer {
 	constructor() {
 		super({
@@ -24,248 +36,289 @@ export class DemoIconsLayer extends Layer {
 			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
-				width : vwToPixels(50),
-				height: vhToPixels(80),
+				width : '52vw',
+				height: 'auto',
 			},
 		})
+
+		this.props = new PropsController<Record<string, unknown>>({
+			countdownSeconds: COUNTDOWN_SECONDS,
+		})
+
+		timers.setInterval(() => {
+			if (!this.props) {
+				console.error('DemoIconsLayer: tick: props controller missing')
+				return
+			}
+			const current = this.props.get('countdownSeconds') as number
+			const next    = current <= 0 ? COUNTDOWN_SECONDS : current - 1
+			this.props.set('countdownSeconds', next)
+		}, 1000)
 	}
 
 
 	// MARK: body
 	protected body() {
-		const theme = getTheme()
+		if (!this.props) {
+			console.error('DemoIconsLayer.body: props controller missing')
+			return null
+		}
+
+		const theme     = getTheme()
+		const countdown = this.props.get('countdownSeconds') as number
 
 		return (
-			<Background>
+			<Background fitContent>
 				<Column
-					cols={12}
-					spacing={6}
-					uiTransform={{
-						height        : '100%',
-						alignItems    : 'flex-start',
-						justifyContent: 'flex-start',
-						padding       : { top: 12, right: 20, bottom: 12, left: 20 },
-					}}
+					cols           = {12}
+					spacing        = {6}
+					alignItems     = "flex-start"
+					justifyContent = "flex-start"
+					padding        = {{ top: 12, right: 20, bottom: 16, left: 20 }}
 				>
-					{/* MARK: Title 
-					*/}
 					<H2 value="Icons" />
-					<Text value="Named cells from atlasIconsFontAwesome — use atlas.uv.<name> with Icon (src defaults to this atlas). AvatarIcon uses uiBackground.avatarTexture." />
+					<Text value="Named Font Awesome cells via atlas.uv.<name>, AvatarIcon portraits, and atlas glyph text for scores / labels." />
 
+					{/* MARK: Font Awesome named shortcut */}
 					<Label
-						cols        = {12}
-						value       = "Named shortcut (cat)"
-						uiTransform = {{ margin: { bottom: 8 } }}
+						cols   = {12}
+						value  = "Icons - Font Awesome"
+						margin = {{ top: 8, bottom: 8 }}
 					/>
 					<Row
-						uiTransform={{
-							justifyContent: 'flex-start',
-							alignItems    : 'center',
-							margin        : { bottom: 8 },
-						}}
+						justifyContent = "flex-start"
+						alignItems     = "center"
+						margin         = {{ bottom: 4 }}
 					>
 						<Icon
-							uvs         = {atlasIconsFontAwesome.uv.cat}
-							width       = "64"
-							height      = "64"
-							uiTransform = {{ margin: { right: 12 } }}
+							uvs    = {atlasIconsFontAwesome.uv.cat}
+							width  = "64"
+							height = "64"
+							margin = {{ right: 12 }}
 						/>
-						<Code value = "<Icon uvs={atlasIconsFontAwesome.uv.cat} />" />
+						<Code value="<Icon uvs={atlasIconsFontAwesome.uv.cat} />" />
 					</Row>
 
-					{/* MARK: Colors 
-					*/}
+					{/* MARK: Tints / avatars / sample grid */}
 					<Row
-						uiTransform={{
-							justifyContent: 'flex-start',
-							alignItems    : 'flex-start',
-							margin        : { bottom: 8 },
-						}}
+						flexWrap       = "wrap"
+						justifyContent = "flex-start"
+						alignItems     = "flex-start"
+						margin         = {{ top: 8, bottom: 8 }}
 					>
 						<Column
-							cols={6}
-							uiTransform={{
-								alignItems    : 'flex-start',
-								justifyContent: 'flex-start',
-								padding       : { right: 8 },
-							}}
+							cols           = {4}
+							alignItems     = "flex-start"
+							justifyContent = "flex-start"
+							padding        = {{ right: 8 }}
 						>
 							<Label
-								cols        = {12}
-								value       = "color tint (texture × color)"
-								uiTransform = {{ margin: { bottom: 8 } }}
+								cols   = {12}
+								value  = "Icon - Color Tints"
+								margin = {{ bottom: 8 }}
 							/>
 							<Row
-								uiTransform={{
-									justifyContent: 'flex-start',
-									alignItems    : 'center',
-									margin        : { bottom: 6 },
-								}}
+								justifyContent = "flex-start"
+								alignItems     = "center"
+								margin         = {{ bottom: 6 }}
 							>
 								<Icon
-									uvs         = {atlasIconsFontAwesome.uv.star}
-									width       = "64"
-									height      = "64"
-									color       = {theme.colors.primary}
-									uiTransform = {{ margin: { right: 8 } }}
-								/>
-								<Icon
-									uvs         = {atlasIconsFontAwesome.uv.star}
-									width       = "64"
-									height      = "64"
-									color       = {theme.colors.danger}
-									uiTransform = {{ margin: { right: 8 } }}
+									uvs    = {atlasIconsFontAwesome.uv.star}
+									width  = "48"
+									height = "48"
+									color  = {theme.colors.primary}
+									margin = {{ right: 8 }}
 								/>
 								<Icon
 									uvs    = {atlasIconsFontAwesome.uv.star}
-									width  = "64"
-									height = "64"
+									width  = "48"
+									height = "48"
+									color  = {theme.colors.danger}
+									margin = {{ right: 8 }}
+								/>
+								<Icon
+									uvs    = {atlasIconsFontAwesome.uv.star}
+									width  = "48"
+									height = "48"
 									color  = {theme.colors.success}
 								/>
 							</Row>
-							<Code
-								value  = "<Icon color={…} />"
-								uiText = {{
-									fontSize: scaleFontSize(theme.typography.size.code+3, -0.1),
-									textWrap: 'nowrap',
-								}}
-							/>
+							<Code value="<Icon color={…} />" textWrap="nowrap" />
 						</Column>
 
-					{/* MARK: Avatar 
-					*/}
 						<Column
-							cols={6}
-							uiTransform={{
-								alignItems    : 'flex-start',
-								justifyContent: 'flex-start',
-								padding       : { left: 8 },
-							}}
+							cols           = {4}
+							alignItems     = "flex-start"
+							justifyContent = "flex-start"
+							padding        = {{ left: 4, right: 4 }}
 						>
 							<Label
-								cols        = {12}
-								value       = "AvatarIcon (player portrait)"
-								uiTransform = {{ margin: { bottom: 8 } }}
+								cols   = {12}
+								value  = "Avatar Icons"
+								margin = {{ bottom: 8 }}
 							/>
 							<Row
-								uiTransform={{
-									justifyContent: 'flex-start',
-									alignItems    : 'center',
-									margin        : { bottom: 6 },
-								}}
+								justifyContent = "flex-start"
+								alignItems     = "center"
+								margin         = {{ bottom: 6 }}
 							>
 								<AvatarIcon
 									userId = {DEFAULT_AVATAR_USER_ID}
-									width  = {64}
-									height = {64}
+									width  = {48}
+									height = {48}
 								/>
 								<AvatarIcon
 									userId       = {DEFAULT_AVATAR_USER_ID}
-									width        = {64}
-									height       = {64}
-									borderRadius = {32}
-									borderWidth  = {3}
+									width        = {48}
+									height       = {48}
+									borderRadius = {24}
+									borderWidth  = {2}
 									borderColor  = {alpha(theme.colors.light, 0.8)}
 								/>
 								<AvatarIcon
 									userId       = {DEFAULT_AVATAR_USER_ID}
-									width        = {64}
-									height       = {64}
+									width        = {48}
+									height       = {48}
 									borderRadius = {theme.border.radiusDefault}
-									borderWidth  = {3}
+									borderWidth  = {2}
 									borderColor  = {alpha(theme.colors.info, 0.8)}
 								/>
-								<AvatarIcon
-									userId       = {DEFAULT_AVATAR_USER_ID}
-									width        = {64}
-									height       = {64}
-									borderRadius = {theme.border.radiusDefault}
-									borderWidth  = {3}
-									borderColor  = {alpha(theme.colors.light, 0.8)}
-									backgroundColor={theme.colors.danger}
-								/>
 							</Row>
-							<Code
-								value  = {'<AvatarIcon userId="…" />'}
-								uiText = {{
-									fontSize: scaleFontSize(theme.typography.size.code+2, -0.1),
-									textWrap: 'nowrap',
-								}}
+							<Code value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
+						</Column>
+
+						<Column
+							cols           = {4}
+							alignItems     = "flex-start"
+							justifyContent = "flex-start"
+							padding        = {{ left: 8 }}
+						>
+							<Label
+								cols   = {12}
+								value  = "Sample icons"
+								margin = {{ bottom: 8 }}
+							/>
+							{this.renderSampleGrid()}
+							<Text
+								value    = "This kit ships 256 Font Awesome icons for gaming — use atlasIconsFontAwesome.uv.<name>."
+								fontSize = {theme.typography.size.small}
+								margin   = {{ top: 6 }}
 							/>
 						</Column>
 					</Row>
 
+					{/* MARK: Atlas glyph examples */}
+					<Row
+						flexWrap       = "wrap"
+						justifyContent = "flex-start"
+						alignItems     = "flex-start"
+					>
+						<Column
+							cols           = {4}
+							spacing        = {6}
+							alignItems     = "flex-start"
+							justifyContent = "flex-start"
+							padding        = {{ right: 8 }}
+						>
+							<Label cols={12} value="IconNumber" margin={{ bottom: 4 }} />
+							<Text
+								value    = "Countdown timer (MM:SS) — digits + colon from the numbers atlas."
+								fontSize = {theme.typography.size.small}
+							/>
+							<Column
+								cols           = {12}
+								alignItems     = "center"
+								justifyContent = "center"
+								borderWidth    = {theme.border.width}
+								borderRadius   = {theme.border.radiusDefault}
+								borderColor    = {alpha(theme.colors.light, 0.2)}
+								color          = {alpha(theme.colors.primary, 0.35)}
+								padding        = {{ top: 10, right: 12, bottom: 10, left: 12 }}
+								margin         = {{ top: 4, bottom: 6 }}
+							>
+								<IconNumber value={formatClock(countdown)} height={36} />
+							</Column>
+							<Text value="Score / formula:" fontSize={theme.typography.size.small} />
+							<IconNumber value="+120/2=60" height={28} />
+							<Code value={'<IconNumber value="01:05" />'} textWrap="nowrap" />
+						</Column>
 
-					<Label
-						cols        = {12}
-						value       = "Sample icons (atlasIconsFontAwesome)"
-						uiTransform = {{ margin: { bottom: 8 } }}
-					/>
-					{this.renderIconGrid()}
+						<Column
+							cols           = {4}
+							spacing        = {6}
+							alignItems     = "flex-start"
+							justifyContent = "flex-start"
+							padding        = {{ left: 4, right: 4 }}
+						>
+							<Label cols={12} value="IconCharacter" margin={{ bottom: 4 }} />
+							<Text
+								value    = "Letters from atlasCharsAlphaNumeric (a–z, A–Z, 0–9)."
+								fontSize = {theme.typography.size.small}
+							/>
+							<IconCharacter value="HELLO" height={28} />
+							<IconCharacter value="Player1" height={28} />
+							<IconCharacter value="WAVE 3" height={28} />
+							<Code value={'<IconCharacter value="HELLO" />'} textWrap="nowrap" />
+						</Column>
+
+						<Column
+							cols           = {4}
+							spacing        = {6}
+							alignItems     = "flex-start"
+							justifyContent = "flex-start"
+							padding        = {{ left: 8 }}
+						>
+							<Label cols={12} value="IconSymbol / IconString" margin={{ bottom: 4 }} />
+							<Text
+								value    = "Symbols alone, or IconString when you need mixed letters + punctuation."
+								fontSize = {theme.typography.size.small}
+							/>
+							<IconSymbol value="$%#?!" height={28} />
+							<IconSymbol value="(@)" height={28} />
+							<IconString value="HI $120!" height={28} />
+							<IconString value="A+B=C" height={28} />
+							<Code value={'<IconString value="HI $120!" />'} textWrap="nowrap" />
+						</Column>
+					</Row>
 				</Column>
 			</Background>
 		)
 	}
 
 
-	// MARK: renderIconGrid
-	/** Renders a curated sample of named Font Awesome icons. */
-	private renderIconGrid() {
+	// MARK: renderSampleGrid
+	/** Renders a 4×2 sample of named Font Awesome icons. */
+	private renderSampleGrid() {
 		const theme = getTheme()
-		const rows: ReactEcs.JSX.Element[] = []
-		const rowCount = Math.ceil(SAMPLE_ICONS.length / GRID_COLS)
 
-		for (let row = 0; row < rowCount; row++) {
-			const cells: ReactEcs.JSX.Element[] = []
-
-			for (let col = 0; col < GRID_COLS; col++) {
-				const name = SAMPLE_ICONS[row * GRID_COLS + col]
-				if (!name) break
-
-				cells.push(
+		return (
+			<Row
+				flexWrap       = "wrap"
+				justifyContent = "flex-start"
+				alignItems     = "flex-start"
+			>
+				{SAMPLE_ICONS.map((name) => (
 					<Column
-						key          = {`icon-cell-${name}`}
-						cols         = {2}
-						borderWidth  = {theme.border.width}
-						borderRadius = {theme.border.radiusDefault}
-						borderColor  = {alpha(theme.colors.light, 0.1)}
-						spacing      = {0}
-						uiTransform  = {{
-							alignItems    : 'center',
-							justifyContent: 'center',
-							padding       : { top: 8, left: 2, right: 2, bottom: 8 },
-							margin        : { bottom: 8 },
-						}}
+						key            = {`icon-sample-${name}`}
+						cols           = {3}
+						spacing        = {0}
+						borderWidth    = {theme.border.width}
+						borderRadius   = {theme.border.radiusSmall}
+						borderColor    = {alpha(theme.colors.light, 0.12)}
+						alignItems     = "center"
+						justifyContent = "center"
+						padding        = {{ top: 6, right: 2, bottom: 6, left: 2 }}
+						minHeight      = {40}
 					>
 						<Icon
-							uvs         = {atlasIconsFontAwesome.uv[name]}
-							width       = "40"
-							height      = "40"
-							uiTransform = {{ margin: { bottom: 0 } }}
-						/>
-						<Text
-							value           = {name}
-							uiText          = {{ textAlign     : 'middle-center', fontSize: scaleFontSize(theme.typography.size.default, -0.1) }}
-							uiTransform     = {{ justifyContent: 'center', padding: 0 }}
+							uvs    = {atlasIconsFontAwesome.uv[name]}
+							width  = "26"
+							height = "26"
 						/>
 					</Column>
-				)
-			}
-
-			rows.push(
-				<Row
-					key         = {`icon-row-${row}`}
-					uiTransform = {{
-						justifyContent: 'flex-start',
-						alignItems    : 'flex-start',
-					}}
-				>
-					{cells}
-				</Row>
-			)
-		}
-
-		return rows
+				))}
+			</Row>
+		)
 	}
 }
 

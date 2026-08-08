@@ -26,6 +26,7 @@ import { demoSafeZoneTopLayer }              from './demo.safeZone.top.layer'
 import { demoSafeZoneTopLeftLayer }          from './demo.safeZone.topLeft.layer'
 import { demoSafeZoneTopRightLayer }         from './demo.safeZone.topRight.layer'
 import { demoSafeZonesLayer }                from './demo.safeZones.layer'
+import { demoSpriteIconLayer }               from './demo.spriteIcon.layer'
 import { demoTextLayer }                     from './demo.text.layer'
 import { demoToastsLayer }                   from './demo.toasts.layer'
 import { demoToggleLayer }                   from './demo.toggle.layer'
@@ -58,6 +59,7 @@ export const layers: Layer[] = [
 	demoProgressLayer,
 	demoButtonsLayer,
 	demoIconsLayer,
+	demoSpriteIconLayer,
 	demoGridsLayer,
 	demoLayoutLayer,
 	demoListLayer,

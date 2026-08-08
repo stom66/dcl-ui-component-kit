@@ -85,6 +85,41 @@ export const exampleNumbersAtlas = new TextureAtlas({
 })
 
 
+// MARK: exampleSpriteSheetAtlas
+/**
+ * Example 4×4 sprite sheet for `SpriteIcon`. Cells play left → right, top →
+ * bottom in the PNG. Replace `sprite-sheet-4x4.png` with your own art — keep
+ * the 4×4 grid (or update `columns` / `rows` to match).
+ */
+export const exampleSpriteSheetAtlas = new TextureAtlas({
+	source    : 'assets/images/example-themes/showcase/sprites-pigeon.png',
+	columns   : 7,
+	rows      : 7,
+	filterMode: 'point',
+})
+
+export const SpriteSmoke = new TextureAtlas({
+	source    : 'assets/images/example-themes/showcase/sprites-smoke.png',
+	columns   : 4,
+	rows      : 4,
+	filterMode: 'point',
+})
+
+export const SpriteSmoke2 = new TextureAtlas({
+	source    : 'assets/images/example-themes/showcase/sprites-smoke-2.png',
+	columns   : 4,
+	rows      : 2,
+	filterMode: 'point',
+})
+
+export const SpriteSmoke3 = new TextureAtlas({
+	source    : 'assets/images/example-themes/showcase/sprites-smoke-3.png',
+	columns   : 4,
+	rows      : 3,
+	filterMode: 'point',
+})
+
+
 // MARK: exampleProgressBarTexturesHorizontal
 /**
  * Example horizontal progress-bar textures for `ProgressBarImage`.

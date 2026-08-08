@@ -66,9 +66,7 @@ export class InfoLayer extends Layer {
 
 		return (
 			<Background
-				uiTransform={{
-					padding: { top: 12, right: 12, bottom: 12, left: 12 },
-				}}
+				padding={{ top: 12, right: 12, bottom: 12, left: 12 }}
 				uiText={{
 					value    : readout,
 					fontSize : scaleFontSize(theme.typography.size.code),

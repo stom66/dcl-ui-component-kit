@@ -212,7 +212,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 			height        : BAR_ZONE_HEIGHT,
 			width         : '25%',
 			positionType  : 'absolute',
-			position      : { top: 8, right: CORNER_SIDE_INSET },
+			position      : { top: 8, right: isMobile() ? '5vw' : '8px' },
 			justifyContent: 'flex-start',
 			alignItems    : 'flex-end',
 		}),

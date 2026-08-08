@@ -73,6 +73,9 @@ export type ThemeAnimation = {
 
 	/** Seconds to lerp a progress bar toward a new value. Defaults to `0.35`. */
 	progressBarLerpDurationDefault: number
+
+	/** Seconds to rest between `SpriteIcon` loops when `loopInterval` is omitted. Defaults to `0`. */
+	spriteIconLoopIntervalDefault: number
 }
 
 export const animation: ThemeAnimation = {
@@ -118,4 +121,6 @@ export const animation: ThemeAnimation = {
 	wiggleMaxRotationDefault  : 30,
 
 	progressBarLerpDurationDefault: 0.35,
+
+	spriteIconLoopIntervalDefault: 0,
 }

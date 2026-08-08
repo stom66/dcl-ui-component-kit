@@ -90,26 +90,22 @@ export class DemoToggleLayer extends Layer {
 		return (
 			<Background>
 				<Column
-					cols={12}
-					uiTransform={{
-						height        : '100%',
-						alignItems    : 'stretch',
-						justifyContent: 'flex-start',
-						padding       : { top: 16, right: 20, bottom: 16, left: 20 },
-					}}
+					cols           = {12}
+					height         = "100%"
+					alignItems     = "stretch"
+					justifyContent = "flex-start"
+					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 				>
 					<H2 value="Toggle" />
 					<Text value="Pill track with a sliding thumb. Click anywhere on the switch." />
 
-					<Divider uiTransform={{ margin: { top: 8, bottom: 8 } }} />
+					<Divider margin={{ top: 8, bottom: 8 }} />
 
 					<Row
-						uiTransform={{
-							alignItems: 'center',
-							margin    : { bottom: 12 },
-						}}
+						alignItems = "center"
+						margin     = {{ bottom: 12 }}
 					>
-						<Column cols={2} uiTransform={{ alignItems: 'center', justifyContent: 'center' }}>
+						<Column cols={2} alignItems="center" justifyContent="center">
 							<Toggle
 								id       = "demo_toggle_default"
 								value    = {defaultOn}
@@ -119,18 +115,16 @@ export class DemoToggleLayer extends Layer {
 								}}
 							/>
 						</Column>
-						<Column cols={10} uiTransform={{ alignItems: 'stretch', justifyContent: 'center' }}>
+						<Column cols={10} alignItems="stretch" justifyContent="center">
 							<Label cols={12} value="Default — no custom colors" color={alpha(primary, defaultOnAlpha)} />
 						</Column>
 					</Row>
 
 					<Row
-						uiTransform={{
-							alignItems: 'center',
-							margin    : { bottom: 12 },
-						}}
+						alignItems = "center"
+						margin     = {{ bottom: 12 }}
 					>
-						<Column cols={2} uiTransform={{ alignItems: 'center', justifyContent: 'center' }}>
+						<Column cols={2} alignItems="center" justifyContent="center">
 							<Toggle
 								id              = "demo_toggle_background"
 								value           = {backgroundOn}
@@ -141,18 +135,16 @@ export class DemoToggleLayer extends Layer {
 								}}
 							/>
 						</Column>
-						<Column cols={10} uiTransform={{ alignItems: 'stretch', justifyContent: 'center' }}>
+						<Column cols={10} alignItems="stretch" justifyContent="center">
 							<Label cols={12} value="backgroundColor — default ↔ green" color={alpha(primary, backgroundOnAlpha)} />
 						</Column>
 					</Row>
 
 					<Row
-						uiTransform={{
-							alignItems: 'center',
-							margin    : { bottom: 12 },
-						}}
+						alignItems = "center"
+						margin     = {{ bottom: 12 }}
 					>
-						<Column cols={2} uiTransform={{ alignItems: 'center', justifyContent: 'center' }}>
+						<Column cols={2} alignItems="center" justifyContent="center">
 							<Toggle
 								id          = "demo_toggle_thumb"
 								value       = {toggleOn}
@@ -163,15 +155,13 @@ export class DemoToggleLayer extends Layer {
 								}}
 							/>
 						</Column>
-						<Column cols={10} uiTransform={{ alignItems: 'stretch', justifyContent: 'center' }}>
+						<Column cols={10} alignItems="stretch" justifyContent="center">
 							<Label cols={12} value="toggleColor — default ↔ primary" color={alpha(primary, toggleOnAlpha)} />
 						</Column>
 					</Row>
 
-					<Row
-						uiTransform={{ alignItems: 'center' }}
-					>
-						<Column cols={2} uiTransform={{ alignItems: 'center', justifyContent: 'center' }}>
+					<Row alignItems="center">
+						<Column cols={2} alignItems="center" justifyContent="center">
 							<Toggle
 								id              = "demo_toggle_both"
 								value           = {bothOn}
@@ -183,7 +173,7 @@ export class DemoToggleLayer extends Layer {
 								}}
 							/>
 						</Column>
-						<Column cols={10} uiTransform={{ alignItems: 'stretch', justifyContent: 'center' }}>
+						<Column cols={10} alignItems="stretch" justifyContent="center">
 							<Label cols={12} value="Both — background + toggleColor" color={alpha(primary, bothOnAlpha)} />
 						</Column>
 					</Row>
