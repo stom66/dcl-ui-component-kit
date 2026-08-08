@@ -92,18 +92,21 @@ Equal-cell grid (inventories / icon boards). Chunks children into tracks of `lim
 
 Full-size panel chrome (theme body fill + border by default).
 
-Default layout is absolute fill (for fixed-size Zones). Use `fitContent` when the Layer Zone uses `height: 'auto'` so chrome contributes in-flow height.
+**Sibling chrome only** — render `<Background />` as a peer of content under the Zone / parent. Do **not** nest body content inside it; nesting creates a new flex root and discards zone `alignItems` / `justifyContent`. See safe-zone demos (`demo.safeZone.factory.tsx`).
+
+Default layout is absolute fill (out of flex flow). For Layer `height: 'auto'`, keep absolute chrome and let in-flow content siblings size the Zone. Prefer `UiBox` for small self-sized chips; `fitContent` is a rare escape hatch.
 
 | Option | Type | Description |
 |---|---|---|
 | `color` / `backgroundColor` | `Color4` | Fill (`color` preferred) |
 | `borderColor` / `borderWidth` / `borderRadius` | — | Border |
 | `textureSrc` | `string` | Optional texture |
-| `fitContent` | `boolean` | Size to children (required for Layer `height: 'auto'`) |
-| `padding` / `alignItems` / … | — | Layout shorthands |
-| `children` | JSX | Panel content |
+| `fitContent` | `boolean` | Rare self-sized chrome (not Layer panel chrome) |
+| `padding` / `alignItems` / … | — | Layout shorthands (usually unused for empty chrome) |
 
 ### `BackgroundGradient`
+
+Same sibling-chrome rule as `Background` — empty peer for fill, not a content wrapper.
 
 | Option | Type | Description |
 |---|---|---|
@@ -111,7 +114,7 @@ Default layout is absolute fill (for fixed-size Zones). Use `fitContent` when th
 | `gradientStart` / `gradientEnd` | `number` | UV ratios 0–1 |
 | `color` | `Color4` | Tint |
 | `textureSrc` | `string` | Optional override texture |
-| `fitContent` | `boolean` | Forwarded to `Background` |
+| `fitContent` | `boolean` | Forwarded to `Background` (rare; see `Background`) |
 
 ### `Divider`
 
@@ -431,4 +434,7 @@ Demo: `src/exampleThemes/showcase/layers/demo.animations.layer.tsx` in this repo
 | `getUVCell` / `getUVColumn` / `getUVRow` | Low-level UVs (1-based) |
 | `resolveAspectDimensions` / `sizeValueToPixels` | Aspect-aware sizing |
 | `vwToPixels` / `vhToPixels` | Virtual canvas math |
+| `vWidth` / `vHeight` / `getUiScaleFactor` | Virtual canvas constants + SDK scale mirror (`min(phys/virtual)/DPR`) |
 | `tweenValue` / `lerp` / `easingFunctions` | Shared easing |
+
+Virtual canvas (desktop `1920×1080`, mobile `800×360`) is set once in `utils/sizing.ts` and passed to `ReactEcsRenderer`. Smaller virtual size makes numeric/`px` UI larger on screen; `%` / native `vw`/`vh` are unaffected. Use `scaleFontSize` for fonts only — not border radii or padding.

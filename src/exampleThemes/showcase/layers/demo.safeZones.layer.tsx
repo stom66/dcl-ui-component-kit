@@ -3,6 +3,7 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { Background, ButtonText, Column, Divider, H2, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
 
 import { demoSafeZoneBottomLayer } from './demo.safeZone.bottom.layer'
+import { demoSafeZoneBottomCenterLayer } from './demo.safeZone.bottomCenter.layer'
 import { demoSafeZoneBottomLeftLayer } from './demo.safeZone.bottomLeft.layer'
 import { demoSafeZoneBottomRightLayer } from './demo.safeZone.bottomRight.layer'
 import { demoSafeZoneDefaultLayer } from './demo.safeZone.default.layer'
@@ -15,6 +16,7 @@ import { demoSafeZoneRightLayer } from './demo.safeZone.right.layer'
 import { demoSafeZoneRightBottomLayer } from './demo.safeZone.rightBottom.layer'
 import { demoSafeZoneRightTopLayer } from './demo.safeZone.rightTop.layer'
 import { demoSafeZoneTopLayer } from './demo.safeZone.top.layer'
+import { demoSafeZoneTopCenterLayer } from './demo.safeZone.topCenter.layer'
 import { demoSafeZoneTopLeftLayer } from './demo.safeZone.topLeft.layer'
 import { demoSafeZoneTopRightLayer } from './demo.safeZone.topRight.layer'
 
@@ -36,6 +38,7 @@ const SAFE_ZONE_TOGGLES: SafeZoneToggle[][] = [
 	[
 		{ id: 'btn_safe_zone_top_left',          label: 'TopLeft',          layer: demoSafeZoneTopLeftLayer },
 		{ id: 'btn_safe_zone_top',               label: 'Top',              layer: demoSafeZoneTopLayer },
+		{ id: 'btn_safe_zone_top_center',        label: 'TopCenter',        layer: demoSafeZoneTopCenterLayer },
 		{ id: 'btn_safe_zone_top_right',         label: 'TopRight',         layer: demoSafeZoneTopRightLayer },
 	],
 	[
@@ -51,6 +54,7 @@ const SAFE_ZONE_TOGGLES: SafeZoneToggle[][] = [
 	[
 		{ id: 'btn_safe_zone_bottom_left',       label: 'BottomLeft',       layer: demoSafeZoneBottomLeftLayer },
 		{ id: 'btn_safe_zone_bottom',            label: 'Bottom',           layer: demoSafeZoneBottomLayer },
+		{ id: 'btn_safe_zone_bottom_center',     label: 'BottomCenter',     layer: demoSafeZoneBottomCenterLayer },
 		{ id: 'btn_safe_zone_bottom_right',      label: 'BottomRight',      layer: demoSafeZoneBottomRightLayer },
 	],
 ]
@@ -61,7 +65,9 @@ const SAFE_ZONE_TOGGLES: SafeZoneToggle[][] = [
 export function hideAllSafeZonePreviews() {
 	for (const row of SAFE_ZONE_TOGGLES) {
 		for (const { layer } of row) {
-			if (!layer.visibility.isHidden) layer.hide()
+			if (!layer.visibility.isHidden || !layer.visibility.isFullyHidden) {
+				layer.hide()
+			}
 		}
 	}
 }
@@ -78,7 +84,7 @@ export class DemoSafeZonesLayer extends Layer {
 			id             : 'demo-safe-zones',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : true,
+			startHidden    : false,
 			showCloseButton: true,
 			zIndex         : DEMO_SAFE_ZONES_PANEL_Z_INDEX,
 			uiTransform    : {
@@ -91,15 +97,16 @@ export class DemoSafeZonesLayer extends Layer {
 
 	// MARK: body
 	protected body() {
-		return (
-			<Background fitContent>
-				<Column
-					cols           = {12}
-					spacing        = {8}
-					alignItems     = "stretch"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="demo_safe_zones_chrome" />,
+			<Column
+				key            = "demo_safe_zones_body"
+				cols           = {12}
+				spacing        = {8}
+				alignItems     = "stretch"
+				justifyContent = "flex-start"
+				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="Safe Zones" />
 					<Text value="Toggle each ZoneType. Side strips show content alignment (top / center / bottom)." />
 					<Text value="Zones normally have no background — translucent fills here only show each zone’s full extent." />
@@ -113,15 +120,14 @@ export class DemoSafeZonesLayer extends Layer {
 									key       = {id}
 									id        = {id}
 									textLabel = {label}
-									cols      = {4}
+									cols      = {row.length === 4 ? 3 : 4}
 									callback  = {() => layer.toggle()}
 								/>
 							))}
 						</Row>
 					))}
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 }
 

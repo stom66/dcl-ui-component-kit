@@ -47,7 +47,7 @@ class SafeZonesDesktopLayer extends Layer {
 					width       : '100%',
 					height      : '100%',
 					positionType: 'absolute',
-					position    : { left: 0, top: 0 },
+					position    : { top: 0, left: 0 },
 				}}
 			>
 
@@ -57,7 +57,7 @@ class SafeZonesDesktopLayer extends Layer {
 						width       : '50%',
 						height      : '12%',
 						positionType: 'absolute',
-						position    : { right: 0, top: 0 },
+						position    : { top: 0, right: 0 },
 					}}
 					
 					uiBackground={{...bgDanger}}
@@ -68,7 +68,7 @@ class SafeZonesDesktopLayer extends Layer {
 						width       : '2.5%',
 						height      : '100%',
 						positionType: 'absolute',
-						position    : { left: 0, top: 0 },
+						position    : { top: 0, left: 0 },
 					}}
 					uiBackground={{...bgDanger}}
 				/>
@@ -80,7 +80,7 @@ class SafeZonesDesktopLayer extends Layer {
 						//maxWidth    : 420 * getUiScaleFactor(),
 						height      : '66.6%',
 						positionType: 'absolute',
-						position    : { left: 0, bottom: 0 },
+						position    : { bottom: 0, left: 0 },
 					}}
 
 					uiBackground={{...bgWarning}}
@@ -92,7 +92,7 @@ class SafeZonesDesktopLayer extends Layer {
 						width       : '24.5%',
 						height      : '6.5%',
 						positionType: 'absolute',
-						position    : { left: 0, bottom: 0 },
+						position    : { bottom: 0, left: 0 },
 					}}
 
 					uiBackground={{...bgDanger}}
@@ -104,7 +104,7 @@ class SafeZonesDesktopLayer extends Layer {
 						width       : '3%',
 						height      : '8.5%',
 						positionType: 'absolute',
-						position    : { right: 0, top: 0 },
+						position    : { top: 0, right: 0 },
 					}}
 					
 					uiBackground={{...bgDanger}}

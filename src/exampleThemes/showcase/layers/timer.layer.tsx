@@ -13,7 +13,7 @@ function getSecondsRemainingInMinute(): number {
 /**
  * Example top-bar countdown: seconds remaining in the current minute.
  * Uses ZoneType.Top; size overrides go through Layer → Zone props.
- * Chrome (fill / border) comes from `Background` inside `body()`.
+ * Chrome (fill / border) is a sibling empty `Background` in `body()`.
  */
 export class TimerLayer extends Layer {
 	constructor() {
@@ -50,15 +50,15 @@ export class TimerLayer extends Layer {
 		const theme   = getTheme()
 		const seconds = this.props.get('secondsRemaining') as number
 
-		return (
-			<Background color={theme.colors.primary}>
-				<IconNumber
-					// Fixed width so the digit entity count stays at 2 (no 9↔10 remount churn).
-					value  = {String(seconds).padStart(2, '0')}
-					height = {"80px"}
-				/>
-			</Background>
-		)
+		return [
+			<Background key="chrome" color={theme.colors.primary} />,
+			<IconNumber
+				key    = "timer-value"
+				// Fixed width so the digit entity count stays at 2 (no 9↔10 remount churn).
+				value  = {String(seconds).padStart(2, '0')}
+				height = {"80px"}
+			/>,
+		]
 	}
 }
 

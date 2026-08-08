@@ -8,9 +8,9 @@ import { UiBox, type UiBoxProps } from '../base'
 
 type DividerMargin = {
 	top?   : number
+	right? : number
 	bottom?: number
 	left?  : number
-	right? : number
 }
 
 type DividerProps = Omit<UiBoxProps, 'margin' | 'color' | 'width' | 'uiTransform'> & {
@@ -29,8 +29,8 @@ type DividerProps = Omit<UiBoxProps, 'margin' | 'color' | 'width' | 'uiTransform
 export const Divider = ({
 	children,
 	color,
-	margin    = { top: 10, bottom: 10, left: 0, right: 0 },
-	thickness = 5,
+	margin    = { top: 10, right: 0, bottom: 10, left: 0 },
+	thickness = 3,
 	width     = '100%',
 	uiBackground,
 	uiTransform,

@@ -51,7 +51,7 @@ class SafeZonesMobileLayer extends Layer {
 						width       : '25%',
 						height      : '100%',
 						positionType: 'absolute',
-						position    : { left: 0, top: 0 },
+						position    : { top: 0, left: 0 },
 					}}
 					uiBackground={{...bgDanger}}
 				/>
@@ -61,7 +61,7 @@ class SafeZonesMobileLayer extends Layer {
 						width       : '25%',
 						height      : '23%',
 						positionType: 'absolute',
-						position    : { right: 0, top: 0 },
+						position    : { top: 0, right: 0 },
 					}}
 					uiBackground={{...bgDanger}}
 				/>

@@ -11,6 +11,7 @@ import { demoLeftBarLayer }                  from './demo.leftBar.layer'
 import { demoListLayer }                     from './demo.list.layer'
 import { demoProgressLayer }                 from './demo.progress.layer'
 import { demoSafeZoneBottomLayer }           from './demo.safeZone.bottom.layer'
+import { demoSafeZoneBottomCenterLayer }     from './demo.safeZone.bottomCenter.layer'
 import { demoSafeZoneBottomLeftLayer }       from './demo.safeZone.bottomLeft.layer'
 import { demoSafeZoneBottomRightLayer }      from './demo.safeZone.bottomRight.layer'
 import { demoSafeZoneDefaultLayer }          from './demo.safeZone.default.layer'
@@ -23,6 +24,7 @@ import { demoSafeZoneRightLayer }            from './demo.safeZone.right.layer'
 import { demoSafeZoneRightBottomLayer }      from './demo.safeZone.rightBottom.layer'
 import { demoSafeZoneRightTopLayer }         from './demo.safeZone.rightTop.layer'
 import { demoSafeZoneTopLayer }              from './demo.safeZone.top.layer'
+import { demoSafeZoneTopCenterLayer }        from './demo.safeZone.topCenter.layer'
 import { demoSafeZoneTopLeftLayer }          from './demo.safeZone.topLeft.layer'
 import { demoSafeZoneTopRightLayer }         from './demo.safeZone.topRight.layer'
 import { demoSafeZonesLayer }                from './demo.safeZones.layer'
@@ -41,6 +43,7 @@ export const layers: Layer[] = [
 	demoSafeZoneFullScreenLayer,
 	demoSafeZoneInteractableAreaLayer,
 	demoSafeZoneTopLayer,
+	demoSafeZoneTopCenterLayer,
 	demoSafeZoneTopLeftLayer,
 	demoSafeZoneTopRightLayer,
 	demoSafeZoneLeftTopLayer,
@@ -50,6 +53,7 @@ export const layers: Layer[] = [
 	demoSafeZoneRightLayer,
 	demoSafeZoneRightBottomLayer,
 	demoSafeZoneBottomLayer,
+	demoSafeZoneBottomCenterLayer,
 	demoSafeZoneBottomLeftLayer,
 	demoSafeZoneBottomRightLayer,
 

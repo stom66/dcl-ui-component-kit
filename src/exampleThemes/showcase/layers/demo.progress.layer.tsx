@@ -86,10 +86,10 @@ export class DemoProgressLayer extends Layer {
 		const randomValue3 = this.props.get('randomValue3') as number
 		const dangerLabel3 = `Random value: ${randomValue3}%`
 
-		return (
-			<Background>
-				{/* cols={12} = 100% width — nested cols={3}/{9} need a definite parent width */}
-				<Column cols={12} height="100%" alignItems="stretch">
+		return [
+			<Background key="demo_progress_chrome" />,
+			/* cols={12} = 100% width — nested cols={3}/{9} need a definite parent width */
+			<Column key="demo_progress_body" cols={12} height="100%" alignItems="stretch">
 					<H2 value="Progress Bars" />
 					<Row alignItems="flex-start">
 						<Column
@@ -294,9 +294,8 @@ export class DemoProgressLayer extends Layer {
 
 						</Column>
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 }
 

@@ -67,15 +67,16 @@ export class DemoIconsLayer extends Layer {
 		const theme     = getTheme()
 		const countdown = this.props.get('countdownSeconds') as number
 
-		return (
-			<Background fitContent>
-				<Column
-					cols           = {12}
-					spacing        = {6}
-					alignItems     = "flex-start"
-					justifyContent = "flex-start"
-					padding        = {{ top: 12, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="chrome" />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				spacing        = {6}
+				alignItems     = "flex-start"
+				justifyContent = "flex-start"
+				padding        = {{ top: 12, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="Icons" />
 					<Text value="Named Font Awesome cells via atlas.uv.<name>, AvatarIcon portraits, and atlas glyph text for scores / labels." />
 
@@ -150,7 +151,7 @@ export class DemoIconsLayer extends Layer {
 							cols           = {4}
 							alignItems     = "flex-start"
 							justifyContent = "flex-start"
-							padding        = {{ left: 4, right: 4 }}
+							padding        = {{ right: 4, left: 4 }}
 						>
 							<Label
 								cols   = {12}
@@ -248,7 +249,7 @@ export class DemoIconsLayer extends Layer {
 							spacing        = {6}
 							alignItems     = "flex-start"
 							justifyContent = "flex-start"
-							padding        = {{ left: 4, right: 4 }}
+							padding        = {{ right: 4, left: 4 }}
 						>
 							<Label cols={12} value="IconCharacter" margin={{ bottom: 4 }} />
 							<Text
@@ -280,9 +281,8 @@ export class DemoIconsLayer extends Layer {
 							<Code value={'<IconString value="HI $120!" />'} textWrap="nowrap" />
 						</Column>
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 
 

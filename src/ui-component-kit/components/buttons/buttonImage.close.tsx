@@ -35,11 +35,11 @@ export function ButtonImageClose({
 			{...props}
 			id          = {id}
 			uvColumn    = {uvColumn}
-			width       = {width  ?? (m ? 128 : 90)}
-			height      = {height ?? (m ? 128 : 90)}
+			width       = {width  ?? isMobile() ? 128 : 90}
+			height      = {height ?? isMobile() ? 128 : 90}
 			textureSrc  = {textureSrc}
 			uiTransform = {{
-				position    : { top: 0, right: 0 },
+				position    : { top: isMobile() ? -42 : 0, right: isMobile() ? -42 : 0 },
 				positionType: 'absolute',
 				borderWidth : 0,
 				...uiTransform,

@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, getTheme, Layer, Text, ZoneType, type Theme } from '../../../ui-component-kit'
+import { alpha, Background, getTheme, Layer, Text, UiBox, ZoneType, type Theme } from '../../../ui-component-kit'
 
 /** Stack order for zone preview overlays — below info / nav / control panels. */
 export const DEMO_SAFE_ZONE_Z_INDEX = 0
@@ -15,29 +15,29 @@ export type CreateSafeZoneDemoLayerOptions = {
 
 // MARK: DemoChildBox
 /** Compact labelled chip used to show multi-child flow inside a zone. */
+const DEMO_CHILD_MARGIN = { top: 8, right: 8, bottom: 8, left: 8 }
+
 function DemoChildBox({
 	id,
 	label,
 	fill,
 	theme,
-	margin,
 }: {
-	id    : string
-	label : string
-	fill  : Color4
-	theme : Theme
-	margin?: { top?: number; right?: number; bottom?: number; left?: number }
+	id   : string
+	label: string
+	fill : Color4
+	theme: Theme
 }) {
 	return (
-		<Background
+		<UiBox
 			key            = {id}
-			fitContent
 			color          = {fill}
 			borderColor    = {theme.colors.dark}
 			borderRadius   = {theme.border.radiusSmall}
 			borderWidth    = {1}
 			width          = "auto"
-			margin         = {margin}
+			height         = "auto"
+			margin         = {DEMO_CHILD_MARGIN}
 			padding        = {{ top: 10, right: 14, bottom: 10, left: 14 }}
 			alignItems     = "center"
 			justifyContent = "center"
@@ -49,7 +49,7 @@ function DemoChildBox({
 				fontSize  = {theme.typography.size.h3}
 				textAlign = "middle-center"
 			/>
-		</Background>
+		</UiBox>
 	)
 }
 
@@ -97,11 +97,10 @@ export function createSafeZoneDemoLayer(
 					theme = {theme}
 				/>,
 				<DemoChildBox
-					id     = {`${id}_child_2`}
-					label  = "second child"
-					fill   = {alpha(theme.colors.body, 0.1)}
-					theme  = {theme}
-					margin = {{ top: 8, right: 8, bottom: 8, left: 8 }}
+					id    = {`${id}_child_2`}
+					label = "second child"
+					fill  = {alpha(theme.colors.body, 0.1)}
+					theme = {theme}
 				/>,
 				<DemoChildBox
 					id    = {`${id}_child_3`}

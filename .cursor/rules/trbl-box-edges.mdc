@@ -1,0 +1,27 @@
+---
+description: Order margin / padding / position edge keys top → right → bottom → left
+globs: src/**/*.{ts,tsx}
+alwaysApply: true
+---
+
+# Box edge key order (TRBL)
+
+For `margin`, `padding`, `position`, and similar edge objects, always declare keys in **top → right → bottom → left** (CSS clockwise order).
+
+Omit edges that are unused, but keep the relative order of those present.
+
+```ts
+// BAD
+{ left: 8, top: 8, bottom: 8, right: 8 }
+{ top: 8, bottom: 8, left: 0, right: 0 }
+{ left: 0, top: 0 }
+
+// GOOD
+{ top: 8, right: 8, bottom: 8, left: 8 }
+{ top: 8, right: 0, bottom: 8, left: 0 }
+{ top: 0, left: 0 }
+{ top: 8, right: 8 }
+{ bottom: 8, left: '25%' }
+```
+
+Prefer vertical alignment on the colons when several edges are listed (existing project style).

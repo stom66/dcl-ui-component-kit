@@ -42,15 +42,16 @@ export class DemoSpriteIconLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
-		return (
-			<Background fitContent>
-				<Column
-					cols           = {12}
-					spacing        = {6}
-					alignItems     = "flex-start"
-					justifyContent = "flex-start"
-					padding        = {{ top: 12, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="chrome" />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				spacing        = {6}
+				alignItems     = "flex-start"
+				justifyContent = "flex-start"
+				padding        = {{ top: 12, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="Sprite Icon" />
 					<Text value="Animated sprite sheets via SpriteIcon. Cells play left → right, top → bottom. Use offset / limit for a window; pingPong reverses at the end; loopInterval pauses between loops." />
 
@@ -65,54 +66,51 @@ export class DemoSpriteIconLayer extends Layer {
 						alignItems     = "center"
 						spacing        = {0}
 					>
-						<Column cols={6}>
-							<Row>
-								<Column cols={4}>
-								<Code
-									value = {`<SpriteIcon
+						<Column cols={1} />
+						<Column cols={3}>
+							<Code
+								value = {`<SpriteIcon
   atlas = {myAtlas}
   fps   = {15}
 />`}
-								/>
-								</Column>
-								
-								<SpriteIcon
-									id     = {ID.full}
-									atlas  = {exampleSpriteSheetAtlas}
-									fps    = {15}
-									limit  = {44}
-									width  = {SIZE}
-									height = {SIZE}
-									margin = {{ right: 16 }}
-									/>
-								<SpriteIcon
-									id     = {ID.smoke}
-									atlas  = {SpriteSmoke}
-									fps    = {30}
-									limit  = {16} // There's actually only 12 occupied cells in this 4x4 sheet, so we limit to more to show blank space after the sequence
-									width  = {SIZE}
-									height = {SIZE}
-									margin = {{ right: 16 }}
-								/>
-								<SpriteIcon
-									id     = {ID.smoke2}
-									atlas  = {SpriteSmoke2}
-									fps    = {20}
-									limit  = {8}
-									width  = {SIZE}
-									height = {SIZE}
-									margin = {{ right: 16 }}
-									/>
-								<SpriteIcon
-									id     = {ID.smoke3}
-									atlas  = {SpriteSmoke3}
-									fps    = {16}
-									limit  = {10}
-									width  = {SIZE}
-									height = {SIZE*0.75}
-									/>
-							</Row>
+							/>
 						</Column>
+								
+						<SpriteIcon
+							id     = {ID.full}
+							atlas  = {exampleSpriteSheetAtlas}
+							fps    = {15}
+							limit  = {44}
+							width  = {SIZE}
+							height = {SIZE}
+							margin = {{ right: 16 }}
+							/>
+						<SpriteIcon
+							id     = {ID.smoke}
+							atlas  = {SpriteSmoke}
+							fps    = {30}
+							limit  = {16} // There's actually only 12 occupied cells in this 4x4 sheet, so we limit to more to show blank space after the sequence
+							width  = {SIZE}
+							height = {SIZE}
+							margin = {{ right: 16 }}
+						/>
+						<SpriteIcon
+							id     = {ID.smoke2}
+							atlas  = {SpriteSmoke2}
+							fps    = {20}
+							limit  = {8}
+							width  = {SIZE}
+							height = {SIZE}
+							margin = {{ right: 16 }}
+							/>
+						<SpriteIcon
+							id     = {ID.smoke3}
+							atlas  = {SpriteSmoke3}
+							fps    = {16}
+							limit  = {10}
+							width  = {SIZE}
+							height = {SIZE*0.75}
+							/>
 					</Row>
 
 					{/* MARK: Windows — sprites row, then codes row */}
@@ -228,9 +226,8 @@ export class DemoSpriteIconLayer extends Layer {
 							/>
 						</Column>
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 }
 

@@ -23,15 +23,16 @@ export class DemoButtonsLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
-		return (
-			<Background>
-				<Column
-					cols           = {12}
-					height         = "100%"
-					alignItems     = "stretch"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="chrome" />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				height         = "100%"
+				alignItems     = "stretch"
+				justifyContent = "flex-start"
+				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="Buttons" />
 					<Text value="ButtonText for labelled controls; ButtonImage for atlas icons." />
 
@@ -118,7 +119,7 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ left: 8, right: 8 }}
+							margin      = {{ right: 8, left: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_1"
@@ -130,7 +131,7 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ left: 8, right: 8 }}
+							margin      = {{ right: 8, left: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_2"
@@ -142,7 +143,7 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ left: 8, right: 8 }}
+							margin      = {{ right: 8, left: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_3"
@@ -154,12 +155,11 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ left: 8, right: 8 }}
+							margin      = {{ right: 8, left: 8 }}
 						/>
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 }
 

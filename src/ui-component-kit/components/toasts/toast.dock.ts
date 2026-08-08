@@ -37,7 +37,7 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 		case 'top':
 			return {
 				positionType  : 'absolute',
-				position      : { top: barH, left: 0, right: 0 },
+				position      : { top: barH, right: 0, left: 0 },
 				width         : '100%',
 				height        : 'auto',
 				display       : 'flex',
@@ -48,7 +48,7 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 		case 'bottom':
 			return {
 				positionType  : 'absolute',
-				position      : { bottom: barH, left: 0, right: 0 },
+				position      : { right: 0, bottom: barH, left: 0 },
 				width         : '100%',
 				height        : 'auto',
 				display       : 'flex',
@@ -92,7 +92,7 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 		case 'bottomRight':
 			return {
 				positionType  : 'absolute',
-				position      : { bottom: barH, right: side },
+				position      : { right: side, bottom: barH },
 				width         : 'auto',
 				height        : 'auto',
 				display       : 'flex',
@@ -103,7 +103,7 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 		default:
 			return {
 				positionType  : 'absolute',
-				position      : { top: barH, left: 0, right: 0 },
+				position      : { top: barH, right: 0, left: 0 },
 				width         : '100%',
 				height        : 'auto',
 				display       : 'flex',

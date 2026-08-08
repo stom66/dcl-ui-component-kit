@@ -9,7 +9,7 @@ alwaysApply: false
 Before adding or changing a Layer, read `.cursor/skills/ui-component-kit/SKILL.md` and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`.
 
 - One Layer = one Zone. Implement **`body()` only**. Base `render()` mounts `Zone`. `SetupUiComponentKit` owns `ScreenInsetArea` + the full-size stack — do not re-wrap.
-- Select layout with `zone: ZoneType.*`. Override size/alignment via **`uiTransform`** / **`uiBackground`** only (no Layer shorthands like `backgroundColor` / `borderRadius` / `showFrame`). Panel fill / border → wrap `body()` content in **`Background`**.
+- Select layout with `zone: ZoneType.*`. Override size/alignment via **`uiTransform`** / **`uiBackground`** only (no Layer shorthands like `backgroundColor` / `borderRadius` / `showFrame`). Panel fill / border → sibling empty **`<Background />`** in `body()` (**never nest content inside it** — keeps zone flex).
 - **Do not** invent new Layer option fields. **Do not** override `render()` to re-wrap zones.
 - `showCloseButton` / `canBeHidden` are Layer options forwarded to the Zone (Zone inserts the close control).
 - Prefer native `'30vw'` / `'10vh'` in `uiTransform`. Use `vwToPixels` / `vhToPixels` only for numeric math (virtual canvas, never physical screen size).

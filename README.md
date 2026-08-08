@@ -140,7 +140,7 @@ Layer rules (short):
 1. **One Layer = one Zone** (`zone: ZoneType.*`)
 2. Implement **`body()` only** — do not remount `Zone` / `ScreenInsetArea`
 3. Override Layer/Zone size / align with **`uiTransform`** / **`uiBackground`** if you need to (no Layer shorthands like `backgroundColor`)
-4. Panel chrome via **`<Background>`** inside `body()` — prefer component shorthands (`color`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
+4. Panel chrome via **sibling** empty **`<Background />`** in `body()` (do **not** nest content inside it — preserves zone flex) — prefer component shorthands (`color`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
 5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` when you need grid widths (`Row` is always full width)
 
 Full options: [docs/layers-and-zones.md](docs/layers-and-zones.md).

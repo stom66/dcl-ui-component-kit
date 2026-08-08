@@ -20,16 +20,20 @@ type BackgroundProps = UiBoxProps & {
 
 // MARK: Background
 /**
- * Full-size chrome wrapper: fills its parent edge-to-edge with a theme body fill
+ * Full-size panel chrome: fills its parent edge-to-edge with a theme body fill
  * and theme border width/radius by default.
  *
- * Default layout uses absolute insets (not `width`/`height` `100%`) so borders
- * stay inside a sized parent, and `overflow: 'hidden'` so fill/content clips to
- * the border radius.
+ * **Sibling chrome only** — do not nest content inside `Background`. Render it
+ * as a peer of the real body (`Row` / `Column` / …) so the parent Zone keeps
+ * owning flex alignment. Nesting creates a new flex root and discards zone
+ * `alignItems` / `justifyContent`.
  *
- * Pass `fitContent` when the parent Zone / Layer uses `height: 'auto'` (or
- * otherwise sizes to children). Absolute fill is out of flex flow and would
- * leave the parent with no in-flow height.
+ * Default layout uses absolute insets (not `width`/`height` `100%`) so borders
+ * stay inside a sized parent, and `overflow: 'hidden'` so fill clips to the
+ * border radius. Absolute chrome stays out of flex flow; in-flow siblings size
+ * auto-height Zones.
+ *
+ * Pass `fitContent` only for rare self-sized chrome (not Layer panel chrome).
  *
  * Shorthands (prefer over nesting):
  * - Fill: `color` or `backgroundColor` → `uiBackground.color` (`backgroundColor` wins if both)

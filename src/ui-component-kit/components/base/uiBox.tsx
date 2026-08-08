@@ -174,7 +174,8 @@ function resolveBoxSize(
 // MARK: UiBox
 /**
  * Base UI Component Kit entity that supports project-level UI shortcuts.
- * No default padding, border, or fill — wrap content in `Background` for panel chrome.
+ * No default padding, border, or fill — use a sibling empty `Background` for panel chrome
+ * (do not nest content inside `Background`).
  *
  * Only forwards known UiEntity props. Shorthands like `value` / `cols` must never
  * reach the entity — DCL treats every top-level key as an ECS component name.

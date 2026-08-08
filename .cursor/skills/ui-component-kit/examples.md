@@ -6,9 +6,9 @@
 - Implement `body()` only
 - Size / align via forwarded native props (`uiTransform`, `uiBackground`) on **Layer / Zone**
 - Inside `body()`, prefer component **shorthands** (`color`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
-- Panel chrome via `<Background>` inside `body()`
+- Panel chrome via **sibling** empty `<Background />` in `body()` — never nest content inside it (preserves zone flex)
 
-Real references: `simple.layer.tsx`, `timer.layer.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`
+Real references: `demo.safeZone.factory.tsx`, `timer.layer.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`
 
 ## Top-bar timer (preset + uiTransform + Background)
 
@@ -32,16 +32,15 @@ export class TimerLayer extends Layer {
 	protected body() {
 		const theme   = getTheme()
 		const seconds = this.props!.get('secondsRemaining') as number
-		return (
-			<Background color={theme.colors.primary} borderRadius={8}>
-				<Text
-					key      = "timer-value"
-					value    = {String(seconds)}
-					fontSize = {theme.typography.size.h1}
-					textAlign = "middle-center"
-				/>
-			</Background>
-		)
+		return [
+			<Background key="chrome" color={theme.colors.primary} borderRadius={8} />,
+			<Text
+				key       = "timer-value"
+				value     = {String(seconds)}
+				fontSize  = {theme.typography.size.h1}
+				textAlign = "middle-center"
+			/>,
+		]
 	}
 }
 ```
@@ -106,8 +105,9 @@ Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is u
 ## Text / Background shorthands
 
 ```tsx
-<Background color={theme.colors.primary} padding={16}>
-	<Column cols={12} alignItems="stretch">
+[
+	<Background key="chrome" color={theme.colors.primary} />,
+	<Column key="body" cols={12} alignItems="stretch" padding={16}>
 		<H2 value="Title" />
 		<Text
 			value    = "Body copy"
@@ -115,8 +115,8 @@ Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is u
 			color    = {theme.colors.light}
 		/>
 		<Code value="const x = 1" />
-	</Column>
-</Background>
+	</Column>,
+]
 ```
 
 `fontSize` takes the theme base number (auto-scaled). `color` on text = font; on `Background` = fill.
@@ -132,13 +132,14 @@ super({
 	showCloseButton: true,
 })
 
-// in body():
-<Background>
-	{/* panel content */}
-</Background>
+// in body() — chrome sibling, then content
+return [
+	<Background key="chrome" />,
+	{/* panel content */},
+]
 ```
 
-Zones are bare by default. Wrap content in `<Background>` for fill and border.
+Zones are bare by default. Add a sibling `<Background />` for fill and border — do not nest content inside it.
 
 ### Different show / hide edges
 
@@ -301,17 +302,21 @@ render() {
 	)
 }
 
-// GOOD — zone size via uiTransform; chrome via Background
+// GOOD — zone size via uiTransform; chrome via sibling Background
 super({
 	zone       : ZoneType.Top,
 	uiTransform: { width: '30vw', height: '10vw' },
 })
 
 protected body() {
-	return (
-		<Background backgroundColor={getTheme().colors.primary} borderRadius={8}>
-			{/* … */}
-		</Background>
-	)
+	return [
+		<Background key="chrome" color={getTheme().colors.primary} borderRadius={8} />,
+		{/* content siblings */},
+	]
 }
+
+// BAD — nesting content inside Background replaces zone flex
+<Background color={getTheme().colors.primary}>
+	{/* … */}
+</Background>
 ```

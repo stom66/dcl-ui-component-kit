@@ -37,7 +37,7 @@ type BackgroundGradientProps = Omit<UiBoxProps, 'backgroundColor'> & {
 	textureSrc?    : string
 	/**
 	 * When true, sizes to children instead of filling the parent.
-	 * Forwarded to `Background` — required for Layer `height: 'auto'`.
+	 * Forwarded to `Background` — rare escape hatch (prefer sibling chrome).
 	 */
 	fitContent?    : boolean
 }
@@ -70,6 +70,7 @@ function gradientUvCells(
 // MARK: BackgroundGradient
 /**
  * Full-size chrome like `Background`, filled with a directional gradient texture.
+ * Same sibling-chrome rule: empty peer behind content — do not nest body content.
  *
  * Samples a horizontal strip of `textureSrc` from `gradientStart`–`gradientEnd`
  * (UV ratios), then rotates that quad via `rotateUvIndexes` for `direction`.

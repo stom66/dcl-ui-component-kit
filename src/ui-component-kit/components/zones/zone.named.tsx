@@ -19,6 +19,13 @@ export function ZoneTop(props: NamedZoneProps) {
 }
 
 
+// MARK: ZoneTopCenter
+/** Top-center edge zone preset (50% width). */
+export function ZoneTopCenter(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.TopCenter })
+}
+
+
 // MARK: ZoneTopLeft
 /** Top-left corner zone preset. */
 export function ZoneTopLeft(props: NamedZoneProps) {
@@ -37,6 +44,13 @@ export function ZoneTopRight(props: NamedZoneProps) {
 /** Bottom edge zone preset. */
 export function ZoneBottom(props: NamedZoneProps) {
 	return Zone({ ...props, type: ZoneType.Bottom })
+}
+
+
+// MARK: ZoneBottomCenter
+/** Bottom-center edge zone preset (50% width). */
+export function ZoneBottomCenter(props: NamedZoneProps) {
+	return Zone({ ...props, type: ZoneType.BottomCenter })
 }
 
 

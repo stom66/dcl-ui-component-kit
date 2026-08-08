@@ -55,15 +55,16 @@ export class DemoAnimationsLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
-		return (
-			<Background>
-				<Column
-					cols           = {12}
-					height         = "100%"
-					alignItems     = "center"
-					justifyContent = "center"
-					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
-				>
+		return [
+			<Background key="chrome" />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				height         = "100%"
+				alignItems     = "center"
+				justifyContent = "center"
+				padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
+			>
 					<H1 value="Animations" color={theme.colors.light} />
 					{/* MARK: Row 1 
 					*/}
@@ -357,9 +358,8 @@ export class DemoAnimationsLayer extends Layer {
 							},
 						)}
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 
 
@@ -380,18 +380,19 @@ export class DemoAnimationsLayer extends Layer {
 		return (
 			<Column
 				alignItems = "center"
-				margin     = {{ left: 8, right: 8, top: 8, bottom: 8 }}
+				margin     = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 			>
 				<UiBox
-					width        = {CELL.width}
-					height       = {CELL.height}
-					onMouseEnter = {events?.onMouseEnter}
-					onMouseLeave = {events?.onMouseLeave}
-					onMouseDown  = {events?.onMouseDown}
+					width          = {CELL.width}
+					height         = {CELL.height}
+					alignItems     = "center"
+					justifyContent = "center"
+					onMouseEnter   = {events?.onMouseEnter}
+					onMouseLeave   = {events?.onMouseLeave}
+					onMouseDown    = {events?.onMouseDown}
 				>
-					<Background color={bgColor}>
-						{children}
-					</Background>
+					<Background color={bgColor} />
+					{children}
 				</UiBox>
 				<Text
 					value           = {label}

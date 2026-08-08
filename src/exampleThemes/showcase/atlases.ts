@@ -82,6 +82,7 @@ export const exampleNumbersAtlas = new TextureAtlas({
 		'*': '×',
 		'x': '×',
 	},
+	filterMode: 'bi-linear',
 })
 
 

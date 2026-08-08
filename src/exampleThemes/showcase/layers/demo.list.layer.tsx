@@ -57,24 +57,24 @@ export class DemoListLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
-		return (
-			<Background fitContent>
-				<Column
-					cols           = {12}
-					spacing        = {8}
-					alignItems     = "stretch"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="chrome" />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				spacing        = {8}
+				alignItems     = "stretch"
+				justifyContent = "flex-start"
+				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="List / Scoreboard" />
 					<Text
 						value  = "Column of rows — cols 1 + 1 + 1 + 6 + 3. Avatar after rank; ranks and scores use IconNumber. Row 4 uses FlashBorder."
 						margin = {{ bottom: 12 }}
 					/>
 					{SCOREBOARD.map((entry, index) => this.renderRow(entry, index, theme))}
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 
 

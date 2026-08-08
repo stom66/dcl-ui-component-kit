@@ -19,62 +19,89 @@ export class DemoTextLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
-		return (
-			<Background>
+		return [
+			<Background key="chrome" />,
+			<Row>
 				<Column
-					cols           = {12}
+					key            = "body"
+					cols           = {4}
 					height         = "100%"
 					alignItems     = "flex-start"
 					justifyContent = "flex-start"
 					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
 				>
-					<H1 value="Header 1" />
-					<H2 value="Header 2" />
-					<H3 value="Header 3" />
-					<H4 value="Header 4" />
-					<H5 value="Header 5" />
-					<H6 value="Header 6" />
-
-					<Divider />
-
-					<SectionHeader value="Section header" />
-					<Text value="Body text via the Text component. Use this for longer copy." />
-					<Code value="const tip = 'Code uses the monospace theme font.'" />
-
-					<Divider />
-
-					<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
-						<Label
-							value  = "Sample label"
-							margin = {{ right: 8 }}
-						/>
-						<Label
-							value  = "Success"
-							color  = {theme.colors.success}
-							margin = {{ right: 8 }}
-						/>
-						<Label
-							value = "Warning"
-							color = {theme.colors.warning}
-						/>
-					</Row>
-
-					<Row justifyContent="flex-start" alignItems="center" margin={{ top: 16 }}>
-						<Icon
-							uvs    = {atlasIconsFontAwesome.uv.gift}
-							width  = "48"
-							height = "48"
-							margin = {{ right: 12 }}
-						/>
-						<Text
-							value  = "Icon + atlas number font (see Icons demo for more):"
-							margin = {{ right: 8 }}
-						/>
-						<IconNumber value="+120/2=60" />
-					</Row>
+						<H1 value="Header 1" />
+						<H2 value="Header 2" />
+						<H3 value="Header 3" />
+						<H4 value="Header 4" />
+						<H5 value="Header 5" />
+						<H6 value="Header 6" />
 				</Column>
-			</Background>
-		)
+				<Column
+					key            = "body"
+					cols           = {8}
+					height         = "100%"
+					alignItems     = "flex-start"
+					justifyContent = "flex-start"
+					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
+				>
+						<SectionHeader value="Section header" />
+						<Text value="Body text via the Text component. Use this for longer copy. By default it will fill 100% width, and automatically wrap long content" />
+						<Code value="const tip = '<Code> uses the monospace theme font.</Code>'" />
+
+						<Divider />
+
+						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
+							<Text value="Labels:" width="auto" />
+							<Label
+								value  = "Sample label"
+							/>
+							<Label
+								value  = "Success"
+								color  = {theme.colors.success}
+							/>
+							<Label
+								value = "Info"
+								color = {theme.colors.info}
+							/>
+							<Label
+								value = "Warning"
+								color = {theme.colors.warning}
+							/>
+							<Label
+								value = "Danger"
+								color = {theme.colors.danger}
+							/>
+						</Row>
+
+						<Divider />
+
+						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
+							<Text
+								value  = "Icons, and custom font support via texture atlases (see Icons):"
+								margin = {{ right: 8 }}
+								width = "auto"
+							/>
+						</Row>
+
+						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
+							
+							<Icon
+								uvs    = {atlasIconsFontAwesome.uv.gift}
+								width  = "48"
+								height = "48"
+							/>
+							<IconNumber value="+1" margin={{right: 64}} />
+							
+							
+							<IconNumber value="1*0+120/2=60" margin={{right: 64}} />
+							
+							
+							<IconNumber value="12:30" margin={{right: 16}} />
+						</Row>
+				</Column>
+			</Row>
+		]
 	}
 }
 

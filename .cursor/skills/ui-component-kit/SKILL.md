@@ -39,17 +39,17 @@ Do not mark install/setup complete until `assets/images/ui-component-kit/` is po
 2. **One Layer = one Zone.** The layer fills that zone. Implement **`body()` only**.
 3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **`Zone`** only (the inset canvas is owned by SetupUiComponentKit — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`).
 4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset.
-5. Compose content with **`Row` / `Column` / `Background` / `UiBox` / …** inside `body()`.
+5. Compose content with **`Row` / `Column` / `UiBox` / …** inside `body()`. Panel chrome is a sibling **`Background`** (empty), not a wrapper around content.
 
 **All imports under `src/` must be relative** (`./`, `../`) — never absolute `src/...`.
 Stay inside the package with sibling/parent paths (`../components`, `../../styles`) — do not climb out to `src/` and back in via a folder name (`../../ui-component-kit/...`). That hardcodes the package directory name and breaks when it is renamed. Keep multi-named imports on one line.
 
 ## Prop forwarding (critical)
 
-Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them to the Zone. Do not add UiBox shorthand props (`backgroundColor`, `borderRadius`, …) on `LayerOptions` — put those on the native objects, or wrap body content in **`Background`**:
+Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them to the Zone. Do not add UiBox shorthand props (`backgroundColor`, `borderRadius`, …) on `LayerOptions` — put those on the native objects, or add a sibling **`Background`** in `body()`:
 
 - Zone size / flex → `uiTransform: { width, height, alignItems, justifyContent, … }`
-- Panel fill / border → `<Background>` inside `body()` (not Layer options)
+- Panel fill / border → empty sibling `<Background />` in `body()` (not Layer options; **do not nest content inside it**)
 - Background fill shorthand → `color` (or `backgroundColor`)
 - Background border → `borderColor` / `borderWidth` / `borderRadius`
 - Background texture → `textureSrc`
@@ -70,22 +70,23 @@ super({
 	},
 })
 
-// in body():
-<Background color={getTheme().colors.primary} borderRadius={8}>
-	{/* … */}
-</Background>
+// in body() — Background is chrome only; content stays a zone sibling
+return [
+	<Background key="chrome" color={getTheme().colors.primary} borderRadius={8} />,
+	{/* content: Row / Column / Text / … */},
+]
 ```
 
 | Need | How |
 |---|---|
 | Top / corner / etc. | `zone: ZoneType.*` |
-| Narrower / shorter than preset | `uiTransform: { width, height }` |
-| Height from children | `uiTransform: { height: 'auto' }` **and** `<Background fitContent>` |
-| Flex alignment | `uiTransform: { alignItems, justifyContent, … }` |
-| Fill / border on content | `<Background>` in `body()` |
+| Narrower / shorter than preset | `uiTransform: { width, height }` — corner zones pin to their flex-start/end edge (opposing `left`/`right` or `top`/`bottom` is cleared). Use `width: '100%'` / omit size to fill the slot |
+| Height from children | `uiTransform: { height: 'auto' }` + in-flow content siblings (absolute `<Background />` paints the sized zone) |
+| Flex alignment | Zone preset / `uiTransform: { alignItems, justifyContent, … }` on the **Layer** (not inside Background) |
+| Fill / border behind content | Sibling `<Background />` in `body()` |
 | Close control | `showCloseButton: true` (Layer option → Zone inserts button) |
 
-**Anti-pattern:** adding Layer shorthand fields (`backgroundColor`, `borderRadius`, `themeBackground`, `widthVw`, `showFrame`, …). Use `uiTransform` / `uiBackground` on the Zone, and `Background` for panel chrome.
+**Anti-pattern:** adding Layer shorthand fields (`backgroundColor`, `borderRadius`, `themeBackground`, `widthVw`, `showFrame`, …). Use `uiTransform` / `uiBackground` on the Zone, and sibling `Background` for panel chrome.
 
 ### Component shorthands (prefer over nesting)
 
@@ -102,19 +103,20 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 **`fontSize` shorthand** takes a **theme base px** number (e.g. `theme.typography.size.small`) and auto-wraps `scaleFontSize` inside the component. Do **not** pre-scale when using the shorthand. If you nest `uiText.fontSize`, you must still call `scaleFontSize` yourself.
 
 ```tsx
-// GOOD
-<Text value="Hello" fontSize={theme.typography.size.small} color={theme.colors.light} />
-<Background color={theme.colors.primary} borderRadius={8} padding={16}>
-	<Column cols={12} alignItems="stretch" spacing={8}>
+// GOOD — chrome sibling + content sibling (zone keeps flex)
+[
+	<Background key="chrome" color={theme.colors.primary} borderRadius={8} />,
+	<Column key="body" cols={12} alignItems="stretch" spacing={8} padding={16}>
+		<Text value="Hello" fontSize={theme.typography.size.small} color={theme.colors.light} />
 		<Row flexWrap="wrap" alignItems="flex-start">
 			{/* … */}
 		</Row>
-	</Column>
-</Background>
+	</Column>,
+]
 
 // AVOID when a shorthand exists
 <Text value="Hello" uiText={{ fontSize: scaleFontSize(theme.typography.size.small) }} />
-<Background uiBackground={{ color: theme.colors.primary }} uiTransform={{ padding: 16 }}>
+<Background uiBackground={{ color: theme.colors.primary }} />
 ```
 
 **`color` context:** on text components → font color; on `Background` / `Row` / `Column` / `UiBox` → fill (`uiBackground.color`); on `Label` → chip fill; on `Icon` → texture tint.
@@ -187,6 +189,27 @@ Reserve `Row` + `flexWrap` + `cols` for mixed 12-col spans (unequal cell widths)
 
 Optional platform overrides: `colsDesktop` / `colsMobile`. `uiTransform.height` is unrelated — keep using it for vertical size.
 
+### Virtual canvas & UI scale
+
+`SetupUiComponentKit` calls `syncVirtualCanvasToPlatform()` then passes the result into
+`ReactEcsRenderer` (`vWidth` / `vHeight` in `utils/sizing.ts`). Do **not** call `isMobile()`
+at module import to pick the virtual size — platform is unreliable that early; defaults stay
+desktop until Setup runs.
+
+| Platform | Virtual size |
+|---|---|
+| Desktop | `1920×1080` |
+| Mobile | `800×360` |
+
+SDK scale (mirrored by `getUiScaleFactor()`):
+
+`uiScale = min(physW / virtualW, physH / virtualH) / devicePixelRatio`
+
+- **Smaller virtual → larger on-screen UI** for numeric / `'Npx'` layout values (and numeric fonts after parse).
+- **DPR ÷ is intentional** — canvas size is physical; dividing maps to logical px (same units as `vw`/`vh`).
+- **`%` and native `'Nvw'` / `'Nvh'`** are **not** enlarged by shrinking the virtual canvas.
+- Phone landscape target: info HUD `uiScale` near **~0.9–1.2**. Portrait still fit-by-width and stays smaller.
+
 ### VH / VW helpers
 
 For `uiTransform` sizes/positions, prefer native strings (`'30vw'`, `'10vh'`).
@@ -231,6 +254,16 @@ arg is an optional `ScaleContext` object, not a unit.
 
 If a caller overrides `uiText.fontSize`, that override must also use `scaleFontSize`.
 
+**`scaleFontSize` is for fonts only** — do not use it on `borderRadius`, padding, or other layout numbers. Those are plain theme/virtual px and already × `uiScale` at parse time.
+
+Fonts go through two steps: `scaleFontSize(base)` (additive fluid boost from viewport width) **then** × `uiScale`. Layout numbers only get the multiply.
+
+**`textWrap`:** `@dcl/react-ecs` defaults **unset** `textWrap` to **`wrap`** (not `nowrap`, despite some docs). Button / nav labels should set `textWrap="nowrap"` — otherwise a first-frame narrow flex width can mid-word-break short strings (`List` → `Lis`/`t`) until layout settles. `ButtonText` defaults `nowrap` for `textLabel`; nested `Text` children must set it themselves.
+
+**Exclusive Default-zone panels:** when switching showcase panels, hide the others first (normal hide duration).
+
+**Do not tear down a layer’s UiEntity tree after it has been shown.** Returning `null` / skipping `body()` when `isFullyHidden` lets ReactEcs recycle those entities into sibling layers (Progress bars permanently stuck inside Grids, Layout, left nav, etc.). After the first show, keep `body()` mounted under a keyed Zone with `display: 'none'`. Never-opened `startHidden` layers may skip `body()` until first shown. Prefer unique React `key`s per layer (`demo_progress_chrome`, not bare `chrome`).
+
 ## Create a layer
 
 ```tsx
@@ -243,11 +276,10 @@ export class MyLayer extends Layer {
 	}
 
 	protected body() {
-		return (
-			<Background>
-				<UiBox key="my-body" uiText={{ value: 'Hello' }} />
-			</Background>
-		)
+		return [
+			<Background key="chrome" />,
+			<Text key="my-body" value="Hello" />,
+		]
 	}
 }
 
@@ -260,17 +292,19 @@ export const myLayer = new MyLayer()
 |---|---|
 | Override `render()` to wrap `ScreenInsetArea` / `ZoneRoot` / `Zone` | Base `Layer.render()`; only implement `body()` |
 | Hand-build edge layout | `zone: ZoneType.*` |
-| Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / `<Background>` |
+| Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / sibling `<Background />` |
+| Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `color`, `flexWrap`, `padding`, …) |
 | `fontSize={scaleFontSize(theme.typography.size.*)}` on Text shorthand | `fontSize={theme.typography.size.*}` (component scales) |
 | Bare `uiText.fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` or use the shorthand |
+| `scaleFontSize(...)` on `borderRadius` / padding / layout px | Raw theme / virtual number (SDK × `uiScale` at parse) |
 | `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**); `Row` is always full width |
 | Inventory / equal-cell board built with `Row` + `flexWrap` + `cols` | Prefer `<Grid limit={n}>` — equal cells, spacer gutters, no padded wrappers |
 | Inventory `Row` without `flexWrap` expecting multi-line layout | Use `Grid`, or set `flexWrap="wrap"` — default is `nowrap` (overflow / spill) |
 | Text/`H*`/`Code` crushed / overlapping in a height-capped `Column` | Keep kit defaults: `flexShrink: 0`, `minHeight` from font size, `alignSelf: 'flex-start'` — Yoga’s default `flexShrink: 1` collapses `height: 'auto'` text to 0 |
-| Layer `height: 'auto'` with default `<Background>` (absolute) | `<Background fitContent>` so chrome contributes in-flow height |
+| Layer `height: 'auto'` with only absolute `<Background>` (no in-flow siblings) | Keep chrome absolute; add in-flow content siblings that size the Zone |
 
 ## Procedural vs image-based
 
@@ -441,7 +475,7 @@ Shared value API: `id`, `value`, `minValue` / `maxValue`, `fillFrom`, lerp per `
 - **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/exampleThemes/<theme>/`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
 ## Hideable + close button
 
-`canBeHidden` / `startHidden` / `showCloseButton` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — wrap panel content in `<Background>` for theme body fill and border. Leave Background off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
+`canBeHidden` / `startHidden` / `showCloseButton` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — add a sibling `<Background />` for theme body fill and border (do not wrap content). Leave Background off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
 
 ### showFrom / hideTo
 
@@ -530,25 +564,34 @@ export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: 
 
 ## Background
 
+**Sibling chrome only.** `Background` paints fill/border behind content. It must **not** wrap Layer body content — nesting installs a new flex root (`alignItems` / `justifyContent` defaults) and zone safe-zone alignment no longer applies to those children. Reference: `demo.safeZone.factory.tsx` (empty bounds `Background` + content siblings).
+
 ```tsx
-<Background
-	color        = {theme.colors.primary}
-	borderRadius = {8}
-	textureSrc   = "assets/images/panel.png"
-	padding      = {16}
->
-	{children}
+// GOOD
+return [
+	<Background
+		key          = "chrome"
+		color        = {theme.colors.primary}
+		borderRadius = {8}
+		textureSrc   = "assets/images/panel.png"
+	/>,
+	<Column key="body" cols={12} spacing={8} padding={16}>
+		{/* … */}
+	</Column>,
+]
+
+// BAD — discards zone flex for nested children
+<Background color={theme.colors.primary}>
+	<Column cols={12}>{/* … */}</Column>
 </Background>
 ```
 
 Defaults: fills parent via absolute insets, theme body fill, theme border width/radius, no padding.
-Prefer `color` over `backgroundColor` / `uiBackground.color`; prefer layout shorthands (`padding`, `alignItems`, …) over nesting `uiTransform`.
+Prefer `color` over `backgroundColor` / `uiBackground.color`. Empty chrome normally needs no layout shorthands.
 
 ### Auto-height layers (`height: 'auto'`)
 
-Default `Background` is **absolutely positioned** (out of flex flow). That is correct for fixed-size zones, but with Layer `uiTransform.height: 'auto'` the Zone collapses to ~0 because nothing in-flow contributes height — content then clips under `overflow: 'hidden'`.
-
-Use **`fitContent`** so Background participates in layout (`width: 100%`, `height: 'auto'`):
+Default `Background` is **absolutely positioned** (out of flex flow). That is correct for sibling chrome: the Zone sizes from in-flow content siblings, and absolute Background paints the resulting box.
 
 ```tsx
 super({
@@ -561,19 +604,21 @@ super({
 })
 
 // in body():
-<Background fitContent>
-	<Column cols={12} spacing={8} uiTransform={{ padding: 16 }}>
+return [
+	<Background key="chrome" />,
+	<Column key="body" cols={12} spacing={8} padding={16}>
 		{/* … */}
-	</Column>
-</Background>
+	</Column>,
+]
 ```
 
 | Wrong | Right |
 |---|---|
-| `height: 'auto'` + `<Background>` (absolute fill) | `height: 'auto'` + `<Background fitContent>` |
+| Nest content in `<Background>` so the zone “has a panel” | Sibling `<Background />` + in-flow content |
+| `height: 'auto'` with only absolute chrome (no in-flow children) | Add in-flow content siblings that contribute height |
 | Inner `Column` with `height: '100%'` under auto Zone | Omit height (Column defaults to `'auto'`) |
 
-If the panel must stay inside a fixed viewport budget instead of growing, keep a definite Zone `height` and let children `flexShrink` — do not use `height: 'auto'`.
+`fitContent` is a rare escape for self-sized chrome chips — not the Layer panel pattern. Prefer `UiBox` for small labelled boxes. If the panel must stay inside a fixed viewport budget instead of growing, keep a definite Zone `height` and let children `flexShrink` — do not use `height: 'auto'`.
 
 ## Texture atlases & UV helpers
 

@@ -154,7 +154,7 @@ function applyPaddedRowGutters(
 						flexGrow  : 0,
 						flexShrink: 0,
 					}),
-					padding       : { left: pad, right: pad },
+					padding       : { right: pad, left: pad },
 					...(lineGap ? { margin: { bottom: gap } } : {}),
 					display       : 'flex',
 					flexDirection : 'column',

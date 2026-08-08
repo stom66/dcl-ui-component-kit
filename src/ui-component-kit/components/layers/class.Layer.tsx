@@ -38,6 +38,13 @@ export abstract class Layer {
 
 	protected props?: PropsController<Record<string, unknown>>
 
+	/**
+	 * Once a hideable layer has been shown, keep `body()` mounted under
+	 * `display: 'none'` when hidden. Unmounting the tree lets ReactEcs recycle
+	 * UiEntities into other layers (Progress bars appearing inside Grids / Layout).
+	 */
+	private keepContentMounted = false
+
 	constructor(options: LayerOptions) {
 		this.id              = options.id
 		this.zone            = options.zone ?? ZoneType.FullScreen
@@ -54,8 +61,7 @@ export abstract class Layer {
 			hideTo  : options.hideTo,
 		})
 
-		// Apply startHidden before the first render so off-screen layers can
-		// unmount immediately instead of building a full UI tree every frame.
+		// startHidden layers stay content-unmounted until first show().
 		if (this.canBeHidden) {
 			this.visibility.initialize(this.startHidden)
 		}
@@ -105,19 +111,25 @@ export abstract class Layer {
 	 * Mounts this layer as one Zone (preset + uiTransform / uiBackground).
 	 * The canvas (`ScreenInsetArea` + full-size stack) is owned by SetupUiComponentKit.
 	 * `showCloseButton` is configured on the Layer and applied by the Zone.
-	 * For fill / border, wrap `body()` content in `Background`.
+	 * For fill / border, return a sibling empty `Background` from `body()`
+	 * (do not nest content inside it — preserves zone flex alignment).
 	 *
-	 * After the hide animation finishes, returns `null` so the UiEntity tree is
-	 * unmounted (driven by `visibility.isFullyHidden`, not viewport math).
+	 * Hidden layers use a keyed Zone with `display: 'none'`. After the first show,
+	 * `body()` stays mounted — tearing it down lets ReactEcs recycle UiEntities
+	 * into sibling layers (Progress bars inside Grids / Layout / left nav).
+	 * Never-opened `startHidden` layers skip `body()` until first shown.
 	 */
 	render(): ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | null {
-		if (this.canBeHidden && this.visibility.isFullyHidden) {
-			return null
+		const fullyHidden = this.canBeHidden && this.visibility.isFullyHidden
+		if (!fullyHidden) {
+			this.keepContentMounted = true
 		}
 
-		const content = this.body()
+		const mountContent = !fullyHidden || this.keepContentMounted
+		const content      = mountContent ? this.body() : null
 
 		if (this.zone === ZoneType.None) {
+			if (!mountContent) return null
 			return content
 		}
 
@@ -136,6 +148,7 @@ export abstract class Layer {
 				uiTransform          = {{
 					zIndex: this.zIndex,
 					...this.uiTransform,
+					...(fullyHidden ? { display: 'none' as const } : {}),
 				}}
 			>
 				{content}

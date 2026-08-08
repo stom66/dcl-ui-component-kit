@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, Background, ButtonText, Column, getTheme, Icon, Layer, Text, ZoneType } from '../../../ui-component-kit'
+import { alpha, atlasIconsFontAwesome, Background, ButtonText, Column, getTheme, Icon, Layer, Text, UiBox, ZoneType } from '../../../ui-component-kit'
 
 import { demoAnimationsLayer } from './demo.animations.layer'
 import { demoBackgroundsLayer } from './demo.backgrounds.layer'
@@ -51,7 +51,9 @@ const DEMO_PANEL_LAYERS: Layer[] = [
 function toggleDemoPanel(target: Layer) {
 	for (const layer of DEMO_PANEL_LAYERS) {
 		if (layer === target) continue
-		if (!layer.visibility.isHidden) layer.hide()
+		if (!layer.visibility.isHidden || !layer.visibility.isFullyHidden) {
+			layer.hide()
+		}
 	}
 
 	if (target !== demoSafeZonesLayer) {
@@ -97,7 +99,7 @@ function DemoNavButton({ id, label, icon, layer }: NavEntry) {
 			uiTransform    = {{ flexDirection: 'row' }}
 			justifyContent = "flex-start"
 			alignItems     = "center"
-			padding        = {{ left: 10, right: 12 }}
+			padding        = {{ right: 12, left: 10 }}
 			uiText         = {{ value: '' }}
 		>
 			<Icon
@@ -114,6 +116,9 @@ function DemoNavButton({ id, label, icon, layer }: NavEntry) {
 				alignSelf = "center"
 				fontSize  = {theme.typography.size.default}
 				textAlign = "middle-left"
+				// react-ecs defaults unset textWrap to wrap — first-frame narrow
+				// flex widths mid-word-break short labels until layout settles.
+				textWrap  = "nowrap"
 			/>
 		</ButtonText>
 	)
@@ -131,8 +136,10 @@ export class DemoLeftBarLayer extends Layer {
 			zone  : ZoneType.Left,
 			zIndex: 1000,
 			uiTransform: {
-				alignItems    : 'stretch',
-				justifyContent: 'flex-start',
+				// Let ZoneType.Left center this panel vertically; only constrain width.
+				width     : '100%',
+				height    : 'auto',
+				alignItems: 'stretch',
 			},
 		})
 	}
@@ -142,37 +149,40 @@ export class DemoLeftBarLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
+		// height:auto shell sized by the Column; Background paints that shell only
+		// (height 100% was stretching the chrome to the full Left strip).
 		return (
-			<Background
-				color          = {alpha(theme.colors.body, 0.65)}
-				borderRadius   = {theme.border.radiusDefault}
+			<UiBox
+				key            = "demo_left_bar_shell"
 				alignSelf      = "flex-start"
 				alignItems     = "stretch"
 				justifyContent = "flex-start"
-				padding        = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 				zIndex         = {1000}
+				width          = "100%"
+				height         = "auto"
 				uiTransform    = {{
-					// In-flow panel inside the Left zone (preset stays 25%).
-					// Do NOT pin left+right (Background's default absolute fill does) —
-					// that stretches to the full zone and ignores maxWidth.
-					positionType: 'relative',
-					position    : { top: 0, bottom: 0, left: 0 },
-					width       : '100%',
-					maxWidth    : NAV_BAR_WIDTH,
-					height      : '100%',
+					display : 'flex',
+					maxWidth: NAV_BAR_WIDTH,
 				}}
 			>
+				<Background
+					key          = "demo_left_bar_chrome"
+					color        = {alpha(theme.colors.body, 0.65)}
+					borderRadius = {theme.border.radiusDefault}
+				/>
 				<Column
+					key            = "demo_left_bar_body"
 					cols           = {12}
 					height         = "auto"
 					alignItems     = "stretch"
 					justifyContent = "flex-start"
+					padding        = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 				>
 					{NAV_ENTRIES.map((entry) => (
 						DemoNavButton(entry)
 					))}
 				</Column>
-			</Background>
+			</UiBox>
 		)
 	}
 }

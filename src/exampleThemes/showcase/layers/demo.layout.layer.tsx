@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, Column, Divider, getTheme, H2, H3, Layer, Row, Text, ZoneType, type Theme } from '../../../ui-component-kit'
+import { alpha, Background, Column, Divider, getTheme, H2, H3, Layer, Row, Text, UiBox, ZoneType, type Theme } from '../../../ui-component-kit'
 
 
 // MARK: DemoCell
@@ -16,20 +16,20 @@ function DemoCell({
 	theme: Theme
 }) {
 	return (
-		<Background
-			fitContent
+		<UiBox
 			color          = {color}
 			borderRadius   = {theme.border.radiusSmall}
 			padding        = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 			alignItems     = "center"
 			justifyContent = "center"
+			width          = "100%"
 		>
 			<Text
 				value     = {label}
 				fontSize  = {theme.typography.size.small}
 				textAlign = "middle-center"
 			/>
-		</Background>
+		</UiBox>
 	)
 }
 
@@ -65,15 +65,16 @@ export class DemoLayoutLayer extends Layer {
 		const cNest  = alpha(theme.colors.warning, 0.7)
 		const cMuted = alpha(theme.colors.secondary, 0.55)
 
-		return (
-			<Background fitContent>
-				<Column
-					cols           = {12}
-					spacing        = {10}
-					alignItems     = "stretch"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="demo_layout_chrome" />,
+			<Column
+				key            = "demo_layout_body"
+				cols           = {12}
+				spacing        = {10}
+				alignItems     = "stretch"
+				justifyContent = "flex-start"
+				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="Rows & Columns" />
 					<Text value="Typically, Cols go inside Rows. Cols are sized by the number of columns they span, out of 12." />
 
@@ -194,9 +195,8 @@ export class DemoLayoutLayer extends Layer {
 							</Row>
 						</Column>
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 }
 

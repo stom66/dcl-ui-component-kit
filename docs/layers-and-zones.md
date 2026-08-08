@@ -19,7 +19,7 @@ Class-based UI surface. Implement **`body()` only**. Base `render()` mounts the 
 | `uiTransform` | `UiTransform` | — | Forwarded to the Zone (size / flex) |
 | `uiBackground` | `UiBackground` | — | Forwarded to the Zone |
 
-**Do not** add Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`, …). Panel chrome → `<Background>` in `body()`.
+**Do not** add Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`, …). Panel chrome → sibling `<Background />` in `body()` (never nest content inside it — that replaces zone flex alignment).
 
 ### Example
 
@@ -36,14 +36,13 @@ export class ScoreboardLayer extends Layer {
 	}
 
 	body() {
-		return (
-			<Background>
-				<Row alignItems="center" justifyContent="space-between" padding={12}>
-					<Header value="Score" />
-					<Text value="12" />
-				</Row>
-			</Background>
-		)
+		return [
+			<Background key="chrome" color={/* … */} borderRadius={8} />,
+			<Row key="content" alignItems="center" justifyContent="space-between" padding={12}>
+				<Header value="Score" />
+				<Text value="12" />
+			</Row>,
+		]
 	}
 }
 
@@ -67,11 +66,10 @@ export class NotificationLayer extends Layer {
 	}
 
 	body() {
-		return (
-			<Background>
-				<Header value="Quest complete" />
-			</Background>
-		)
+		return [
+			<Background key="chrome" />,
+			<Header key="title" value="Quest complete" />,
+		]
 	}
 }
 
@@ -95,12 +93,16 @@ Zones are preset layout slots on the virtual canvas. Layers pick one via `zone: 
 | `FullScreen` | Full canvas overlay (Layer constructor default) |
 | `InteractableArea` | Fits the explorer interactable area |
 | `Top` / `Bottom` | Edge chrome |
-| `TopLeft` / `TopRight` / `BottomLeft` / `BottomRight` | Corner HUD slots (`TopLeft`/`TopRight` `20vw` side inset; `BottomLeft` `25vw`) |
+| `TopCenter` / `BottomCenter` | Centered edge bars (`width: 50%`, pinned with `left: 25%`) |
+| `TopLeft` / `TopRight` | Same band as `Top` (`flexDirection: row`); content `flex-start` / `flex-end` |
+| `BottomLeft` / `BottomRight` | Corner HUD slots (`BottomLeft` `25vw` side inset) |
 | `LeftTop` / `Left` / `LeftBottom` | Left strip (same insets; content `flex-start` / center / `flex-end`) |
 | `RightTop` / `Right` / `RightBottom` | Right strip (mirror of left) |
 | `None` | Raw content (no zone wrapper) |
 
 Zone merges transforms as: **flex defaults → zone preset → `uiTransform` overrides**.
+
+Explicit `width` / `height` on a stretched corner slot (e.g. `BottomRight` with `left`+`right`) clear the inward edge so the box pins to that corner. Omit size or use `width: '100%'` to keep filling the full slot.
 
 Named helpers (`ZoneTop`, `ZoneBottomRight`, …) wrap the same presets when you need a zone outside a `Layer`.
 

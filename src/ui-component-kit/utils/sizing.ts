@@ -1,7 +1,32 @@
 import { engine, PBUiCanvasInformation, UiCanvasInformation } from '@dcl/sdk/ecs'
 import { isMobile } from '@dcl/sdk/platform'
 
-export const [vWidth, vHeight] = isMobile() ? [1600, 720]: [1920, 1080]
+/** Desktop virtual design canvas (default until `syncVirtualCanvasToPlatform`). */
+const DESKTOP_VIRTUAL = { width: 1920, height: 1080 } as const
+/** Mobile virtual design canvas — smaller than desktop so numeric/`px` UI reads larger. */
+const MOBILE_VIRTUAL  = { width: 1200,  height: 540  } as const
+
+/**
+ * Live virtual canvas size used by kit math and SetupUiComponentKit.
+ * Do not read these at module top-level to pick a platform — call
+ * `syncVirtualCanvasToPlatform()` from Setup (isMobile is unreliable at import time).
+ */
+export let vWidth : number = DESKTOP_VIRTUAL.width
+export let vHeight: number = DESKTOP_VIRTUAL.height
+
+
+// MARK: syncVirtualCanvasToPlatform
+/**
+ * Resolves desktop vs mobile virtual size via `isMobile()` and updates `vWidth` / `vHeight`.
+ * Must run from `SetupUiComponentKit` (or equivalent) before the renderer is mounted —
+ * not at module import time.
+ */
+export function syncVirtualCanvasToPlatform(): { width: number; height: number } {
+	const next = isMobile() ? MOBILE_VIRTUAL : DESKTOP_VIRTUAL
+	vWidth  = next.width
+	vHeight = next.height
+	return { width: vWidth, height: vHeight }
+}
 
 
 // MARK: getCanvasInfo
@@ -11,12 +36,11 @@ export function getCanvasInfo(): PBUiCanvasInformation | null {
 }
 
 
-// MARK: readCanvasDimensions
+// MARK: readVirtualCanvasDimensions
 /** Virtual canvas size configured by SetupUiComponentKit. */
 export function readVirtualCanvasDimensions(): { height: number; width: number } {
 	return { height: vHeight, width: vWidth }
 }
-
 
 
 // MARK: getUiScaleFactor
@@ -45,12 +69,18 @@ export function readPhysicalCanvasDimensions(): { height: number; width: number 
 
 	return { height: canvas.height, width: canvas.width }
 }
-	export function readPhysicalCanvasWidth(): number {
-		return readPhysicalCanvasDimensions().width
-	}
-	export function readPhysicalCanvasHeight(): number {
-		return readPhysicalCanvasDimensions().height
-	}
+
+
+// MARK: readPhysicalCanvasWidth
+export function readPhysicalCanvasWidth(): number {
+	return readPhysicalCanvasDimensions().width
+}
+
+
+// MARK: readPhysicalCanvasHeight
+export function readPhysicalCanvasHeight(): number {
+	return readPhysicalCanvasDimensions().height
+}
 
 
 // MARK: vhToPixels

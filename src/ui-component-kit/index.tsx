@@ -1,16 +1,16 @@
-import { isMobile } from '@dcl/sdk/platform'
 import ReactEcs, { ReactEcsRenderer, ScreenInsetArea, UiEntity } from '@dcl/sdk/react-ecs'
 
 import type { Layer } from './components/layers'
 import { safeZonesDesktopLayer, safeZonesMobileLayer } from './debug'
 import { setTheme } from './styles/theme'
 import type { Theme, ThemeCustomize } from './styles/theme'
+import { syncVirtualCanvasToPlatform } from './utils/sizing'
 
 // MARK: Exports
 export { Layer }                  from './components/layers'
 export type { LayerOptions }      from './components/layers'
 
-export { VisibilityController, Zone, ZoneBottom, ZoneBottomLeft, ZoneBottomRight, ZoneDefault, ZoneFullScreen, ZoneLeft, ZoneLeftBottom, ZoneLeftTop, ZoneRight, ZoneRightBottom, ZoneRightTop, ZoneRoot, ZoneTop, ZoneTopLeft, ZoneTopRight, ZoneType } from './components/zones'
+export { VisibilityController, Zone, ZoneBottom, ZoneBottomCenter, ZoneBottomLeft, ZoneBottomRight, ZoneDefault, ZoneFullScreen, ZoneLeft, ZoneLeftBottom, ZoneLeftTop, ZoneRight, ZoneRightBottom, ZoneRightTop, ZoneRoot, ZoneTop, ZoneTopCenter, ZoneTopLeft, ZoneTopRight, ZoneType } from './components/zones'
 export type { VisibilityPosition, ZoneProps } from './components/zones'
 
 export { AvatarIcon, Background, BackgroundGradient, Bounce, ButtonImage, ButtonImageClose, ButtonText, clearToastGroup, Code, Column, ColumnReverse, DEFAULT_AVATAR_USER_ID, Divider, FlashBorder, FlashColor, getToggleProps, Grid, H1, H2, H3, H4, H5, H6, Header, hideToast, Icon, IconCharacter, IconNumber, IconString, IconSymbol, isPlaying, Label, mergeUiBackground, playOnce, ProgressBar, ProgressBarImage, Pulse, resolveSpriteLocalFrame, resolveUiBackground, Row, RowReverse, SectionHeader, setLooping, setPlaying, Shake, showToast, Spinner, spriteCycleFrameCount, spriteFrameToUvCell, SpriteIcon, Text, Toggle, toastHostLayer, ToastHostLayer, UiBox, Wiggle } from './components'
@@ -58,11 +58,10 @@ export function SetupUiComponentKit({
 	layers,
 	debug = {},
 }: SetupUiComponentKitOptions) {
-	const activeTheme       = setTheme(theme)
-	
-	const stack             = [...layers]
-
-	const [vWidth, vHeight] = isMobile() ? [1600, 720]: [1920, 1080]
+	const activeTheme = setTheme(theme)
+	const stack       = [...layers]
+	// isMobile() is unreliable at module import — resolve virtual canvas here.
+	const virtual     = syncVirtualCanvasToPlatform()
 
 	if (debug.showDesktopSafeZones) stack.push(safeZonesDesktopLayer)
 	if (debug.showMobileSafeZones)  stack.push(safeZonesMobileLayer)
@@ -77,7 +76,7 @@ export function SetupUiComponentKit({
 							width         : '100%',
 							height        : '100%',
 							positionType  : 'absolute',
-							position      : { left: 0, top: 0 },
+							position      : { top: 0, left: 0 },
 							display       : 'flex',
 							flexDirection : 'column',
 							alignItems    : 'center',
@@ -92,8 +91,8 @@ export function SetupUiComponentKit({
 			</ScreenInsetArea>
 		),
 		{
-			virtualHeight: vHeight,
-			virtualWidth : vWidth,
+			virtualHeight: virtual.height,
+			virtualWidth : virtual.width,
 		}
 	)
 

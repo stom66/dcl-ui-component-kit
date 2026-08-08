@@ -17,6 +17,7 @@ export enum ZoneType {
 	FullScreen       = 'fullScreen',
 	InteractableArea = 'interactableArea',
 	Top              = 'top',
+	TopCenter        = 'topCenter',
 	TopRight         = 'topRight',
 	TopLeft          = 'topLeft',
 	LeftTop          = 'leftTop',
@@ -26,6 +27,7 @@ export enum ZoneType {
 	Right            = 'right',
 	RightBottom      = 'rightBottom',
 	Bottom           = 'bottom',
+	BottomCenter     = 'bottomCenter',
 	BottomRight      = 'bottomRight',
 	BottomLeft       = 'bottomLeft',
 }
@@ -72,10 +74,15 @@ export function resolveVisibilityEdges(
 	return { showFrom: presetEdge, hideTo: presetEdge }
 }
 
-function getInteractableArea(): { top: number; bottom: number; left: number; right: number } {
+function getInteractableArea(): { top: number; right: number; bottom: number; left: number } {
 	const canvas = getCanvasInfo()
-	if (!canvas) return { top: 0, bottom: 0, left: 0, right: 0 }
-	return { top: canvas.interactableArea?.top ?? 0, bottom: canvas.interactableArea?.bottom ?? 0, left: canvas.interactableArea?.left ?? 0, right: canvas.interactableArea?.right ?? 0 }
+	if (!canvas) return { top: 0, right: 0, bottom: 0, left: 0 }
+	return {
+		top   : canvas.interactableArea?.top ?? 0,
+		right : canvas.interactableArea?.right ?? 0,
+		bottom: canvas.interactableArea?.bottom ?? 0,
+		left  : canvas.interactableArea?.left ?? 0,
+	}
 }
 
 
@@ -85,80 +92,30 @@ function getInteractableArea(): { top: number; bottom: number; left: number; rig
  * `UiCanvasInformation.interactableArea.left` as a live inset (see info HUD).
  * `screenInsetArea` is hardware-only and already handled by `ScreenInsetArea`.
  */
-export const LEFT_ZONE_INSET = isMobile() ? 8 : vwToPixels(3)
+export const LEFT_ZONE_INSET = isMobile() ? 0 : vwToPixels(3)
 
 /** Mirror of `LEFT_ZONE_INSET` for right-edge side strips. */
 export const RIGHT_ZONE_INSET = 8
 
-/** Corner HUD side inset for TopLeft / TopRight. */
-export const CORNER_SIDE_INSET = '20vw'
-
-/** Bottom-left corner side inset. */
-export const BOTTOM_LEFT_SIDE_INSET = '25vw'
-
-/** Top / bottom bar height fraction used by zone presets and toast docks. */
-export const BAR_ZONE_HEIGHT = '23%'
-
-/** Side-strip width for Left* / Right* zone presets (and toast docks). */
-export const RIGHT_ZONE_WIDTH = '25%'
-
-type FlexAlign = 'flex-start' | 'center' | 'flex-end'
-
-function leftSideTopInset(): `${number}vh` {
-	return isMobile() ? '25vh' : '12vh'
-}
-
-function leftSideBottomInset(): `${number}vh` {
-	return isMobile() ? '40vh' : '25vh'
-}
-
-
-// MARK: getLeftSideTransform
-/**
- * Shared geometry for Left / LeftTop / LeftBottom.
- * Column flex: justifyContent = vertical, alignItems = horizontal.
- */
-function getLeftSideTransform(justifyContent: FlexAlign): UiEntityTransform {
-	return {
-		width         : RIGHT_ZONE_WIDTH,
-		positionType  : 'absolute',
-		justifyContent,
-		alignItems    : 'flex-start',
-		position      : {
-			top   : leftSideTopInset(),
-			bottom: leftSideBottomInset(),
-			left  : LEFT_ZONE_INSET,
-		},
-	}
-}
-
-
-// MARK: getRightSideTransform
-/**
- * Shared geometry for Right / RightTop / RightBottom.
- * Column flex: justifyContent = vertical, alignItems = horizontal.
- */
-function getRightSideTransform(justifyContent: FlexAlign): UiEntityTransform {
-	return {
-		width         : RIGHT_ZONE_WIDTH,
-		positionType  : 'absolute',
-		justifyContent,
-		alignItems    : 'flex-end',
-		position      : {
-			top   : leftSideTopInset(),
-			bottom: leftSideBottomInset(),
-			right : RIGHT_ZONE_INSET,
-		},
-	}
-}
-
 
 // MARK: zonePresets
+/**
+ * Center-aligned slots (Default / Top / TopCenter / Bottom / BottomCenter /
+ * Left / Right) use explicit width + height so the box stays sized and can
+ * sit at the midpoint. TopLeft / TopRight share Top’s band and row layout,
+ * differing only in start / end alignment. Other corner / edge slots stretch
+ * with opposing position edges (top+bottom, etc.).
+ */
 export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> = {
 	[ZoneType.FullScreen]: {
 		getUiTransform: () => ({
-			height        : '100%',
-			width         : '100%',
+			positionType  : 'absolute',
+			position      : {
+				top   : 0,
+				right : 0,
+				bottom: 0,
+				left  : 0,
+			},
 			justifyContent: 'center',
 			alignItems    : 'center',
 		}),
@@ -174,9 +131,9 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 				positionType  : 'absolute',
 				position      : {
 					top   : area.top,
+					right : area.right,
 					bottom: area.bottom,
 					left  : area.left,
-					right : area.right,
 				},
 				justifyContent: 'center',
 				alignItems    : 'center',
@@ -195,106 +152,233 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		visibilityPosition: 'bottom',
 	},
 
+	// MARK: Top
 	[ZoneType.Top]: {
 		getUiTransform: () => ({
-			height        : BAR_ZONE_HEIGHT,
-			width         : '50%',
+			height        : '23%',
 			positionType  : 'absolute',
-			position      : { top: 8 },
-			justifyContent: 'flex-start',
-			alignItems    : 'center',
+			position      : {
+				top  : 8,
+				right: isMobile() ? '20vw' : 8,
+				left : isMobile() ? '32vw' : '17.5vw',
+			},
+			justifyContent: 'center',
+			alignItems    : 'flex-start',
+			flexDirection : 'row',
+		}),
+		visibilityPosition: 'top',
+	},
+
+	[ZoneType.TopCenter]: {
+		getUiTransform: () => ({
+			height        : '23%',
+			width         : '50%',
+			alignSelf     : 'flex-start',
+			positionType  : 'absolute',
+			position      : {
+				top : 8,
+				left: '25%',
+			},
+			justifyContent: 'center',
+			alignItems    : 'flex-start',
+			flexDirection : 'row',
 		}),
 		visibilityPosition: 'top',
 	},
 
 	[ZoneType.TopRight]: {
 		getUiTransform: () => ({
-			height        : BAR_ZONE_HEIGHT,
-			width         : '25%',
+			height        : '23%',
 			positionType  : 'absolute',
-			position      : { top: 8, right: isMobile() ? '5vw' : '8px' },
-			justifyContent: 'flex-start',
-			alignItems    : 'flex-end',
+			position      : {
+				top  : 8,
+				right: isMobile() ? '20vw' : 8,
+				left : isMobile() ? '32vw' : '17.5vw',
+			},
+			justifyContent: 'flex-end',
+			alignItems    : 'flex-start',
+			flexDirection : 'row',
 		}),
 		visibilityPosition: 'top',
 	},
 
 	[ZoneType.TopLeft]: {
 		getUiTransform: () => ({
-			height        : BAR_ZONE_HEIGHT,
-			width         : '25%',
+			height        : '23%',
 			positionType  : 'absolute',
-			position      : { top: 8, left: CORNER_SIDE_INSET },
+			position      : {
+				top  : 8,
+				right: isMobile() ? '20vw' : 8,
+				left : isMobile() ? '32vw' : '17.5vw',
+			},
 			justifyContent: 'flex-start',
 			alignItems    : 'flex-start',
+			flexDirection : 'row',
 		}),
 		visibilityPosition: 'top',
 	},
 
+
+	// MARK: Right
+	[ZoneType.RightTop]: {
+		getUiTransform: () => ({
+			positionType  : 'absolute',
+			position      : {
+				top   : isMobile() ? '25vh' : 8,
+				right : RIGHT_ZONE_INSET,
+				bottom: isMobile() ? '60vh' : 8,
+				left  : '75%',
+			},
+			justifyContent: 'flex-start',
+			alignItems    : 'flex-end',
+		}),
+		visibilityPosition: 'right',
+	},
+
+	[ZoneType.Right]: {
+		getUiTransform: () => ({
+			positionType  : 'absolute',
+			position      : {
+				top   : isMobile() ? '25vh' : 8,
+				right : RIGHT_ZONE_INSET,
+				bottom: isMobile() ? '60vh' : 8,
+				left  : '75%',
+			},
+			justifyContent: 'center',
+			alignItems    : 'flex-end',
+		}),
+		visibilityPosition: 'right',
+	},
+
+	[ZoneType.RightBottom]: {
+		getUiTransform: () => ({
+			positionType  : 'absolute',
+			position      : {
+				top   : isMobile() ? '25vh' : 8,
+				right : RIGHT_ZONE_INSET,
+				bottom: isMobile() ? '60vh' : 8,
+				left  : '75%',
+			},
+			justifyContent: 'flex-end',
+			alignItems    : 'flex-end',
+		}),
+		visibilityPosition: 'right',
+	},
+
+
+	// MARK: Bottom
 	[ZoneType.Bottom]: {
 		getUiTransform: () => ({
-			height        : BAR_ZONE_HEIGHT,
+			height        : '25%',
+			positionType  : 'absolute',
+			position      : {
+				right : isMobile() ? '22.5%' : 8,
+				bottom: 8,
+				left  : isMobile() ? '22.5%' : '22%',
+			},
+			justifyContent: 'center',
+			alignItems    : 'flex-end',
+			flexDirection : 'row',
+		}),
+		visibilityPosition: 'bottom',
+	},
+
+	[ZoneType.BottomCenter]: {
+		getUiTransform: () => ({
+			height        : '25%',
 			width         : '50%',
 			positionType  : 'absolute',
-			position      : { bottom: 8 },
-			justifyContent: 'flex-end',
-			alignItems    : 'center',
+			position      : {
+				right : '25%',
+				bottom: 8,
+				left  : '25%',
+			},
+			justifyContent: 'center',
+			alignItems    : 'flex-end',
+			flexDirection : 'row',
 		}),
 		visibilityPosition: 'bottom',
 	},
 
 	[ZoneType.BottomRight]: {
 		getUiTransform: () => ({
-			height        : BAR_ZONE_HEIGHT,
-			width         : vwToPixels(25) - RIGHT_ZONE_INSET,
+			height        : '25%',
 			positionType  : 'absolute',
-			position      : { bottom: 8, right: RIGHT_ZONE_INSET },
+			position      : {
+				right : isMobile() ? '22.5%' : 8,
+				bottom: 8,
+				left  : isMobile() ? '22.5%' : '22%',
+			},
 			justifyContent: 'flex-end',
 			alignItems    : 'flex-end',
+			flexDirection : 'row',
 		}),
 		visibilityPosition: 'bottom',
 	},
 
 	[ZoneType.BottomLeft]: {
 		getUiTransform: () => ({
-			height        : BAR_ZONE_HEIGHT,
-			width         : '25%',
+			height        : '25%',
 			positionType  : 'absolute',
-			position      : { bottom: 8, left: BOTTOM_LEFT_SIDE_INSET },
-			justifyContent: 'flex-end',
-			alignItems    : 'flex-start',
+			position      : {
+				right : isMobile() ? '22.5%' : 8,
+				bottom: 8,
+				left  : isMobile() ? '22.5%' : '22%',
+			},
+			justifyContent: 'flex-start',
+			alignItems    : 'flex-end',
+			flexDirection : 'row',
 		}),
 		visibilityPosition: 'bottom',
 	},
 
+
+	// MARK: Left
 	[ZoneType.LeftTop]: {
-		getUiTransform: () => getLeftSideTransform('flex-start'),
+		getUiTransform: () => ({
+			positionType  : 'absolute',
+			position      : {
+				top   : isMobile() ? '25vh' : '12vh',
+				right : '75%',
+				bottom: isMobile() ? '40vh' : '6vh',
+				left  : LEFT_ZONE_INSET,
+			},
+			justifyContent: 'flex-start',
+			alignItems    : 'flex-start',
+		}),
 		visibilityPosition: 'left',
 	},
 
 	[ZoneType.Left]: {
-		getUiTransform: () => getLeftSideTransform('center'),
+		getUiTransform: () => ({
+			// Strip from top→bottom; content shrink-wraps and centers vertically.
+			// (height/flexGrow on an absolute top+bottom box cannot shrink the strip.)
+			positionType  : 'absolute',
+			position      : {
+				top   : isMobile() ? '25vh' : '12vh',
+				right : '75%',
+				bottom: isMobile() ? '40vh' : '6vh',
+				left  : LEFT_ZONE_INSET,
+			},
+			justifyContent: 'center',
+			alignItems    : 'flex-start',
+		}),
 		visibilityPosition: 'left',
 	},
 
 	[ZoneType.LeftBottom]: {
-		getUiTransform: () => getLeftSideTransform('flex-end'),
+		getUiTransform: () => ({
+			positionType  : 'absolute',
+			position      : {
+				top   : isMobile() ? '25vh' : '12vh',
+				right : '75%',
+				bottom: isMobile() ? '40vh' : '6vh',
+				left  : LEFT_ZONE_INSET,
+			},
+			justifyContent: 'flex-end',
+			alignItems    : 'flex-start',
+		}),
 		visibilityPosition: 'left',
-	},
-
-	[ZoneType.RightTop]: {
-		getUiTransform: () => getRightSideTransform('flex-start'),
-		visibilityPosition: 'right',
-	},
-
-	[ZoneType.Right]: {
-		getUiTransform: () => getRightSideTransform('center'),
-		visibilityPosition: 'right',
-	},
-
-	[ZoneType.RightBottom]: {
-		getUiTransform: () => getRightSideTransform('flex-end'),
-		visibilityPosition: 'right',
 	},
 }
 

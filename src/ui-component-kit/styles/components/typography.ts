@@ -26,7 +26,7 @@ export type ThemeTypography = {
 
 export const typography: ThemeTypography = {
 	size: {
-		code   : 4,
+		code   : 6,
 		default: 10,
 		small  : 8,
 		h1     : 40,

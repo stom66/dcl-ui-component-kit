@@ -87,15 +87,16 @@ export class DemoToggleLayer extends Layer {
 		const bothOnAlpha       = this.props.get('bothOnAlpha') as number
 		const primary           = theme.colors.primary
 
-		return (
-			<Background>
-				<Column
-					cols           = {12}
-					height         = "100%"
-					alignItems     = "stretch"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
-				>
+		return [
+			<Background key="chrome" />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				height         = "100%"
+				alignItems     = "stretch"
+				justifyContent = "flex-start"
+				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
+			>
 					<H2 value="Toggle" />
 					<Text value="Pill track with a sliding thumb. Click anywhere on the switch." />
 
@@ -177,9 +178,8 @@ export class DemoToggleLayer extends Layer {
 							<Label cols={12} value="Both — background + toggleColor" color={alpha(primary, bothOnAlpha)} />
 						</Column>
 					</Row>
-				</Column>
-			</Background>
-		)
+			</Column>,
+		]
 	}
 }
 

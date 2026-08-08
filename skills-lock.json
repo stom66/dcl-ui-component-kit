@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "sdk-scenes": {
+      "source": "decentraland/sdk-skills",
+      "sourceType": "github",
+      "skillPath": "sdk-scenes/SKILL.md",
+      "computedHash": "3fd1e5e1526fb339f17795a42dee5d462efb2d57782ae039a25c0cb069f43a75"
+    },
+    "unity-explorer-mcp": {
+      "source": "decentraland/sdk-skills",
+      "sourceType": "github",
+      "skillPath": "unity-explorer-mcp/SKILL.md",
+      "computedHash": "64e1d490d0515e6b8e424fec191cc09790de618256969b6094b0a730fcca0019"
+    }
+  }
+}

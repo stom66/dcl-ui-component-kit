@@ -6,7 +6,10 @@ const SAMPLE_MARGIN = { top: 8, bottom: 8 }
 
 
 // MARK: DemoSample
-/** Sized host so absolute `Background` / `BackgroundGradient` fill a visible sample slot. */
+/**
+ * Sized host so absolute `Background` / `BackgroundGradient` fill a visible
+ * sample slot. Chrome and label are siblings (intended Background usage).
+ */
 function DemoSample({
 	children,
 }: {
@@ -14,9 +17,11 @@ function DemoSample({
 }) {
 	return (
 		<Column
-			cols   = {12}
-			height = {SAMPLE_HEIGHT}
-			margin = {SAMPLE_MARGIN}
+			cols           = {12}
+			height         = {SAMPLE_HEIGHT}
+			margin         = {SAMPLE_MARGIN}
+			alignItems     = "center"
+			justifyContent = "center"
 		>
 			{children}
 		</Column>
@@ -46,93 +51,86 @@ export class DemoBackgroundsLayer extends Layer {
 	protected body() {
 		const theme = getTheme()
 
-		return (
-			<Background
-				padding={{ top: 16, right: 16, bottom: 16, left: 16 }}
+		return [
+			<Background key="chrome" />,
+			<Row
+				key            = "body"
+				height         = "100%"
+				alignItems     = "flex-start"
+				justifyContent = "flex-start"
+				padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
 			>
-				<Row
+				<Column
+					cols           = {4}
 					height         = "100%"
-					alignItems     = "flex-start"
+					alignItems     = "stretch"
 					justifyContent = "flex-start"
+					padding        = {{ right: 8 }}
 				>
-					<Column
-						cols           = {4}
-						height         = "100%"
-						alignItems     = "stretch"
-						justifyContent = "flex-start"
-						padding        = {{ right: 8 }}
-					>
-						<Row margin={{ bottom: 4 }}>
-							<Label cols={12} value="Backgrounds" />
-						</Row>
+					<Row margin={{ bottom: 4 }}>
+						<Label cols={12} value="Backgrounds" />
+					</Row>
 
-						<DemoSample>
-							<Background>
-								<Label value="Default" />
-							</Background>
-						</DemoSample>
+					<DemoSample>
+						<Background />
+						<Label value="Default" />
+					</DemoSample>
 
-						<DemoSample>
-							<Background
-								color        = {theme.colors.primary}
-								borderRadius = {theme.border.radiusLarge}
-								borderWidth  = {theme.border.width}
-							>
-								<Label value="Custom color" />
-							</Background>
-						</DemoSample>
-					</Column>
+					<DemoSample>
+						<Background
+							color        = {theme.colors.primary}
+							borderRadius = {theme.border.radiusLarge}
+							borderWidth  = {theme.border.width}
+						/>
+						<Label value="Custom color" />
+					</DemoSample>
+				</Column>
 
-					<Column
-						cols           = {8}
-						height         = "100%"
-						alignItems     = "stretch"
-						justifyContent = "flex-start"
-						padding        = {{ left: 8 }}
-					>
-						<Row margin={{ bottom: 4 }}>
-							<Label cols={12} value="Background gradients" />
-						</Row>
+				<Column
+					cols           = {8}
+					height         = "100%"
+					alignItems     = "stretch"
+					justifyContent = "flex-start"
+					padding        = {{ left: 8 }}
+				>
+					<Row margin={{ bottom: 4 }}>
+						<Label cols={12} value="Background gradients" />
+					</Row>
 
-						<DemoSample>
-							<BackgroundGradient
-								color     = {theme.colors.primary}
-								direction = "top"
-							>
-								<Label value="Primary · top" />
-							</BackgroundGradient>
-						</DemoSample>
+					<DemoSample>
+						<BackgroundGradient
+							color     = {theme.colors.primary}
+							direction = "top"
+						/>
+						<Label value="Primary · top" />
+					</DemoSample>
 
-						<DemoSample>
-							<BackgroundGradient
-								color     = {theme.colors.danger}
-								direction = "bottom"
-							>
-								<Label value="Danger · bottom" />
-							</BackgroundGradient>
-						</DemoSample>
+					<DemoSample>
+						<BackgroundGradient
+							color     = {theme.colors.danger}
+							direction = "bottom"
+						/>
+						<Label value="Danger · bottom" />
+					</DemoSample>
 
-						<DemoSample>
-							<BackgroundGradient
-								color     = {theme.colors.info}
-								direction = "left"
-							>
-								<Label value="Info · left" />
-							</BackgroundGradient>
-						</DemoSample>
+					<DemoSample>
+						<BackgroundGradient
+							color     = {theme.colors.info}
+							direction = "left"
+						/>
+						<Label value="Info · left" />
+					</DemoSample>
 
-						<DemoSample>
-							<BackgroundGradient
-								color     = {theme.colors.success}
-								direction = "right"
-							>
-								<Label value="Success · right" />
-							</BackgroundGradient>
-						</DemoSample>
-					</Column>
-				</Row>
-			</Background>
-		)
+					<DemoSample>
+						<BackgroundGradient
+							color     = {theme.colors.success}
+							direction = "right"
+						/>
+						<Label value="Success · right" />
+					</DemoSample>
+				</Column>
+			</Row>,
+		]
 	}
 }
 

@@ -131,7 +131,7 @@ export const ButtonText = ({
 				flexShrink    : useColWidth ? col.flexShrink : 0,
 				flexBasis     : useColWidth ? col.flexBasis : undefined,
 				maxWidth      : useColWidth ? col.maxWidth : undefined,
-				borderRadius  : scaleFontSize(theme.border.radiusSmall),
+				borderRadius  : theme.border.radiusSmall,
 				alignItems    : 'center',
 				justifyContent: 'center',
 				...uiTransform
@@ -139,6 +139,7 @@ export const ButtonText = ({
 			uiText={{
 				value   : textLabel ?? '',
 				fontSize: scaleFontSize(theme.typography.size.default),
+				textWrap: 'nowrap',
 				...uiText
 			}}
 			uiBackground = {uiBackground}
