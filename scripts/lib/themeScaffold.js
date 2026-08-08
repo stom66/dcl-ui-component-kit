@@ -107,6 +107,7 @@ import { Background, Column, Layer, Text, ZoneType, getTheme } from '${PACKAGE_N
 // MARK: ExampleLayer
 /**
  * Minimal sample layer — edit or delete.
+ * Panel chrome is a sibling empty \`Background\` (do not nest content inside it).
  */
 export class ExampleLayer extends Layer {
 	constructor() {
@@ -115,21 +116,30 @@ export class ExampleLayer extends Layer {
 			zone       : ZoneType.Default,
 			uiTransform: {
 				width         : '40vw',
-				height        : '20vw',
+				height        : 'auto',
 				alignItems    : 'center',
 				justifyContent: 'center',
 			},
 		})
 	}
 
-	body() {
-		return (
-			<Background backgroundColor={getTheme().colors.primary} borderRadius={8}>
-				<Column cols={12} uiTransform={{ alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-					<Text value="${name}" fontSize={24} />
-				</Column>
-			</Background>
-		)
+
+	// MARK: body
+	protected body() {
+		const theme = getTheme()
+
+		return [
+			<Background key="chrome" color={theme.colors.primary} borderRadius={8} />,
+			<Column
+				key            = "body"
+				cols           = {12}
+				alignItems     = "center"
+				justifyContent = "center"
+				padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
+			>
+				<Text value="${name}" fontSize={theme.typography.size.h3} />
+			</Column>,
+		]
 	}
 }
 

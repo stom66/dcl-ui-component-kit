@@ -29,7 +29,10 @@
   "files": [
     "src/ui-component-kit",
     "assets/images/ui-component-kit",
-    "scripts",
+    "scripts/cli.js",
+    "scripts/postinstall.js",
+    "scripts/lib/assets.js",
+    "scripts/lib/themeScaffold.js",
     "INSTALL.md"
   ],
   "bin": {
