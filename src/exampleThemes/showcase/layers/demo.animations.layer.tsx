@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Text, UiBox, Wiggle, ZoneType } from '../../../ui-component-kit'
+import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Label, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, UiBox, Wiggle, ZoneType } from '../../../ui-component-kit'
 import { alpha, easingFunctions, vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
 
 const CELL = {
@@ -65,7 +65,7 @@ export class DemoAnimationsLayer extends Layer {
 				justifyContent = "center"
 				padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
 			>
-					<H1 value="Animations" color={theme.colors.light} />
+					<H1 value="Animations" fontColor={theme.colors.light} />
 					{/* MARK: Row 1 
 					*/}
 					<Row justifyContent="center">
@@ -121,7 +121,7 @@ export class DemoAnimationsLayer extends Layer {
 						))}
 
 						{this.renderAnimCell('FlashColor', theme.colors.warning, (
-							<FlashColor id={ID.flashColor} color={theme.colors.danger}>
+							<FlashColor id={ID.flashColor} flashColor={theme.colors.danger}>
 								<Icon
 									uvs    = {atlasIconsFontAwesome.uv.bomb}
 									width  = {64}
@@ -170,7 +170,7 @@ export class DemoAnimationsLayer extends Layer {
 							>
 								<FlashColor 
 									id            = "skadjfhksjdf" 
-									color         = {theme.colors.success} 
+									flashColor         = {theme.colors.success} 
 									duration      = {2} 
 									burstInterval = {0}
 								>
@@ -178,7 +178,7 @@ export class DemoAnimationsLayer extends Layer {
 										uvs    = {ICON_UVS}
 										width  = {64}
 										height = {64}
-										color  = {theme.colors.primary}
+										iconColor  = {theme.colors.primary}
 									/>
 								</FlashColor>
 							</Pulse>,
@@ -375,8 +375,6 @@ export class DemoAnimationsLayer extends Layer {
 			onMouseDown ?: () => void
 		},
 	) {
-		const theme = getTheme()
-
 		return (
 			<Column
 				alignItems = "center"
@@ -391,17 +389,13 @@ export class DemoAnimationsLayer extends Layer {
 					onMouseLeave   = {events?.onMouseLeave}
 					onMouseDown    = {events?.onMouseDown}
 				>
-					<Background color={bgColor} />
+					<Background backgroundColor={bgColor} />
 					{children}
 				</UiBox>
-				<Text
+				<Label
 					value           = {label}
 					width           = {CELL.width}
-					height          = {32}
 					margin          = {{ top: 4 }}
-					borderRadius    = {theme.border.radiusSmall}
-					fontSize        = {theme.typography.size.default}
-					textAlign       = "middle-center"
 					backgroundColor = {alpha(bgColor, 0.5)}
 				/>
 			</Column>

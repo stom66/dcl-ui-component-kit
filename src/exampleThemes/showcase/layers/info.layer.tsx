@@ -82,7 +82,7 @@ export class InfoLayer extends Layer {
 		const iconSize   = fontSize + 4
 
 		return [
-			<Background key="chrome" color={alpha(theme.colors.body, 0.5)} />,
+			<Background key="chrome" backgroundColor={alpha(theme.colors.body, 0.5)} />,
 			<Column
 				key            = "body"
 				cols           = {12}

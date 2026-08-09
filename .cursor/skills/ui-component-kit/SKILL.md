@@ -50,7 +50,7 @@ Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them 
 
 - Zone size / flex → `uiTransform: { width, height, alignItems, justifyContent, … }`
 - Panel fill / border → empty sibling `<Background />` in `body()` (not Layer options; **do not nest content inside it**)
-- Background fill shorthand → `color` (or `backgroundColor`)
+- Background fill shorthand → `backgroundColor`
 - Background border → `borderColor` / `borderWidth` / `borderRadius`
 - Background texture → `textureSrc`
 
@@ -72,7 +72,7 @@ super({
 
 // in body() — Background is chrome only; content stays a zone sibling
 return [
-	<Background key="chrome" color={getTheme().colors.primary} borderRadius={8} />,
+	<Background key="chrome" backgroundColor={getTheme().colors.primary} borderRadius={8} />,
 	{/* content: Row / Column / Text / … */},
 ]
 ```
@@ -94,20 +94,22 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 
 | Component | Prefer | Instead of |
 |---|---|---|
-| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize: scaleFontSize(…), … }}` |
-| `Background` / `Row` / `Column` / `UiBox` fill | `color` (or `backgroundColor`) | `uiBackground={{ color }}` |
+| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize: scaleFontSize(…), … }}` |
+| `Background` / `Row` / `Column` / `UiBox` fill | `backgroundColor` | `uiBackground={{ color }}` |
 | Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
 | Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
-| `Label` | `value`, `fontSize`, `font`, `textAlign`, `textWrap`; **`color` = chip fill** (not font) | nesting `uiText` for size/align; use `uiText.color` for font tint |
+| `Label` | `value`, `fontColor`, `fontSize`, …; **`backgroundColor` = chip fill** | nesting `uiText` for size/align; use `fontColor` (or `uiText.color`) for font tint |
+| `Icon` / `SpriteIcon` | `iconColor` | `uiBackground.color` tint |
+| `FlashColor` / `FlashBorder` | `flashColor` (target) | ambiguous bare `color` |
 
 **`fontSize` shorthand** takes a **theme base px** number (e.g. `theme.typography.size.small`) and auto-wraps `scaleFontSize` inside the component. Do **not** pre-scale when using the shorthand. If you nest `uiText.fontSize`, you must still call `scaleFontSize` yourself.
 
 ```tsx
 // GOOD — chrome sibling + content sibling (zone keeps flex)
 [
-	<Background key="chrome" color={theme.colors.primary} borderRadius={8} />,
+	<Background key="chrome" backgroundColor={theme.colors.primary} borderRadius={8} />,
 	<Column key="body" cols={12} alignItems="stretch" spacing={8} padding={16}>
-		<Text value="Hello" fontSize={theme.typography.size.small} color={theme.colors.light} />
+		<Text value="Hello" fontSize={theme.typography.size.small} fontColor={theme.colors.light} />
 		<Row flexWrap="wrap" alignItems="flex-start">
 			{/* … */}
 		</Row>
@@ -119,7 +121,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 <Background uiBackground={{ color: theme.colors.primary }} />
 ```
 
-**`color` context:** on text components → font color; on `Background` / `Row` / `Column` / `UiBox` → fill (`uiBackground.color`); on `Label` → chip fill; on `Icon` → texture tint.
+**Color props are always specific:** `fontColor` (text), `backgroundColor` (fills / Label chips), `iconColor` (Icon / SpriteIcon tint), `borderColor` (borders), `flashColor` (FlashColor / FlashBorder target). Nested `uiText.color` / `uiBackground.color` remain DCL escape hatches.
 
 ### Row / Column width (`cols` — required for grid widths)
 
@@ -296,7 +298,7 @@ export const myLayer = new MyLayer()
 | Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
-| Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `color`, `flexWrap`, `padding`, …) |
+| Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `fontColor`, `backgroundColor`, `flexWrap`, `padding`, …) |
 | `fontSize={scaleFontSize(theme.typography.size.*)}` on Text shorthand | `fontSize={theme.typography.size.*}` (component scales) |
 | Bare `uiText.fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` or use the shorthand |
 | `scaleFontSize(...)` on `borderRadius` / padding / layout px | Raw theme / virtual number (SDK × `uiScale` at parse) |
@@ -321,7 +323,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` | `textures?` (per-layer optional) / `atlas` + `uvCell` |
-| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); tint with `color` (not `backgroundColor`); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
+| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); tint with `iconColor` (not `backgroundColor`); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -463,7 +465,7 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/exampleThemes/<theme>/`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`.
+Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). Wide blank sheet: `atlasBtn3x1` (1×4) — nest icon / text children for labelled image buttons. For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/exampleThemes/<theme>/`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`. See `demo.buttons.layer.tsx`.
 
 ## Progress bars
 
@@ -571,7 +573,7 @@ export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: 
 return [
 	<Background
 		key          = "chrome"
-		color        = {theme.colors.primary}
+		backgroundColor        = {theme.colors.primary}
 		borderRadius = {8}
 		textureSrc   = "assets/images/panel.png"
 	/>,
@@ -581,13 +583,13 @@ return [
 ]
 
 // BAD — discards zone flex for nested children
-<Background color={theme.colors.primary}>
+<Background backgroundColor={theme.colors.primary}>
 	<Column cols={12}>{/* … */}</Column>
 </Background>
 ```
 
 Defaults: fills parent via absolute insets, theme body fill, theme border width/radius, no padding.
-Prefer `color` over `backgroundColor` / `uiBackground.color`. Empty chrome normally needs no layout shorthands.
+Prefer `backgroundColor` over nesting `uiBackground.color`. Empty chrome normally needs no layout shorthands.
 
 ### Auto-height layers (`height: 'auto'`)
 

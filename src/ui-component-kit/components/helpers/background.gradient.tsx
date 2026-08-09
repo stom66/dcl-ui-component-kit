@@ -20,10 +20,10 @@ const DIRECTION_ROTATION: Record<GradientDirection, number> = {
 	top   : 3,
 }
 
-type BackgroundGradientProps = Omit<UiBoxProps, 'backgroundColor'> & {
+type BackgroundGradientProps = UiBoxProps & {
 	children?      : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Tint applied to the gradient texture. Defaults to `theme.colors.body`. */
-	color?         : Color4
+	backgroundColor?: Color4
 	/** Gradient flow direction. Defaults to `'top'`. */
 	direction?     : GradientDirection
 	/**
@@ -77,7 +77,7 @@ function gradientUvCells(
  */
 export function BackgroundGradient({
 	children,
-	color,
+	backgroundColor,
 	direction     = 'top',
 	gradientStart = 0.5,
 	gradientEnd   = 1,
@@ -86,7 +86,7 @@ export function BackgroundGradient({
 	...props
 }: BackgroundGradientProps) {
 	const theme = getTheme()
-	const tint  = color ?? theme.colors.body
+	const tint  = backgroundColor ?? theme.colors.body
 
 	if (gradientEnd <= gradientStart) {
 		console.error(

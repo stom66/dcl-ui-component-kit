@@ -2,7 +2,12 @@ import { Color4 } from '@dcl/sdk/math'
 import { isMobile } from '@dcl/sdk/platform'
 import ReactEcs, { UiTransformProps } from '@dcl/sdk/react-ecs'
 
-import { atlasBtnIconsStyled } from '../../atlases'
+import {
+	atlasBtnIconsStyled,
+	type AtlasTextureSlices,
+	type TextureAtlas,
+	type TextureAtlasNamedCell,
+} from '../../atlases'
 import { PropsController } from '../../classes/propsController'
 import { tweenValue } from '../../utils/tweens'
 import { getUVCell } from '../../utils/uvs'
@@ -39,18 +44,32 @@ type ButtonImageProps = Omit<UiBoxProps, 'uiTransform'> & {
 	 */
 	uvColumn      : number
 	/**
-	 * Total columns in the atlas. Defaults to `atlasBtnIconsStyled.columns`.
-	 * Pass with `uvRowCount` (and `textureSrc`) when using a custom sheet.
+	 * Preferred atlas instance. Uses `.cell()` (including atlas `inset` /
+	 * `insetX` / `insetY`) and `.texture` for wrap / filter. When set,
+	 * `textureSrc` / `uvColumnCount` / `uvRowCount` default from the atlas.
+	 * When the atlas (or prop) has `textureSlices`, uses native
+	 * `textureMode: 'nine-slices'`.
+	 */
+	atlas        ?: TextureAtlas<Record<string, TextureAtlasNamedCell>>
+	/**
+	 * Total columns in the atlas. Defaults to `atlas.columns` or
+	 * `atlasBtnIconsStyled.columns`. Prefer passing `atlas` for custom sheets.
 	 */
 	uvColumnCount?: number
 	/**
-	 * Total rows in the atlas. Defaults to `atlasBtnIconsStyled.rows`.
-	 * Required for correct UVs when a custom sheet has a different row count.
+	 * Total rows in the atlas. Defaults to `atlas.rows` or
+	 * `atlasBtnIconsStyled.rows`. Prefer passing `atlas` for custom sheets.
 	 */
 	uvRowCount?  : number
+	/**
+	 * Optional nine-slice margins (fractions of the texture / UV cell).
+	 * Overrides `atlas.textureSlices` when both are set. Passed straight to
+	 * `uiBackground.textureSlices` with `textureMode: 'nine-slices'`.
+	 */
+	textureSlices?: AtlasTextureSlices
 	width        ?: number
 	height       ?: number
-	/** Atlas texture path. Defaults to `atlasBtnIconsStyled.source`. */
+	/** Atlas texture path. Defaults to `atlas.source` or `atlasBtnIconsStyled.source`. */
 	textureSrc   ?: string
 	uiTransform  ?: UiTransformProps
 	callback     ?: () => void
@@ -74,16 +93,19 @@ function getButtonProps(id: string): PropsController<ButtonImagePropsState> {
 /**
  * Renders an image button with per-instance hover and press state.
  * Atlas layout: columns = button variants, rows = states (disabled → default, UV bottom→top).
+ * Blank sheets with `textureSlices` use the engine's native nine-slices mode.
  */
 export const ButtonImage = ({
 	id,
 	children,
 	uvColumn,
-	uvColumnCount = atlasBtnIconsStyled.columns,
-	uvRowCount    = atlasBtnIconsStyled.rows,
+	atlas,
+	uvColumnCount,
+	uvRowCount,
+	textureSlices,
 	width         = 64,
 	height        = 64,
-	textureSrc    = atlasBtnIconsStyled.source,
+	textureSrc,
 	uiTransform,
 	callback,
 	onMouseDown,
@@ -97,19 +119,32 @@ export const ButtonImage = ({
 	const scale  = button.get('scale')
 	const row    = currentIndex.get(id) ?? ButtonIndex.DEFAULT
 
-	const useDefaultAtlas =
-		textureSrc    === atlasBtnIconsStyled.source &&
-		uvColumnCount === atlasBtnIconsStyled.columns &&
-		uvRowCount    === atlasBtnIconsStyled.rows
+	const resolvedAtlas = atlas
+	const columns = uvColumnCount ?? resolvedAtlas?.columns ?? atlasBtnIconsStyled.columns
+	const rows    = uvRowCount    ?? resolvedAtlas?.rows    ?? atlasBtnIconsStyled.rows
+	const src     = textureSrc    ?? resolvedAtlas?.source  ?? atlasBtnIconsStyled.source
 
-	const uvs = useDefaultAtlas
-		? atlasBtnIconsStyled.cell({ xStart: uvColumn, yStart: row })
+	const sheet =
+		resolvedAtlas
+		?? (src === atlasBtnIconsStyled.source
+			&& columns === atlasBtnIconsStyled.columns
+			&& rows    === atlasBtnIconsStyled.rows
+			? atlasBtnIconsStyled
+			: undefined)
+
+	const uvs = sheet
+		? sheet.cell({ xStart: uvColumn, yStart: row })
 		: getUVCell({
 			xStart: uvColumn,
 			yStart: row,
-			xTotal: uvColumnCount,
-			yTotal: uvRowCount,
+			xTotal: columns,
+			yTotal: rows,
 		})
+
+	const slices  = textureSlices ?? sheet?.textureSlices
+	const texture = sheet
+		? sheet.texture
+		: { src, wrapMode: 'clamp' as const }
 
 	return (
 		<UiBox
@@ -121,6 +156,7 @@ export const ButtonImage = ({
 				position      : { top: 20, left: -24 },
 				alignItems    : 'center',
 				justifyContent: 'center',
+				flexShrink    : 0,
 				zIndex        : 1000,
 				...uiTransform
 			}}
@@ -133,12 +169,11 @@ export const ButtonImage = ({
 					borderWidth : 0,
 				}}
 				uiBackground={mergeUiBackground({
-					texture    : textureSrc === atlasBtnIconsStyled.source
-						? atlasBtnIconsStyled.texture
-						: { src: textureSrc, wrapMode: 'clamp' as const },
-					textureMode: 'stretch',
+					texture,
+					textureMode  : slices ? 'nine-slices' : 'stretch',
+					...(slices ? { textureSlices: slices } : {}),
 					uvs,
-					color      : Color4.White(),
+					color        : Color4.White(),
 				}, uiBackground)}
 				onMouseEnter={() => {
 					hoverStates.set(id, true)

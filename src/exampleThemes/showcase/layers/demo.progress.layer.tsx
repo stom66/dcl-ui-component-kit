@@ -189,7 +189,7 @@ export class DemoProgressLayer extends Layer {
 								<Label
 									cols       = {12}
 									value      = {dangerLabel1}
-									color      = {Color4.create(0, 0, 0, 0)}
+									backgroundColor      = {Color4.create(0, 0, 0, 0)}
 									height     = "100%"
 									padding    = {0}
 									fontSize   = {theme.typography.size.default}
@@ -210,7 +210,7 @@ export class DemoProgressLayer extends Layer {
 							>
 							{/* 	<Label
 									cols        = {2}
-									//color       = {alpha(theme.colors.body, 0.5)}
+									//backgroundColor       = {alpha(theme.colors.body, 0.5)}
 									uiTransform = {{
 										height        : '50%',
 										width         : '20%',

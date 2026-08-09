@@ -106,12 +106,12 @@ function DemoNavButton({ id, label, icon, layer }: NavEntry) {
 				uvs    = {atlasIconsFontAwesome.uv[icon]}
 				width  = {NAV_ICON_SIZE}
 				height = {NAV_ICON_SIZE}
-				color  = {theme.colors.light}
+				iconColor  = {theme.colors.light}
 				margin = {{ right: 10 }}
 			/>
 			<Text
 				value     = {label}
-				color     = {theme.colors.light}
+				fontColor     = {theme.colors.light}
 				width     = "auto"
 				alignSelf = "center"
 				fontSize  = {theme.typography.size.default}
@@ -167,7 +167,7 @@ export class DemoLeftBarLayer extends Layer {
 			>
 				<Background
 					key          = "demo_left_bar_chrome"
-					color        = {alpha(theme.colors.body, 0.65)}
+					backgroundColor        = {alpha(theme.colors.body, 0.65)}
 					borderRadius = {theme.border.radiusDefault}
 				/>
 				<Column

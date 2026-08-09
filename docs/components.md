@@ -43,7 +43,7 @@ Primary layout primitive — themed `UiEntity` wrapper.
 
 | Option | Type | Description |
 |---|---|---|
-| `color` / `backgroundColor` | `Color4` | Fill shorthand → `uiBackground.color` (`backgroundColor` wins if both) |
+| `backgroundColor` | `Color4` | Fill shorthand → `uiBackground.color`  |
 | `borderColor` / `borderWidth` / `borderRadius` | — | Border shorthands |
 | `aspectRatio` | `number` | Derive missing axis |
 | `width` / `height` | `PositionUnit` | Size |
@@ -67,7 +67,7 @@ Widths: prefer **`cols`** on `Column` / `Label` / `ButtonText` (`cols={12}` = fu
 | `colsDesktop` / `colsMobile` | same | Responsive spans |
 | `spacing` | `number` | Gap between children (default `theme.spacing`) |
 | `flexWrap` / `alignItems` / `justifyContent` / `padding` / `margin` / … | — | Layout shorthands (prefer over `uiTransform`) |
-| `color` / `backgroundColor` | `Color4` | Fill shorthand |
+| `backgroundColor` | `Color4` | Fill shorthand |
 | `uiTransform` / `uiBackground` | native | Escape hatches |
 | `children` | JSX | Content |
 
@@ -84,7 +84,7 @@ Equal-cell grid (inventories / icon boards). Chunks children into tracks of `lim
 | `padIncomplete` | `boolean` | Pad short final tracks so cell size matches a full track (default `true`) |
 | `spacing` | `number` | Gap between cells / tracks (default `theme.spacing`) |
 | `cols` / `colsDesktop` / `colsMobile` | `number \| 'auto'` | Size the whole grid in a parent `Row` (same as `Column`) |
-| `color` / `backgroundColor` | `Color4` | Fill shorthand |
+| `backgroundColor` | `Color4` | Fill shorthand |
 | `uiTransform` / `uiBackground` | native | Escape hatches |
 | `children` | JSX | Cell content — do **not** set `cols` on cells |
 
@@ -98,7 +98,7 @@ Default layout is absolute fill (out of flex flow). For Layer `height: 'auto'`, 
 
 | Option | Type | Description |
 |---|---|---|
-| `color` / `backgroundColor` | `Color4` | Fill (`color` preferred) |
+| `backgroundColor` | `Color4` | Fill shorthand → `uiBackground.color` |
 | `borderColor` / `borderWidth` / `borderRadius` | — | Border |
 | `textureSrc` | `string` | Optional texture |
 | `fitContent` | `boolean` | Rare self-sized chrome (not Layer panel chrome) |
@@ -112,17 +112,17 @@ Same sibling-chrome rule as `Background` — empty peer for fill, not a content 
 |---|---|---|
 | `direction` | `'top' \| 'bottom' \| 'left' \| 'right'` | Gradient direction |
 | `gradientStart` / `gradientEnd` | `number` | UV ratios 0–1 |
-| `color` | `Color4` | Tint |
+| `backgroundColor` | `Color4` | Tint |
 | `textureSrc` | `string` | Optional override texture |
 | `fitContent` | `boolean` | Forwarded to `Background` (rare; see `Background`) |
 
 ### `Divider`
 
-Thin horizontal rule. Accepts standard box / transform props.
+Thin horizontal rule. Prefer `backgroundColor` for the line fill (plus `margin` / `thickness` / `width`).
 
 ### `Label`
 
-Short labelled chip / callout. Supports `cols` and theme fill.
+Short labelled chip / callout. Supports `cols`. Chip fill via `backgroundColor`; font tint via `fontColor`.
 
 ---
 
@@ -157,21 +157,39 @@ Atlas layout: **columns = variants**, **rows = states** (UV bottom→top).
 |---|---|---|
 | `id` | `string` | Unique id (required) |
 | `callback` | `() => void` | Click handler |
-| `textureSrc` | `string` | Atlas / texture source |
+| `atlas` | `TextureAtlas` | Preferred sheet — applies `.cell()` insets + `.texture` wrap/filter |
+| `textureSrc` | `string` | Atlas / texture source (defaults from `atlas` when set) |
 | `uvColumn` | `number` | **1-based** variant column |
-| `uvColumnCount` / `uvRowCount` | `number` | Grid totals (match your atlas) |
+| `uvColumnCount` / `uvRowCount` | `number` | Grid totals (defaults from `atlas` when set) |
 | `width` / `height` | — | Size |
 | `uiTransform` | native | Extra layout |
 
 ```tsx
-import { atlasBtnIconsStyled, ButtonImage } from '@stom66/dcl-ui-component-kit'
+import { atlasBtn3x1, atlasBtnIconsStyled, atlasIconsFontAwesome, ButtonImage, Icon, Row, Text } from '@stom66/dcl-ui-component-kit'
 
+// Icon-column atlas (default sheet when atlas / textureSrc omitted)
 <ButtonImage
-	id         = "btn_help"
-	textureSrc = {atlasBtnIconsStyled.source}
-	uvColumn   = {1}
-	callback   = {() => helpLayer.toggle()}
+	id       = "btn_help"
+	atlas    = {atlasBtnIconsStyled}
+	uvColumn = {1}
+	callback = {() => helpLayer.toggle()}
 />
+
+// Wide blank atlas + nested icon / text (no border — ButtonImage already uses borderWidth 0)
+<ButtonImage
+	id          = "btn_click_me"
+	atlas       = {atlasBtn3x1}
+	uvColumn    = {1}
+	width       = {192}
+	height      = {64}
+	callback    = {() => { /* … */ }}
+	uiTransform = {{ positionType: 'relative', position: { top: 0, left: 0 } }}
+>
+	<Row height="100%" alignItems="center" justifyContent="center" spacing={8}>
+		<Icon uvs={atlasIconsFontAwesome.uv.handPointer} width={28} height={28} />
+		<Text value="Click me" width="auto" textWrap="nowrap" />
+	</Row>
+</ButtonImage>
 ```
 
 ### `ButtonImageClose`
@@ -241,11 +259,11 @@ Nine-slice note: corners keep absolute size from `texture size × slice fraction
 
 ## Text
 
-Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme base px** number and is auto-scaled inside the component. `color` here is **font color** (not fill).
+Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme base px** number and is auto-scaled inside the component. Use **`fontColor`** for font tint (not fill).
 
 | Component | Shorthands | Role |
 |---|---|---|
-| `Text` | `value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap` | Body text |
+| `Text` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | Body text |
 | `Code` | same | Monospace |
 | `Header` | same | Panel title (h2-sized) |
 | `SectionHeader` | same | Section title in a panel |
@@ -269,14 +287,14 @@ Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme ba
 |---|---|---|
 | `src` | `string` | Texture (default: Font Awesome atlas) |
 | `uvs` | UV quad | Atlas cell (`atlas.uv.name`) |
-| `color` | `Color4` | Tint multiply (texture × color; not `backgroundColor`) |
+| `iconColor` | `Color4` | Tint multiply (texture × color; not `backgroundColor`) |
 | `width` / `height` | number | Size (theme default if omitted) |
 
 ```tsx
 import { Icon, atlasIconsFontAwesome, getTheme } from '@stom66/dcl-ui-component-kit'
 
 <Icon uvs={atlasIconsFontAwesome.uv.cat} width={64} height={64} />
-<Icon uvs={atlasIconsFontAwesome.uv.star} color={getTheme().colors.primary} width={64} height={64} />
+<Icon uvs={atlasIconsFontAwesome.uv.star} iconColor={getTheme().colors.primary} width={64} height={64} />
 ```
 
 ### `AvatarIcon`
@@ -400,8 +418,8 @@ Used by `Bounce`, `Pulse`, `Shake`, `Wiggle`, `FlashColor`, `FlashBorder`, and `
 | `Shake` | `position.left` left/right |
 | `Wiggle` | Rotates child UVs |
 | `Spinner` | UV rotation via `duration` + `degrees` |
-| `FlashColor` | Lerps child tint toward `color` |
-| `FlashBorder` | Flashes border colour |
+| `FlashColor` | Lerps child tint toward `flashColor` |
+| `FlashBorder` | Flashes border toward `flashColor` |
 
 ### Spinner extras
 

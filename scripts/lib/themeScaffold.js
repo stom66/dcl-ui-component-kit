@@ -129,7 +129,7 @@ export class ExampleLayer extends Layer {
 		const theme = getTheme()
 
 		return [
-			<Background key="chrome" color={theme.colors.primary} borderRadius={8} />,
+			<Background key="chrome" backgroundColor={theme.colors.primary} borderRadius={8} />,
 			<Column
 				key            = "body"
 				cols           = {12}

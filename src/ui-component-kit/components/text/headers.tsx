@@ -8,7 +8,7 @@ import { mergeTextShorthands, type TextShorthandProps } from './textShorthands'
 
 type HeaderLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
-export type HeadingProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProps & {
+export type HeadingProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
@@ -17,7 +17,7 @@ export type HeadingProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandP
 // MARK: Heading
 /**
  * Shared H1–H6 renderer — theme size/family per level.
- * Prefer text shorthands (`value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap`)
  * over nesting `uiText`. Uses `flexShrink: 0` + `minHeight` so height-capped columns
  * cannot crush text (default Yoga `flexShrink: 1` was collapsing `height: 'auto'` boxes to 0).
  */
@@ -25,7 +25,7 @@ function Heading({
 	level,
 	children,
 	value,
-	color,
+	fontColor,
 	fontSize: fontSizeProp,
 	font,
 	textAlign,
@@ -45,7 +45,7 @@ function Heading({
 			value    : '',
 		},
 		uiText,
-		{ value, color, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
 	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
 
@@ -69,42 +69,42 @@ function Heading({
 
 
 // MARK: H1
-/** Theme `h1` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+/** Theme `h1` heading. Pass copy via `value`; tint via `fontColor` or `uiText.color`. */
 export function H1(props: HeadingProps) {
 	return <Heading level="h1" {...props} />
 }
 
 
 // MARK: H2
-/** Theme `h2` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+/** Theme `h2` heading. Pass copy via `value`; tint via `fontColor` or `uiText.color`. */
 export function H2(props: HeadingProps) {
 	return <Heading level="h2" {...props} />
 }
 
 
 // MARK: H3
-/** Theme `h3` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+/** Theme `h3` heading. Pass copy via `value`; tint via `fontColor` or `uiText.color`. */
 export function H3(props: HeadingProps) {
 	return <Heading level="h3" {...props} />
 }
 
 
 // MARK: H4
-/** Theme `h4` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+/** Theme `h4` heading. Pass copy via `value`; tint via `fontColor` or `uiText.color`. */
 export function H4(props: HeadingProps) {
 	return <Heading level="h4" {...props} />
 }
 
 
 // MARK: H5
-/** Theme `h5` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+/** Theme `h5` heading. Pass copy via `value`; tint via `fontColor` or `uiText.color`. */
 export function H5(props: HeadingProps) {
 	return <Heading level="h5" {...props} />
 }
 
 
 // MARK: H6
-/** Theme `h6` heading. Pass copy via `value`; tint via `color` or `uiText.color`. */
+/** Theme `h6` heading. Pass copy via `value`; tint via `fontColor` or `uiText.color`. */
 export function H6(props: HeadingProps) {
 	return <Heading level="h6" {...props} />
 }

@@ -117,7 +117,7 @@ export class DemoToggleLayer extends Layer {
 							/>
 						</Column>
 						<Column cols={10} alignItems="stretch" justifyContent="center">
-							<Label cols={12} value="Default — no custom colors" color={alpha(primary, defaultOnAlpha)} />
+							<Label cols={12} value="Default — no custom colors" backgroundColor={alpha(primary, defaultOnAlpha)} />
 						</Column>
 					</Row>
 
@@ -137,7 +137,7 @@ export class DemoToggleLayer extends Layer {
 							/>
 						</Column>
 						<Column cols={10} alignItems="stretch" justifyContent="center">
-							<Label cols={12} value="backgroundColor — default ↔ green" color={alpha(primary, backgroundOnAlpha)} />
+							<Label cols={12} value="backgroundColor — default ↔ green" backgroundColor={alpha(primary, backgroundOnAlpha)} />
 						</Column>
 					</Row>
 
@@ -157,7 +157,7 @@ export class DemoToggleLayer extends Layer {
 							/>
 						</Column>
 						<Column cols={10} alignItems="stretch" justifyContent="center">
-							<Label cols={12} value="toggleColor — default ↔ primary" color={alpha(primary, toggleOnAlpha)} />
+							<Label cols={12} value="toggleColor — default ↔ primary" backgroundColor={alpha(primary, toggleOnAlpha)} />
 						</Column>
 					</Row>
 
@@ -175,7 +175,7 @@ export class DemoToggleLayer extends Layer {
 							/>
 						</Column>
 						<Column cols={10} alignItems="stretch" justifyContent="center">
-							<Label cols={12} value="Both — background + toggleColor" color={alpha(primary, bothOnAlpha)} />
+							<Label cols={12} value="Both — background + toggleColor" backgroundColor={alpha(primary, bothOnAlpha)} />
 						</Column>
 					</Row>
 			</Column>,

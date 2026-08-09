@@ -12,8 +12,8 @@ import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAni
 export type FlashBorderProps = UiBoxProps & BurstAnimationProps & {
 	/** Seconds for one full flash (to target + back). Not the full burst — see `burstCount`. */
 	duration?       : number
-	/** Color to flash toward. Defaults to `theme.colors.primary`. */
-	color?          : Color4
+	/** Border color to flash toward. Defaults to `theme.colors.primary`. */
+	flashColor?     : Color4
 	/**
 	 * Easing for both directions. Overridden per-direction by `easingFlash` /
 	 * `easingReturn` when those are set.
@@ -62,7 +62,7 @@ function resolveChildBorderWidth(child: ReactEcs.JSX.Element | undefined): numbe
 
 // MARK: FlashBorder
 /**
- * Flashes a single child's border color toward `color` and back.
+ * Flashes a single child's border color toward `flashColor` and back.
  * The child's original `borderColor` (or UiBox-style darkened fill) is the base.
  * Ensures a `borderWidth` so the flash is visible.
  *
@@ -80,7 +80,7 @@ export const FlashBorder = ({
 	burstCount     = theme.animation.flashBorderBurstCountDefault,
 	burstInterval  = theme.animation.flashBorderBurstIntervalDefault,
 	burstOffset    = 0,
-	color          = theme.colors.primary,
+	flashColor     = theme.colors.primary,
 	easingFunction,
 	easingFlash,
 	easingReturn,
@@ -105,9 +105,9 @@ export const FlashBorder = ({
 	if (sample.inBurst) {
 		const cycleT = sample.cycleT
 		if (cycleT < 0.5) {
-			currentColor = Color4.lerp(baseColor, color, easeFlash(cycleT * 2))
+			currentColor = Color4.lerp(baseColor, flashColor, easeFlash(cycleT * 2))
 		} else {
-			currentColor = Color4.lerp(color, baseColor, easeReturn((cycleT - 0.5) * 2))
+			currentColor = Color4.lerp(flashColor, baseColor, easeReturn((cycleT - 0.5) * 2))
 		}
 	}
 

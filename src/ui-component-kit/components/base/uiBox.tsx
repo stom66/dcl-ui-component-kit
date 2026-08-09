@@ -13,11 +13,7 @@ type UiEntityTransform  = Parameters<typeof UiEntity>[0]['uiTransform']
 type UiEntityProps      = Parameters<typeof UiEntity>[0]
 
 export type UiComponentKitProps = UiTransformShorthandProps & {
-	/**
-	 * Fill color shorthand → `uiBackground.color`.
-	 * Alias of `backgroundColor` (either works; `backgroundColor` wins if both set).
-	 */
-	color          ?: Color4
+	/** Fill shorthand → `uiBackground.color`. */
 	backgroundColor?: Color4
 	borderColor    ?: Color4
 	borderRadius   ?: number
@@ -183,8 +179,8 @@ function resolveBoxSize(
  * Pass `aspectRatio` with a single axis (`width` / `height` or via `uiTransform`)
  * to derive the other axis in virtual pixels (`vw`/`vh` are converted).
  *
- * Layout shorthands (`padding`, `alignItems`, `flexWrap`, …) and fill (`color` /
- * `backgroundColor`) are preferred over nesting `uiTransform` / `uiBackground`
+ * Layout shorthands (`padding`, `alignItems`, `flexWrap`, …) and fill
+ * (`backgroundColor`) are preferred over nesting `uiTransform` / `uiBackground`
  * when a single field is enough. Nested objects remain escape hatches; shorthands win.
  */
 export function UiBox({
@@ -194,7 +190,6 @@ export function UiBox({
 	borderRadius,
 	borderWidth,
 	children,
-	color,
 	height,
 	onMouseDown,
 	onMouseEnter,
@@ -228,7 +223,7 @@ export function UiBox({
 	opacity,
 	zIndex,
 }: UiBoxProps) {
-	const fill = backgroundColor ?? color
+	const fill = backgroundColor
 	const size = resolveBoxSize(width, height, aspectRatio, uiTransform)
 	const mergedTransform = mergeTransformShorthands(
 		undefined,

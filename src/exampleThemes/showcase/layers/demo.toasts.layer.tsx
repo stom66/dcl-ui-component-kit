@@ -23,7 +23,7 @@ function toastLabel(value: string) {
 
 	return (
 		<UiBox
-			color          = {theme.colors.primary}
+			backgroundColor          = {theme.colors.primary}
 			borderRadius   = {8}
 			width          = "140"
 			height         = "64"
@@ -75,7 +75,7 @@ export class DemoToastsLayer extends Layer {
 				<H2 value="Toasts" />
 				<Text value="Dock positions, slide edges, scale, and group policies." />
 
-				<Label cols={12} value="Positions" margin={{ bottom: 4 }} color={theme.colors.primary} />
+				<Label cols={12} value="Positions" margin={{ bottom: 4 }} backgroundColor={theme.colors.primary} />
 				<Row spacing={4}>
 					{POSITIONS.slice(0, 3).map((position) => (
 						<ButtonText
@@ -123,7 +123,7 @@ export class DemoToastsLayer extends Layer {
 					))}
 				</Row>
 
-				<Label cols={12} value="Motion" margin={{ bottom: 4 }} color={theme.colors.primary} />
+				<Label cols={12} value="Motion" margin={{ bottom: 4 }} backgroundColor={theme.colors.primary} />
 				<Row spacing={4}>
 					<ButtonText
 						id              = "btn_toast_slide_cross"
@@ -163,7 +163,7 @@ export class DemoToastsLayer extends Layer {
 										value        = {value}
 										width        = "100%"
 										height       = "100%"
-										color        = {theme.colors.info}
+										backgroundColor = {theme.colors.info}
 										borderRadius = {8}
 										padding      = {{ top: 4, right: 12, bottom: 4, left: 4 }}
 									/>
@@ -175,7 +175,7 @@ export class DemoToastsLayer extends Layer {
 					/>
 				</Row>
 
-				<Label cols={12} value="Hint group" margin={{ bottom: 4 }} color={theme.colors.primary} />
+				<Label cols={12} value="Hint group" margin={{ bottom: 4 }} backgroundColor={theme.colors.primary} />
 				<Row spacing={4}>
 					<ButtonText
 						id              = "btn_toast_hint_queue"

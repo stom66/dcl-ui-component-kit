@@ -58,19 +58,19 @@ export class DemoTextLayer extends Layer {
 							/>
 							<Label
 								value  = "Success"
-								color  = {theme.colors.success}
+								backgroundColor  = {theme.colors.success}
 							/>
 							<Label
 								value = "Info"
-								color = {theme.colors.info}
+								backgroundColor = {theme.colors.info}
 							/>
 							<Label
 								value = "Warning"
-								color = {theme.colors.warning}
+								backgroundColor = {theme.colors.warning}
 							/>
 							<Label
 								value = "Danger"
-								color = {theme.colors.danger}
+								backgroundColor = {theme.colors.danger}
 							/>
 						</Row>
 

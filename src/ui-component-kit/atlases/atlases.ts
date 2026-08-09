@@ -25,6 +25,43 @@ export const atlasBtnIconsStyled = new TextureAtlas({
 })
 
 
+// MARK: atlasBtn3x1
+/**
+ * Wide blank button atlas (`atlas-btn-3x1.png`) — one variant column, four
+ * state rows (disabled → default, UV bottom→top). `textureSlices` drive
+ * native `textureMode: 'nine-slices'` on `ButtonImage`.
+ */
+export const atlasBtn3x1 = new TextureAtlas({
+	source        : 'assets/images/ui-component-kit/atlas-btn-3x1.png',
+	columns       : 1,
+	rows          : 4,
+	textureSlices : {
+		top   : 0.42,
+		bottom: 0.42,
+		left  : 0.18,
+		right : 0.18,
+	},
+})
+
+
+// MARK: atlasBtn1x1
+/**
+ * Narrow blank button atlas (`atlas-btn-1x1.png`) — one variant column, four
+ * state rows. `textureSlices` drive native `textureMode: 'nine-slices'`.
+ */
+export const atlasBtn1x1 = new TextureAtlas({
+	source        : 'assets/images/ui-component-kit/atlas-btn-1x1.png',
+	columns       : 1,
+	rows          : 4,
+	textureSlices : {
+		top   : 0.42,
+		bottom: 0.42,
+		left  : 0.42,
+		right : 0.42,
+	},
+})
+
+
 // MARK: atlasCharsNumbers
 /**
  * Number / operator atlas (`atlas-chars-numbers.png`), top → bottom in the PNG.

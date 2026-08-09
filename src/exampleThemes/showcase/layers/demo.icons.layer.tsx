@@ -3,10 +3,14 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, IconCharacter, IconNumber, IconString, IconSymbol, Label, Layer, PropsController, Row, Text, ZoneType } from '../../../ui-component-kit'
 import { timers } from '../../../ui-component-kit/utils/timers'
 
-/** 4×2 sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
+/** 4×8 sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
 const SAMPLE_ICONS = [
 	'cat', 'star', 'heart', 'coins',
 	'crown', 'dice', 'rocket', 'trophy',
+	'fire', 'cubes', 'gear', 'bolt',
+	'gem', 'key', 'shield', 'skull',
+	'gamepad', 'bomb', 'ghost', 'dragon',
+	'gift', 'medal', 'compass', 'bell',
 ] as const
 
 const COUNTDOWN_SECONDS = 3 * 60
@@ -91,122 +95,136 @@ export class DemoIconsLayer extends Layer {
 						alignItems     = "center"
 						margin         = {{ bottom: 4 }}
 					>
-						<Icon
-							uvs    = {atlasIconsFontAwesome.uv.cat}
-							width  = "64"
-							height = "64"
-							margin = {{ right: 12 }}
-						/>
-						<Code value="<Icon uvs={atlasIconsFontAwesome.uv.cat} />" />
-					</Row>
+						<Column cols = {8}>
+							<Row>
+								<Text
+									value    = "This kit ships 256 Font Awesome icons - use atlasIconsFontAwesome.uv.<name>."
+									fontSize = {theme.typography.size.small}
+									margin   = {{ top: 6 }}
+								/>
+							</Row>
 
-					{/* MARK: Tints / avatars / sample grid */}
-					<Row
-						flexWrap       = "wrap"
-						justifyContent = "flex-start"
-						alignItems     = "flex-start"
-						margin         = {{ top: 8, bottom: 8 }}
-					>
-						<Column
-							cols           = {4}
-							alignItems     = "flex-start"
-							justifyContent = "flex-start"
-							padding        = {{ right: 8 }}
-						>
-							<Label
-								cols   = {12}
-								value  = "Icon - Color Tints"
-								margin = {{ bottom: 8 }}
-							/>
 							<Row
 								justifyContent = "flex-start"
 								alignItems     = "center"
-								margin         = {{ bottom: 6 }}
+								margin         = {{ bottom: 4 }}
 							>
 								<Icon
-									uvs    = {atlasIconsFontAwesome.uv.star}
-									width  = "48"
-									height = "48"
-									color  = {theme.colors.primary}
-									margin = {{ right: 8 }}
+									uvs    = {atlasIconsFontAwesome.uv.cat}
+									width  = "64"
+									height = "64"
+									margin = {{ right: 12 }}
 								/>
-								<Icon
-									uvs    = {atlasIconsFontAwesome.uv.star}
-									width  = "48"
-									height = "48"
-									color  = {theme.colors.danger}
-									margin = {{ right: 8 }}
-								/>
-								<Icon
-									uvs    = {atlasIconsFontAwesome.uv.star}
-									width  = "48"
-									height = "48"
-									color  = {theme.colors.success}
-								/>
+								<Code value="<Icon uvs={atlasIconsFontAwesome.uv.cat} />" />
 							</Row>
-							<Code value="<Icon color={…} />" textWrap="nowrap" />
-						</Column>
 
-						<Column
-							cols           = {4}
-							alignItems     = "flex-start"
-							justifyContent = "flex-start"
-							padding        = {{ right: 4, left: 4 }}
-						>
-							<Label
-								cols   = {12}
-								value  = "Avatar Icons"
-								margin = {{ bottom: 8 }}
-							/>
+
+							{/* MARK: Tints / avatars / sample grid */}
 							<Row
+								flexWrap       = "wrap"
 								justifyContent = "flex-start"
-								alignItems     = "center"
-								margin         = {{ bottom: 6 }}
+								alignItems     = "flex-start"
+								margin         = {{ top: 8, bottom: 8 }}
 							>
-								<AvatarIcon
-									userId = {DEFAULT_AVATAR_USER_ID}
-									width  = {48}
-									height = {48}
-								/>
-								<AvatarIcon
-									userId       = {DEFAULT_AVATAR_USER_ID}
-									width        = {48}
-									height       = {48}
-									borderRadius = {24}
-									borderWidth  = {2}
-									borderColor  = {alpha(theme.colors.light, 0.8)}
-								/>
-								<AvatarIcon
-									userId       = {DEFAULT_AVATAR_USER_ID}
-									width        = {48}
-									height       = {48}
-									borderRadius = {theme.border.radiusDefault}
-									borderWidth  = {2}
-									borderColor  = {alpha(theme.colors.info, 0.8)}
-								/>
-							</Row>
-							<Code value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
-						</Column>
+								<Column
+									cols           = {6}
+									alignItems     = "flex-start"
+									justifyContent = "flex-start"
+									padding        = {{ right: 8 }}
+								>
+									<Label
+										cols   = {12}
+										value  = "Icon - Color Tints"
+										margin = {{ bottom: 8 }}
+									/>
+									<Row
+										justifyContent = "flex-start"
+										alignItems     = "center"
+										margin         = {{ bottom: 6 }}
+									>
+										<Icon
+											uvs    = {atlasIconsFontAwesome.uv.star}
+											width  = "48"
+											height = "48"
+											iconColor  = {theme.colors.primary}
+											margin = {{ right: 8 }}
+										/>
+										<Icon
+											uvs    = {atlasIconsFontAwesome.uv.star}
+											width  = "48"
+											height = "48"
+											iconColor  = {theme.colors.danger}
+											margin = {{ right: 8 }}
+										/>
+										<Icon
+											uvs    = {atlasIconsFontAwesome.uv.star}
+											width  = "48"
+											height = "48"
+											iconColor  = {theme.colors.success}
+										/>
+									</Row>
+									<Code value="<Icon iconColor={…} />" textWrap="nowrap" />
+								</Column>
 
-						<Column
-							cols           = {4}
-							alignItems     = "flex-start"
-							justifyContent = "flex-start"
-							padding        = {{ left: 8 }}
-						>
-							<Label
-								cols   = {12}
-								value  = "Sample icons"
-								margin = {{ bottom: 8 }}
-							/>
-							{this.renderSampleGrid()}
-							<Text
-								value    = "This kit ships 256 Font Awesome icons for gaming — use atlasIconsFontAwesome.uv.<name>."
-								fontSize = {theme.typography.size.small}
-								margin   = {{ top: 6 }}
-							/>
+								<Column
+									cols           = {6}
+									alignItems     = "flex-start"
+									justifyContent = "flex-start"
+									padding        = {{ right: 4, left: 4 }}
+								>
+									<Label
+										cols   = {12}
+										value  = "Avatar Icons"
+										margin = {{ bottom: 8 }}
+									/>
+									<Row
+										justifyContent = "flex-start"
+										alignItems     = "center"
+										margin         = {{ bottom: 6 }}
+									>
+										<AvatarIcon
+											userId = {DEFAULT_AVATAR_USER_ID}
+											width  = {48}
+											height = {48}
+										/>
+										<AvatarIcon
+											userId       = {DEFAULT_AVATAR_USER_ID}
+											width        = {48}
+											height       = {48}
+											borderRadius = {24}
+											borderWidth  = {2}
+											borderColor  = {alpha(theme.colors.light, 0.8)}
+										/>
+										<AvatarIcon
+											userId       = {DEFAULT_AVATAR_USER_ID}
+											width        = {48}
+											height       = {48}
+											borderRadius = {theme.border.radiusDefault}
+											borderWidth  = {2}
+											borderColor  = {alpha(theme.colors.info, 0.8)}
+										/>
+										<AvatarIcon
+											userId          = {DEFAULT_AVATAR_USER_ID}
+											width           = {48}
+											height          = {48}
+											borderRadius    = {theme.border.radiusDefault}
+											borderWidth     = {2}
+											borderColor     = {alpha(theme.colors.info, 0.8)}
+											backgroundColor = {alpha(theme.colors.info, 0.8)}
+										/>
+									</Row>
+									<Code value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
+								</Column>
+
+							</Row>
+							
 						</Column>
-					</Row>
+						<Column cols = {4}>
+							{this.renderSampleGrid()}							
+						</Column>
+					</Row>	
+
+					
 
 					{/* MARK: Atlas glyph examples */}
 					<Row
@@ -233,7 +251,7 @@ export class DemoIconsLayer extends Layer {
 								borderWidth    = {theme.border.width}
 								borderRadius   = {theme.border.radiusDefault}
 								borderColor    = {alpha(theme.colors.light, 0.2)}
-								color          = {alpha(theme.colors.primary, 0.35)}
+								backgroundColor          = {alpha(theme.colors.primary, 0.35)}
 								padding        = {{ top: 10, right: 12, bottom: 10, left: 12 }}
 								margin         = {{ top: 4, bottom: 6 }}
 							>
@@ -287,7 +305,7 @@ export class DemoIconsLayer extends Layer {
 
 
 	// MARK: renderSampleGrid
-	/** Renders a 4×2 sample of named Font Awesome icons. */
+	/** Renders a 4×8 sample of named Font Awesome icons. */
 	private renderSampleGrid() {
 		const theme = getTheme()
 

@@ -8,16 +8,16 @@ import { alpha, Background, Column, Divider, getTheme, H2, H3, Layer, Row, Text,
 /** Coloured swatch used to make column spans obvious in the layout demo. */
 function DemoCell({
 	label,
-	color,
+	backgroundColor,
 	theme,
 }: {
 	label: string
-	color: Color4
+	backgroundColor: Color4
 	theme: Theme
 }) {
 	return (
 		<UiBox
-			color          = {color}
+			backgroundColor = {backgroundColor}
 			borderRadius   = {theme.border.radiusSmall}
 			padding        = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 			alignItems     = "center"
@@ -82,44 +82,44 @@ export class DemoLayoutLayer extends Layer {
 
 					<Text value="Cols with auto expand to fill the space" />
 					<Row
-						color        = {alpha(theme.colors.secondary, 0.25)}
+						backgroundColor        = {alpha(theme.colors.secondary, 0.25)}
 						borderRadius = {theme.border.radiusSmall}
 					>
 						<Column cols={4}>
-							<DemoCell label="cols={4} (33%)" color={c4} theme={theme} />
+							<DemoCell label="cols={4} (33%)" backgroundColor={c4} theme={theme} />
 						</Column>
 						<Column cols="auto">
-							<DemoCell label='cols="auto" → fill' color={cFill} theme={theme} />
+							<DemoCell label='cols="auto" → fill' backgroundColor={cFill} theme={theme} />
 						</Column>
 					</Row>
 
 					<Text value="Sibling autos share space evenly" />
 					<Row
-						color        = {alpha(theme.colors.secondary, 0.25)}
+						backgroundColor        = {alpha(theme.colors.secondary, 0.25)}
 						borderRadius = {theme.border.radiusSmall}
 					>
 						<Column cols={3}>
-							<DemoCell label="cols={3} (25%)" color={c4} theme={theme} />
+							<DemoCell label="cols={3} (25%)" backgroundColor={c4} theme={theme} />
 						</Column>
 						<Column cols="auto">
-							<DemoCell label='cols="auto"' color={cFill} theme={theme} />
+							<DemoCell label='cols="auto"' backgroundColor={cFill} theme={theme} />
 						</Column>
 						<Column cols="auto">
-							<DemoCell label='cols="auto"' color={cFill} theme={theme} />
+							<DemoCell label='cols="auto"' backgroundColor={cFill} theme={theme} />
 						</Column>
 					</Row>
 
 
 					<Text value="Explicit col sizes don't expand" />
 					<Row
-						color        = {alpha(theme.colors.secondary, 0.25)}
+						backgroundColor        = {alpha(theme.colors.secondary, 0.25)}
 						borderRadius = {theme.border.radiusSmall}
 					>
 						<Column cols={4}>
-							<DemoCell label="cols={4}" color={c4} theme={theme} />
+							<DemoCell label="cols={4}" backgroundColor={c4} theme={theme} />
 						</Column>
 						<Column cols={4}>
-							<DemoCell label="cols={4}" color={c4} theme={theme} />
+							<DemoCell label="cols={4}" backgroundColor={c4} theme={theme} />
 						</Column>
 					</Row>
 
@@ -128,36 +128,36 @@ export class DemoLayoutLayer extends Layer {
 					<H3 value="cols={4} + cols={8} with nested rows" />
 					<Text value="Rows are always 100% of their parent. Narrow a section with a Column wrapper" />
 					<Row
-						color        = {alpha(theme.colors.secondary, 0.25)}
+						backgroundColor        = {alpha(theme.colors.secondary, 0.25)}
 						borderRadius = {theme.border.radiusSmall}
 					>
 						<Column
 							cols         = {4}
 							spacing      = {6}
 							alignItems   = "stretch"
-							color        = {alpha(theme.colors.primary, 0.15)}
+							backgroundColor        = {alpha(theme.colors.primary, 0.15)}
 							borderRadius = {theme.border.radiusSmall}
 						>
-							<DemoCell label="cols={4} parent" color={c4} theme={theme} />
+							<DemoCell label="cols={4} parent" backgroundColor={c4} theme={theme} />
 							<Row
-								color        = {alpha(theme.colors.body, 0.5)}
+								backgroundColor        = {alpha(theme.colors.body, 0.5)}
 								borderRadius = {theme.border.radiusSmall}
 								margin       = {{ top: 6, bottom: 6 }}
 							>
 								<Column cols="auto">
-									<DemoCell label="nested → auto fill" color={cNest} theme={theme} />
+									<DemoCell label="nested → auto fill" backgroundColor={cNest} theme={theme} />
 								</Column>
 							</Row>
 							<Row
-								color        = {alpha(theme.colors.body, 0.5)}
+								backgroundColor        = {alpha(theme.colors.body, 0.5)}
 								borderRadius = {theme.border.radiusSmall}
 								margin       = {{ top: 6, bottom: 6 }}
 							>
 								<Column cols={6}>
-									<DemoCell label="6" color={cMuted} theme={theme} />
+									<DemoCell label="6" backgroundColor={cMuted} theme={theme} />
 								</Column>
 								<Column cols={6}>
-									<DemoCell label="6" color={cMuted} theme={theme} />
+									<DemoCell label="6" backgroundColor={cMuted} theme={theme} />
 								</Column>
 							</Row>
 						</Column>
@@ -165,32 +165,32 @@ export class DemoLayoutLayer extends Layer {
 							cols         = {8}
 							spacing      = {6}
 							alignItems   = "stretch"
-							color        = {alpha(theme.colors.primary, 0.15)}
+							backgroundColor        = {alpha(theme.colors.primary, 0.15)}
 							borderRadius = {theme.border.radiusSmall}
 						>
-							<DemoCell label="cols={8} parent" color={c8} theme={theme} />
+							<DemoCell label="cols={8} parent" backgroundColor={c8} theme={theme} />
 							<Row
-								color        = {alpha(theme.colors.body, 0.5)}
+								backgroundColor        = {alpha(theme.colors.body, 0.5)}
 								borderRadius = {theme.border.radiusSmall}
 								margin       = {{ top: 6, bottom: 6 }}
 							>
 								<Column cols={4}>
-									<DemoCell label="4" color={cNest} theme={theme} />
+									<DemoCell label="4" backgroundColor={cNest} theme={theme} />
 								</Column>
 								<Column cols={4}>
-									<DemoCell label="4" color={cNest} theme={theme} />
+									<DemoCell label="4" backgroundColor={cNest} theme={theme} />
 								</Column>
 								<Column cols={4}>
-									<DemoCell label="4" color={cNest} theme={theme} />
+									<DemoCell label="4" backgroundColor={cNest} theme={theme} />
 								</Column>
 							</Row>
 							<Row
-								color        = {alpha(theme.colors.body, 0.5)}
+								backgroundColor        = {alpha(theme.colors.body, 0.5)}
 								borderRadius = {theme.border.radiusSmall}
 								margin       = {{ top: 6, bottom: 6 }}
 							>
 								<Column cols={6}>
-									<DemoCell label="cols={6} half of parent" color={cFill} theme={theme} />
+									<DemoCell label="cols={6} half of parent" backgroundColor={cFill} theme={theme} />
 								</Column>
 							</Row>
 						</Column>

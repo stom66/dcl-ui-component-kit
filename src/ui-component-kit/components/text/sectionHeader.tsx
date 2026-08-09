@@ -6,7 +6,7 @@ import { textMinHeight } from './textLayout'
 import { mergeTextShorthands, type TextShorthandProps } from './textShorthands'
 
 
-export type SectionHeaderProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProps & {
+export type SectionHeaderProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
@@ -14,13 +14,13 @@ export type SectionHeaderProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShor
 
 // MARK: SectionHeader
 /**
- * Section title within a panel body (h2-sized). Pass copy via `value`; tint via `color`.
+ * Section title within a panel body (h2-sized). Pass copy via `value`; tint via `fontColor`.
  * Prefer text shorthands over nesting `uiText`.
  */
 export const SectionHeader = ({
 	children,
 	value,
-	color,
+	fontColor,
 	fontSize: fontSizeProp,
 	font,
 	textAlign,
@@ -39,7 +39,7 @@ export const SectionHeader = ({
 			value    : '',
 		},
 		uiText,
-		{ value, color, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
 	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
 

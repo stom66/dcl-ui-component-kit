@@ -31,7 +31,7 @@ function DemoChildBox({
 	return (
 		<UiBox
 			key            = {id}
-			color          = {fill}
+			backgroundColor          = {fill}
 			borderColor    = {theme.colors.dark}
 			borderRadius   = {theme.border.radiusSmall}
 			borderWidth    = {1}
@@ -85,7 +85,7 @@ export function createSafeZoneDemoLayer(
 			return [
 				<Background
 					key          = {`${id}_bounds`}
-					color        = {alpha(theme.colors.primary, 0.35)}
+					backgroundColor        = {alpha(theme.colors.primary, 0.35)}
 					borderColor  = {theme.colors.dark}
 					borderRadius = {0}
 					borderWidth  = {1}

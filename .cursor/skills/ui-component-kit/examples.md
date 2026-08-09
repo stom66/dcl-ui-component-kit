@@ -5,7 +5,7 @@
 - One layer → one zone (`zone: ZoneType.*`)
 - Implement `body()` only
 - Size / align via forwarded native props (`uiTransform`, `uiBackground`) on **Layer / Zone**
-- Inside `body()`, prefer component **shorthands** (`color`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
+- Inside `body()`, prefer component **shorthands** (`fontColor`, `backgroundColor`, `iconColor`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
 - Panel chrome via **sibling** empty `<Background />` in `body()` — never nest content inside it (preserves zone flex)
 
 Real references: `demo.safeZone.factory.tsx`, `timer.layer.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`
@@ -33,7 +33,7 @@ export class TimerLayer extends Layer {
 		const theme   = getTheme()
 		const seconds = this.props!.get('secondsRemaining') as number
 		return [
-			<Background key="chrome" color={theme.colors.primary} borderRadius={8} />,
+			<Background key="chrome" backgroundColor={theme.colors.primary} borderRadius={8} />,
 			<Text
 				key       = "timer-value"
 				value     = {String(seconds)}
@@ -106,20 +106,20 @@ Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is u
 
 ```tsx
 [
-	<Background key="chrome" color={theme.colors.primary} />,
+	<Background key="chrome" backgroundColor={theme.colors.primary} />,
 	<Column key="body" cols={12} alignItems="stretch" padding={16}>
 		<H2 value="Title" />
 		<Text
 			value    = "Body copy"
 			fontSize = {theme.typography.size.small}
-			color    = {theme.colors.light}
+			fontColor    = {theme.colors.light}
 		/>
 		<Code value="const x = 1" />
 	</Column>,
 ]
 ```
 
-`fontSize` takes the theme base number (auto-scaled). `color` on text = font; on `Background` = fill.
+`fontSize` takes the theme base number (auto-scaled). Use `fontColor` on text, `backgroundColor` on fills, `iconColor` on icons.
 
 ## Close button / framed panel
 
@@ -227,6 +227,30 @@ import { exampleBtnIconsAtlas } from '../../exampleThemes/showcase'
 />
 ```
 
+Wide blank sheet (`atlasBtn3x1`) as the button texture with nested icon + label (see `demo.buttons.layer.tsx`). Prefer `atlas={…}` so atlas `inset` / `insetX` / `insetY` apply:
+
+```tsx
+import { atlasBtn3x1, atlasIconsFontAwesome, ButtonImage, Icon, Row, Text } from '../../../ui-component-kit'
+
+<ButtonImage
+	id          = "btn_click_me"
+	atlas       = {atlasBtn3x1}
+	uvColumn    = {1}
+	width       = {192}
+	height      = {64}
+	callback    = {() => { /* … */ }}
+	uiTransform = {{
+		positionType: 'relative',
+		position    : { top: 0, left: 0 },
+	}}
+>
+	<Row height="100%" alignItems="center" justifyContent="center" spacing={8}>
+		<Icon uvs={atlasIconsFontAwesome.uv.handPointer} width={28} height={28} iconColor={theme.colors.dark} />
+		<Text value="Click me" width="auto" fontColor={theme.colors.dark} textWrap="nowrap" />
+	</Row>
+</ButtonImage>
+```
+
 ## Progress bars
 
 > **Variants:** procedural (`ProgressBar`) · image / hybrid (`ProgressBarImage`)
@@ -274,7 +298,7 @@ import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconCharacter, IconNumber, Ic
 import { getTheme } from '../../styles'
 
 <Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
-<Icon uvs={exampleIconsAtlas.uv.star} color={getTheme().colors.primary} />
+<Icon uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} />
 {/* Prefer IconNumber for scores/timers — smallest atlas, least overhead */}
 <IconNumber value={42} atlas={exampleNumbersAtlas} />
 <IconSymbol value="$%#" />
@@ -310,13 +334,13 @@ super({
 
 protected body() {
 	return [
-		<Background key="chrome" color={getTheme().colors.primary} borderRadius={8} />,
+		<Background key="chrome" backgroundColor={getTheme().colors.primary} borderRadius={8} />,
 		{/* content siblings */},
 	]
 }
 
 // BAD — nesting content inside Background replaces zone flex
-<Background color={getTheme().colors.primary}>
+<Background backgroundColor={getTheme().colors.primary}>
 	{/* … */}
 </Background>
 ```

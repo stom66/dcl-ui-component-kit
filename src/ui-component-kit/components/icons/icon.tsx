@@ -11,7 +11,7 @@ export type IconProps = Omit<UiBoxProps, 'backgroundColor'> & {
 	 * Tint multiply for the icon texture (applied as `uiBackground.color`).
 	 * Prefer this over `backgroundColor` — icons are glyphs, not filled panels.
 	 */
-	color?      : Color4
+	iconColor?  : Color4
 	/** Texture path. Defaults to the bundled Font Awesome atlas. */
 	src?        : string
 	textureMode?: TextureMode | undefined
@@ -27,11 +27,11 @@ export type IconProps = Omit<UiBoxProps, 'backgroundColor'> & {
  * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
  * `src` defaults to `atlasIconsFontAwesome.source` and inherits that atlas's
  * `wrapMode` / `filterMode` (override via `uiBackground.texture` — deep-merged).
- * Tint with `color` (texture × color multiply).
+ * Tint with `iconColor` (texture × color multiply).
  */
 export const Icon = ({
 	children,
-	color,
+	iconColor,
 	src         = atlasIconsFontAwesome.source,
 	textureMode,
 	uvs,
@@ -49,7 +49,7 @@ export const Icon = ({
 	return (
 		<UiBox
 			{...props}
-			backgroundColor={color}
+			backgroundColor={iconColor}
 			uiTransform={{
 				width     : width,
 				height    : height,

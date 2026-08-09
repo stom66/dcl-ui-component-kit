@@ -78,7 +78,7 @@ export class DemoBackgroundsLayer extends Layer {
 
 					<DemoSample>
 						<Background
-							color        = {theme.colors.primary}
+							backgroundColor        = {theme.colors.primary}
 							borderRadius = {theme.border.radiusLarge}
 							borderWidth  = {theme.border.width}
 						/>
@@ -99,7 +99,7 @@ export class DemoBackgroundsLayer extends Layer {
 
 					<DemoSample>
 						<BackgroundGradient
-							color     = {theme.colors.primary}
+							backgroundColor     = {theme.colors.primary}
 							direction = "top"
 						/>
 						<Label value="Primary · top" />
@@ -107,7 +107,7 @@ export class DemoBackgroundsLayer extends Layer {
 
 					<DemoSample>
 						<BackgroundGradient
-							color     = {theme.colors.danger}
+							backgroundColor     = {theme.colors.danger}
 							direction = "bottom"
 						/>
 						<Label value="Danger · bottom" />
@@ -115,7 +115,7 @@ export class DemoBackgroundsLayer extends Layer {
 
 					<DemoSample>
 						<BackgroundGradient
-							color     = {theme.colors.info}
+							backgroundColor     = {theme.colors.info}
 							direction = "left"
 						/>
 						<Label value="Info · left" />
@@ -123,7 +123,7 @@ export class DemoBackgroundsLayer extends Layer {
 
 					<DemoSample>
 						<BackgroundGradient
-							color     = {theme.colors.success}
+							backgroundColor     = {theme.colors.success}
 							direction = "right"
 						/>
 						<Label value="Success · right" />

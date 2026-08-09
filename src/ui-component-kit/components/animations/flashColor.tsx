@@ -12,7 +12,7 @@ export type FlashColorProps = UiBoxProps & BurstAnimationProps & {
 	/** Seconds for one full flash (to target + back). Not the full burst — see `burstCount`. */
 	duration?       : number
 	/** Color to flash toward. Defaults to `theme.colors.primary`. */
-	color?          : Color4
+	flashColor?     : Color4
 	/**
 	 * Easing for both directions. Overridden per-direction by `easingFlash` /
 	 * `easingReturn` when those are set.
@@ -30,11 +30,11 @@ const theme = getTheme()
 
 // MARK: resolveChildBaseColor
 /**
- * Reads the child's tint from `color` (Icon shorthand), `backgroundColor`, or
+ * Reads the child's tint from `iconColor`, `backgroundColor`, or
  * `uiBackground.color`. Falls back to white so textured children keep a neutral multiply.
  */
 function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 {
-	return child?.props?.color
+	return child?.props?.iconColor
 		?? child?.props?.backgroundColor
 		?? child?.props?.uiBackground?.color
 		?? Color4.White()
@@ -43,8 +43,8 @@ function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 
 
 // MARK: FlashColor
 /**
- * Flashes a single child's tint toward `color` and back.
- * The child's original `color` / `backgroundColor` / `uiBackground.color` is the base.
+ * Flashes a single child's tint toward `flashColor` and back.
+ * The child's original `iconColor` / `backgroundColor` / `uiBackground.color` is the base.
  * Forwards `width` / `height` (including scaled sizes from an outer `Pulse`) to
  * the child so nested animation stacks keep sizing in sync.
  *
@@ -61,7 +61,7 @@ export const FlashColor = ({
 	burstCount     = theme.animation.flashColorBurstCountDefault,
 	burstInterval  = theme.animation.flashColorBurstIntervalDefault,
 	burstOffset    = 0,
-	color          = theme.colors.primary,
+	flashColor     = theme.colors.primary,
 	easingFunction,
 	easingFlash,
 	easingReturn,
@@ -93,9 +93,9 @@ export const FlashColor = ({
 	if (sample.inBurst) {
 		const cycleT = sample.cycleT
 		if (cycleT < 0.5) {
-			currentColor = Color4.lerp(baseColor, color, easeFlash(cycleT * 2))
+			currentColor = Color4.lerp(baseColor, flashColor, easeFlash(cycleT * 2))
 		} else {
-			currentColor = Color4.lerp(color, baseColor, easeReturn((cycleT - 0.5) * 2))
+			currentColor = Color4.lerp(flashColor, baseColor, easeReturn((cycleT - 0.5) * 2))
 		}
 	}
 
@@ -116,7 +116,7 @@ export const FlashColor = ({
 			{child && cloneAnimChild(child, {
 				width          : w,
 				height         : h,
-				color          : currentColor,
+				iconColor      : currentColor,
 				backgroundColor: currentColor,
 				uiBackground   : mergeUiBackground(child.props?.uiBackground, {
 					color: currentColor,

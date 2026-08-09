@@ -13,22 +13,22 @@ type DividerMargin = {
 	left?  : number
 }
 
-type DividerProps = Omit<UiBoxProps, 'margin' | 'color' | 'width' | 'uiTransform'> & {
-	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
+type DividerProps = Omit<UiBoxProps, 'margin' | 'backgroundColor' | 'width' | 'uiTransform'> & {
+	children?        : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Line fill color. Defaults to `theme.colors.light` at 0.5 alpha. */
-	color?      : Color4
-	margin?     : DividerMargin
-	thickness?  : number
-	width?      : PositionUnit | 'auto' | undefined
-	uiTransform?: UiTransformProps
+	backgroundColor? : Color4
+	margin?          : DividerMargin
+	thickness?       : number
+	width?           : PositionUnit | 'auto' | undefined
+	uiTransform?     : UiTransformProps
 }
 
 
 // MARK: Divider
-/** Horizontal rule. Prefer `color` / `margin` / `thickness` / `width` shorthands. */
+/** Horizontal rule. Prefer `backgroundColor` / `margin` / `thickness` / `width` shorthands. */
 export const Divider = ({
 	children,
-	color,
+	backgroundColor,
 	margin    = { top: 10, right: 0, bottom: 10, left: 0 },
 	thickness = 3,
 	width     = '100%',
@@ -37,7 +37,7 @@ export const Divider = ({
 	...props
 }: DividerProps) => {
 	const theme        = getTheme()
-	const dividerColor = color ?? alpha(theme.colors.light, 0.25)
+	const dividerColor = backgroundColor ?? alpha(theme.colors.light, 0.25)
 
 	const transform: UiTransformProps = {
 		width,

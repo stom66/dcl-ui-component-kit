@@ -28,6 +28,18 @@ export type TextureAtlasCellOptions = Omit<GetUVCellOptions, 'xTotal' | 'yTotal'
 export type TextureAtlasNamedCell = TextureAtlasCellOptions
 
 /**
+ * Nine-slice margins as fractions of the texture (0–1), matching SDK
+ * `uiBackground.textureSlices`. Used by `ButtonImage` with
+ * `textureMode: 'nine-slices'`.
+ */
+export type AtlasTextureSlices = {
+	top   : number
+	bottom: number
+	left  : number
+	right : number
+}
+
+/**
  * Per-glyph inset for `char()`. A number is uniform inset on both axes
  * (`inset` / `insetX` / `insetY`); an object uses the same fields as `cell()`.
  */
@@ -45,10 +57,20 @@ export type TextureAtlasOptions<
 	/** Row count in the atlas grid. */
 	rows    : number
 	/**
-	 * Default inset applied to `cell` / `row` / `column` / `char` when the
-	 * call does not pass its own inset.
+	 * Optional nine-slice margins for `uiBackground.textureSlices`.
+	 * When set, `ButtonImage` uses native `textureMode: 'nine-slices'`.
+	 */
+	textureSlices? : AtlasTextureSlices
+	/**
+	 * Default uniform inset (both axes) for `cell` / `row` / `column` / `char`
+	 * when the call does not pass its own inset. Overridden per-axis by
+	 * `insetX` / `insetY` when those are set (same rules as `getUVCell`).
 	 */
 	inset?  : number
+	/** Default X-axis inset; falls back to `inset` when omitted. */
+	insetX? : number
+	/** Default Y-axis inset; falls back to `inset` when omitted. */
+	insetY? : number
 	/**
 	 * Texture wrap mode for the whole sheet. Defaults to `'clamp'` so UV samples
 	 * near cell edges do not bleed into neighbouring atlas cells.
@@ -125,6 +147,8 @@ export class TextureAtlas<
 	readonly wrapMode   : AtlasTextureWrapMode
 	readonly filterMode?: AtlasTextureFilterMode
 	readonly layout?    : AtlasLayout
+	/** Optional nine-slice margins for native `textureMode: 'nine-slices'`. */
+	readonly textureSlices?: AtlasTextureSlices
 	/**
 	 * Named cell options as declared in the constructor (`xStart` / `yStart` / …).
 	 * Pass to `uvCell` / `.cell()` — e.g. `atlas.named.yellowOrange`.
@@ -136,23 +160,28 @@ export class TextureAtlas<
 	 */
 	readonly uv     : { readonly [K in keyof TNamed]: number[] }
 
-	private readonly defaultInset: number
-	private readonly aliases     : Record<string, string>
-	private readonly charInsets  : Record<string, TextureAtlasCharInset>
+	private readonly defaultInset : number
+	private readonly defaultInsetX?: number
+	private readonly defaultInsetY?: number
+	private readonly aliases      : Record<string, string>
+	private readonly charInsets   : Record<string, TextureAtlasCharInset>
 	/** Stable UV quads for `char()` — new arrays every frame leak ReactEcs entities. */
-	private readonly charCache   = new Map<string, number[]>()
+	private readonly charCache    = new Map<string, number[]>()
 
 
 	constructor(options: TextureAtlasOptions<TNamed>) {
-		this.source       = options.source
-		this.columns      = options.columns
-		this.rows         = options.rows
-		this.wrapMode     = options.wrapMode ?? 'clamp'
-		this.filterMode   = options.filterMode
-		this.layout       = options.layout
-		this.defaultInset = options.inset ?? 0
-		this.aliases      = options.aliases ?? {}
-		this.charInsets   = options.charInsets ?? {}
+		this.source        = options.source
+		this.columns       = options.columns
+		this.rows          = options.rows
+		this.textureSlices = options.textureSlices
+		this.wrapMode      = options.wrapMode ?? 'clamp'
+		this.filterMode    = options.filterMode
+		this.layout        = options.layout
+		this.defaultInset  = options.inset ?? 0
+		this.defaultInsetX = options.insetX
+		this.defaultInsetY = options.insetY
+		this.aliases       = options.aliases ?? {}
+		this.charInsets    = options.charInsets ?? {}
 
 		const named = options.named ?? ({} as TNamed)
 		const uv    = {} as { [K in keyof TNamed]: number[] }
@@ -222,7 +251,21 @@ export class TextureAtlas<
 			insetX: baseInsetX,
 			...glyphInset,
 		}
-		return merged.insetX ?? merged.inset ?? this.defaultInset
+		return merged.insetX ?? merged.inset ?? this.defaultInsetX ?? this.defaultInset
+	}
+
+
+	// MARK: atlasInsetDefaults
+	/**
+	 * Atlas-level inset defaults for `getUVCell`. Axis defaults are omitted
+	 * when unset so a call-site uniform `inset` still applies to both axes.
+	 */
+	private atlasInsetDefaults(): Pick<TextureAtlasCellOptions, 'inset' | 'insetX' | 'insetY'> {
+		return {
+			inset: this.defaultInset,
+			...(this.defaultInsetX !== undefined ? { insetX: this.defaultInsetX } : {}),
+			...(this.defaultInsetY !== undefined ? { insetY: this.defaultInsetY } : {}),
+		}
 	}
 
 
@@ -234,13 +277,21 @@ export class TextureAtlas<
 	 * Coordinates are **1-based inclusive** — first cell is
 	 * `{ xStart: 1, yStart: 1 }`.
 	 *
+	 * Inset merge: atlas `inset` / `insetX` / `insetY` → call-site `options`
+	 * (same axis rules as `getUVCell`: `insetX ?? inset`, `insetY ?? inset`).
+	 *
 	 * @param options - Cell selection / inset (no `xTotal` / `yTotal`)
 	 * @returns Flat UV quad
 	 */
 	cell(options: TextureAtlasCellOptions = {}): number[] {
+		const uniformOverride = options.inset !== undefined
 		return getUVCell({
-			inset: this.defaultInset,
+			...this.atlasInsetDefaults(),
 			...options,
+			// Uniform call-site `inset` clears atlas axis defaults for unset axes
+			// so `insetX ?? inset` / `insetY ?? inset` in getUVCell apply evenly.
+			...(uniformOverride && options.insetX === undefined ? { insetX: undefined } : {}),
+			...(uniformOverride && options.insetY === undefined ? { insetY: undefined } : {}),
 			xTotal: this.columns,
 			yTotal: this.rows,
 		})

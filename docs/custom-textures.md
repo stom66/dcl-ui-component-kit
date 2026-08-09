@@ -59,6 +59,8 @@ export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
 
 Every `TextureAtlas` defaults `wrapMode` to `'clamp'`. Optional `filterMode`: `'point'` | `'bi-linear'` | `'tri-linear'`. Prefer `atlas.texture` over `{ src: atlas.source }` alone.
 
+Atlas-level UV crop defaults: `inset` (both axes), or independent `insetX` / `insetY` (same rules as `getUVCell`). Per-call / named-cell options still override.
+
 ## UV helpers (1-based)
 
 Always use `getUVCell` / `getUVColumn` / `getUVRow`, or `TextureAtlas` methods. **Cell / column / row numbers start at `1`.** Totals are counts. Ends (`xEnd` / `yEnd`) are inclusive.

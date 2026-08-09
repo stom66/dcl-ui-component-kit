@@ -37,7 +37,7 @@ export class ScoreboardLayer extends Layer {
 
 	body() {
 		return [
-			<Background key="chrome" color={/* … */} borderRadius={8} />,
+			<Background key="chrome" backgroundColor={/* … */} borderRadius={8} />,
 			<Row key="content" alignItems="center" justifyContent="space-between" padding={12}>
 				<Header value="Score" />
 				<Text value="12" />

@@ -86,7 +86,7 @@ export class DemoGridsLayer extends Layer {
 			cells.push(
 				<UiBox
 					key   = {`vert-num-${n}`}
-					color = {alpha(theme.colors.primary, 0.5)}
+					backgroundColor = {alpha(theme.colors.primary, 0.5)}
 					{...cell}
 				>
 					<IconNumber value={n} height={28} />
@@ -98,7 +98,7 @@ export class DemoGridsLayer extends Layer {
 			cells.push(
 				<UiBox
 					key   = {`vert-${name}`}
-					color = {alpha(theme.colors.body, 0.45)}
+					backgroundColor = {alpha(theme.colors.body, 0.45)}
 					{...cell}
 				>
 					<Icon
@@ -148,7 +148,7 @@ export class DemoGridsLayer extends Layer {
 			cells.push(
 				<UiBox
 					key   = {`horiz-num-${n}`}
-					color = {alpha(theme.colors.primary, 0.5)}
+					backgroundColor = {alpha(theme.colors.primary, 0.5)}
 					{...cell}
 				>
 					<IconNumber value={n} height={28} />
@@ -160,7 +160,7 @@ export class DemoGridsLayer extends Layer {
 			cells.push(
 				<UiBox
 					key   = {`horiz-${name}`}
-					color = {alpha(theme.colors.body, 0.45)}
+					backgroundColor = {alpha(theme.colors.body, 0.45)}
 					{...cell}
 				>
 					<Icon

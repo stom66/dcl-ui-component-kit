@@ -109,7 +109,7 @@ export class BottomBarLayer extends Layer {
 					>
 						<Label
 							value     = "Start Game"
-							color     = {Color4.create(0, 0, 0, 0)}
+							backgroundColor     = {Color4.create(0, 0, 0, 0)}
 							height    = "100%"
 							padding   = {0}
 							fontSize  = {theme.typography.size.default}

@@ -6,7 +6,7 @@ import { textMinHeight } from './textLayout'
 import { mergeTextShorthands, type TextShorthandProps } from './textShorthands'
 
 
-export type TextProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProps & {
+export type TextProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
 }
@@ -16,7 +16,7 @@ export type TextProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProp
 /**
  * Default body text block. Pass copy via `value` (or `uiText.value`); nest element children as needed.
  *
- * Prefer text shorthands (`value`, `color`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap`)
  * over nesting `uiText`. `fontSize` takes a theme base px number and is auto-scaled.
  *
  * Layout notes (DCL / Yoga):
@@ -29,7 +29,7 @@ export type TextProps = Omit<UiBoxProps, 'uiText' | 'color'> & TextShorthandProp
 export const Text = ({
 	children,
 	value,
-	color,
+	fontColor,
 	fontSize: fontSizeProp,
 	font,
 	textAlign,
@@ -49,7 +49,7 @@ export const Text = ({
 			value    : '',
 		},
 		uiText,
-		{ value, color, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
 	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
 

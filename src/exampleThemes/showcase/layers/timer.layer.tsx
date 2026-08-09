@@ -51,7 +51,7 @@ export class TimerLayer extends Layer {
 		const seconds = this.props.get('secondsRemaining') as number
 
 		return [
-			<Background key="chrome" color={theme.colors.primary} />,
+			<Background key="chrome" backgroundColor={theme.colors.primary} />,
 			<IconNumber
 				key    = "timer-value"
 				// Fixed width so the digit entity count stays at 2 (no 9↔10 remount churn).

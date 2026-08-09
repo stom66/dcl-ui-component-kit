@@ -1,5 +1,5 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { Background, ButtonImage, ButtonText, Column, Divider, getTheme, H2, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
+import { atlasBtn1x1, atlasBtn3x1, atlasBtnIconsStyled, atlasIconsFontAwesome, Background, ButtonImage, ButtonText, Column, Divider, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
 
 // MARK: DemoButtonsLayer
 /** Demo panel for ButtonText and ButtonImage variants. */
@@ -13,7 +13,7 @@ export class DemoButtonsLayer extends Layer {
 			showCloseButton: true,
 			uiTransform    : {
 				width : '45vw',
-				height: '40vw',
+				height: 'auto',
 			},
 		})
 	}
@@ -28,13 +28,12 @@ export class DemoButtonsLayer extends Layer {
 			<Column
 				key            = "body"
 				cols           = {12}
-				height         = "100%"
 				alignItems     = "stretch"
 				justifyContent = "flex-start"
 				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 			>
 					<H2 value="Buttons" />
-					<Text value="ButtonText for labelled controls; ButtonImage for atlas icons." />
+					<Text value="ButtonText for labelled controls; ButtonImage for atlas icons and wide textured buttons." />
 
 					<Divider margin={{ top: 8, bottom: 8 }} />
 
@@ -101,16 +100,18 @@ export class DemoButtonsLayer extends Layer {
 
 					<Label
 						cols   = {12}
-						value  = "ButtonImage (atlas columns)"
+						value  = "ButtonImage — atlasBtnIconsStyled (4 columns × 4 states)"
 						margin = {{ bottom: 8 }}
 					/>
 					<Row
 						height         = {80}
 						justifyContent = "flex-start"
 						alignItems     = "center"
+						spacing        = {12}
 					>
 						<ButtonImage
 							id          = "demo_btn_image_0"
+							atlas       = {atlasBtnIconsStyled}
 							uvColumn    = {1}
 							width       = {64}
 							height      = {64}
@@ -119,10 +120,10 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ right: 8, left: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_1"
+							atlas       = {atlasBtnIconsStyled}
 							uvColumn    = {2}
 							width       = {64}
 							height      = {64}
@@ -131,10 +132,10 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ right: 8, left: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_2"
+							atlas       = {atlasBtnIconsStyled}
 							uvColumn    = {3}
 							width       = {64}
 							height      = {64}
@@ -143,10 +144,10 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ right: 8, left: 8 }}
 						/>
 						<ButtonImage
 							id          = "demo_btn_image_3"
+							atlas       = {atlasBtnIconsStyled}
 							uvColumn    = {4}
 							width       = {64}
 							height      = {64}
@@ -155,8 +156,85 @@ export class DemoButtonsLayer extends Layer {
 								positionType: 'relative',
 								position    : { top: 0, left: 0 },
 							}}
-							margin      = {{ right: 8, left: 8 }}
 						/>
+					</Row>
+
+					<Divider margin={{ top: 16, bottom: 8 }} />
+
+					<Label
+						cols   = {12}
+						value  = "ButtonImage — blank sheets (atlasBtn3x1 + atlasBtn1x1)"
+						margin = {{ bottom: 8 }}
+					/>
+					<Text
+						value  = "Wide and narrow blank atlases with native nine-slices; nest icon / text children on top."
+						margin = {{ bottom: 8 }}
+					/>
+					<Row
+						height         = {80}
+						justifyContent = "flex-start"
+						alignItems     = "center"
+						spacing        = {16}
+					>
+						<ButtonImage
+							id          = "demo_btn_wide_click_me"
+							atlas       = {atlasBtn3x1}
+							uvColumn    = {1}
+							width       = {192}
+							height      = {64}
+							callback    = {() => console.log('DemoButtonsLayer: wide click-me clicked')}
+							uiTransform = {{
+								positionType: 'relative',
+								position    : { top: 0, left: 0 },
+							}}
+						>
+							<Row
+								height         = "100%"
+								alignItems     = "center"
+								justifyContent = "center"
+								spacing        = {8}
+							>
+								<Icon
+									uvs       = {atlasIconsFontAwesome.uv.handPointer}
+									width     = {28}
+									height    = {28}
+									iconColor = {theme.colors.dark}
+								/>
+								<Text
+									value     = "Click me"
+									width     = "auto"
+									fontSize  = {theme.typography.size.default}
+									fontColor = {theme.colors.dark}
+									textAlign = "middle-center"
+									textWrap  = "nowrap"
+								/>
+							</Row>
+						</ButtonImage>
+						<ButtonImage
+							id          = "demo_btn_narrow_ok"
+							atlas       = {atlasBtn1x1}
+							uvColumn    = {1}
+							width       = {64}
+							height      = {64}
+							callback    = {() => console.log('DemoButtonsLayer: narrow ok clicked')}
+							uiTransform = {{
+								positionType: 'relative',
+								position    : { top: 0, left: 0 },
+							}}
+						>
+							<Row
+								height         = "100%"
+								alignItems     = "center"
+								justifyContent = "center"
+							>
+								<Icon
+									uvs       = {atlasIconsFontAwesome.uv.check}
+									width     = {28}
+									height    = {28}
+									iconColor = {theme.colors.dark}
+								/>
+							</Row>
+						</ButtonImage>
 					</Row>
 			</Column>,
 		]

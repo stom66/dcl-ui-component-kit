@@ -93,7 +93,7 @@ export class DemoListLayer extends Layer {
 		const row = (
 			<Row
 				key          = {`score-row-${rank}`}
-				color        = {fill}
+				backgroundColor        = {fill}
 				borderRadius = {theme.border.radiusDefault}
 				borderWidth  = {flashBorder ? theme.border.width : 0}
 				borderColor  = {flashBorder ? alpha(lighten(fill, 0.75), 0.5) : undefined}
@@ -111,7 +111,7 @@ export class DemoListLayer extends Layer {
 							uvs    = {atlasIconsFontAwesome.uv[entry.icon]}
 							width  = {ICON_SIZE}
 							height = {ICON_SIZE}
-							color  = {rank === 1 ? theme.colors.primary : undefined}
+							iconColor  = {rank === 1 ? theme.colors.primary : undefined}
 						/>
 					) : null}
 				</Column>
@@ -170,7 +170,7 @@ export class DemoListLayer extends Layer {
 				duration      = {0.5}
 				burstCount    = {2}
 				burstInterval = {1}
-				color         = {theme.colors.primary}
+				flashColor         = {theme.colors.primary}
 			>
 				{row}
 			</FlashBorder>

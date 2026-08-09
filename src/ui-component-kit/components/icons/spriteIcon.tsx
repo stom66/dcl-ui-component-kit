@@ -71,7 +71,7 @@ export type SpriteIconProps = Omit<UiBoxProps, 'backgroundColor'> & {
 	 * Tint multiply for the sprite texture (applied as `uiBackground.color`).
 	 * Prefer this over `backgroundColor`.
 	 */
-	color?       : Color4
+	iconColor?   : Color4
 	textureMode? : TextureMode | undefined
 	width?       : PositionUnit | 'auto' | undefined
 	height?      : PositionUnit | 'auto' | undefined
@@ -229,7 +229,7 @@ export function SpriteIcon({
 	loopInterval = getTheme().animation.spriteIconLoopIntervalDefault,
 	playing      = true,
 	looping      = true,
-	color,
+	iconColor,
 	textureMode,
 	width        = 'auto',
 	height       = 'auto',
@@ -296,7 +296,7 @@ export function SpriteIcon({
 	return (
 		<Icon
 			{...props}
-			color        = {color}
+			iconColor    = {iconColor}
 			src          = {resolvedSrc}
 			textureMode  = {textureMode}
 			uvs          = {uvs}

@@ -36,7 +36,7 @@ type BackgroundProps = UiBoxProps & {
  * Pass `fitContent` only for rare self-sized chrome (not Layer panel chrome).
  *
  * Shorthands (prefer over nesting):
- * - Fill: `color` or `backgroundColor` → `uiBackground.color` (`backgroundColor` wins if both)
+ * - Fill: `backgroundColor` → `uiBackground.color`
  * - Border: `borderColor` / `borderWidth` / `borderRadius`
  * - Texture: `textureSrc`
  * - Layout: `padding`, `alignItems`, `justifyContent`, … (UiBox transform shorthands)
@@ -45,7 +45,6 @@ type BackgroundProps = UiBoxProps & {
  */
 export function Background({
 	children,
-	color,
 	backgroundColor,
 	borderColor,
 	borderRadius,
@@ -57,7 +56,7 @@ export function Background({
 	...props
 }: BackgroundProps) {
 	const theme = getTheme()
-	const fill: Color4 = backgroundColor ?? color ?? theme.colors.body
+	const fill: Color4 = backgroundColor ?? theme.colors.body
 
 	const layout = fitContent
 		? {
@@ -84,7 +83,6 @@ export function Background({
 	return (
 		<UiBox
 			{...props}
-			color           = {fill}
 			backgroundColor = {fill}
 			borderColor     = {borderColor}
 			borderRadius    = {borderRadius ?? theme.border.radiusDefault}

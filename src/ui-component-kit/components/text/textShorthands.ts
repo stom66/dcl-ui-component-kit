@@ -9,20 +9,20 @@ import { scaleFontSize, type TextAlignType, type UiFontType, type UiLabelProps, 
  */
 export type TextShorthandProps = {
 	/** Copy string. Prefer this over JSX text children / `uiText.value`. */
-	value?    : string
+	value?     : string
 	/** Font color. Overrides `uiText.color`. */
-	color?    : Color4
+	fontColor? : Color4
 	/**
 	 * Base font size in theme px (e.g. `theme.typography.size.small`).
 	 * Auto-wrapped with `scaleFontSize` — do not pre-scale.
 	 */
-	fontSize? : number
+	fontSize?  : number
 	/** Font family. Overrides `uiText.font`. */
-	font?     : UiFontType
+	font?      : UiFontType
 	/** Text alignment. Overrides `uiText.textAlign`. */
-	textAlign?: TextAlignType
+	textAlign? : TextAlignType
 	/** Wrap behaviour. Overrides `uiText.textWrap`. */
-	textWrap? : UiTextWrapType
+	textWrap?  : UiTextWrapType
 }
 
 
@@ -62,7 +62,7 @@ export function mergeTextShorthands(
 			font     : shorthands.font,
 			textAlign: shorthands.textAlign,
 			textWrap : shorthands.textWrap,
-			color    : shorthands.color,
+			color    : shorthands.fontColor,
 		}),
 		value: shorthands.value ?? uiText?.value ?? defaults.value ?? '',
 	}
