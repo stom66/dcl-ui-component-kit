@@ -54,6 +54,7 @@ export function main() {
     - [Make your own theme (recommended overrides)](#make-your-own-theme-recommended-overrides)
 - [Building blocks](#building-blocks)
 - [Docs](#docs)
+- [License & credits](#license--credits)
 - [This repo as a demo scene](#this-repo-as-a-demo-scene)
 
 ## Install
@@ -200,7 +201,17 @@ Deeper guides and per-component **options tables** live under [`docs/`](docs/):
 | [docs/themes.md](docs/themes.md) | Theme overrides, `init-theme`, project layout |
 | [docs/custom-textures.md](docs/custom-textures.md) | Affinity template, atlases, UV helpers (1-based) |
 | [docs/components.md](docs/components.md) | Component reference with options tables |
+| [docs/licensing.md](docs/licensing.md) | MIT package license + credits / attributions |
 | [docs/media](docs/media/README.md) | Showcase GIF / media notes |
+
+## License & credits
+
+The package is **MIT**. Third-party art is credited separately:
+
+- **[Font Awesome Free](https://fontawesome.com)** — this kit ships a **limited subset** of the Free pack as `atlasIconsFontAwesome`. For the full icon set, get Font Awesome from [fontawesome.com](https://fontawesome.com) ([Free license](https://fontawesome.com/license/free)).
+- **[CraftPix.net](https://craftpix.net)** — some showcase demo sprite sheets (not npm stock textures).
+
+Full notes: [docs/licensing.md](docs/licensing.md).
 
 ## This repo as a demo scene
 

@@ -192,11 +192,12 @@ export const atlasGradientColors = new TextureAtlas({
 
 // MARK: atlasIconsFontAwesome
 /**
- * Font Awesome solid icon atlas — 16×16 grid (PNG top → bottom; UV Y is
- * bottom → top). Cells are 128×128 with icons fit to an **86px** max axis
- * (~0.707 × cell, minus shadow budget) and centered so rotations / wiggle
- * animations do not clip into neighbours. Named keys are camelCase FA names
- * (e.g. `dice-d20` → `diceD20`). Default source for `Icon`.
+ * Limited subset of Font Awesome Free (solid) — see docs/licensing.md and
+ * https://fontawesome.com for the full pack / license. 16×16 grid (PNG top →
+ * bottom; UV Y is bottom → top). Cells are 128×128 with icons fit to an
+ * **86px** max axis (~0.707 × cell, minus shadow budget) and centered so
+ * rotations / wiggle animations do not clip into neighbours. Named keys are
+ * camelCase FA names (e.g. `dice-d20` → `diceD20`). Default source for `Icon`.
  */
 export const atlasIconsFontAwesome = new TextureAtlas({
 	source : 'assets/images/ui-component-kit/atlas-icons-font-awesome.png',

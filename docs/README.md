@@ -8,4 +8,5 @@ Guides for `@stom66/dcl-ui-component-kit`. Start with the [root README](../READM
 | [themes.md](./themes.md) | Theme overrides, CLI scaffold, layout |
 | [custom-textures.md](./custom-textures.md) | Affinity template, atlases, UV helpers |
 | [components.md](./components.md) | Component reference + options tables |
+| [licensing.md](./licensing.md) | License & credits (MIT, Font Awesome Free, CraftPix) |
 | [media/](./media/README.md) | Showcase GIF / media tips |

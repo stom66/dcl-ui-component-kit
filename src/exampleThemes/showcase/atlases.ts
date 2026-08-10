@@ -88,9 +88,8 @@ export const exampleNumbersAtlas = new TextureAtlas({
 
 // MARK: exampleSpriteSheetAtlas
 /**
- * Example 4×4 sprite sheet for `SpriteIcon`. Cells play left → right, top →
- * bottom in the PNG. Replace `sprite-sheet-4x4.png` with your own art — keep
- * the 4×4 grid (or update `columns` / `rows` to match).
+ * Showcase sprite sheets from CraftPix.net (demo only — not kit stock).
+ * See docs/licensing.md. Cells play left → right, top → bottom.
  */
 export const exampleSpriteSheetAtlas = new TextureAtlas({
 	source    : 'assets/images/example-themes/showcase/sprites-pigeon.png',
