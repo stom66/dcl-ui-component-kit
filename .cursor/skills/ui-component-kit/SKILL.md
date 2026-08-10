@@ -99,7 +99,8 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 | Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
 | Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
 | `Label` | `value`, `fontColor`, `fontSize`, …; **`backgroundColor` = chip fill** | nesting `uiText` for size/align; use `fontColor` (or `uiText.color`) for font tint |
-| `Icon` / `SpriteIcon` | `iconColor` | `uiBackground.color` tint |
+| `Icon` / `SpriteIcon` / `AvatarIcon` / `IconNumber` / `IconCharacter` / `IconSymbol` / `IconString` | `iconColor` | texture tint (`uiBackground.color` on the glyph) |
+| Same icon components | `backgroundColor` | chip / panel fill behind the glyph (wrapper or container — never the texture tint) |
 | `FlashColor` / `FlashBorder` | `flashColor` (target) | ambiguous bare `color` |
 
 **`fontSize` shorthand** takes a **theme base px** number (e.g. `theme.typography.size.small`) and auto-wraps `scaleFontSize` inside the component. Do **not** pre-scale when using the shorthand. If you nest `uiText.fontSize`, you must still call `scaleFontSize` yourself.
@@ -121,7 +122,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 <Background uiBackground={{ color: theme.colors.primary }} />
 ```
 
-**Color props are always specific:** `fontColor` (text), `backgroundColor` (fills / Label chips), `iconColor` (Icon / SpriteIcon tint), `borderColor` (borders), `flashColor` (FlashColor / FlashBorder target). Nested `uiText.color` / `uiBackground.color` remain DCL escape hatches.
+**Color props are always specific:** `fontColor` (text), `backgroundColor` (fills / Label chips / icon chip wrappers), `iconColor` (texture tint on every icon component — never use `backgroundColor` to recolour a glyph), `borderColor` (borders), `flashColor` (FlashColor / FlashBorder target). Nested `uiText.color` / `uiBackground.color` remain DCL escape hatches.
 
 ### Row / Column width (`cols` — required for grid widths)
 
@@ -323,7 +324,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` | `textures?` (per-layer optional) / `atlas` + `uvCell` |
-| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); tint with `iconColor` (not `backgroundColor`); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
+| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); **tint only with `iconColor`**; `backgroundColor` is always a chip fill (wrapper `UiBox` on `Icon` / `SpriteIcon` / `AvatarIcon`, container row on atlas glyph text); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -652,10 +653,10 @@ Image-based “font” rows from the bundled char atlases. Prefer the **narrowes
 | `IconCharacter` | `atlasCharsAlphaNumeric` | Letters (`a–z` / `A–Z`) and digits from that sheet |
 | `IconString` | Cascade: alphanumeric → symbols → numbers | Arbitrary mixed strings |
 
-Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols, numbers }}` on `IconString`.
+Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols, numbers }}` on `IconString`. Tint with `iconColor` (same multiply as `Icon` / `SpriteIcon`).
 
 ```tsx
-<IconNumber value={1250} height={32} />
+<IconNumber value={1250} height={32} iconColor={theme.colors.primary} />
 <IconSymbol value="$%#" height={32} />
 <IconCharacter value="HELLO" height={32} />
 <IconString value="Score: 120/2=60!" height={32} />

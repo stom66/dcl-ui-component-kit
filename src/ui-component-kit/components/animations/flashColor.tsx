@@ -28,14 +28,42 @@ export type FlashColorProps = UiBoxProps & BurstAnimationProps & {
 const theme = getTheme()
 
 
+// MARK: childUsesIconTint
+/**
+ * Texture-icon children tint via `iconColor` only. Detect them so we do not
+ * inject `backgroundColor` (that would create a chip wrapper on `Icon`).
+ */
+function childUsesIconTint(child: ReactEcs.JSX.Element | undefined): boolean {
+	const props = child?.props
+	if (!props) {
+		return false
+	}
+	return props.iconColor !== undefined
+		|| props.uvs !== undefined
+		|| props.src !== undefined
+		|| props.atlas !== undefined
+		|| props.userId !== undefined
+		|| (
+			props.value !== undefined
+			&& props.fontSize === undefined
+			&& props.fontColor === undefined
+			&& props.uiText === undefined
+		)
+}
+
+
 // MARK: resolveChildBaseColor
 /**
- * Reads the child's tint from `iconColor`, `backgroundColor`, or
- * `uiBackground.color`. Falls back to white so textured children keep a neutral multiply.
+ * Reads the child's tint from `iconColor` (icons) or `backgroundColor` /
+ * `uiBackground.color` (fills). Falls back to white for untinted textures.
  */
 function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 {
-	return child?.props?.iconColor
-		?? child?.props?.backgroundColor
+	if (childUsesIconTint(child)) {
+		return child?.props?.iconColor
+			?? child?.props?.uiBackground?.color
+			?? Color4.White()
+	}
+	return child?.props?.backgroundColor
 		?? child?.props?.uiBackground?.color
 		?? Color4.White()
 }
@@ -44,7 +72,8 @@ function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 
 // MARK: FlashColor
 /**
  * Flashes a single child's tint toward `flashColor` and back.
- * The child's original `iconColor` / `backgroundColor` / `uiBackground.color` is the base.
+ * Icons flash via `iconColor` only (never invent a `backgroundColor` chip).
+ * Solid fills flash via `backgroundColor` / `uiBackground.color`.
  * Forwards `width` / `height` (including scaled sizes from an outer `Pulse`) to
  * the child so nested animation stacks keep sizing in sync.
  *
@@ -113,15 +142,24 @@ export const FlashColor = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && cloneAnimChild(child, {
-				width          : w,
-				height         : h,
-				iconColor      : currentColor,
-				backgroundColor: currentColor,
-				uiBackground   : mergeUiBackground(child.props?.uiBackground, {
-					color: currentColor,
-				}),
-			})}
+			{child && cloneAnimChild(child, childUsesIconTint(child)
+				? {
+					width       : w,
+					height      : h,
+					iconColor   : currentColor,
+					uiBackground: mergeUiBackground(child.props?.uiBackground, {
+						color: currentColor,
+					}),
+				}
+				: {
+					width          : w,
+					height         : h,
+					backgroundColor: currentColor,
+					uiBackground   : mergeUiBackground(child.props?.uiBackground, {
+						color: currentColor,
+					}),
+				}
+			)}
 		</UiBox>
 	)
 }

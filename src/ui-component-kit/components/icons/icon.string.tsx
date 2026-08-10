@@ -1,3 +1,4 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
 import { atlasCharsAlphaNumeric, atlasCharsNumbers, atlasCharsSymbols, type TextureAtlas } from '../../atlases'
@@ -15,6 +16,11 @@ type IconStringAtlases = {
 
 type IconStringProps = Omit<UiBoxProps, 'uiText'> & {
 	value    : number | string
+	/**
+	 * Tint multiply for each glyph texture. Only way to recolour glyphs —
+	 * `backgroundColor` fills the container row (chip), same as `Icon`.
+	 */
+	iconColor?: Color4
 	/**
 	 * Optional atlas overrides for the cascade. Lookup order is always
 	 * characters → symbols → numbers.
@@ -61,6 +67,8 @@ function resolveStringGlyphAtlas(
  * - `IconNumber` — scores / timers / formulas (smallest sheet, least overhead)
  * - `IconSymbol` — punctuation only
  * - `IconCharacter` — letters (+ digits from the alphanumeric sheet)
+ *
+ * Tint with `iconColor` (texture × color multiply).
  */
 export const IconString = ({
 	value   = '',

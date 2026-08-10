@@ -143,27 +143,30 @@ export class DemoIconsLayer extends Layer {
 										margin         = {{ bottom: 6 }}
 									>
 										<Icon
-											uvs    = {atlasIconsFontAwesome.uv.star}
-											width  = "48"
-											height = "48"
-											iconColor  = {theme.colors.primary}
-											margin = {{ right: 8 }}
+											uvs       = {atlasIconsFontAwesome.uv.star}
+											width     = "48"
+											height    = "48"
+											iconColor = {theme.colors.primary}
+											margin    = {{ right: 8 }}
 										/>
 										<Icon
-											uvs    = {atlasIconsFontAwesome.uv.star}
-											width  = "48"
-											height = "48"
-											iconColor  = {theme.colors.danger}
-											margin = {{ right: 8 }}
+											uvs       = {atlasIconsFontAwesome.uv.star}
+											width     = "48"
+											height    = "48"
+											iconColor = {theme.colors.danger}
+											margin    = {{ right: 8 }}
 										/>
 										<Icon
-											uvs    = {atlasIconsFontAwesome.uv.star}
-											width  = "48"
-											height = "48"
-											iconColor  = {theme.colors.success}
+											uvs             = {atlasIconsFontAwesome.uv.star}
+											width           = "48"
+											height          = "48"
+											iconColor       = {theme.colors.light}
+											backgroundColor = {theme.colors.primary}
+											borderRadius    = {8}
+											padding         = {{ top: 6, right: 6, bottom: 6, left: 6 }}
 										/>
 									</Row>
-									<Code value="<Icon iconColor={…} />" textWrap="nowrap" />
+									<Code value="<Icon iconColor={…} backgroundColor={…} />" textWrap="nowrap" />
 								</Column>
 
 								<Column
@@ -259,7 +262,12 @@ export class DemoIconsLayer extends Layer {
 							</Column>
 							<Text value="Score / formula:" fontSize={theme.typography.size.small} />
 							<IconNumber value="+120/2=60" height={28} />
-							<Code value={'<IconNumber value="01:05" />'} textWrap="nowrap" />
+							<Row justifyContent="flex-start" alignItems="center" margin={{ top: 4 }}>
+								<IconNumber value={42} height={28} iconColor={theme.colors.primary} margin={{ right: 8 }} />
+								<IconNumber value={42} height={28} iconColor={theme.colors.danger} margin={{ right: 8 }} />
+								<IconNumber value={42} height={28} iconColor={theme.colors.success} />
+							</Row>
+							<Code value={'<IconNumber value={42} iconColor={…} />'} textWrap="nowrap" />
 						</Column>
 
 						<Column
@@ -275,9 +283,9 @@ export class DemoIconsLayer extends Layer {
 								fontSize = {theme.typography.size.small}
 							/>
 							<IconCharacter value="HELLO" height={28} />
-							<IconCharacter value="Player1" height={28} />
-							<IconCharacter value="WAVE 3" height={28} />
-							<Code value={'<IconCharacter value="HELLO" />'} textWrap="nowrap" />
+							<IconCharacter value="Player1" height={28} iconColor={theme.colors.primary} />
+							<IconCharacter value="WAVE 3" height={28} iconColor={theme.colors.success} />
+							<Code value={'<IconCharacter value="HELLO" iconColor={…} />'} textWrap="nowrap" />
 						</Column>
 
 						<Column
@@ -292,11 +300,11 @@ export class DemoIconsLayer extends Layer {
 								value    = "Symbols alone, or IconString when you need mixed letters + punctuation."
 								fontSize = {theme.typography.size.small}
 							/>
-							<IconSymbol value="$%#?!" height={28} />
-							<IconSymbol value="(@)" height={28} />
-							<IconString value="HI $120!" height={28} />
-							<IconString value="A+B=C" height={28} />
-							<Code value={'<IconString value="HI $120!" />'} textWrap="nowrap" />
+							<IconSymbol value="$%#?!" height={28} iconColor={theme.colors.warning} />
+							<IconSymbol value="(@)" height={28} iconColor={theme.colors.primary} />
+							<IconString value="HI $120!" height={28} iconColor={theme.colors.danger} />
+							<IconString value="A+B=C" height={28} iconColor={theme.colors.success} />
+							<Code value={'<IconString value="HI $120!" iconColor={…} />'} textWrap="nowrap" />
 						</Column>
 					</Row>
 			</Column>,

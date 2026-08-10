@@ -11,6 +11,11 @@ const SPACE_ASPECT = 0.4
 export type IconAtlasTextProps = Omit<UiBoxProps, 'uiText'> & {
 	value     : number | string
 	/**
+	 * Tint multiply for each glyph texture (`uiBackground.color` on digits).
+	 * Only way to recolour glyphs — `backgroundColor` fills the container row.
+	 */
+	iconColor?  : Color4
+	/**
 	 * Resolves each character to a texture glyph, blank space, or missing marker.
 	 * Called once per character with the theme horizontal inset.
 	 */
@@ -112,6 +117,16 @@ export function missingGlyph(horizontalInset: number): ResolvedAtlasGlyph {
 }
 
 
+// MARK: colorCacheKey
+/** Stable cache segment for an optional Color4 tint. */
+function colorCacheKey(color: Color4 | undefined): string {
+	if (!color) {
+		return ''
+	}
+	return `${color.r}|${color.g}|${color.b}|${color.a}`
+}
+
+
 // MARK: getDigitBackground
 /** Cached stretch background for one atlas glyph (shared across icon-text instances). */
 function getDigitBackground(
@@ -119,14 +134,16 @@ function getDigitBackground(
 	uvs   : number[],
 	glyph : string,
 	insetX: number,
+	color?: Color4,
 ) {
-	const key = `${atlas.source}|${atlas.wrapMode}|${atlas.filterMode ?? ''}|${glyph}|${insetX}`
+	const key = `${atlas.source}|${atlas.wrapMode}|${atlas.filterMode ?? ''}|${glyph}|${insetX}|${colorCacheKey(color)}`
 	let bg = digitBackgroundCache.get(key)
 	if (!bg) {
 		bg = {
 			texture    : atlas.texture,
 			textureMode: 'stretch',
 			uvs,
+			...(color ? { color } : {}),
 		}
 		digitBackgroundCache.set(key, bg)
 	}
@@ -357,10 +374,12 @@ function resolveIconAtlasTextSize(args: {
  * Shared row renderer for atlas-backed glyph strings (`IconNumber` / `IconSymbol` /
  * `IconCharacter` / `IconString`). Digits are raw `UiEntity`s with string keys —
  * wrapping through `Icon` / `UiBox` + numeric keys recreates entities every frame.
+ * Tint glyphs with `iconColor` (texture × color multiply), same as `Icon`.
  */
 export const IconAtlasText = ({
 	children,
 	value        = '',
+	iconColor,
 	resolveGlyph,
 	keyPrefix    = 'icon-atlas',
 	width        = 'auto',
@@ -432,7 +451,7 @@ export const IconAtlasText = ({
 			<UiEntity
 				key={`${keyPrefix}-${i}`}
 				uiTransform={transform}
-				uiBackground={getDigitBackground(item.atlas, uvs, item.glyph, item.insetX)}
+				uiBackground={getDigitBackground(item.atlas, uvs, item.glyph, item.insetX, iconColor)}
 			/>
 		)
 	}

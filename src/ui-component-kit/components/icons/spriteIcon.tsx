@@ -13,7 +13,7 @@ import { Icon } from './icon'
 const spriteUvCache = new Map<string, number[]>()
 
 
-export type SpriteIconProps = Omit<UiBoxProps, 'backgroundColor'> & {
+export type SpriteIconProps = UiBoxProps & {
 	/** Unique playback instance key (shared animation clock). */
 	id           : string
 	children?    : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
@@ -69,7 +69,7 @@ export type SpriteIconProps = Omit<UiBoxProps, 'backgroundColor'> & {
 	looping?     : boolean
 	/**
 	 * Tint multiply for the sprite texture (applied as `uiBackground.color`).
-	 * Prefer this over `backgroundColor`.
+	 * Only way to recolour the sprite — `backgroundColor` is a chip fill via `Icon`.
 	 */
 	iconColor?   : Color4
 	textureMode? : TextureMode | undefined

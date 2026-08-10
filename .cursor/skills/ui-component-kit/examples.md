@@ -119,7 +119,7 @@ Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is u
 ]
 ```
 
-`fontSize` takes the theme base number (auto-scaled). Use `fontColor` on text, `backgroundColor` on fills, `iconColor` on icons.
+`fontSize` takes the theme base number (auto-scaled). Use `fontColor` on text, `backgroundColor` on fills (including icon chip wrappers), `iconColor` to tint icon textures.
 
 ## Close button / framed panel
 
@@ -299,12 +299,21 @@ import { getTheme } from '../../styles'
 
 <Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
 <Icon uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} />
+{/* backgroundColor = chip behind the glyph; iconColor = texture tint */}
+<Icon
+	uvs             = {exampleIconsAtlas.uv.star}
+	iconColor       = {getTheme().colors.light}
+	backgroundColor = {getTheme().colors.primary}
+	borderRadius    = {8}
+	width           = {48}
+	height          = {48}
+/>
 {/* Prefer IconNumber for scores/timers — smallest atlas, least overhead */}
-<IconNumber value={42} atlas={exampleNumbersAtlas} />
-<IconSymbol value="$%#" />
+<IconNumber value={42} atlas={exampleNumbersAtlas} iconColor={getTheme().colors.primary} />
+<IconSymbol value="$%#" iconColor={getTheme().colors.warning} />
 <IconCharacter value="HELLO" />
 {/* Mixed letters + symbols + numbers — cascades alphanumeric → symbols → numbers */}
-<IconString value="HI $120!" />
+<IconString value="HI $120!" iconColor={getTheme().colors.success} />
 <AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
 ```
 

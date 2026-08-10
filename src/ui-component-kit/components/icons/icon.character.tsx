@@ -1,3 +1,4 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
 import { atlasCharsAlphaNumeric, type TextureAtlas } from '../../atlases'
@@ -6,6 +7,11 @@ import { charGlyph, IconAtlasText, missingGlyph } from './icon.atlasText'
 
 type IconCharacterProps = Omit<UiBoxProps, 'uiText'> & {
 	value    : string
+	/**
+	 * Tint multiply for each glyph texture. Only way to recolour glyphs —
+	 * `backgroundColor` fills the container row (chip), same as `Icon`.
+	 */
+	iconColor?: Color4
 	/**
 	 * Glyph atlas with a `layout`. Defaults to `atlasCharsAlphaNumeric`.
 	 * Pass a custom `TextureAtlas` to use your own letter sheet.
@@ -24,7 +30,7 @@ type IconCharacterProps = Omit<UiBoxProps, 'uiText'> & {
  * sheet — this atlas is larger and has more texture overhead.
  * Unsupported characters (including most punctuation) render as a
  * warning-coloured box; spaces are blank spacers. For mixed letters +
- * symbols, use `IconString`.
+ * symbols, use `IconString`. Tint with `iconColor` (texture × color multiply).
  */
 export const IconCharacter = ({
 	value = '',

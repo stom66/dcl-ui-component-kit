@@ -1,3 +1,4 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
 import { atlasCharsNumbers, atlasCharsSymbols, type TextureAtlas } from '../../atlases'
@@ -6,6 +7,11 @@ import { charGlyph, IconAtlasText, missingGlyph } from './icon.atlasText'
 
 type IconNumberProps = Omit<UiBoxProps, 'uiText'> & {
 	value    : number | '/' | '+' | '-' | '×' | '*' | 'x' | '=' | ':' | string
+	/**
+	 * Tint multiply for each glyph texture. Only way to recolour glyphs —
+	 * `backgroundColor` fills the container row (chip), same as `Icon`.
+	 */
+	iconColor?: Color4
 	/**
 	 * Glyph atlas with a `layout`. Defaults to `atlasCharsNumbers`.
 	 * Pass a custom `TextureAtlas` to use your own number sheet.
@@ -47,7 +53,7 @@ function resolveNumberGlyphAtlas(
  * other axis is computed from the sum of glyph aspects.
  * When using the default numbers atlas, missing glyphs (e.g. `=`) resolve from
  * `atlasCharsSymbols`. Unsupported characters render as a warning-coloured box;
- * spaces are blank spacers.
+ * spaces are blank spacers. Tint with `iconColor` (texture × color multiply).
  */
 export const IconNumber = ({
 	value = 0,
