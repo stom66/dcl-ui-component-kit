@@ -35,9 +35,9 @@ Do not mark install/setup complete until `assets/images/ui-component-kit/` is po
 
 ## Core model
 
-1. **`SetupUiComponentKit({ theme, layers })`** mounts the renderer inside **`ScreenInsetArea`** (device hardware safe margins) with a 100% × 100% stack.
+1. **`SetupUiComponentKit({ theme, layers })`** mounts the renderer. Most layers sit inside **`ScreenInsetArea`** (device hardware safe margins). **`ZoneType.FullScreen` layers are mounted outside that inset** as edge-to-edge siblings — use them for loading / splash screens only.
 2. **One Layer = one Zone.** The layer fills that zone. Implement **`body()` only**.
-3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **`Zone`** only (the inset canvas is owned by SetupUiComponentKit — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`).
+3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **`Zone`** only (the canvas is owned by SetupUiComponentKit — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`).
 4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset.
 5. Compose content with **`Row` / `Column` / `UiBox` / …** inside `body()`. Panel chrome is a sibling **`Background`** (empty), not a wrapper around content.
 
@@ -80,6 +80,7 @@ return [
 | Need | How |
 |---|---|
 | Top / corner / etc. | `zone: ZoneType.*` |
+| True edge-to-edge loading / splash (ignore notch / home indicator) | `zone: ZoneType.FullScreen` — mounted **outside** `ScreenInsetArea` by SetupUiComponentKit. Do not use for normal HUDs |
 | Narrower / shorter than preset | `uiTransform: { width, height }` — corner zones pin to their flex-start/end edge (opposing `left`/`right` or `top`/`bottom` is cleared). Use `width: '100%'` / omit size to fill the slot |
 | Height from children | `uiTransform: { height: 'auto' }` + in-flow content siblings (absolute `<Background />` paints the sized zone) |
 | Flex alignment | Zone preset / `uiTransform: { alignItems, justifyContent, … }` on the **Layer** (not inside Background) |

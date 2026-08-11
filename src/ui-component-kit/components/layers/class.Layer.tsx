@@ -9,6 +9,11 @@ import { createVisibilityForZone, ZoneType } from '../zones/zone.presets'
 
 export type LayerOptions = {
 	id              : string
+	/**
+	 * Zone preset. Defaults to `ZoneType.Default` (inside `ScreenInsetArea`).
+	 * Use `ZoneType.FullScreen` for loading / splash — those mount edge-to-edge
+	 * outside the hardware inset wrapper.
+	 */
 	zone?           : ZoneType
 	canBeHidden?    : boolean
 	startHidden?    : boolean
@@ -47,7 +52,9 @@ export abstract class Layer {
 
 	constructor(options: LayerOptions) {
 		this.id              = options.id
-		this.zone            = options.zone ?? ZoneType.FullScreen
+		// Default stays inside ScreenInsetArea. FullScreen is edge-to-edge
+		// (outside the inset) — reserve it for loading / splash layers.
+		this.zone            = options.zone ?? ZoneType.Default
 		this.canBeHidden     = options.canBeHidden ?? false
 		this.startHidden     = options.startHidden ?? false
 		this.showCloseButton = options.showCloseButton ?? false
@@ -109,7 +116,9 @@ export abstract class Layer {
 	// MARK: render
 	/**
 	 * Mounts this layer as one Zone (preset + uiTransform / uiBackground).
-	 * The canvas (`ScreenInsetArea` + full-size stack) is owned by SetupUiComponentKit.
+	 * The canvas is owned by SetupUiComponentKit: most zones sit inside
+	 * `ScreenInsetArea`; `ZoneType.FullScreen` is mounted edge-to-edge outside
+	 * that inset (loading / splash). Do not re-wrap `ScreenInsetArea` here.
 	 * `showCloseButton` is configured on the Layer and applied by the Zone.
 	 * For fill / border, return a sibling empty `Background` from `body()`
 	 * (do not nest content inside it — preserves zone flex alignment).

@@ -1,6 +1,7 @@
 import ReactEcs, { ReactEcsRenderer, ScreenInsetArea, UiEntity } from '@dcl/sdk/react-ecs'
 
 import type { Layer } from './components/layers'
+import { ZoneType } from './components/zones'
 import { safeZonesDesktopLayer, safeZonesMobileLayer } from './debug'
 import { setTheme } from './styles/theme'
 import type { Theme, ThemeCustomize } from './styles/theme'
@@ -43,15 +44,47 @@ declare var process: { env: { NODE_ENV: string } }
 export const IS_DEV = process.env.NODE_ENV == 'development'
 
 
-
+// MARK: renderLayerShell
+/**
+ * Absolute full-parent shell for one layer. `zIndex` comes from the layer or
+ * its original index in the SetupUiComponentKit stack.
+ */
+function renderLayerShell(
+	layer : Layer,
+	zIndex: number,
+): ReactEcs.JSX.Element {
+	return (
+		<UiEntity
+			key={layer.id}
+			uiTransform={{
+				width         : '100%',
+				height        : '100%',
+				positionType  : 'absolute',
+				position      : { top: 0, left: 0 },
+				display       : 'flex',
+				flexDirection : 'column',
+				alignItems    : 'center',
+				justifyContent: 'center',
+				flexShrink    : 0,
+				zIndex,
+			}}
+		>
+			{layer.render()}
+		</UiEntity>
+	)
+}
 
 
 // MARK: SetupUiComponentKit
 /**
  * Mounts the UI Component Kit renderer with the given theme and layer instances.
- * Everything is wrapped in `ScreenInsetArea` so layers stay clear of device
- * hardware insets (notch, status bar, home indicator). Debug safe-zone
- * overlays are appended last and stacked above scene layers.
+ *
+ * Most layers render inside `ScreenInsetArea` (device hardware safe margins:
+ * notch, status bar, home indicator). **`ZoneType.FullScreen` layers are
+ * mounted as edge-to-edge siblings outside that inset** — intended for loading
+ * / splash screens that must cover the whole virtual canvas.
+ *
+ * Debug safe-zone overlays are appended last and stacked above scene layers.
  */
 export function SetupUiComponentKit({
 	theme = {},
@@ -66,30 +99,20 @@ export function SetupUiComponentKit({
 	if (debug.showDesktopSafeZones) stack.push(safeZonesDesktopLayer)
 	if (debug.showMobileSafeZones)  stack.push(safeZonesMobileLayer)
 
+	const zById = new Map(stack.map((layer, index) => [layer.id, layer.zIndex ?? index]))
+
+	const fullScreenLayers = stack.filter((layer) => layer.zone === ZoneType.FullScreen)
+	const insetLayers      = stack.filter((layer) => layer.zone !== ZoneType.FullScreen)
+
 	ReactEcsRenderer.setUiRenderer(
-		() => (
-			<ScreenInsetArea>
-				{stack.map((layer, index) => (
-					<UiEntity
-						key={layer.id}
-						uiTransform={{
-							width         : '100%',
-							height        : '100%',
-							positionType  : 'absolute',
-							position      : { top: 0, left: 0 },
-							display       : 'flex',
-							flexDirection : 'column',
-							alignItems    : 'center',
-							justifyContent: 'center',
-							flexShrink    : 0,
-							zIndex        : layer.zIndex ?? index,
-						}}
-					>
-						{layer.render()}
-					</UiEntity>
-				))}
-			</ScreenInsetArea>
-		),
+		() => [
+			<ScreenInsetArea key="ui-kit-inset">
+				{insetLayers.map((layer) => renderLayerShell(layer, zById.get(layer.id) ?? 0))}
+			</ScreenInsetArea>,
+			// After inset stack so loading/splash FullScreen layers paint on top
+			// when z-index ties; explicit layer.zIndex still wins across siblings.
+			...fullScreenLayers.map((layer) => renderLayerShell(layer, zById.get(layer.id) ?? 0)),
+		],
 		{
 			virtualHeight: virtual.height,
 			virtualWidth : virtual.width,

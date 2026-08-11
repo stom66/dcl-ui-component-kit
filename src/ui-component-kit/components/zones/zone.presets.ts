@@ -90,7 +90,8 @@ function getInteractableArea(): { top: number; right: number; bottom: number; le
  * Temporary left offset for zones that hug the left edge.
  * Clear of the explorer left rail (settings / places / events) until we wire
  * `UiCanvasInformation.interactableArea.left` as a live inset (see info HUD).
- * `screenInsetArea` is hardware-only and already handled by `ScreenInsetArea`.
+ * Hardware insets are handled by `ScreenInsetArea` in SetupUiComponentKit
+ * (except `FullScreen`, which mounts outside that wrapper).
  */
 export const LEFT_ZONE_INSET = isMobile() ? 0 : vwToPixels(3)
 
@@ -107,6 +108,11 @@ export const RIGHT_ZONE_INSET = 8
  * with opposing position edges (top+bottom, etc.).
  */
 export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> = {
+	/**
+	 * Edge-to-edge canvas. `SetupUiComponentKit` mounts these layers **outside**
+	 * `ScreenInsetArea` so loading / splash screens cover the full virtual
+	 * canvas (notch / home indicator included). Prefer other zones for HUDs.
+	 */
 	[ZoneType.FullScreen]: {
 		getUiTransform: () => ({
 			positionType  : 'absolute',
@@ -124,6 +130,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 
 	// Inset the zone box itself to the explorer interactable rect (not padding —
 	// absolute children would ignore padding and still paint full-bleed).
+	// Still lives inside `ScreenInsetArea` (hardware); this is the DCL HUD rect.
 	[ZoneType.InteractableArea]: {
 		getUiTransform: () => {
 			const area = getInteractableArea()
