@@ -288,6 +288,15 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 	textures = {exampleProgressBarTexturesHorizontal}
 	height   = {64}
 />
+
+// contentInset: number (uniform) or TRBL edges — fill/track only, not children
+<ProgressBarImage id="xp_inset" value={55} height={64} contentInset={16} />
+<ProgressBarImage
+	id           = "xp_inset_trbl"
+	value        = {55}
+	height       = {64}
+	contentInset = {{ top: 8, right: 16, bottom: 8, left: 16 }}
+/>
 ```
 
 ## Icons (image-based)

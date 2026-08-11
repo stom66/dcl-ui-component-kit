@@ -7,7 +7,9 @@ import { flipUVs, mirrorUVs, rotateUvIndexes } from '../../utils/uvs'
 
 import { UiBox, type UiBoxProps } from '../base'
 
-import { type FillFrom, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
+import { type ContentInset, resolveContentInset, type FillFrom, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
+
+export type { ContentInset, ContentInsetEdges, ResolvedContentInset } from './progressBar.shared'
 
 
 export type TextureSlices = {
@@ -152,11 +154,21 @@ export type ProgressBarImageProps = Omit<
 	 */
 	textureSlices?  : TextureSlices
 	/**
-	 * Pixel inset for fill (+ image background) inside the border.
+	 * Pixel inset for **fill + image track** inside the border (not children).
+	 *
+	 * Accepts:
+	 * - `number` — uniform inset on all edges (historical / preferred for even chrome)
+	 * - `{ top?, right?, bottom?, left? }` — per-edge TRBL inset (omit unused edges)
+	 *
+	 * Does **not** inset nested `children` (labels / icons stay full-box centered).
+	 * For child spacing use `padding` / `margin` on the child, not `contentInset`.
+	 *
+	 * Not UV nine-slice margins — those are `textureSlices` (fractions 0–1).
+	 *
 	 * Defaults to `0` when the border is a texture, or the procedural border
 	 * width when the border is procedural (keeps fill inside the stroke).
 	 */
-	contentInset?   : number
+	contentInset?   : ContentInset
 	/** Seconds to lerp when `value` changes. Defaults to theme animation value. */
 	lerpDuration?   : number
 	uiTransform?    : UiTransformProps
@@ -335,6 +347,8 @@ function resolveUvCellForFill(
  * - Omit `textures` and `atlas` → built-in full nine-slice set
  * - Partial `textures` → mix image + procedural layers
  * - `atlas` alone → gradient-atlas fill + procedural track/border
+ * - `contentInset` → pixel inset for fill/track (`number` or TRBL edges); does
+ *   **not** pad `children` (use child `margin` / `padding` for icons/labels)
  *
  * Same value API as `ProgressBar`.
  */
@@ -381,10 +395,12 @@ export function ProgressBarImage({
 	const border         = borderColor     ?? theme.colors.secondary
 	const bWidth         = borderWidth     ?? theme.border.width
 	const bRadius        = borderRadius    ?? resolveDefaultBorderRadius(width, height)
-	const inset          = contentInset   !== undefined
-		? Math.max(0, contentInset)
-		: (useBorderTex ? 0: resolveProceduralFillInset(bWidth))
-	const fillRadius     = Math.max(0, bRadius - inset)
+	const inset = resolveContentInset(
+		contentInset,
+		useBorderTex ? 0 : resolveProceduralFillInset(bWidth),
+	)
+	const insetMin   = Math.min(inset.top, inset.right, inset.bottom, inset.left)
+	const fillRadius = Math.max(0, bRadius - insetMin)
 
 	const display        = syncDisplayValue(id, value, minValue, maxValue, duration)
 	const percent        = valueToPercent(display, minValue, maxValue)
@@ -430,10 +446,10 @@ export function ProgressBarImage({
 				uiTransform={{
 					positionType: 'absolute',
 					position    : {
-						top   : useBgTex ? inset : 0,
-						right : useBgTex ? inset : 0,
-						bottom: useBgTex ? inset : 0,
-						left  : useBgTex ? inset : 0,
+						top   : useBgTex ? inset.top    : 0,
+						right : useBgTex ? inset.right  : 0,
+						bottom: useBgTex ? inset.bottom : 0,
+						left  : useBgTex ? inset.left   : 0,
 					},
 					borderRadius: bRadius,
 					zIndex      : Z_INDEX_BACKGROUND,
@@ -446,7 +462,12 @@ export function ProgressBarImage({
 				key = {`${id}_fill_host`}
 				uiTransform={{
 					positionType  : 'absolute',
-					position      : { top: inset, right: inset, bottom: inset, left: inset },
+					position      : {
+						top   : inset.top,
+						right : inset.right,
+						bottom: inset.bottom,
+						left  : inset.left,
+					},
 					display       : 'flex',
 					flexDirection : layout.flexDirection,
 					alignItems    : layout.alignItems,

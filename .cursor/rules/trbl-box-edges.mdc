@@ -10,6 +10,13 @@ For `margin`, `padding`, `position`, and similar edge objects, always declare ke
 
 Omit edges that are unused, but keep the relative order of those present.
 
+## `ProgressBarImage.contentInset` (do not confuse)
+
+- `contentInset` accepts a **uniform `number`** *or* a TRBL edges object (`{ top?, right?, bottom?, left? }`).
+- A bare number has always been valid and expands to all four edges — it was **never** removed.
+- It insets **fill + image track inside the border only**. It does **not** pad nested `children` (icons/labels) — use child `margin` / `padding` for that.
+- Do **not** confuse with `textureSlices` (UV nine-slice fractions 0–1) or outer `padding` / `margin`.
+
 ```ts
 // BAD
 { left: 8, top: 8, bottom: 8, right: 8 }

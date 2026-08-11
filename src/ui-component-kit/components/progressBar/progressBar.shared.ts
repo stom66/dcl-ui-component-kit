@@ -30,6 +30,62 @@ export function resolveProceduralFillInset(borderWidth: number): number {
 	return Math.max(FILL_INSET_PX, Math.max(0, borderWidth))
 }
 
+
+/**
+ * Per-edge pixel inset for `ProgressBarImage.contentInset`.
+ * Keys are **top → right → bottom → left** (same TRBL order as `margin` /
+ * `padding` / `position`). Omit unused edges (they resolve to `0`).
+ */
+export type ContentInsetEdges = {
+	top?   : number
+	right? : number
+	bottom?: number
+	left?  : number
+}
+
+/**
+ * `ProgressBarImage.contentInset` — uniform pixel inset (`number`) **or** a
+ * TRBL edges object. Not the same as `textureSlices` (UV nine-slice fractions)
+ * or `padding` / `margin` on the outer box.
+ */
+export type ContentInset = number | ContentInsetEdges
+
+/** Resolved absolute inset used for fill / image-track positioning. */
+export type ResolvedContentInset = {
+	top   : number
+	right : number
+	bottom: number
+	left  : number
+}
+
+
+// MARK: resolveContentInset
+/**
+ * Normalizes `contentInset` to a TRBL pixel inset.
+ * - `undefined` → all edges = `fallback`
+ * - `number` → all edges = `max(0, value)` (uniform)
+ * - edges object → each provided edge `max(0, value)`, omitted edges `0`
+ */
+export function resolveContentInset(
+	contentInset: ContentInset | undefined,
+	fallback    : number,
+): ResolvedContentInset {
+	if (contentInset === undefined) {
+		const n = Math.max(0, fallback)
+		return { top: n, right: n, bottom: n, left: n }
+	}
+	if (typeof contentInset === 'number') {
+		const n = Math.max(0, contentInset)
+		return { top: n, right: n, bottom: n, left: n }
+	}
+	return {
+		top   : Math.max(0, contentInset.top    ?? 0),
+		right : Math.max(0, contentInset.right  ?? 0),
+		bottom: Math.max(0, contentInset.bottom ?? 0),
+		left  : Math.max(0, contentInset.left   ?? 0),
+	}
+}
+
 const progressProps   = new Map<string, PropsController<ProgressBarPropsState>>()
 const tweenGeneration = new Map<string, number>()
 

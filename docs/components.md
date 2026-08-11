@@ -234,7 +234,8 @@ Colour layers: background → fill → border. Defaults: fill `primary`, backgro
 | `uvCropWithFill` | `boolean` | Crop UV with fill ratio |
 | `uvMirror` / `uvFlip` | `boolean` | UV orientation |
 | `orientation` | `'horizontal' \| 'vertical'` | Built-in texture set |
-| `textureSlices` | fractions | Nine-slice fractions |
+| `textureSlices` | `{ top, right, bottom, left }` fractions | UV nine-slice margins (0–1) — **not** layout inset |
+| `contentInset` | `number` \| `{ top?, right?, bottom?, left? }` | Pixel inset for **fill + image track** inside the border. A number is uniform (always supported). TRBL edges are per-side. Does **not** pad nested children — use child `margin` / `padding` for icons/labels |
 
 Omit `textures` and `atlas` → built-in nine-slice set. Partial `textures` → missing layers fall back to procedural colours.
 
@@ -250,6 +251,15 @@ import { ProgressBarImage, atlasGradientColors } from '@stom66/dcl-ui-component-
 	atlas          = {atlasGradientColors}
 	uvCell         = {atlasGradientColors.named.yellowOrange}
 	uvCropWithFill = {true}
+/>
+
+{/* Uniform inset (number) or per-edge TRBL — fill/track only */}
+<ProgressBarImage id="xp_inset" value={55} height={64} contentInset={16} />
+<ProgressBarImage
+	id           = "xp_inset_trbl"
+	value        = {55}
+	height       = {64}
+	contentInset = {{ top: 8, right: 16, bottom: 8, left: 16 }}
 />
 ```
 

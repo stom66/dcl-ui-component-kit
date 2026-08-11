@@ -237,7 +237,7 @@ export class DemoProgressLayer extends Layer {
 									//fill      : 'assets/images/ui-component-kit/progressBar-horizontal-fill.png',
 									border    : 'assets/images/ui-component-kit/progressBar-horizontal-border-2.png',
 								}}
-								contentInset = {16}
+								contentInset = {{ top: 12, right: 16, bottom: 12, left: 16 }}
 								textureSlices = {{
 									// 40px corners on a 512×128 sheet (was 32px → 0.0625 / 0.25)
 									top   : 40 / 128, // 0.3125

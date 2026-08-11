@@ -476,6 +476,19 @@ Shared value API: `id`, `value`, `minValue` / `maxValue`, `fillFrom`, lerp per `
 
 - **`ProgressBar`** — colour track / fill / border. Defaults: fill `primary`, track `dark`, border `secondary`, radius = half shortest axis
 - **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/exampleThemes/<theme>/`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
+- **`contentInset`** — pixel inset for **fill + image track inside the border**. Accepts `number` (uniform, always supported) **or** `{ top?, right?, bottom?, left? }` (TRBL). Does **not** inset `children`; for arrow/label spacing use child `margin` / `padding`. Do not confuse with `textureSlices` (UV fractions) or claim it was “dropped” when a number still works.
+
+```tsx
+// GOOD
+<ProgressBarImage id="xp" value={60} contentInset={16} />
+<ProgressBarImage id="xp2" value={60} contentInset={{ top: 8, right: 12, bottom: 8, left: 12 }} />
+
+// BAD — does not pad children; use margin on the icon instead
+<ProgressBarImage id="xp3" value={60} contentInset={{ left: 24 }}>
+	<Icon uvs={…} /> {/* still full-box centered */}
+</ProgressBarImage>
+```
+
 ## Hideable + close button
 
 `canBeHidden` / `startHidden` / `showCloseButton` are **Layer** options. The Zone receives them; when `showCloseButton` is set, the Zone injects `ButtonImageClose`. Zones are bare by default — add a sibling `<Background />` for theme body fill and border (do not wrap content). Leave Background off for controls that bring their own visuals (e.g. a toggle `ButtonText`).
