@@ -273,12 +273,61 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 	textures = {{ fill: 'assets/images/ui-component-kit/progressBar-horizontal-fill.png' }}
 />
 
-// Atlas fill + procedural border / track
+// Atlas fill — STRETCHED (default): UV scales with bar width
 <ProgressBarImage
-	id     = "xp_grad"
+	id     = "xp_grad_stretch"
 	value  = {65}
 	height = {24}
 	atlas  = {atlasGradientColors}
+	uvCell = {atlasGradientColors.named.yellowOrange}
+/>
+
+// Atlas fill — REVEALED: crop UVs to fill % (gradient peels open, does not squash)
+// Prefer this for colour-ramp / strip art. Live demos: demo.progress.layer.tsx
+<ProgressBarImage
+	id             = "xp_grad_reveal"
+	value          = {65}
+	height         = {24}
+	atlas          = {atlasGradientColors}
+	uvCell         = {atlasGradientColors.named.yellowOrange}
+	uvCropWithFill = {true}
+/>
+
+// Vertical bar + custom art authored upright: uvRotate defaults to 0 (no 90° twist)
+<ProgressBarImage
+	id             = "xp_vert_custom"
+	value          = {65}
+	fillFrom       = "bottom"
+	width          = {32}
+	height         = {200}
+	atlas          = {myVerticalFillAtlas}
+	uvCell         = {myVerticalFillAtlas.named.fill}
+	uvCropWithFill = {true}
+/>
+
+// Vertical bar + horizontal strip atlas (stock gradients): opt in to 90° with uvRotate={1}
+<ProgressBarImage
+	id             = "xp_vert_grad"
+	value          = {65}
+	fillFrom       = "top"
+	width          = {32}
+	height         = {200}
+	atlas          = {atlasGradientColors}
+	uvCell         = {atlasGradientColors.named.green}
+	uvCropWithFill = {true}
+	uvRotate       = {1}
+/>
+
+// fillFrom="right": use uvMirror if the ramp should lead from the origin edge
+<ProgressBarImage
+	id             = "xp_grad_from_right"
+	value          = {65}
+	fillFrom       = "right"
+	height         = {24}
+	atlas          = {atlasGradientColors}
+	uvCell         = {atlasGradientColors.named.blue}
+	uvCropWithFill = {true}
+	uvMirror       = {true}
 />
 
 // Custom textures from exampleThemes/showcase (partial OK)

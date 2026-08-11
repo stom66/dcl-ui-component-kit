@@ -230,9 +230,10 @@ Colour layers: background → fill → border. Defaults: fill `primary`, backgro
 | *(shared)* | — | Same value / colour API as `ProgressBar` |
 | `textures` | `{ background?, fill?, border? }` | Optional per-layer image paths |
 | `atlas` | `TextureAtlas` | Atlas fill source |
-| `uvCell` | cell opts / named | Atlas sample region |
-| `uvCropWithFill` | `boolean` | Crop UV with fill ratio |
-| `uvMirror` / `uvFlip` | `boolean` | UV orientation |
+| `uvCell` | cell opts / named | Atlas sample region (`atlas.named.*`) |
+| `uvCropWithFill` | `boolean` | **Reveal mode:** crop UVs to fill % so art peels open instead of stretching |
+| `uvRotate` | `number` (steps) | UV corner rotation (`1` = 90°). Default `0` (as-authored). Use `1` only for horizontal strip atlases on vertical bars |
+| `uvMirror` / `uvFlip` | `boolean` | Flip UV orientation; use with `uvCropWithFill` when `fillFrom` is `"right"` / vertical |
 | `orientation` | `'horizontal' \| 'vertical'` | Built-in texture set |
 | `textureSlices` | `{ top, right, bottom, left }` fractions | UV nine-slice margins (0–1) — **not** layout inset |
 | `contentInset` | `number` \| `{ top?, right?, bottom?, left? }` | Pixel inset for **fill + image track** inside the border. A number is uniform (always supported). TRBL edges are per-side. Does **not** pad nested children — use child `margin` / `padding` for icons/labels |
@@ -244,6 +245,7 @@ import { ProgressBarImage, atlasGradientColors } from '@stom66/dcl-ui-component-
 
 <ProgressBarImage id="xp" value={55} height={64} />
 
+{/* Reveal a gradient strip as the bar fills (do not stretch the UV) */}
 <ProgressBarImage
 	id             = "xp_grad"
 	value          = {65}
@@ -251,6 +253,19 @@ import { ProgressBarImage, atlasGradientColors } from '@stom66/dcl-ui-component-
 	atlas          = {atlasGradientColors}
 	uvCell         = {atlasGradientColors.named.yellowOrange}
 	uvCropWithFill = {true}
+/>
+
+{/* Vertical + horizontal stock gradient: opt in to 90° — custom vertical art omits uvRotate */}
+<ProgressBarImage
+	id             = "xp_vert_grad"
+	value          = {65}
+	fillFrom       = "top"
+	width          = {32}
+	height         = {200}
+	atlas          = {atlasGradientColors}
+	uvCell         = {atlasGradientColors.named.green}
+	uvCropWithFill = {true}
+	uvRotate       = {1}
 />
 
 {/* Uniform inset (number) or per-edge TRBL — fill/track only */}

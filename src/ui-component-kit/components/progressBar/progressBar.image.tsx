@@ -128,13 +128,19 @@ export type ProgressBarImageProps = Omit<
 	uvCell?         : TextureAtlasCellOptions
 	/**
 	 * When using `atlas`, crop the UV cell to the current fill ratio so the
-	 * gradient is revealed rather than stretched. Crops along the atlas
-	 * gradient axis (left/right) opposite `fillFrom` (`1 - percent/100`);
-	 * vertical `fillFrom` uses the same axis before the 90° UV rotate.
-	 * Respects `uvMirror` / `uvFlip` so the inset stays aligned with the
-	 * fill origin. Defaults to `false`.
+	 * art is **revealed** rather than stretched (`1 - percent/100` on the
+	 * trailing edge for `fillFrom`). Crop axis follows as-authored UVs unless
+	 * `uvRotate` turns a horizontal strip onto a vertical bar.
+	 * Respects `uvMirror` / `uvFlip`. Defaults to `false`.
 	 */
 	uvCropWithFill? : boolean
+	/**
+	 * Corner steps of atlas UV rotation via `rotateUvIndexes` (`1` = 90°).
+	 * Defaults to `0` (as-authored — correct for custom vertical fill art).
+	 * Set `1` when mapping a **horizontal** strip/gradient atlas onto a
+	 * vertical bar (`fillFrom` `"top"` / `"bottom"`), e.g. `atlasGradientColors`.
+	 */
+	uvRotate?       : number
 	/**
 	 * Mirror atlas UVs horizontally (left ↔ right). Useful with
 	 * `fillFrom="right"` so the gradient leads from the origin edge.
@@ -240,16 +246,11 @@ function layerNineSlice(
 }
 
 
-/**
- * `rotateUvIndexes` steps so a horizontal atlas gradient follows the bar axis.
- * Horizontal fills stay as authored (crop left/right reveals). Vertical fills
- * share one 90° turn (atlas left → top); crop left/right selects top vs bottom.
- */
-const FILL_FROM_UV_ROTATION: Record<FillFrom, number> = {
-	left  : 0,
-	right : 0,
-	top   : 1,
-	bottom: 1,
+// MARK: normalizeUvRotateSteps
+/** Wraps `uvRotate` into `0…3` corner steps (`rotateUvIndexes`). */
+function normalizeUvRotateSteps(uvRotate: number | undefined): number {
+	const steps = Math.trunc(uvRotate ?? 0)
+	return ((steps % 4) + 4) % 4
 }
 
 
@@ -258,12 +259,12 @@ const FILL_FROM_UV_ROTATION: Record<FillFrom, number> = {
 function layerAtlas(
 	atlas    : TextureAtlas<Record<string, TextureAtlasNamedCell>>,
 	uvCell   : TextureAtlasCellOptions,
-	fillFrom : FillFrom,
+	uvRotate : number,
 	uvMirror : boolean,
 	uvFlip   : boolean,
 ) {
 	let uvs = atlas.cell(uvCell)
-	const steps = FILL_FROM_UV_ROTATION[fillFrom]
+	const steps = normalizeUvRotateSteps(uvRotate)
 	if (steps !== 0) uvs = rotateUvIndexes(uvs, steps)
 	if (uvMirror)    uvs = mirrorUVs(uvs)
 	if (uvFlip)      uvs = flipUVs(uvs)
@@ -278,31 +279,52 @@ function layerAtlas(
 
 // MARK: resolveUvCropEdge
 /**
- * Trailing (empty-side) crop edge for `fillFrom` in atlas-native space
- * (horizontal gradient axis). Vertical fills crop left/right too — the UV
- * rotate then maps that axis onto the bar. Swapped when `uvMirror` /
- * `uvFlip` will run after rotate so the reveal still matches the origin.
+ * Trailing (empty-side) crop edge for `fillFrom` in atlas space **before**
+ * `uvRotate` / mirror / flip.
+ *
+ * - `uvRotate` 0 (default): crop on the bar axis as authored
+ *   (`left`/`right` → horizontal insets; `top`/`bottom` → vertical insets).
+ * - Odd `uvRotate` (90° / 270°): horizontal-strip atlases on vertical bars —
+ *   crop left/right; rotation maps that axis onto the bar.
  */
 function resolveUvCropEdge(
 	fillFrom : FillFrom,
 	uvMirror : boolean,
 	uvFlip   : boolean,
+	uvRotate : number,
 ): 'left' | 'right' | 'top' | 'bottom' {
+	const rotated = normalizeUvRotateSteps(uvRotate)
+	const mapVerticalViaHorizontalCrop = rotated === 1 || rotated === 3
+
 	let edge: 'left' | 'right' | 'top' | 'bottom'
 	switch (fillFrom) {
-		case 'right' :
-		case 'bottom': edge = 'left'; break
-		case 'top'   :
-		case 'left'  :
-		default      : edge = 'right'; break
+		case 'right':
+			edge = 'left'
+			break
+		case 'left':
+			edge = 'right'
+			break
+		case 'bottom':
+			edge = mapVerticalViaHorizontalCrop ? 'left' : 'top'
+			break
+		case 'top':
+		default:
+			edge = mapVerticalViaHorizontalCrop ? 'right' : 'bottom'
+			break
 	}
 
-	// Mirror / vertical flip run after rotate — invert the crop axis to match.
 	if (uvMirror && (edge === 'left' || edge === 'right')) {
 		edge = edge === 'left' ? 'right' : 'left'
 	}
-	if (uvFlip && (fillFrom === 'top' || fillFrom === 'bottom')) {
-		edge = edge === 'left' ? 'right' : 'left'
+	if (uvFlip) {
+		if (mapVerticalViaHorizontalCrop && (fillFrom === 'top' || fillFrom === 'bottom')) {
+			// After 90° rotate, vertical flip swaps the horizontal crop edge.
+			if (edge === 'left' || edge === 'right') {
+				edge = edge === 'left' ? 'right' : 'left'
+			}
+		} else if (edge === 'top' || edge === 'bottom') {
+			edge = edge === 'top' ? 'bottom' : 'top'
+		}
 	}
 
 	return edge
@@ -312,9 +334,8 @@ function resolveUvCropEdge(
 // MARK: resolveUvCellForFill
 /**
  * Optionally crops `uvCell` to the fill ratio (`1 - percent/100` on the
- * trailing edge for `fillFrom`) so atlas gradients reveal instead of stretch.
- * Crop edge respects `uvMirror` / `uvFlip` so inset direction stays aligned
- * with the fill origin after those transforms.
+ * trailing edge for `fillFrom`) so atlas art reveals instead of stretch.
+ * Crop edge respects `uvRotate` / `uvMirror` / `uvFlip`.
  */
 function resolveUvCellForFill(
 	uvCell         : TextureAtlasCellOptions,
@@ -323,11 +344,12 @@ function resolveUvCellForFill(
 	uvCropWithFill : boolean,
 	uvMirror       : boolean,
 	uvFlip         : boolean,
+	uvRotate       : number,
 ): TextureAtlasCellOptions {
 	if (!uvCropWithFill) return uvCell
 
 	const crop = 1 - Math.min(1, Math.max(0, percent / 100))
-	const edge = resolveUvCropEdge(fillFrom, uvMirror, uvFlip)
+	const edge = resolveUvCropEdge(fillFrom, uvMirror, uvFlip, uvRotate)
 
 	switch (edge) {
 		case 'left'  : return { ...uvCell, insetLeft  : crop }
@@ -370,6 +392,7 @@ export function ProgressBarImage({
 	atlas,
 	uvCell           = DEFAULT_UV_CELL,
 	uvCropWithFill   = false,
+	uvRotate         = 0,
 	uvMirror         = false,
 	uvFlip           = false,
 	textureSlices,
@@ -412,10 +435,11 @@ export function ProgressBarImage({
 		uvCropWithFill,
 		uvMirror,
 		uvFlip,
+		uvRotate,
 	)
 
 	const fillBackground = useAtlasFill
-		? layerAtlas(atlas, atlasUv, fillFrom, uvMirror, uvFlip)
+		? layerAtlas(atlas, atlasUv, uvRotate, uvMirror, uvFlip)
 		: useFillTex
 			? layerNineSlice(resolved.fill!, slices)
 			: undefined

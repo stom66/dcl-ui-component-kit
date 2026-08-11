@@ -137,6 +137,7 @@ export class DemoProgressLayer extends Layer {
 									atlas          = {atlasGradientColors}
 									uvCell         = {atlasGradientColors.named.green}
 									uvCropWithFill = {true}
+									uvRotate       = {1}
 									uvFlip         = {true}
 								/>
 							</Row>
