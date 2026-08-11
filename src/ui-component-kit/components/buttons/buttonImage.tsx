@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
 import { isMobile } from '@dcl/sdk/platform'
-import ReactEcs, { UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import {
 	atlasBtnIconsStyled,
@@ -9,6 +9,7 @@ import {
 	type TextureAtlasNamedCell,
 } from '../../atlases'
 import { PropsController } from '../../classes/propsController'
+import { scalePositionUnit } from '../../utils/positionUnit'
 import { tweenValue } from '../../utils/tweens'
 import { getUVCell } from '../../utils/uvs'
 
@@ -67,8 +68,8 @@ type ButtonImageProps = Omit<UiBoxProps, 'uiTransform'> & {
 	 * `uiBackground.textureSlices` with `textureMode: 'nine-slices'`.
 	 */
 	textureSlices?: AtlasTextureSlices
-	width        ?: number
-	height       ?: number
+	width        ?: PositionUnit | 'auto'
+	height       ?: PositionUnit | 'auto'
 	/** Atlas texture path. Defaults to `atlas.source` or `atlasBtnIconsStyled.source`. */
 	textureSrc   ?: string
 	uiTransform  ?: UiTransformProps
@@ -164,8 +165,8 @@ export const ButtonImage = ({
 			<UiBox
 				{...props}
 				uiTransform={{
-					width       : `${width * scale}`,
-					height      : `${height * scale}`,
+					width       : scalePositionUnit(width, scale),
+					height      : scalePositionUnit(height, scale),
 					borderWidth : 0,
 				}}
 				uiBackground={mergeUiBackground({

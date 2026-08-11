@@ -1,5 +1,5 @@
 import { isMobile } from '@dcl/sdk/platform'
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
 import { atlasBtnIconsStyled } from '../../atlases'
 
@@ -9,8 +9,8 @@ import { ButtonImage } from './buttonImage'
 type ButtonImageCloseProps = Omit<Parameters<typeof ButtonImage>[0], 'width' | 'height' | 'uvColumn'> & {
 	/** 1-based atlas column for the close glyph. Defaults to `1`. */
 	uvColumn?: number
-	width?   : number
-	height?  : number
+	width?   : PositionUnit | 'auto'
+	height?  : PositionUnit | 'auto'
 }
 
 // MARK: ButtonImageClose
