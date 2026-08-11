@@ -1,4 +1,5 @@
 import type ReactEcs from '@dcl/sdk/react-ecs'
+import type { PositionUnit } from '@dcl/sdk/react-ecs'
 
 import type { VisibilityPosition } from '../../classes/visibilityController'
 
@@ -34,8 +35,8 @@ export type ShowToastOptions = {
 	/** Defaults to `stack`. `queue` / `replace` require `group`. */
 	groupPolicy?  : ToastGroupPolicy
 	/** Root box size used for scale animation. Defaults from theme icon size × aspect. */
-	width?        : number
-	height?       : number
+	width?        : PositionUnit | 'auto'
+	height?       : PositionUnit | 'auto'
 	zIndex?       : number
 }
 
@@ -53,8 +54,8 @@ export type ToastItem = {
 	scalePulse    : boolean
 	group?        : string
 	groupPolicy   : ToastGroupPolicy
-	width         : number
-	height        : number
+	width         : PositionUnit | 'auto'
+	height        : PositionUnit | 'auto'
 	zIndex        : number
 	phase         : ToastPhase
 	activeEdge    : VisibilityPosition
