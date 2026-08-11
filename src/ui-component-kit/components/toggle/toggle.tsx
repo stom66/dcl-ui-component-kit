@@ -4,6 +4,7 @@ import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
+import { sizeValueToPixels } from '../../utils/aspect'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
 
 import { UiBox, type UiBoxProps } from '../base'
@@ -47,8 +48,12 @@ export type ToggleProps = Omit<
 	backgroundColor?: Color4
 	/** Thumb (knob) fill color. Defaults to theme light. Lerps when the prop changes. */
 	toggleColor?   : Color4
-	/** Track height in virtual pixels. Width is always `height × 2`. Defaults to `32`. */
-	height?        : number
+	/**
+	 * Track height (`PositionUnit`: px / vw / vh). Width is always
+	 * `height × 2.2` after converting to virtual pixels. `%` needs a parent
+	 * measurement and falls back to `32`. Defaults to `32`.
+	 */
+	height?        : PositionUnit
 	/** Seconds to slide the thumb and lerp colors. Defaults to `0.2`. */
 	lerpDuration?  : number
 	uiTransform?   : UiTransformProps
@@ -258,7 +263,13 @@ export function Toggle({
 	const slide = syncToggleValue(id, resolved, lerpDuration, trackTarget, thumbTarget)
 	const colors = syncToggleColors(id, trackTarget, thumbTarget, lerpDuration, resolved)
 
-	const trackHeight = height
+	const heightPx = sizeValueToPixels(height)
+	let trackHeight = TOGGLE_HEIGHT_DEFAULT
+	if (heightPx !== null) {
+		trackHeight = heightPx
+	} else if (height !== TOGGLE_HEIGHT_DEFAULT) {
+		console.error('Toggle: height: unsupported or relative unit (need px/vw/vh)', height)
+	}
 	const trackWidth  = trackHeight * TOGGLE_ASPECT_RATIO
 	const thumbSize   = Math.max(0, trackHeight - TOGGLE_PADDING * 2)
 	const travel      = Math.max(0, trackWidth - TOGGLE_PADDING * 2 - thumbSize)
