@@ -3,6 +3,7 @@ import ReactEcs, { PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
+import { formatPositionUnit, parsePositionUnit, scalePositionUnit, sumPositionUnits } from '../../utils/positionUnit'
 import { UiBox, type UiBoxProps } from '../base'
 import { resolveIconRotatedUvs } from './icon.uvs'
 
@@ -49,11 +50,6 @@ export type ResolvedAtlasGlyph =
 		kind  : 'missing'
 		aspect: number
 	}
-
-type ParsedPositionUnit = {
-	amount: number
-	unit  : string
-}
 
 type ResolvedIconAtlasTextSize = {
 	containerWidth : PositionUnit
@@ -192,81 +188,6 @@ function getDigitTransform(
 		digitTransformCache.set(key, transform)
 	}
 	return transform
-}
-
-
-// MARK: parsePositionUnit
-/** Splits a PositionUnit into a numeric amount and unit suffix (`""` for bare numbers). */
-function parsePositionUnit(value: PositionUnit): ParsedPositionUnit | null {
-	if (typeof value === 'number') {
-		return { amount: value, unit: '' }
-	}
-
-	const match = String(value).match(/^(-?[\d.]+)(.*)$/)
-	if (!match) {
-		return null
-	}
-
-	return {
-		amount: parseFloat(match[1]),
-		unit  : match[2],
-	}
-}
-
-
-// MARK: formatPositionUnit
-/** Rebuilds a PositionUnit from an amount and unit suffix. */
-function formatPositionUnit(
-	amount: number,
-	unit  : string,
-): PositionUnit {
-	if (unit === '') {
-		return amount
-	}
-	return `${amount}${unit}` as PositionUnit
-}
-
-
-// MARK: scalePositionUnit
-/** Multiplies a PositionUnit by `factor`, preserving unit suffix when present. */
-function scalePositionUnit(
-	value : PositionUnit,
-	factor: number,
-): PositionUnit {
-	const parsed = parsePositionUnit(value)
-	if (!parsed) {
-		console.error('IconAtlasText: scalePositionUnit: unsupported PositionUnit', value)
-		return value
-	}
-	return formatPositionUnit(parsed.amount * factor, parsed.unit)
-}
-
-
-// MARK: sumPositionUnits
-/** Adds PositionUnits that share a unit suffix; errors and returns the first value on mismatch. */
-function sumPositionUnits(values: PositionUnit[]): PositionUnit {
-	if (values.length === 0) {
-		return 0
-	}
-	let total   = 0
-	let unit    = ''
-	let hasUnit = false
-	for (const value of values) {
-		const parsed = parsePositionUnit(value)
-		if (!parsed) {
-			console.error('IconAtlasText: sumPositionUnits: unsupported PositionUnit', value)
-			return values[0]
-		}
-		if (!hasUnit) {
-			unit    = parsed.unit
-			hasUnit = true
-		} else if (parsed.unit !== unit) {
-			console.error('IconAtlasText: sumPositionUnits: mixed units', values)
-			return values[0]
-		}
-		total += parsed.amount
-	}
-	return formatPositionUnit(total, unit)
 }
 
 

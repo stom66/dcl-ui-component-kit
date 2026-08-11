@@ -10,6 +10,9 @@ export { PropsController }                                            from '../c
 
 export { clampNumber }                                                from './math'
 
+export { formatPositionUnit, parsePositionUnit, scalePositionUnit, sumPositionUnits } from './positionUnit'
+export type { ParsedPositionUnit, SizeValue }                         from './positionUnit'
+
 export { getCanvasInfo }                                              from './sizing'
 export { getUiScaleFactor }                                           from './sizing'
 export { readVirtualCanvasDimensions as readCanvasDimensions }        from './sizing'
