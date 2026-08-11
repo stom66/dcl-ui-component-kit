@@ -1,13 +1,18 @@
 import ReactEcs, { type PositionUnit } from '@dcl/sdk/react-ecs'
 
+import type { SizeValue } from '../../utils/positionUnit'
 
-// MARK: readNumericSize
-/** Parses a numeric size; rejects `%` / `vw` / `auto` / non-finite values. */
-function readNumericSize(value: unknown): number | undefined {
+
+// MARK: readSizeValue
+/** Reads a PositionUnit / `auto` size; rejects unrecognized values. */
+function readSizeValue(value: unknown): SizeValue | undefined {
 	if (typeof value === 'number' && Number.isFinite(value)) return value
-	if (typeof value === 'string' && value !== '' && !value.includes('%') && value !== 'auto') {
-		const n = Number(value)
-		if (Number.isFinite(n)) return n
+	if (typeof value === 'string' && value !== '') {
+		if (value === 'auto') return 'auto'
+		const match = value.match(/^(-?[\d.]+)(%|px|vw|vh)?$/i)
+		if (match && Number.isFinite(parseFloat(match[1]))) {
+			return value as PositionUnit
+		}
 	}
 	return undefined
 }
@@ -15,7 +20,7 @@ function readNumericSize(value: unknown): number | undefined {
 
 // MARK: resolveAnimContentSize
 /**
- * Resolves intrinsic numeric width/height for an animation target.
+ * Resolves intrinsic width/height for an animation target.
  * Prefers the element's own `width` / `height` (or `uiTransform`), otherwise
  * walks into `children` so wrappers like `FlashColor` → `Icon` still size
  * correctly when nested under `Pulse` / `Bounce` / etc.
@@ -23,12 +28,12 @@ function readNumericSize(value: unknown): number | undefined {
 export function resolveAnimContentSize(
 	element : ReactEcs.JSX.Element | undefined,
 	fallback: number,
-): { width: number; height: number } {
+): { width: SizeValue; height: SizeValue } {
 	let current: ReactEcs.JSX.Element | undefined = element
 
 	while (current) {
-		const w = readNumericSize(current.props?.width  ?? current.props?.uiTransform?.width)
-		const h = readNumericSize(current.props?.height ?? current.props?.uiTransform?.height)
+		const w = readSizeValue(current.props?.width  ?? current.props?.uiTransform?.width)
+		const h = readSizeValue(current.props?.height ?? current.props?.uiTransform?.height)
 		if (w !== undefined && h !== undefined) {
 			return { width: w, height: h }
 		}
@@ -52,10 +57,10 @@ export function resolveAnimBoxSize(
 	heightProp: PositionUnit | 'auto' | undefined,
 	child     : ReactEcs.JSX.Element | undefined,
 	fallback  : number,
-): { width: number; height: number } {
+): { width: SizeValue; height: SizeValue } {
 	const content = resolveAnimContentSize(child, fallback)
-	const w       = readNumericSize(widthProp)
-	const h       = readNumericSize(heightProp)
+	const w       = readSizeValue(widthProp)
+	const h       = readSizeValue(heightProp)
 	return {
 		width : w ?? content.width,
 		height: h ?? content.height,
@@ -86,8 +91,8 @@ export function cloneAnimChild(
 export function cloneAnimChildDeep(
 	child    : ReactEcs.JSX.Element,
 	overrides: {
-		width? : number
-		height?: number
+		width? : SizeValue
+		height?: SizeValue
 		uvs?   : number[]
 		[key: string]: unknown
 	},

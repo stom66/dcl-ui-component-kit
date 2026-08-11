@@ -89,12 +89,18 @@ function resolveLeafUvs(element: ReactEcs.JSX.Element | undefined): number[] {
 
 
 // MARK: readExplicitSize
-/** Numeric size only — ignores `%` / `auto` so Spinner does not squash children. */
-function readExplicitSize(value: PositionUnit | 'auto' | undefined): number | undefined {
+/**
+ * Explicit child size override — ignores `%` / `auto` so Spinner does not
+ * squash children with the wrapper's fill-parent defaults.
+ */
+function readExplicitSize(value: PositionUnit | 'auto' | undefined): PositionUnit | undefined {
+	if (value === undefined || value === 'auto') return undefined
 	if (typeof value === 'number' && Number.isFinite(value)) return value
-	if (typeof value === 'string' && !value.includes('%') && value !== 'auto') {
-		const n = Number(value)
-		if (Number.isFinite(n)) return n
+	if (typeof value === 'string' && !value.includes('%')) {
+		const match = value.match(/^(-?[\d.]+)(px|vw|vh)?$/i)
+		if (match && Number.isFinite(parseFloat(match[1]))) {
+			return value as PositionUnit
+		}
 	}
 	return undefined
 }
@@ -107,9 +113,9 @@ function readExplicitSize(value: PositionUnit | 'auto' | undefined): number | un
  *
  * Defaults to filling its parent (`width` / `height` `100%`) and centering the
  * child. Does **not** rewrite child size unless the caller (or an outer
- * `Pulse`) passes an explicit numeric `width` / `height` — forcing container
- * size onto nested `Pulse` / `Icon` was squashing glyphs and breaking
- * centre-pivot rotation.
+ * `Pulse`) passes an explicit `width` / `height` (px / vw / vh) — forcing
+ * container `%` size onto nested `Pulse` / `Icon` was squashing glyphs and
+ * breaking centre-pivot rotation.
  *
  * @example
  * <Spinner id="loader" duration={1} degrees={180} burstInterval={0}>
@@ -160,8 +166,8 @@ export const Spinner = ({
 	const childOverrides: {
 		uvs     : number[]
 		rotate  : number
-		width?  : number
-		height? : number
+		width?  : PositionUnit
+		height? : PositionUnit
 	} = {
 		// Fold static `Icon.rotate` into the spin; clear it so Icon does not double-apply.
 		uvs   : getRotatedUVs(baseUvs, angle + baseRotate),

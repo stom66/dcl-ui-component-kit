@@ -1,6 +1,7 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
+import { scalePositionUnit } from '../../utils/positionUnit'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
 import { UiBox, type UiBoxProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
@@ -31,8 +32,8 @@ const theme = getTheme()
 /**
  * Scales a single child in a grow/shrink burst loop.
  * Intrinsic size is resolved from the child (or nested leaf, e.g. Icon inside
- * FlashColor) via numeric `width` / `height`. Scaled size is written onto the
- * direct child so intermediate wrappers can forward it inward.
+ * FlashColor) via `width` / `height` (`PositionUnit` or `auto`). Scaled size is
+ * written onto the direct child so intermediate wrappers can forward it inward.
  *
  * Pass `easingFunction` to ease both halves the same way, or `easingGrow` /
  * `easingShrink` for independent curves (defaults: ease-out grow, ease-in shrink).
@@ -99,8 +100,8 @@ export const Pulse = ({
 			uiBackground={uiBackground}
 		>
 			{child && cloneAnimChild(child, {
-				width : w * scale,
-				height: h * scale,
+				width : scalePositionUnit(w, scale),
+				height: scalePositionUnit(h, scale),
 			})}
 		</UiBox>
 	)
