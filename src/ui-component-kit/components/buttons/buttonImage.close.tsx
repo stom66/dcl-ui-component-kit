@@ -17,6 +17,7 @@ type ButtonImageCloseProps = Omit<Parameters<typeof ButtonImage>[0], 'width' | '
 /**
  * Shared close-button image control (default atlas column `1`).
  * Override `textureSrc` / `uvColumn` / `uvColumnCount` / `uvRowCount` for a custom sheet.
+ * Anchored at the parent’s top-right (`top` / `right` `0`) on all platforms.
  */
 export function ButtonImageClose({
 	id          = 'close',
@@ -29,21 +30,20 @@ export function ButtonImageClose({
 	height,
 	...props
 }: ButtonImageCloseProps) {
-	const m = isMobile()
+	const size = isMobile() ? 128 : 90
 	return (
 		<ButtonImage
 			{...props}
 			id          = {id}
 			uvColumn    = {uvColumn}
-			width       = {width  ?? isMobile() ? 128 : 90}
-			height      = {height ?? isMobile() ? 128 : 90}
+			width       = {width  ?? size}
+			height      = {height ?? size}
 			textureSrc  = {textureSrc}
 			uiTransform = {{
-				position    : { top: isMobile() ? -42 : 0, right: isMobile() ? -42 : 0 },
+				position    : { top: 0, right: 0 },
 				positionType: 'absolute',
 				borderWidth : 0,
 				...uiTransform,
-
 			}}
 			callback = {callback}
 		>
