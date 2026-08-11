@@ -7,8 +7,50 @@
 - Size / align via forwarded native props (`uiTransform`, `uiBackground`) on **Layer / Zone**
 - Inside `body()`, prefer component **shorthands** (`fontColor`, `backgroundColor`, `iconColor`, `fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
 - Panel chrome via **sibling** empty `<Background />` in `body()` — never nest content inside it (preserves zone flex)
+- **Edge / corner HUDs:** keep content content-sized (omit `cols` on `ButtonText` / `Label`; do not wrap a lone control in `<Row>` or `<Column cols={12}>`) so zone `alignItems` / `justifyContent` apply. **Panels:** size the Layer with `uiTransform`, then use `cols={12}` inside that box.
 
 Real references: `demo.safeZone.factory.tsx`, `timer.layer.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`
+
+## Edge-zone HUD (content-sized — zone flex applies)
+
+```tsx
+export class CtaLayer extends Layer {
+	constructor() {
+		super({
+			id  : 'cta',
+			zone: ZoneType.BottomCenter,
+		})
+	}
+
+	protected body() {
+		// omit cols — theme aspect size; BottomCenter centers horizontally + pins bottom
+		return (
+			<ButtonText
+				key       = "btn_go"
+				id        = "btn_go"
+				textLabel = "Go"
+				callback  = {() => { /* … */ }}
+			/>
+		)
+	}
+}
+```
+
+```tsx
+// BAD — fills the safe zone; zone justifyContent / alignItems become no-ops
+protected body() {
+	return <ButtonText id="btn_go" textLabel="Go" cols={12} callback={() => { /* … */ }} />
+}
+
+// BAD — Row is always width 100%
+protected body() {
+	return (
+		<Row>
+			<ButtonText id="btn_go" textLabel="Go" callback={() => { /* … */ }} />
+		</Row>
+	)
+}
+```
 
 ## Top-bar timer (preset + uiTransform + Background)
 
@@ -60,7 +102,9 @@ super({
 
 ## Row / Column widths (`cols`)
 
-**Required for grid widths.** Use `cols` on `Column` / `Label` / `ButtonText` — never `width: '100%'` / `'50%'` / `'25%'` when a span will do. Grid is 12-wide; `cols={12}` = full width. `Row` is always full parent width (no `cols` — wrap content in a `Column` to narrow). `cols="auto"` **fills** leftover row space (sibling autos share equally); omit `cols` on `Column` for no grid sizing. Explicit partial spans stay sticky (two `cols={4}` do not become half-width). Parents of nested `cols` children need a definite width (usually `cols={12}` on a vertical stack).
+**Required for grid widths inside panels.** Use `cols` on `Column` / `Label` / `ButtonText` — never `width: '100%'` / `'50%'` / `'25%'` when a span will do. Grid is 12-wide; `cols={12}` = full width. `Row` is always full parent width (no `cols` — wrap content in a `Column` to narrow). `cols="auto"` **fills** leftover row space (sibling autos share equally); omit `cols` on `Column` for no grid sizing; omit `cols` on `ButtonText` / `Label` for shrink-to-content (**required** when the control is a direct edge-zone sibling). Explicit partial spans stay sticky (two `cols={4}` do not become half-width). Parents of nested `cols` children need a definite width (usually `cols={12}` on a vertical stack).
+
+Do **not** put `cols={12}` or a bare `<Row>` on a lone HUD control in `BottomCenter` / corner zones — that stretches the control across the safe zone and cancels zone alignment (see **Edge-zone HUD** above).
 
 ```tsx
 // GOOD

@@ -57,7 +57,7 @@ Prefer shorthands over nesting when a single field is enough. Also exported as t
 
 ## Layout & chrome
 
-Widths: prefer **`cols`** on `Column` / `Label` / `ButtonText` (`cols={12}` = full). **`Row` is always full parent width** (no `cols`). A parent that hosts nested `cols` children needs a definite width (usually `cols={12}`).
+Widths: prefer **`cols`** on `Column` / `Label` / `ButtonText` **inside panels/grids** (`cols={12}` = full). **`Row` is always full parent width** (no `cols`). A parent that hosts nested `cols` children needs a definite width (usually `cols={12}`). For edge / corner HUD controls that should follow zone alignment, **omit `cols`** (shrink-to-content / theme aspect) — see [layers-and-zones.md](layers-and-zones.md) → Zone alignment.
 
 ### `Row` / `RowReverse` / `Column` / `ColumnReverse`
 
@@ -137,8 +137,8 @@ Short labelled chip / callout. Supports `cols`. Chip fill via `backgroundColor`;
 | `id` | `string` | Unique id (required) |
 | `textLabel` | `string` | Button label |
 | `callback` | `() => void` | Click handler |
-| `cols` / `colsDesktop` / `colsMobile` | `number` | Grid width |
-| `width` / `height` | `PositionUnit` | Size (prefer `cols` when spanning) |
+| `cols` / `colsDesktop` / `colsMobile` | `number` | Grid width inside a panel `Row`. **Omit** for content-sized HUD / zone siblings (theme aspect) |
+| `width` / `height` | `PositionUnit` | Size (prefer `cols` when spanning a grid) |
 | `aspectRatio` | `number` | Defaults to theme button ratio |
 | `backgroundColor` | `Color4` | Base fill (theme primary if omitted) |
 | `textureSrc` | `string` | Optional texture |

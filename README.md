@@ -142,7 +142,7 @@ Layer rules (short):
 2. Implement **`body()` only** — do not remount `Zone` / `ScreenInsetArea`
 3. Override Layer/Zone size / align with **`uiTransform`** / **`uiBackground`** if you need to (no Layer shorthands like `backgroundColor`)
 4. Panel chrome via **sibling** empty **`<Background />`** in `body()` (do **not** nest content inside it — preserves zone flex) — prefer specific color shorthands (`fontColor`, `backgroundColor`, `iconColor`, …) and layout shorthands (`fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
-5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` when you need grid widths (`Row` is always full width)
+5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` when you need grid widths **inside panels** (`Row` is always full width). For edge / corner HUDs, omit `cols` so zone flex can place content-sized controls — see [docs/layers-and-zones.md](docs/layers-and-zones.md) → Zone alignment.
 
 Full options: [docs/layers-and-zones.md](docs/layers-and-zones.md).
 

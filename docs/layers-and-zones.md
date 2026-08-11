@@ -21,6 +21,30 @@ Class-based UI surface. Implement **`body()` only**. Base `render()` mounts the 
 
 **Do not** add Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`, …). Panel chrome → sibling `<Background />` in `body()` (never nest content inside it — that replaces zone flex alignment).
 
+### Zone alignment (content-sized children)
+
+Zone presets place in-flow `body()` siblings with `alignItems` / `justifyContent`. **That only works when those siblings are smaller than the zone.**
+
+| Intent | Do | Avoid |
+|---|---|---|
+| Edge / corner HUD (`BottomCenter`, `TopRight`, …) | Content-sized controls — omit `cols` on `ButtonText` / `Label` | `cols={12}`, bare `<Row>` (always 100% wide), `<Column cols={12}>` around a lone control |
+| Panel / modal | Size the Layer with `uiTransform`, then `Column cols={12}` inside that box | Expecting zone flex to center a full-width child |
+
+```tsx
+// GOOD — BottomCenter places a content-sized button
+super({ id: 'cta', zone: ZoneType.BottomCenter })
+body() {
+	return <ButtonText id="btn_go" textLabel="Go" callback={() => { /* … */ }} />
+}
+
+// BAD — button spans the safe zone; zone justifyContent is a no-op
+body() {
+	return <ButtonText id="btn_go" textLabel="Go" cols={12} callback={() => { /* … */ }} />
+}
+```
+
+See `.cursor/skills/ui-component-kit/SKILL.md` → **Zone alignment needs content-sized children**, and `demo.safeZone.factory.tsx`.
+
 ### Example
 
 ```tsx

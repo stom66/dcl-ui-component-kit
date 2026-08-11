@@ -31,7 +31,7 @@ When `@stom66/dcl-ui-component-kit` is **installed or upgraded in a consumer pro
 
 Do not mark install/setup complete until `assets/images/ui-component-kit/` is populated.
 
-**Layout widths:** for every `Column` / `Label` / `ButtonText` that needs a fractional or full width, set **`cols`** (`cols={12}` = full width). `Row` is always full parent width (no `cols` — wrap in a `Column` to narrow). Use `cols="auto"` to fill leftover row space (sibling autos share equally). Omit `cols` on `Column` for no grid sizing. Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
+**Layout widths:** for every `Column` / `Label` / `ButtonText` that needs a fractional or full width **inside a panel / grid**, set **`cols`** (`cols={12}` = full width). `Row` is always full parent width (no `cols` — wrap in a `Column` to narrow). Use `cols="auto"` to fill leftover row space (sibling autos share equally). Omit `cols` on `Column` for no grid sizing; omit `cols` on `ButtonText` / `Label` for shrink-to-content (required for edge-zone HUDs — see **Zone alignment** below). Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
 
 ## Core model
 
@@ -43,6 +43,65 @@ Do not mark install/setup complete until `assets/images/ui-component-kit/` is po
 
 **All imports under `src/` must be relative** (`./`, `../`) — never absolute `src/...`.
 Stay inside the package with sibling/parent paths (`../components`, `../../styles`) — do not climb out to `src/` and back in via a folder name (`../../ui-component-kit/...`). That hardcodes the package directory name and breaks when it is renamed. Keep multi-named imports on one line.
+
+### Zone alignment needs content-sized children (critical — agents)
+
+Zone presets place **in-flow `body()` siblings** with `alignItems` / `justifyContent` (e.g. `BottomCenter` → horizontally centered, vertically bottom). **That only works when those siblings are smaller than the zone.** A child that already spans the zone makes zone flex a no-op — the control’s own defaults (often `flex-start`) take over, so a “bottom-center button” becomes a full-width bar stuck at the start edge.
+
+**Pick one pattern:**
+
+| Intent | Pattern | Typical mistake |
+|---|---|---|
+| HUD chip / single control in an edge / corner zone (`BottomCenter`, `TopRight`, …) | Content-sized sibling(s). Omit `cols` on `ButtonText` / `Label` (theme aspect / shrink-to-content). Optional empty `<Background />` only when you also size a panel. Mirror `demo.safeZone.factory.tsx`. | `cols={12}`, bare `<Row>` (always `width: 100%`), or `<Column cols={12}>` wrapping the only control |
+| Panel / modal that fills the zone | Narrow or size the **Layer** with `uiTransform: { width, height }`, then use `Column cols={12}` **inside that box**. | Expecting zone flex to “center” a full-width child |
+| Full-bleed stack inside an already-sized Layer | `Column cols={12}` / `Row` as intended | — |
+
+```tsx
+// BAD — BottomCenter button stretches the whole safe zone; justifyContent has nothing to do
+super({ id: 'cta', zone: ZoneType.BottomCenter })
+protected body() {
+	return (
+		<ButtonText id="btn_go" textLabel="Go" cols={12} callback={() => { /* … */ }} />
+	)
+}
+
+// BAD — Row is always 100% width; same trap
+protected body() {
+	return (
+		<Row>
+			<ButtonText id="btn_go" textLabel="Go" callback={() => { /* … */ }} />
+		</Row>
+	)
+}
+
+// GOOD — omit cols; ButtonText uses theme aspect size; zone places it bottom-center
+super({ id: 'cta', zone: ZoneType.BottomCenter })
+protected body() {
+	return (
+		<ButtonText
+			key       = "btn_go"
+			id        = "btn_go"
+			textLabel = "Go"
+			callback  = {() => { /* … */ }}
+		/>
+	)
+}
+
+// GOOD — small HUD panel: size the Layer box, then fill that box (not the whole preset band)
+super({
+	id         : 'hud',
+	zone       : ZoneType.BottomRight,
+	uiTransform: { width: '20vw', height: 'auto' },
+})
+protected body() {
+	return [
+		<Background key="chrome" />,
+		<Column key="body" cols={12} padding={12}>{/* … */}</Column>,
+	]
+}
+```
+
+**Do not** default every new Layer to `cols={12}` / a full-width `Row`. Those are for **grid / panel interiors**. Edge-zone HUDs must stay content-sized (or explicitly size the Layer) so the zone preset can align them.
 
 ## Prop forwarding (critical)
 
@@ -83,7 +142,7 @@ return [
 | True edge-to-edge loading / splash (ignore notch / home indicator) | `zone: ZoneType.FullScreen` — mounted **outside** `ScreenInsetArea` by SetupUiComponentKit. Do not use for normal HUDs |
 | Narrower / shorter than preset | `uiTransform: { width, height }` — corner zones pin to their flex-start/end edge (opposing `left`/`right` or `top`/`bottom` is cleared). Use `width: '100%'` / omit size to fill the slot |
 | Height from children | `uiTransform: { height: 'auto' }` + in-flow content siblings (absolute `<Background />` paints the sized zone) |
-| Flex alignment | Zone preset / `uiTransform: { alignItems, justifyContent, … }` on the **Layer** (not inside Background) |
+| Flex alignment | Zone preset / `uiTransform: { alignItems, justifyContent, … }` on the **Layer** (not inside Background). Only places **content-sized** body siblings — see **Zone alignment** |
 | Fill / border behind content | Sibling `<Background />` in `body()` |
 | Close control | `showCloseButton: true` (Layer option → Zone inserts button) |
 
@@ -271,23 +330,49 @@ Fonts go through two steps: `scaleFontSize(base)` (additive fluid boost from vie
 ## Create a layer
 
 ```tsx
-export class MyLayer extends Layer {
+// Modal / panel — size the Layer, then fill that box
+export class MyPanelLayer extends Layer {
 	constructor() {
 		super({
-			id  : 'my-layer',
-			zone: ZoneType.Default,
+			id         : 'my-panel',
+			zone       : ZoneType.Default,
+			uiTransform: { width: '40vw', height: 'auto' },
 		})
 	}
 
 	protected body() {
 		return [
 			<Background key="chrome" />,
-			<Text key="my-body" value="Hello" />,
+			<Column key="body" cols={12} padding={16}>
+				<Text value="Hello" />
+			</Column>,
 		]
 	}
 }
 
-export const myLayer = new MyLayer()
+// Edge HUD — content-sized control; zone preset places it (no cols={12} / no full-width Row)
+export class MyCtaLayer extends Layer {
+	constructor() {
+		super({
+			id  : 'my-cta',
+			zone: ZoneType.BottomCenter,
+		})
+	}
+
+	protected body() {
+		return (
+			<ButtonText
+				key       = "btn_go"
+				id        = "btn_go"
+				textLabel = "Go"
+				callback  = {() => { /* … */ }}
+			/>
+		)
+	}
+}
+
+export const myPanelLayer = new MyPanelLayer()
+export const myCtaLayer   = new MyCtaLayer()
 ```
 
 ## Critical anti-patterns
@@ -298,6 +383,7 @@ export const myLayer = new MyLayer()
 | Hand-build edge layout | `zone: ZoneType.*` |
 | Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / sibling `<Background />` |
 | Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |
+| Edge-zone HUD with `cols={12}`, bare `<Row>`, or `<Column cols={12}>` around a single control | Content-sized siblings (omit `cols` on `ButtonText` / `Label`) **or** size the Layer with `uiTransform` then fill that box — see **Zone alignment needs content-sized children** |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `fontColor`, `backgroundColor`, `flexWrap`, `padding`, …) |
@@ -447,12 +533,22 @@ When creating any kind of button element, ask the user if this is meant to be an
 
 Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `src/ui-component-kit/components/buttons/`.
 
+**Sizing:** omit `cols` for a content-sized HUD control (theme aspect ratio — this is what edge zones need). Use `cols` only inside a grid / panel `Row`. Do **not** put `cols={12}` on a lone button that should sit in a corner or bottom-center zone.
+
 ```tsx
+// HUD / zone sibling — content-sized (zone alignItems / justifyContent apply)
 <ButtonText
 	id        = "btn_simple_toggle"
 	textLabel = "Simple"
-	cols      = {12}
 	callback  = {() => simpleLayer.toggle()}
+/>
+
+// Inside a panel Row — grid span
+<ButtonText
+	id        = "btn_row_half"
+	textLabel = "Half"
+	cols      = {6}
+	callback  = {() => { /* … */ }}
 />
 ```
 
