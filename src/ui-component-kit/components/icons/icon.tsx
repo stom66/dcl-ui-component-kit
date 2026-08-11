@@ -5,6 +5,7 @@ import { atlasIconsFontAwesome } from '../../atlases'
 import { getTheme } from '../../styles'
 import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 import { IconBackgroundWrap } from './icon.backgroundWrap'
+import { resolveIconRotatedUvs } from './icon.uvs'
 
 export type IconProps = UiBoxProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
@@ -19,10 +20,19 @@ export type IconProps = UiBoxProps & {
 	 * extra `UiBox` that owns the fill (and border / padding chrome).
 	 */
 	backgroundColor?: Color4
-	/** Texture path. Defaults to the bundled Font Awesome atlas. */
+	/**
+	 * Texture path. Defaults to the bundled Font Awesome atlas.
+	 * Pass any scene-relative PNG (or a custom `TextureAtlas.source`) for your
+	 * own art — pair with `uvs` for atlas cells, or omit `uvs` for the full image.
+	 */
 	src?        : string
 	textureMode?: TextureMode | undefined
 	uvs?        : number[]
+	/**
+	 * Degrees to rotate the texture UVs around the cell centre.
+	 * Applied via `getRotatedUVs` (static; use `Spinner` / `Wiggle` for motion).
+	 */
+	rotate?     : number
 	width?      : PositionUnit | "auto" | undefined
 	height?     : PositionUnit | "auto" | undefined
 }
@@ -34,9 +44,10 @@ export type IconProps = UiBoxProps & {
  * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
  * `src` defaults to `atlasIconsFontAwesome.source` and inherits that atlas's
  * `wrapMode` / `filterMode` (override via `uiBackground.texture` — deep-merged).
+ * Override `src` (and optional `uvs`) for custom images / project atlases.
  *
  * Tint with `iconColor` only. `backgroundColor` paints a chip behind the glyph
- * (wrapper `UiBox`) — it never multiplies the texture.
+ * (wrapper `UiBox`) — it never multiplies the texture. `rotate` turns the UVs.
  */
 export const Icon = ({
 	children,
@@ -50,6 +61,7 @@ export const Icon = ({
 	src         = atlasIconsFontAwesome.source,
 	textureMode,
 	uvs,
+	rotate,
 	width   = "auto",
 	height  = "auto",
 	uiBackground,
@@ -65,7 +77,8 @@ export const Icon = ({
 		? atlasIconsFontAwesome.texture
 		: { src, wrapMode: 'clamp' as const }
 
-	const wrapChip = backgroundColor !== undefined
+	const wrapChip    = backgroundColor !== undefined
+	const resolvedUvs = resolveIconRotatedUvs(uvs, rotate)
 
 	const glyph = (
 		<UiBox
@@ -97,7 +110,7 @@ export const Icon = ({
 			uiBackground={mergeUiBackground({
 				texture,
 				textureMode: textureMode ?? "stretch",
-				uvs        : uvs ?? [],
+				uvs        : resolvedUvs ?? [],
 				...(iconColor ? { color: iconColor } : {}),
 			}, uiBackground)}
 		>

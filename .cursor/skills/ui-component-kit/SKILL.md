@@ -324,7 +324,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` | `textures?` (per-layer optional) / `atlas` + `uvCell` |
-| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src`, defaults to `atlasIconsFontAwesome`); **tint only with `iconColor`**; `backgroundColor` is always a chip fill (wrapper `UiBox` on `Icon` / `SpriteIcon` / `AvatarIcon`, container row on atlas glyph text); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
+| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src` for **custom images** — defaults to `atlasIconsFontAwesome`); `rotate` (degrees, UV rotate on every icon type); **tint only with `iconColor`**; `backgroundColor` is always a chip fill (wrapper `UiBox` on `Icon` / `SpriteIcon` / `AvatarIcon`, container row on atlas glyph text); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -653,11 +653,11 @@ Image-based “font” rows from the bundled char atlases. Prefer the **narrowes
 | `IconCharacter` | `atlasCharsAlphaNumeric` | Letters (`a–z` / `A–Z`) and digits from that sheet |
 | `IconString` | Cascade: alphanumeric → symbols → numbers | Arbitrary mixed strings |
 
-Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols, numbers }}` on `IconString`. Tint with `iconColor` (same multiply as `Icon` / `SpriteIcon`).
+Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols, numbers }}` on `IconString`. Tint with `iconColor`; rotate glyphs with `rotate` (degrees) — same as `Icon` / `SpriteIcon`.
 
 ```tsx
 <IconNumber value={1250} height={32} iconColor={theme.colors.primary} />
-<IconSymbol value="$%#" height={32} />
+<IconSymbol value="$%#" height={32} rotate={15} />
 <IconCharacter value="HELLO" height={32} />
 <IconString value="Score: 120/2=60!" height={32} />
 ```

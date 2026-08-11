@@ -72,6 +72,11 @@ export type SpriteIconProps = UiBoxProps & {
 	 * Only way to recolour the sprite — `backgroundColor` is a chip fill via `Icon`.
 	 */
 	iconColor?   : Color4
+	/**
+	 * Degrees to rotate each frame's UVs (forwarded to `Icon.rotate`).
+	 * Applied on top of the current sprite-sheet cell.
+	 */
+	rotate?      : number
 	textureMode? : TextureMode | undefined
 	width?       : PositionUnit | 'auto' | undefined
 	height?      : PositionUnit | 'auto' | undefined

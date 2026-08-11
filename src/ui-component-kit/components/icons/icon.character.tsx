@@ -12,6 +12,8 @@ type IconCharacterProps = Omit<UiBoxProps, 'uiText'> & {
 	 * `backgroundColor` fills the container row (chip), same as `Icon`.
 	 */
 	iconColor?: Color4
+	/** Degrees to rotate each glyph's UVs (same as `Icon.rotate`). */
+	rotate?  : number
 	/**
 	 * Glyph atlas with a `layout`. Defaults to `atlasCharsAlphaNumeric`.
 	 * Pass a custom `TextureAtlas` to use your own letter sheet.

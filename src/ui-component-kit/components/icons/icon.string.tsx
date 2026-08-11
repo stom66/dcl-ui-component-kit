@@ -21,6 +21,8 @@ type IconStringProps = Omit<UiBoxProps, 'uiText'> & {
 	 * `backgroundColor` fills the container row (chip), same as `Icon`.
 	 */
 	iconColor?: Color4
+	/** Degrees to rotate each glyph's UVs (same as `Icon.rotate`). */
+	rotate?  : number
 	/**
 	 * Optional atlas overrides for the cascade. Lookup order is always
 	 * characters → symbols → numbers.

@@ -115,7 +115,12 @@ export const Wiggle = ({
 			{child && cloneAnimChildDeep(child, {
 				width : w,
 				height: h,
-				uvs   : getRotatedUVs(baseUvs, angle),
+				// Fold static `Icon.rotate` into the wiggle; clear it so Icon does not double-apply.
+				uvs   : getRotatedUVs(
+					baseUvs,
+					angle + (typeof child.props?.rotate === 'number' ? child.props.rotate : 0),
+				),
+				rotate: 0,
 			})}
 		</UiBox>
 	)

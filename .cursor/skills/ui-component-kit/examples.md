@@ -297,8 +297,9 @@ import { exampleIconsAtlas, exampleNumbersAtlas } from '../../exampleThemes/show
 import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconCharacter, IconNumber, IconString, IconSymbol } from '../../components'
 import { getTheme } from '../../styles'
 
+{/* Custom image / atlas: override src (+ uvs for a cell). Full image = src only. */}
 <Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
-<Icon uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} />
+<Icon uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} rotate={45} />
 {/* backgroundColor = chip behind the glyph; iconColor = texture tint */}
 <Icon
 	uvs             = {exampleIconsAtlas.uv.star}
@@ -310,7 +311,7 @@ import { getTheme } from '../../styles'
 />
 {/* Prefer IconNumber for scores/timers — smallest atlas, least overhead */}
 <IconNumber value={42} atlas={exampleNumbersAtlas} iconColor={getTheme().colors.primary} />
-<IconSymbol value="$%#" iconColor={getTheme().colors.warning} />
+<IconSymbol value="$%#" iconColor={getTheme().colors.warning} rotate={-15} />
 <IconCharacter value="HELLO" />
 {/* Mixed letters + symbols + numbers — cascades alphanumeric → symbols → numbers */}
 <IconString value="HI $120!" iconColor={getTheme().colors.success} />

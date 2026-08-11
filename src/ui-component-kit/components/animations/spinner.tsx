@@ -156,12 +156,16 @@ export const Spinner = ({
 	const explicitW = readExplicitSize(width)
 	const explicitH = readExplicitSize(height)
 
+	const baseRotate = typeof child?.props?.rotate === 'number' ? child.props.rotate : 0
 	const childOverrides: {
 		uvs     : number[]
+		rotate  : number
 		width?  : number
 		height? : number
 	} = {
-		uvs: getRotatedUVs(baseUvs, angle),
+		// Fold static `Icon.rotate` into the spin; clear it so Icon does not double-apply.
+		uvs   : getRotatedUVs(baseUvs, angle + baseRotate),
+		rotate: 0,
 	}
 	if (explicitW !== undefined) childOverrides.width  = explicitW
 	if (explicitH !== undefined) childOverrides.height = explicitH

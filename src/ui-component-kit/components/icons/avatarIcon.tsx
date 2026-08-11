@@ -4,6 +4,7 @@ import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 import { IconBackgroundWrap } from './icon.backgroundWrap'
+import { resolveIconRotatedUvs } from './icon.uvs'
 
 
 /** Fallback wallet used when `userId` is omitted (useful in local demos / preview). */
@@ -24,6 +25,11 @@ export type AvatarIconProps = UiBoxProps & {
 	 * `backgroundColor` paints a chip behind it via a wrapper.
 	 */
 	iconColor?  : Color4
+	/**
+	 * Degrees to rotate the portrait UVs around the cell centre.
+	 * Same static UV rotate as `Icon.rotate`.
+	 */
+	rotate?     : number
 	textureMode?: TextureMode | undefined
 	width?      : PositionUnit | 'auto' | undefined
 	height?     : PositionUnit | 'auto' | undefined
@@ -38,11 +44,13 @@ export type AvatarIconProps = UiBoxProps & {
  * Defaults `overflow: 'hidden'` so `borderRadius` clips the portrait.
  *
  * Tint with `iconColor`. `backgroundColor` wraps a chip behind the portrait.
+ * `rotate` turns the portrait UVs.
  */
 export function AvatarIcon({
 	children,
 	userId      = DEFAULT_AVATAR_USER_ID,
 	iconColor,
+	rotate,
 	backgroundColor,
 	borderColor,
 	borderRadius,
@@ -66,6 +74,7 @@ export function AvatarIcon({
 	const defaultSize    = theme.icons.defaultSize
 	const resolvedUserId = userId.toLowerCase()
 	const wrapChip       = backgroundColor !== undefined
+	const resolvedUvs    = resolveIconRotatedUvs(undefined, rotate)
 
 	const hasWidth  = width  !== undefined && width  !== 'auto'
 	const hasHeight = height !== undefined && height !== 'auto'
@@ -104,6 +113,7 @@ export function AvatarIcon({
 			uiBackground = {mergeUiBackground({
 				avatarTexture: { userId: resolvedUserId },
 				textureMode  : textureMode ?? 'stretch',
+				...(resolvedUvs ? { uvs: resolvedUvs } : {}),
 				...(iconColor ? { color: iconColor } : {}),
 			}, uiBackground)}
 		>

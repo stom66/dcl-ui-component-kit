@@ -4,6 +4,7 @@ import ReactEcs, { PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 import { type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
+import { resolveIconRotatedUvs } from './icon.uvs'
 
 /** Relative width of a space glyph vs digit height (blank spacer, no texture). */
 const SPACE_ASPECT = 0.4
@@ -15,6 +16,11 @@ export type IconAtlasTextProps = Omit<UiBoxProps, 'uiText'> & {
 	 * Only way to recolour glyphs — `backgroundColor` fills the container row.
 	 */
 	iconColor?  : Color4
+	/**
+	 * Degrees to rotate each glyph's UVs around its cell centre.
+	 * Same static UV rotate as `Icon.rotate`.
+	 */
+	rotate?     : number
 	/**
 	 * Resolves each character to a texture glyph, blank space, or missing marker.
 	 * Called once per character with the theme horizontal inset.
@@ -130,19 +136,21 @@ function colorCacheKey(color: Color4 | undefined): string {
 // MARK: getDigitBackground
 /** Cached stretch background for one atlas glyph (shared across icon-text instances). */
 function getDigitBackground(
-	atlas : TextureAtlas,
-	uvs   : number[],
-	glyph : string,
-	insetX: number,
-	color?: Color4,
+	atlas  : TextureAtlas,
+	uvs    : number[],
+	glyph  : string,
+	insetX : number,
+	color? : Color4,
+	rotate?: number,
 ) {
-	const key = `${atlas.source}|${atlas.wrapMode}|${atlas.filterMode ?? ''}|${glyph}|${insetX}|${colorCacheKey(color)}`
+	const resolvedUvs = resolveIconRotatedUvs(uvs, rotate) ?? uvs
+	const key = `${atlas.source}|${atlas.wrapMode}|${atlas.filterMode ?? ''}|${glyph}|${insetX}|${colorCacheKey(color)}|${rotate ?? 0}`
 	let bg = digitBackgroundCache.get(key)
 	if (!bg) {
 		bg = {
 			texture    : atlas.texture,
 			textureMode: 'stretch',
-			uvs,
+			uvs        : resolvedUvs,
 			...(color ? { color } : {}),
 		}
 		digitBackgroundCache.set(key, bg)
@@ -380,6 +388,7 @@ export const IconAtlasText = ({
 	children,
 	value        = '',
 	iconColor,
+	rotate,
 	resolveGlyph,
 	keyPrefix    = 'icon-atlas',
 	width        = 'auto',
@@ -451,7 +460,7 @@ export const IconAtlasText = ({
 			<UiEntity
 				key={`${keyPrefix}-${i}`}
 				uiTransform={transform}
-				uiBackground={getDigitBackground(item.atlas, uvs, item.glyph, item.insetX, iconColor)}
+				uiBackground={getDigitBackground(item.atlas, uvs, item.glyph, item.insetX, iconColor, rotate)}
 			/>
 		)
 	}

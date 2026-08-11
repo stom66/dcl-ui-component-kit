@@ -115,7 +115,14 @@ export class DemoIconsLayer extends Layer {
 									height = "64"
 									margin = {{ right: 12 }}
 								/>
-								<Code value="<Icon uvs={atlasIconsFontAwesome.uv.cat} />" />
+								<Icon
+									uvs    = {atlasIconsFontAwesome.uv.cat}
+									width  = "64"
+									height = "64"
+									rotate = {45}
+									margin = {{ right: 12 }}
+								/>
+								<Code value="<Icon uvs={…} rotate={45} /> — custom art: src + optional uvs" />
 							</Row>
 
 
