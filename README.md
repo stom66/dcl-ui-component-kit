@@ -1,61 +1,33 @@
 # Decentraland UI Component Kit 🦆
 
-`@stom66/dcl-ui-component-kit` (aka **DUCK**) is a reusable UI toolkit for Decentraland SDK7. Layers, zones, and shared components — so you can build HUDs and panels without hand-placing every `UiEntity`.
+`@stom66/dcl-ui-component-kit` (aka **DUCK**) is a reusable UI toolkit for Decentraland SDK7.
 
-<!-- Drop a short looped recording at docs/media/showcase.gif — GIF is the best format for GitHub README embeds. -->
+## Human? Here, take this!
+
+If you are using AI, this is what you actually need to know.
+
+- **Layer** — a collection of UI that is shown or hidden **together**.
+- **Zones** — add them to the layer. They already account for device chrome (Explorer HUD, notches, safe areas).
+- **Components** — progress bars, icons, buttons, layout helpers, and the rest go **in those zones**.
+
 ![Component showcase](docs/media/showcase.gif)
 
-*Placeholder — add `docs/media/showcase.gif` (see [docs/media](docs/media/README.md)).*
+### Get started
 
-## Features
+Ask your AI. Point your agent at this repository (or `@stom66/dcl-ui-component-kit` on npm) and tell it to install the kit into your scene.
 
-- **Layers system** — each UI surface is a `Layer` pinned to a zone (top bar, corner HUD, popup, …). Attach a **VisibilityController** to show/hide layers cleanly, and a **PropsController** to drive dynamic values into the UI.
-- **Stackable components** — buttons, text, icons, progress bars, toggles, toasts, layout helpers, and more. Drop them into a layer’s `body()` and they look good out of the box with sensible defaults.
-- **Animation** — built-in motion helpers (pulse, bounce, shake, spinner, …) for feedback and polish.
-- **Themes** — ships with a default theme aimed at Decentraland’s look. Pass small overrides (e.g. colors only) or a full custom theme.
-- **Simple style or full image variants** — most major components take basic styling (colors, border width, background color, …) *or* texture/image variants when you want a completely custom look.
-
-```tsx
-import { atlasIconsFontAwesome, Background, Column, getTheme, Icon, Layer, Row, SetupUiComponentKit, Text, ZoneType } from '@stom66/dcl-ui-component-kit'
-
-class HelloLayer extends Layer {
-    constructor() {
-        super({ id: 'hello', zone: ZoneType.Default })
-    }
-
-    body() {
-        return (
-            <Background>
-                <Row>
-                    <Column>
-                        <Text value="Hello World" />
-                    </Column>
-                    <Column>
-                        <Icon uvs={atlasIconsFontAwesome.uv.star} iconColor={getTheme().colors.primary} />
-                    </Column>
-                </Row>
-            </Background>
-        )
-    }
-}
-
-export function main() {
-    SetupUiComponentKit({ layers: [new HelloLayer()] })
-}
+```text
+Install @stom66/dcl-ui-component-kit into this Decentraland SDK7 scene.
+Copy stock UI assets, scaffold a custom theme, wire SetupUiComponentKit, and follow the package README.
 ```
 
-## Table of contents
+## Making your own theme
 
-- [Features](#features)
-- [Install](#install)
-- [Quick start](#quick-start)
-    - [Add it to your project](#add-it-to-your-project)
-    - [Use the defaults (add a layer)](#use-the-defaults-add-a-layer)
-    - [Make your own theme (recommended overrides)](#make-your-own-theme-recommended-overrides)
-- [Building blocks](#building-blocks)
-- [Docs](#docs)
-- [License & credits](#license--credits)
-- [This repo as a demo scene](#this-repo-as-a-demo-scene)
+You do not need a custom theme to start — defaults look like Decentraland out of the box. When you want your own art:
+
+- Get the Affinity template ([`design/ui-component-kit-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/design/ui-component-kit-assets.af)) and customize buttons / progress bars / icons / etc.
+- Export PNGs into the theme folder the CLI scaffolds (`assets/images/themes/<name>/`) — never into stock `assets/images/ui-component-kit/`.
+- Tell your agent to wire those files into the theme. Full walkthrough: [docs/themes.md](docs/themes.md).
 
 ## Install
 
@@ -83,17 +55,8 @@ Then confirm the folder is populated (many `.png` files). Full detail for humans
 Opt out of automatic copy: `UI_COMPONENT_KIT_SKIP_ASSETS=1` or `"config": { "dcl-ui-component-kit": { "skipAssets": true } }`.
 
 ```bash
-npx @stom66/dcl-ui-component-kit init-theme myTheme
+npx @stom66/dcl-ui-component-kit init-theme myGame
 ```
-
-## Quick start
-
-### Add it to your project
-
-1. `npm install @stom66/dcl-ui-component-kit`
-2. **`npx @stom66/dcl-ui-component-kit copy-assets`** — **required**; confirm `assets/images/ui-component-kit/` has PNGs (see [INSTALL.md](./INSTALL.md))
-3. Scaffold a theme (optional): `npx @stom66/dcl-ui-component-kit init-theme myGame`
-4. Call `SetupUiComponentKit` from your scene `main()`
 
 ```tsx
 import { SetupUiComponentKit } from '@stom66/dcl-ui-component-kit'
@@ -107,9 +70,7 @@ export function main() {
 }
 ```
 
-### Use the defaults (add a layer)
-
-You do **not** need a custom theme to start. Pick a zone, implement `body()`, register the layer — zone size and component styling come from defaults:
+You can also skip a custom theme and register layers directly:
 
 ```tsx
 import { Background, Header, Layer, Row, SetupUiComponentKit, Text, ZoneType } from '@stom66/dcl-ui-component-kit'
@@ -120,14 +81,13 @@ class ScoreboardLayer extends Layer {
     }
 
     body() {
-        return (
-            <Background>
-                <Row>
-                    <Header value="Score" />
-                    <Text value="12" />
-                </Row>
-            </Background>
-        )
+        return [
+            <Background key="chrome" />,
+            <Row key="content">
+                <Header value="Score" />
+                <Text value="12" />
+            </Row>,
+        ]
     }
 }
 
@@ -136,57 +96,20 @@ export function main() {
 }
 ```
 
-Layer rules (short):
+Layer notes (short):
 
-1. **One Layer = one Zone** (`zone: ZoneType.*`)
-2. Implement **`body()` only** — do not remount `Zone` / `ScreenInsetArea`
-3. Override Layer/Zone size / align with **`uiTransform`** / **`uiBackground`** if you need to (no Layer shorthands like `backgroundColor`)
-4. Panel chrome via **sibling** empty **`<Background />`** in `body()` (do **not** nest content inside it — preserves zone flex) — prefer specific color shorthands (`fontColor`, `backgroundColor`, `iconColor`, …) and layout shorthands (`fontSize`, `flexWrap`, `padding`, …) over nesting `uiText` / `uiTransform` / `uiBackground`
-5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` when you need grid widths **inside panels** (`Row` is always full width). For edge / corner HUDs, omit `cols` so zone flex can place content-sized controls — see [docs/layers-and-zones.md](docs/layers-and-zones.md) → Zone alignment.
-
-Full options: [docs/layers-and-zones.md](docs/layers-and-zones.md).
-
-### Make your own theme (recommended overrides)
-
-**Do not edit the package’s `defaultTheme`.** Pass a small override object (or a theme folder from `init-theme`) into `SetupUiComponentKit`. Only set what differs from the defaults.
-
-```tsx
-import { Color4 } from '@dcl/sdk/math'
-import { SetupUiComponentKit, type ThemeCustomize } from '@stom66/dcl-ui-component-kit'
-
-const theme: ThemeCustomize = {
-    colors: {
-        primary: Color4.fromHexString('#ff7538'),
-    },
-}
-
-export function main() {
-    SetupUiComponentKit({
-        theme,
-        layers: [/* your layers */],
-    })
-}
-```
-
-Or keep overrides next to your game code:
-
-```tsx
-// src/themes/myGame/theme.ts
-import type { ThemeCustomize } from '@stom66/dcl-ui-component-kit'
-
-export const theme: ThemeCustomize = {
-    // colors: { primary: Color4.fromHexString('#…') },
-}
-```
-
-Guide: [docs/themes.md](docs/themes.md).
+1. A **Layer** is a show/hide group. **Zones** on that layer are device-aware slots.
+2. Implement **`body()` only** — do not remount `Zone` / `ScreenInsetArea`.
+3. Override size / align with **`uiTransform`** / **`uiBackground`** (no Layer shorthands like `backgroundColor`).
+4. Panel chrome via **sibling** empty **`<Background />`** in `body()` (do **not** nest content inside it).
+5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` for grid widths **inside panels**. For edge / corner HUDs, omit `cols` so zone flex can place content-sized controls — see [docs/layers-and-zones.md](docs/layers-and-zones.md) → Zone alignment.
 
 ## Building blocks
 
 | Piece | Role |
 |---|---|
-| **Layer** | Independent UI surface (HUD, popup, menu). One zone + optional show/hide. |
-| **Zone** | Preset slot on the virtual canvas (`Top`, `BottomRight`, `Default`, …). |
+| **Layer** | Show/hide group for a collection of UI (HUD, popup, menu). |
+| **Zone** | Device-aware slot on a layer (`Top`, `BottomRight`, `Default`, …). |
 | **Layout** | `Row`, `Column`, `Background`, `BackgroundGradient`, `Divider`, `Label`. |
 | **Components** | Buttons, progress bars, text, icons, toggle, spinners / motion, toasts. |
 | **Theme** | Colours / type / sizing. Override via `SetupUiComponentKit({ theme })` — never fork the defaults in place. |
@@ -198,8 +121,8 @@ Deeper guides and per-component **options tables** live under [`docs/`](docs/):
 | Guide | Contents |
 |---|---|
 | [docs/layers-and-zones.md](docs/layers-and-zones.md) | Layer / Zone options, hideable popups, toasts |
-| [docs/themes.md](docs/themes.md) | Theme overrides, `init-theme`, project layout |
-| [docs/custom-textures.md](docs/custom-textures.md) | Affinity template, atlases, UV helpers (1-based) |
+| [docs/themes.md](docs/themes.md) | Affinity template, `init-theme`, agent wiring |
+| [docs/custom-textures.md](docs/custom-textures.md) | Atlases, UV helpers (1-based) |
 | [docs/components.md](docs/components.md) | Component reference with options tables |
 | [docs/licensing.md](docs/licensing.md) | MIT package license + credits / attributions |
 | [docs/media](docs/media/README.md) | Showcase GIF / media notes |
