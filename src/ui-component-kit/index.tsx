@@ -116,6 +116,7 @@ export function SetupUiComponentKit({
 		{
 			virtualHeight: virtual.height,
 			virtualWidth : virtual.width,
+			screenInset  : 'none'
 		}
 	)
 
