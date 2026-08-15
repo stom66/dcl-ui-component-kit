@@ -133,7 +133,7 @@ export class DemoLeftBarLayer extends Layer {
 	constructor() {
 		super({
 			id    : 'demo-left-bar',
-			zone  : ZoneType.Left,
+			zone  : ZoneType.LeftTop,
 			zIndex: 1000,
 			uiTransform: {
 				// Let ZoneType.Left center this panel vertically; only constrain width.
