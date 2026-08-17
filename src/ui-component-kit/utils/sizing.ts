@@ -4,7 +4,7 @@ import { isMobile } from '@dcl/sdk/platform'
 /** Desktop virtual design canvas (default until `syncVirtualCanvasToPlatform`). */
 const DESKTOP_VIRTUAL = { width: 1920, height: 1080 } as const
 /** Mobile virtual design canvas — smaller than desktop so numeric/`px` UI reads larger. */
-const MOBILE_VIRTUAL  = { width: 1200,  height: 540  } as const
+const MOBILE_VIRTUAL  = { width: 1600,  height: 720  } as const
 
 /**
  * Live virtual canvas size used by kit math and SetupUiComponentKit.
