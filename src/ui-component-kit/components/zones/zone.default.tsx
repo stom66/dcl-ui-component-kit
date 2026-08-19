@@ -7,7 +7,7 @@ import { ZoneType, zonePresets } from './zone.presets'
 
 
 export type ZoneProps = UiBoxProps & {
-	type?                : Exclude<ZoneType, ZoneType.None>
+	type                 : Exclude<ZoneType, ZoneType.None>
 	canBeHidden?         : boolean
 	startHidden?         : boolean
 	showCloseButton?     : boolean
@@ -89,7 +89,7 @@ function resolveCornerPinnedPosition(
  * zone’s start/end alignment by clearing the opposing position edge.
  */
 export function Zone({
-	type                 = ZoneType.Default,
+	type,
 	startHidden          = false,
 	canBeHidden          = false,
 	showCloseButton      = false,

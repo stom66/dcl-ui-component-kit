@@ -23,6 +23,7 @@ export type ThemeCustomize = Partial<ThemeBase> & {
 		numbers?: Partial<ThemeIcons['numbers']>
 	}
 	typography?: {
+		scale ?: Partial<ThemeTypography['scale']>
 		size  ?: Partial<ThemeTypography['size']>
 		family?: Partial<ThemeTypography['family']>
 	}
@@ -90,6 +91,10 @@ export function buildTheme(
 		},
 		typography  : {
 			...baseTheme.typography,
+			scale : {
+				...baseTheme.typography.scale,
+				...overrides.typography?.scale,
+			},
 			size  : {
 				...baseTheme.typography.size,
 				...overrides.typography?.size,

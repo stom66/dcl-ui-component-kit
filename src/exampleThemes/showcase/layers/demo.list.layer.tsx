@@ -146,6 +146,7 @@ export class DemoListLayer extends Layer {
 				>
 					<Text
 						value    = {entry.name}
+						fontSize = {theme.typography.size.default}
 						textWrap = "nowrap"
 					/>
 				</Column>

@@ -45,19 +45,19 @@ export function readVirtualCanvasDimensions(): { height: number; width: number }
 
 // MARK: getUiScaleFactor
 /**
- * Mirrors @dcl/react-ecs UiScaleSystem:
- * min(realW/virtualW, realH/virtualH) / devicePixelRatio
+ * Mirrors @dcl/react-ecs UiScaleSystem (SDK 7.26+):
+ * min(realW/virtualW, realH/virtualH).
+ * `devicePixelRatio` is intentionally excluded — density is not a layout unit.
  * Numeric pixel/position values are multiplied by this factor at parse time.
  */
 export function getUiScaleFactor(): number {
 	const canvas = getCanvasInfo()
 	if (!canvas) return 1
 
-	const ratio = canvas.devicePixelRatio || 1
 	return Math.min(
 		canvas.width  / vWidth,
 		canvas.height / vHeight
-	) / ratio
+	)
 }
 
 

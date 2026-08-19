@@ -1,5 +1,5 @@
 import { Color4 } from '@dcl/sdk/math'
-import { isDesktop, isMobile } from '@dcl/sdk/platform'
+import { isMobile } from '@dcl/sdk/platform'
 import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
@@ -306,9 +306,18 @@ export function Toggle({
 			}}
 			onMouseDown = {() => {
 				onMouseDown?.()
+				if (isMobile()) {
+					const next = !resolved
+					if (!controlled) {
+						const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)
+						controller.set('value', next)
+						tweenSlide(id, controller, next ? 1 : 0, lerpDuration)
+					}
+					onChange?.(next)
+				}
 			}}
 			onMouseUp = {() => {
-				if (isMobile() || (isDesktop() && hoverStates.get(id) === true)) {
+				if (!isMobile() && hoverStates.get(id) === true) {
 					const next = !resolved
 					if (!controlled) {
 						const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)

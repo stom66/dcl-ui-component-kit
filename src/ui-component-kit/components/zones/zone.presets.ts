@@ -86,16 +86,19 @@ function getInteractableArea(): { top: number; right: number; bottom: number; le
 }
 
 
+// MARK: getLeftZoneInset
 /**
- * Temporary left offset for zones that hug the left edge.
- * Clear of the explorer left rail (settings / places / events) until we wire
- * `UiCanvasInformation.interactableArea.left` as a live inset (see info HUD).
- * Hardware insets are handled by `ScreenInsetArea` in SetupUiComponentKit
- * (except `FullScreen`, which mounts outside that wrapper).
+ * Left-edge clearance from the explorer rail (settings / places / events).
+ * Evaluated at call time so `isMobile()` and `vwToPixels` match the live
+ * platform / virtual canvas — do not cache this at module import.
+ * Device / explorer insets are the SetupUiComponentKit `screenInset` renderer
+ * option (`'none'` default). Do not wrap layers in `ScreenInsetArea`.
  */
-export const LEFT_ZONE_INSET = isMobile() ? 0 : vwToPixels(3)
+export function getLeftZoneInset(): number {
+	return isMobile() ? vwToPixels(4) : vwToPixels(3)
+}
 
-/** Mirror of `LEFT_ZONE_INSET` for right-edge side strips. */
+/** Pixel inset for right-edge side strips. */
 export const RIGHT_ZONE_INSET = 8
 
 
@@ -109,9 +112,7 @@ export const RIGHT_ZONE_INSET = 8
  */
 export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> = {
 	/**
-	 * Edge-to-edge canvas. `SetupUiComponentKit` mounts these layers **outside**
-	 * `ScreenInsetArea` so loading / splash screens cover the full virtual
-	 * canvas (notch / home indicator included). Prefer other zones for HUDs.
+	 * Edge-to-edge canvas. Prefer other zones for HUDs.
 	 */
 	[ZoneType.FullScreen]: {
 		getUiTransform: () => ({
@@ -130,7 +131,8 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 
 	// Inset the zone box itself to the explorer interactable rect (not padding —
 	// absolute children would ignore padding and still paint full-bleed).
-	// Still lives inside `ScreenInsetArea` (hardware); this is the DCL HUD rect.
+	// Explorer HUD rect from `UiCanvasInformation.interactableArea`. Independent
+	// of Setup `screenInset` — this zone insets itself from the canvas.
 	[ZoneType.InteractableArea]: {
 		getUiTransform: () => {
 			const area = getInteractableArea()
@@ -166,7 +168,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 			positionType  : 'absolute',
 			position      : {
 				top  : 8,
-				right: isMobile() ? '20vw' : 8,
+				right: 8,
 				left : isMobile() ? '32vw' : '17.5vw',
 			},
 			justifyContent: 'center',
@@ -199,7 +201,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 			positionType  : 'absolute',
 			position      : {
 				top  : 8,
-				right: isMobile() ? '20vw' : 8,
+				right: 8,
 				left : isMobile() ? '32vw' : '17.5vw',
 			},
 			justifyContent: 'flex-end',
@@ -215,7 +217,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 			positionType  : 'absolute',
 			position      : {
 				top  : 8,
-				right: isMobile() ? '20vw' : 8,
+				right: 8,
 				left : isMobile() ? '32vw' : '17.5vw',
 			},
 			justifyContent: 'flex-start',
@@ -231,7 +233,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '25vh' : 8,
+				top   : 8,
 				right : RIGHT_ZONE_INSET,
 				bottom: isMobile() ? '60vh' : 8,
 				left  : '75%',
@@ -246,7 +248,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '25vh' : 8,
+				top   : 8,
 				right : RIGHT_ZONE_INSET,
 				bottom: isMobile() ? '60vh' : 8,
 				left  : '75%',
@@ -261,7 +263,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '25vh' : 8,
+				top   : 8,
 				right : RIGHT_ZONE_INSET,
 				bottom: isMobile() ? '60vh' : 8,
 				left  : '75%',
@@ -345,10 +347,10 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '25vh' : '12vh',
+				top   : isMobile() ? '20vh' : '12vh',
 				right : '75%',
 				bottom: isMobile() ? '40vh' : '6vh',
-				left  : LEFT_ZONE_INSET,
+				left  : getLeftZoneInset(),
 			},
 			justifyContent: 'flex-start',
 			alignItems    : 'flex-start',
@@ -365,7 +367,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 				top   : isMobile() ? '25vh' : '12vh',
 				right : '75%',
 				bottom: isMobile() ? '40vh' : '6vh',
-				left  : LEFT_ZONE_INSET,
+				left  : getLeftZoneInset(),
 			},
 			justifyContent: 'center',
 			alignItems    : 'flex-start',
@@ -380,7 +382,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 				top   : isMobile() ? '25vh' : '12vh',
 				right : '75%',
 				bottom: isMobile() ? '40vh' : '6vh',
-				left  : LEFT_ZONE_INSET,
+				left  : getLeftZoneInset(),
 			},
 			justifyContent: 'flex-end',
 			alignItems    : 'flex-start',

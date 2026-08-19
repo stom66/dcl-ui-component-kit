@@ -1,8 +1,9 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { scaleFontSize, type TextAlignType, type UiFontType, type UiTextWrapType } from '@dcl/sdk/react-ecs'
+import ReactEcs, { type TextAlignType, type UiFontType, type UiTextWrapType } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getColSelfTransform, type ColSpanInput } from '../../utils'
+import { resolveLayoutFontSize } from '../../utils/typography'
 import { UiBox, type UiBoxProps } from '../base'
 import { asPixelNumber, textBlockMinHeight, textLineCount, textWrappedLineCount } from '../text/textLayout'
 import { mergeTextShorthands } from '../text/textShorthands'
@@ -13,7 +14,7 @@ type LabelProps = Omit<UiBoxProps, 'uiText'> & {
 	value?      : string
 	/** Font tint. Prefer this over nesting `uiText.color`. */
 	fontColor?  : Color4
-	/** Base font size in theme px — auto-wrapped with `scaleFontSize`. */
+	/** Theme-base font size in px — prefer `theme.typography.size.*`. Auto-scaled by `UiBox`. */
 	fontSize?   : number
 	font?       : UiFontType
 	textAlign?  : TextAlignType
@@ -58,7 +59,7 @@ export function Label({
 	const theme           = getTheme()
 	const col             = getColSelfTransform(cols, colsDesktop, colsMobile)!
 	const padding         = theme.border.radiusSmall
-	const defaultFontSize = scaleFontSize(theme.typography.size.default)
+	const defaultFontSize = theme.typography.size.default
 	const uiTextMerged    = mergeTextShorthands(
 		{
 			fontSize : defaultFontSize,
@@ -70,21 +71,20 @@ export function Label({
 		uiText,
 		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
-	const fontSize     = uiTextMerged.fontSize ?? defaultFontSize
-	const lineSize     = typeof fontSize === 'number' ? fontSize : defaultFontSize
-	const fill         = backgroundColor ?? theme.colors.primary
-	const pixelWidth   = asPixelNumber(width) ?? asPixelNumber(uiTransform?.width as typeof width)
-	const contentWidth = pixelWidth !== undefined
+	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
+	const fill           = backgroundColor ?? theme.colors.primary
+	const pixelWidth     = asPixelNumber(width) ?? asPixelNumber(uiTransform?.width as typeof width)
+	const contentWidth   = pixelWidth !== undefined
 		? Math.max(0, pixelWidth - padding * 2)
 		: undefined
-	const canSoftWrap  = uiTextMerged.textWrap !== 'nowrap' && contentWidth !== undefined
-	const lines        = canSoftWrap
-		? textWrappedLineCount(uiTextMerged.value, lineSize, contentWidth)
+	const canSoftWrap    = uiTextMerged.textWrap !== 'nowrap' && contentWidth !== undefined
+	const lines          = canSoftWrap
+		? textWrappedLineCount(uiTextMerged.value, layoutFontSize, contentWidth)
 		: textLineCount(uiTextMerged.value)
-	const padY         = lines > 1 ? padding : 0
-	const minHeight    = height === undefined
+	const padY           = lines > 1 ? padding : 0
+	const minHeight      = height === undefined
 		? textBlockMinHeight(
-			lineSize,
+			layoutFontSize,
 			uiTextMerged.value,
 			canSoftWrap ? contentWidth : undefined,
 		) + padY * 2

@@ -1,11 +1,11 @@
 import { Color4 } from '@dcl/sdk/math'
-import { scaleFontSize, type TextAlignType, type UiFontType, type UiLabelProps, type UiTextWrapType } from '@dcl/sdk/react-ecs'
+import { type TextAlignType, type UiFontType, type UiLabelProps, type UiTextWrapType } from '@dcl/sdk/react-ecs'
 
 
 /**
  * Top-level text shorthands for `Text` / `H*` / `Code` / `Header` / `SectionHeader` / `Label`.
- * Prefer these over nesting `uiText={{ … }}`. `fontSize` is a theme base px number —
- * the helper wraps it with `scaleFontSize` at merge time.
+ * Prefer these over nesting `uiText={{ … }}`. `fontSize` is a theme-base px number
+ * (`theme.typography.size.*`) — `UiBox` scales it. Do not pre-scale.
  */
 export type TextShorthandProps = {
 	/** Copy string. Prefer this over JSX text children / `uiText.value`. */
@@ -13,8 +13,8 @@ export type TextShorthandProps = {
 	/** Font color. Overrides `uiText.color`. */
 	fontColor? : Color4
 	/**
-	 * Base font size in theme px (e.g. `theme.typography.size.small`).
-	 * Auto-wrapped with `scaleFontSize` — do not pre-scale.
+	 * Theme-base font size in px (prefer `theme.typography.size.small` / `.default` / `h1`–`h6` / `.code`).
+	 * Auto-scaled by `UiBox` — do not wrap with `scaleThemeFontSize` / `scaleFontSize`.
 	 */
 	fontSize?  : number
 	/** Font family. Overrides `uiText.font`. */
@@ -42,23 +42,18 @@ function omitUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
 // MARK: mergeTextShorthands
 /**
  * Merges text defaults ← `uiText` ← top-level shorthands.
- * Shorthands win. `fontSize` shorthand is `scaleFontSize`'d; `uiText.fontSize`
- * is left as-is (caller must scale if they nest).
+ * Shorthands win. Numeric `fontSize` values stay theme-base px — `UiBox` scales them.
  */
 export function mergeTextShorthands(
 	defaults  : UiLabelProps,
 	uiText    : Partial<UiLabelProps> | undefined,
 	shorthands: TextShorthandProps,
 ): UiLabelProps {
-	const scaledFontSize = shorthands.fontSize !== undefined
-		? scaleFontSize(shorthands.fontSize)
-		: undefined
-
 	return {
 		...defaults,
 		...uiText,
 		...omitUndefined({
-			fontSize : scaledFontSize,
+			fontSize : shorthands.fontSize,
 			font     : shorthands.font,
 			textAlign: shorthands.textAlign,
 			textWrap : shorthands.textWrap,

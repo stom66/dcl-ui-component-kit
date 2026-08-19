@@ -1,4 +1,6 @@
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
+
+import { resolveLayoutFontSize } from '../../utils/typography'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
@@ -31,7 +33,7 @@ export const Code = ({
 	...props
 }: CodeProps) => {
 	const theme           = getTheme()
-	const defaultFontSize = scaleFontSize(theme.typography.size.code)
+	const defaultFontSize = theme.typography.size.code
 	const uiTextMerged    = mergeTextShorthands(
 		{
 			fontSize : defaultFontSize,
@@ -43,8 +45,7 @@ export const Code = ({
 		uiText,
 		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
-	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
-	const lineSize = typeof fontSize === 'number' ? fontSize : defaultFontSize
+	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 
 	return (
 		<UiBox
@@ -52,7 +53,7 @@ export const Code = ({
 			uiTransform={{
 				width     : '100%',
 				height    : 'auto',
-				minHeight : textBlockMinHeight(lineSize, uiTextMerged.value),
+				minHeight : textBlockMinHeight(layoutFontSize, uiTextMerged.value),
 				alignSelf : 'flex-start',
 				flexShrink: 0,
 				...uiTransform,

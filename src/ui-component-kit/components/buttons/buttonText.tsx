@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
-import { isDesktop, isMobile } from '@dcl/sdk/platform'
-import ReactEcs, { PositionUnit, scaleFontSize, UiTransformProps } from '@dcl/sdk/react-ecs'
+import { isMobile } from '@dcl/sdk/platform'
+import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
@@ -8,8 +8,8 @@ import { getColSelfTransform, getColSpan, type ColSpanInput } from '../../utils'
 import { resolveAspectDimensions } from '../../utils/aspect'
 import { lighten } from '../../utils/colors'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
-
 import { UiBox, type UiBoxProps } from '../base'
+import { mergeTextShorthands, type TextShorthandProps } from '../text/textShorthands'
 
 
 const hoverStates  : Map<string, boolean> = new Map()
@@ -21,7 +21,7 @@ type ButtonTextPropsState = {
 
 const buttonProps = new Map<string, PropsController<ButtonTextPropsState>>()
 
-type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio'> & {
+type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio' | 'uiText'> & Pick<TextShorthandProps, 'fontSize' | 'fontColor' | 'font' | 'textAlign' | 'textWrap'> & {
 	id           : string
 	textLabel?   : string | undefined
 	width?       : PositionUnit | 'auto' | undefined
@@ -34,6 +34,7 @@ type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio'> & {
 	aspectRatio? : number
 	textureSrc?  : string
 	uiTransform? : UiTransformProps
+	uiText?      : NonNullable<UiBoxProps['uiText']>
 	callback?    : () => void
 	children?    : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
@@ -73,6 +74,7 @@ function tweenBackgroundColor(
  * Sizes from `theme.buttons` aspect ratio (default height 48, width = height × 2.6)
  * unless both axes are set. Pass one axis to derive the other.
  * Prefer `cols` for grid widths (`cols={12}` = full parent width).
+ * `fontSize` is theme-base px — prefer `theme.typography.size.*`; `UiBox` scales it.
  */
 export const ButtonText = ({
 	aspectRatio,
@@ -94,6 +96,11 @@ export const ButtonText = ({
 	onMouseUp,
 	uiBackground,
 	uiText,
+	fontSize: fontSizeProp,
+	fontColor,
+	font,
+	textAlign,
+	textWrap,
 	...props
 }: ButtonTextProps) => {
 	const theme        = getTheme()
@@ -136,12 +143,15 @@ export const ButtonText = ({
 				justifyContent: 'center',
 				...uiTransform
 			}}
-			uiText={{
-				value   : textLabel ?? '',
-				fontSize: scaleFontSize(theme.typography.size.default),
-				textWrap: 'nowrap',
-				...uiText
-			}}
+			uiText={mergeTextShorthands(
+				{
+					value   : textLabel ?? '',
+					fontSize: theme.typography.size.default,
+					textWrap: 'nowrap',
+				},
+				uiText,
+				{ fontSize: fontSizeProp, fontColor, font, textAlign, textWrap, value: textLabel },
+			)}
 			uiBackground = {uiBackground}
 			onMouseEnter = {() => {
 				hoverStates.set(id, true)
@@ -156,9 +166,10 @@ export const ButtonText = ({
 			onMouseDown = {() => {
 				pressedStates.set(id, true)
 				onMouseDown?.()
+				if (isMobile()) callback?.()
 			}}
 			onMouseUp = {() => {
-				if (isMobile() || (isDesktop() && hoverStates.get(id) === true)) {
+				if (!isMobile() && hoverStates.get(id) === true) {
 					callback?.()
 				}
 

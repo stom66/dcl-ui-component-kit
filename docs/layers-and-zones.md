@@ -9,13 +9,13 @@ Class-based UI surface. Implement **`body()` only**. Base `render()` mounts the 
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | required | Unique layer id |
-| `zone` | `ZoneType` | `FullScreen` | Preset layout slot |
+| `zone` | `ZoneType` | `Default` | Preset layout slot (`FullScreen` is edge-to-edge splash / loading) |
 | `canBeHidden` | `boolean` | `false` | Enables `show()` / `hide()` / `toggle()` |
 | `startHidden` | `boolean` | `false` | Begin off-screen (needs `canBeHidden`) |
 | `showCloseButton` | `boolean` | `false` | Injects `ButtonImageClose` into the zone |
 | `showFrom` | `VisibilityPosition` | zone preset | Edge used when showing |
 | `hideTo` | `VisibilityPosition` | `showFrom` / preset | Edge used when hiding |
-| `zIndex` | `number` | — | Stack order |
+| `zIndex` | `number` | — | Applied only when set. Not derived from layer-list index. Later siblings still paint on top when unset. |
 | `uiTransform` | `UiTransform` | — | Forwarded to the Zone (size / flex) |
 | `uiBackground` | `UiBackground` | — | Forwarded to the Zone |
 
@@ -107,20 +107,22 @@ Live values belong on `this.props` (`PropsController`) — see `src/exampleTheme
 
 ## Zones
 
-Zones are preset layout slots on the virtual canvas. Layers pick one via `zone: ZoneType.*`.
+Zones are preset layout slots on the virtual canvas. **One Layer = one Zone.** Layers pick the slot via `zone: ZoneType.*`. There are no `ZoneTop` / `ZoneLeft` helper components.
+
+`SetupUiComponentKit` mounts layers as a **flat** list. SDK 7.26+ renderer `screenInset` defaults to `'device'`; the kit passes **`'none'`** unless you override it. Do **not** also wrap the tree in `ScreenInsetArea` / `InteractableArea` (that double-insets). Only `ZoneType.Default` is wrapped in a full-canvas flex parent (so the modal can center). Every other zone is already `position: absolute` — a 100% shell over those would steal pointer events.
 
 ### `ZoneType`
 
 | Value | Typical use |
 |---|---|
 | `Default` | Centered modal / panel |
-| `FullScreen` | Full canvas overlay (Layer constructor default) |
+| `FullScreen` | Full canvas overlay |
 | `InteractableArea` | Fits the explorer interactable area |
 | `Top` / `Bottom` | Edge chrome |
 | `TopCenter` / `BottomCenter` | Centered edge bars (`width: 50%`, pinned with `left: 25%`) |
 | `TopLeft` / `TopRight` | Same band as `Top` (`flexDirection: row`); content `flex-start` / `flex-end` |
 | `BottomLeft` / `BottomRight` | Corner HUD slots (`BottomLeft` `25vw` side inset) |
-| `LeftTop` / `Left` / `LeftBottom` | Left strip (same insets; content `flex-start` / center / `flex-end`) |
+| `LeftTop` / `Left` / `LeftBottom` | Left strip. `left` uses `getLeftZoneInset()` (0 on mobile, `3vw` on desktop — live at render, not import) |
 | `RightTop` / `Right` / `RightBottom` | Right strip (mirror of left) |
 | `None` | Raw content (no zone wrapper) |
 
@@ -128,15 +130,23 @@ Zone merges transforms as: **flex defaults → zone preset → `uiTransform` ove
 
 Explicit `width` / `height` on a stretched corner slot (e.g. `BottomRight` with `left`+`right`) clear the inward edge so the box pins to that corner. Omit size or use `width: '100%'` to keep filling the full slot.
 
-Named helpers (`ZoneTop`, `ZoneBottomRight`, …) wrap the same presets when you need a zone outside a `Layer`.
+### `Zone`
 
-Do **not** remount `ScreenInsetArea`, `ZoneRoot`, or `Zone` inside a layer’s `render()` — `SetupUiComponentKit` owns the inset canvas.
+If you need a zone outside a `Layer` (rare), use the single component with a required `type`:
+
+```tsx
+<Zone type={ZoneType.Top}>{/* … */}</Zone>
+```
+
+Do **not** remount `ScreenInsetArea`, `InteractableArea`, `ZoneRoot`, or `Zone` inside a layer’s `render()` — `SetupUiComponentKit` owns the canvas (`screenInset` option). `Layer.render()` already mounts `Zone`.
+
+Left-edge strips (`Left` / `LeftTop` / `LeftBottom`) inset with **`getLeftZoneInset()`** (0 on mobile, `3vw` on desktop). It is a function so platform + virtual canvas are live — do not cache `isMobile()` or `vwToPixels` at module import.
 
 ---
 
 ## Toasts
 
-Ephemeral notifications need an always-mounted `toastHostLayer` in `SetupUiComponentKit({ layers })`, then `showToast` / `hideToast` / `clearToastGroup`.
+Ephemeral notifications need an always-mounted `toastHostLayer` in `SetupUiComponentKit({ layers })`, then `showToast` / `hideToast` / `clearToastGroup`. The host uses `ZoneType.None` and renders toast views only — no full-screen wrapper (that would cover other layers and eat clicks).
 
 ### `showToast` options
 

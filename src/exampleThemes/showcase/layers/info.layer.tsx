@@ -7,7 +7,7 @@ import { getCanvasInfo, getUiScaleFactor, readPhysicalCanvasDimensions, readVirt
 /**
  * Compact canvas / virtual-scale readout for the example info HUD (platform line excluded —
  * that row is rendered with an Icon + label in `body()`).
- * On phone landscape, aim for uiScale near ~0.9–1.2 after the mobile virtual canvas (800×360).
+ * On phone landscape, aim for uiScale near ~0.9–1.2 after the mobile virtual canvas (1600×720).
  * If virtual shows 1920×1080 on a phone, platform detection failed at Setup.
  */
 function formatCanvasDebugInfo(): string {
@@ -72,14 +72,14 @@ export class InfoLayer extends Layer {
 	protected body() {
 		const theme      = getTheme()
 		const readout    = formatCanvasDebugInfo()
-		const fontSize   = theme.typography.size.code + 1
+		const fontSize   = theme.typography.size.code
 		const isPhone    = isMobile()
 		const platform   = isPhone ? 'Mobile' : isDesktop() ? 'Desktop' : 'Other'
 		// Atlas has `phone` but no desktop/laptop — `terminal` is the closest computer stand-in.
 		const platformUv = isPhone
 			? atlasIconsFontAwesome.uv.phone
 			: atlasIconsFontAwesome.uv.terminal
-		const iconSize   = fontSize + 4
+		const iconSize   = theme.typography.size.small
 
 		return [
 			<Background key="chrome" backgroundColor={alpha(theme.colors.body, 0.5)} />,

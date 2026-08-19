@@ -6,9 +6,9 @@
 
 If you are using AI, this is what you actually need to know.
 
-- **Layer** — a collection of UI that is shown or hidden **together**.
-- **Zones** — add them to the layer. They already account for device chrome (Explorer HUD, notches, safe areas).
-- **Components** — progress bars, icons, buttons, layout helpers, and the rest go **in those zones**.
+- **Layer** — a collection of UI that is shown or hidden **together**. One layer fills **one** zone.
+- **Zones** — preset slots (`ZoneType.Top`, `BottomRight`, `Default`, …). Set `zone: ZoneType.*` on the Layer. There are no `ZoneTop` / `ZoneLeft` helper components.
+- **Components** — progress bars, icons, buttons, layout helpers go **in that zone** (`body()`).
 
 ![Component showcase](docs/media/showcase.gif)
 
@@ -98,19 +98,21 @@ export function main() {
 
 Layer notes (short):
 
-1. A **Layer** is a show/hide group. **Zones** on that layer are device-aware slots.
-2. Implement **`body()` only** — do not remount `Zone` / `ScreenInsetArea`.
+1. A **Layer** is a show/hide group. It fills **one** zone (`zone: ZoneType.*`, default `Default`).
+2. Implement **`body()` only** — do not remount `Zone` / `ScreenInsetArea` / `InteractableArea`. `Layer.render()` already mounts `<Zone type={…}>`.
 3. Override size / align with **`uiTransform`** / **`uiBackground`** (no Layer shorthands like `backgroundColor`).
 4. Panel chrome via **sibling** empty **`<Background />`** in `body()` (do **not** nest content inside it).
 5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` for grid widths **inside panels**. For edge / corner HUDs, omit `cols` so zone flex can place content-sized controls — see [docs/layers-and-zones.md](docs/layers-and-zones.md) → Zone alignment.
+6. SDK **7.26+**: `screenInset` is a `SetupUiComponentKit` option (kit default `'none'`). Do **not** also wrap the tree in `ScreenInsetArea` / `InteractableArea`.
+7. `colsDesktop` / `colsMobile` and `getLeftZoneInset()` are evaluated **at render**. Do not snapshot `isMobile()` into a module-level `const`.
 
 ## Building blocks
 
 | Piece | Role |
 |---|---|
-| **Layer** | Show/hide group for a collection of UI (HUD, popup, menu). |
-| **Zone** | Device-aware slot on a layer (`Top`, `BottomRight`, `Default`, …). |
-| **Layout** | `Row`, `Column`, `Background`, `BackgroundGradient`, `Divider`, `Label`. |
+| **Layer** | Show/hide group for a collection of UI (HUD, popup, menu). One layer = one zone. |
+| **Zone** | Preset slot (`Top`, `BottomRight`, `Default`, …) via `zone: ZoneType.*` or `<Zone type={…}>`. |
+| **Layout** | `Row` / `RowReverse`, `Column` / `ColumnReverse`, `Background`, `BackgroundGradient`, `Divider`, `Label`. |
 | **Components** | Buttons, progress bars, text, icons, toggle, spinners / motion, toasts. |
 | **Theme** | Colours / type / sizing. Override via `SetupUiComponentKit({ theme })` — never fork the defaults in place. |
 
@@ -120,7 +122,7 @@ Deeper guides and per-component **options tables** live under [`docs/`](docs/):
 
 | Guide | Contents |
 |---|---|
-| [docs/layers-and-zones.md](docs/layers-and-zones.md) | Layer / Zone options, hideable popups, toasts |
+| [docs/layers-and-zones.md](docs/layers-and-zones.md) | Layer / Zone options, `screenInset`, hideable popups, toasts |
 | [docs/themes.md](docs/themes.md) | Affinity template, `init-theme`, agent wiring |
 | [docs/custom-textures.md](docs/custom-textures.md) | Atlases, UV helpers (1-based) |
 | [docs/components.md](docs/components.md) | Component reference with options tables |
@@ -135,6 +137,19 @@ The package is **MIT**. Third-party art is credited separately:
 - **[CraftPix.net](https://craftpix.net)** — some showcase demo sprite sheets (not npm stock textures).
 
 Full notes: [docs/licensing.md](docs/licensing.md).
+
+## 0.2.0 notes
+
+Breaking / behaviour changes vs 0.1.x (SDK **7.26** UI):
+
+- **Named zone components removed** (`ZoneTop`, `ZoneBottomRight`, `ZoneDefault`, …). Use `zone: ZoneType.*` on a Layer, or `<Zone type={ZoneType.Top}>` (`type` is required).
+- **`IS_DEV` removed** (unused).
+- **`LEFT_ZONE_INSET` → `getLeftZoneInset()`** — call it at layout time; a module constant froze `isMobile()` / `vwToPixels` at import.
+- **`colsDesktop` / `colsMobile`** still exist and are resolved at render (same live-platform rule).
+- **`screenInset`** is passed straight to `ReactEcsRenderer` (kit default `'none'`). Do not wrap layers in `ScreenInsetArea` / `InteractableArea`. Only `ZoneType.Default` gets a full-canvas centering shell; edge zones are already absolute.
+- **`zIndex`** is applied only when the Layer sets it (not from array index). Later siblings still paint on top when unset.
+- **Buttons / Toggle:** on **mobile**, `callback` fires on `mouseDown`; on desktop, `mouseUp` after hover. Use `isMobile()`, not `!isDesktop()`.
+- Toast host uses `ZoneType.None` with no full-screen wrapper (so it does not steal clicks).
 
 ## This repo as a demo scene
 

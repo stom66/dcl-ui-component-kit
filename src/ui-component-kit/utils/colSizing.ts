@@ -5,10 +5,6 @@ import { getTheme } from '../styles'
 import { clampNumber } from './math'
 
 
-const IS_MOBILE  = isMobile()
-const IS_DESKTOP = isDesktop()
-
-
 /** Grid span, or `'auto'` to fill leftover row space (equal share among siblings). */
 export type ColSpanInput = number | 'auto'
 
@@ -45,10 +41,11 @@ function resolveColInput(
 ): ColSpanInput | undefined {
 	let value: ColSpanInput | undefined = cols
 
-	if (colsDesktop !== undefined && IS_DESKTOP) {
+	// Call isDesktop / isMobile here (render / layout), not at module import.
+	if (colsDesktop !== undefined && isDesktop()) {
 		value = colsDesktop
 	}
-	if (colsMobile !== undefined && IS_MOBILE) {
+	if (colsMobile !== undefined && isMobile()) {
 		value = colsMobile
 	}
 

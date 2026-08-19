@@ -8,14 +8,17 @@ Import from `@stom66/dcl-ui-component-kit`. Each section starts with an **Option
 
 ### `SetupUiComponentKit`
 
-Mounts the renderer (theme + layers) inside device-safe `ScreenInsetArea`.
+Mounts the renderer (theme + layers) as a **flat** list. SDK 7.26+ defaults `screenInset` to `'device'`; the kit passes `'none'` unless you override it. Only `ZoneType.Default` gets a full-canvas centering shell; other zones are already absolute. Layers: [layers-and-zones.md](layers-and-zones.md) (one Layer = one `<Zone type={…}>`; named helpers like `ZoneTop` were removed in 0.2.0).
 
 | Option | Type | Description |
 |---|---|---|
 | `theme` | `ThemeCustomize` | Partial theme overrides (optional) |
 | `layers` | `Layer[]` | Layer instances to mount |
+| `screenInset` | `'none'` / `'device'` / `'interactable'` | SDK renderer option. Default `'none'` (full canvas). Do not also wrap the tree in `ScreenInsetArea` / `InteractableArea`. |
 | `debug.showDesktopSafeZones` | `boolean` | Overlay desktop safe zones |
 | `debug.showMobileSafeZones` | `boolean` | Overlay mobile safe zones |
+
+`getLeftZoneInset()` — left-rail clearance (0 on mobile, `3vw` on desktop). Call at layout/render time; do not cache at import.
 
 ### `PropsController`
 
@@ -64,7 +67,7 @@ Widths: prefer **`cols`** on `Column` / `Label` / `ButtonText` **inside panels/g
 | Option | Type | Description |
 |---|---|---|
 | `cols` | `number \| 'auto'` | 12-column span (`Column` only; omit = no grid sizing) |
-| `colsDesktop` / `colsMobile` | same | Responsive spans |
+| `colsDesktop` / `colsMobile` | same | Responsive spans (resolved at render via `isDesktop()` / `isMobile()`, not at import) |
 | `spacing` | `number` | Gap between children (default `theme.spacing`) |
 | `flexWrap` / `alignItems` / `justifyContent` / `padding` / `margin` / … | — | Layout shorthands (prefer over `uiTransform`) |
 | `backgroundColor` | `Color4` | Fill shorthand |
@@ -83,7 +86,7 @@ Equal-cell grid (inventories / icon boards). Chunks children into tracks of `lim
 | `direction` | `'horizontal' \| 'vertical'` | Flow axis (default `horizontal`) |
 | `padIncomplete` | `boolean` | Pad short final tracks so cell size matches a full track (default `true`) |
 | `spacing` | `number` | Gap between cells / tracks (default `theme.spacing`) |
-| `cols` / `colsDesktop` / `colsMobile` | `number \| 'auto'` | Size the whole grid in a parent `Row` (same as `Column`) |
+| `cols` / `colsDesktop` / `colsMobile` | `number \| 'auto'` | Size the whole grid in a parent `Row` (same as `Column`; platform overrides are live at render) |
 | `backgroundColor` | `Color4` | Fill shorthand |
 | `uiTransform` / `uiBackground` | native | Escape hatches |
 | `children` | JSX | Cell content — do **not** set `cols` on cells |
@@ -137,7 +140,7 @@ Short labelled chip / callout. Supports `cols`. Chip fill via `backgroundColor`;
 | `id` | `string` | Unique id (required) |
 | `textLabel` | `string` | Button label |
 | `callback` | `() => void` | Click handler |
-| `cols` / `colsDesktop` / `colsMobile` | `number` | Grid width inside a panel `Row`. **Omit** for content-sized HUD / zone siblings (theme aspect) |
+| `cols` / `colsDesktop` / `colsMobile` | `number` | Grid width inside a panel `Row`. **Omit** for content-sized HUD / zone siblings (theme aspect). Platform overrides are live at render. |
 | `width` / `height` | `PositionUnit` | Size (prefer `cols` when spanning a grid) |
 | `aspectRatio` | `number` | Defaults to theme button ratio |
 | `backgroundColor` | `Color4` | Base fill (theme primary if omitted) |
@@ -148,6 +151,8 @@ Short labelled chip / callout. Supports `cols`. Chip fill via `backgroundColor`;
 ```tsx
 <ButtonText id="btn_open" textLabel="Open" callback={() => myLayer.show()} />
 ```
+
+On **mobile**, `callback` runs on `mouseDown` (touch). On **desktop**, it runs on `mouseUp` after hover. The kit uses `isMobile()` for that split — not `!isDesktop()`.
 
 ### `ButtonImage`
 
@@ -284,13 +289,13 @@ Nine-slice note: corners keep absolute size from `texture size × slice fraction
 
 ## Text
 
-Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme base px** number and is auto-scaled inside the component. Use **`fontColor`** for font tint (not fill).
+Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme-base px** number — prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-scale via `UiBox` (`scaleThemeFontSize`). Do not pre-scale. Ad-hoc numbers use the same theme-base units. Raw `UiEntity` only: wrap with `scaleThemeFontSize`. Use **`fontColor`** for font tint (not fill).
 
 | Component | Shorthands | Role |
 |---|---|---|
 | `Text` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | Body text |
 | `Code` | same | Monospace |
-| `Header` | same | Panel title (h2-sized) |
+| `Header` | same | Panel title (h2-sized helper; `H1`–`H6` stay the levelled headings) |
 | `SectionHeader` | same | Section title in a panel |
 | `H1` … `H6` | same | Heading levels from theme |
 
@@ -399,6 +404,8 @@ Supported glyphs and atlas grids: see the Affinity numbers / symbols artboards, 
 
 ## Toggle
 
+Same pointer rule as buttons: **mobile** `onChange` / click on `mouseDown`; **desktop** on `mouseUp` after hover (`isMobile()`, not `!isDesktop()`).
+
 ### `Toggle`
 
 | Option | Type | Description |
@@ -477,7 +484,9 @@ Demo: `src/exampleThemes/showcase/layers/demo.animations.layer.tsx` in this repo
 | `getUVCell` / `getUVColumn` / `getUVRow` | Low-level UVs (1-based) |
 | `resolveAspectDimensions` / `sizeValueToPixels` | Aspect-aware sizing |
 | `vwToPixels` / `vhToPixels` | Virtual canvas math |
-| `vWidth` / `vHeight` / `getUiScaleFactor` | Virtual canvas constants + SDK scale mirror (`min(phys/virtual)/DPR`) |
+| `getLeftZoneInset` | Live left-rail inset for left-edge zones |
+| `vWidth` / `vHeight` / `getUiScaleFactor` | Virtual canvas constants + SDK scale mirror (`min(phys/virtual)`) |
+| `scaleThemeFontSize` / `resolveTypographySize` | Font scaling for raw `UiEntity` only — kit `Text` / `Label` auto-scale |
 | `tweenValue` / `lerp` / `easingFunctions` | Shared easing |
 
-Virtual canvas (desktop `1920×1080`, mobile `800×360`) is set once in `utils/sizing.ts` and passed to `ReactEcsRenderer`. Smaller virtual size makes numeric/`px` UI larger on screen; `%` / native `vw`/`vh` are unaffected. Use `scaleFontSize` for fonts only — not border radii or padding.
+Virtual canvas (desktop `1920×1080`, mobile `1600×720`) is set once in `utils/sizing.ts` and passed to `ReactEcsRenderer`. Smaller virtual size makes numeric/`px` UI larger on screen; `%` / native `vw`/`vh` are unaffected. Use `scaleThemeFontSize` for fonts on raw `UiEntity` only — kit text auto-scales. Do not use either scaler on border radii or padding.

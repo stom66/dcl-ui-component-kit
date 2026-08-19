@@ -1,7 +1,6 @@
 import type { UiEntity } from '@dcl/sdk/react-ecs'
 
 import type { VisibilityPosition } from '../../classes/visibilityController'
-import { LEFT_ZONE_INSET } from '../zones/zone.presets'
 import type { ToastPosition } from './toast.types'
 
 
@@ -113,7 +112,3 @@ export function getToastDockTransform(position: ToastPosition): UiTransform {
 			}
 	}
 }
-
-
-/** Left-bar inset constant re-export for callers that need the pixel rail clearance. */
-export { LEFT_ZONE_INSET }

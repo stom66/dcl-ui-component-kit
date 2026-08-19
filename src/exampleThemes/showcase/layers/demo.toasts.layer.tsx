@@ -33,7 +33,7 @@ function toastLabel(value: string) {
 		>
 			<Row>
 				<Icon uvs={atlasIconsFontAwesome.uv.cat} />
-				<Text value={value} />
+				<Text value={value} fontSize={theme.typography.size.default} />
 			</Row>
 		</UiBox>
 	)

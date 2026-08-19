@@ -47,7 +47,12 @@ export class DemoTextLayer extends Layer {
 				>
 						<SectionHeader value="Section header" />
 						<Text value="Body text via the Text component. Use this for longer copy. By default it will fill 100% width, and automatically wrap long content" />
+						<Text
+							value    = "Prefer theme.typography.size.* (small / default / code / h1–h6). Kit Text auto-scales those base px values."
+							fontSize = {theme.typography.size.small}
+						/>
 						<Code value="const tip = '<Code> uses the monospace theme font.</Code>'" />
+						<Code value={"// Ad-hoc size: pass theme-base px on fontSize — UiBox scales it. Raw UiEntity: scaleThemeFontSize(theme.typography.size.default)"} />
 
 						<Divider />
 

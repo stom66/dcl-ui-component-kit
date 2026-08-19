@@ -6,7 +6,7 @@ Package: `@stom66/dcl-ui-component-kit`
 
 1. `npm run bump:patch` (or `minor` / `major`)
 2. `git push && git push --tags`
-3. Actions → **Publish to npm** → **Run workflow** -or- run `gh workflow run`
+3. Actions → **Publish to npm** → **Run workflow** -or- run `gh workflow run publish.yml`
 4. Confirm the version on [npmjs.com/package/@stom66/dcl-ui-component-kit](https://www.npmjs.com/package/@stom66/dcl-ui-component-kit)
 
 ### Alternate method of publishing locally
@@ -21,9 +21,9 @@ Package: `@stom66/dcl-ui-component-kit`
 From a clean working tree (committed changes, on the branch you release from):
 
 ```bash
-npm run bump:patch   # 0.1.12 → 0.1.13
-npm run bump:minor   # 0.1.12 → 0.2.0
-npm run bump:major   # 0.1.12 → 1.0.0
+npm run bump:patch   # 0.2.0 → 0.2.1
+npm run bump:minor   # 0.2.0 → 0.3.0
+npm run bump:major   # 0.2.0 → 1.0.0
 ```
 
 These run `npm version patch|minor|major`, which:

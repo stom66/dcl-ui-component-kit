@@ -35,10 +35,10 @@ Do not mark install/setup complete until `assets/images/ui-component-kit/` is po
 
 ## Core model
 
-1. **`SetupUiComponentKit({ theme, layers })`** mounts the renderer. Most layers sit inside **`ScreenInsetArea`** (device hardware safe margins). **`ZoneType.FullScreen` layers are mounted outside that inset** as edge-to-edge siblings — use them for loading / splash screens only.
+1. **`SetupUiComponentKit({ theme, layers })`** mounts a flat layer list. SDK 7.26+ defaults `screenInset` to `'device'`; the kit passes `'none'` unless you set `screenInset: 'device' | 'interactable'` on Setup (renderer option only — do **not** also wrap in `ScreenInsetArea` / `InteractableArea`). **`ZoneType.FullScreen`** is an edge-to-edge zone preset for loading / splash.
 2. **One Layer = one Zone.** The layer fills that zone. Implement **`body()` only**.
-3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **`Zone`** only (the canvas is owned by SetupUiComponentKit — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`).
-4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset.
+3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **one `<Zone type={…}>`** (the canvas is owned by SetupUiComponentKit — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`). There are no `ZoneTop` / `ZoneLeft` helper components.
+4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset. **`zIndex`** is applied only when the Layer sets it (not from array index).
 5. Compose content with **`Row` / `Column` / `UiBox` / …** inside `body()`. Panel chrome is a sibling **`Background`** (empty), not a wrapper around content.
 
 **All imports under `src/` must be relative** (`./`, `../`) — never absolute `src/...`.
@@ -139,7 +139,7 @@ return [
 | Need | How |
 |---|---|
 | Top / corner / etc. | `zone: ZoneType.*` |
-| True edge-to-edge loading / splash (ignore notch / home indicator) | `zone: ZoneType.FullScreen` — mounted **outside** `ScreenInsetArea` by SetupUiComponentKit. Do not use for normal HUDs |
+| True edge-to-edge loading / splash (ignore notch / home indicator) | `zone: ZoneType.FullScreen`. Do not use for normal HUDs |
 | Narrower / shorter than preset | `uiTransform: { width, height }` — corner zones pin to their flex-start/end edge (opposing `left`/`right` or `top`/`bottom` is cleared). Use `width: '100%'` / omit size to fill the slot |
 | Height from children | `uiTransform: { height: 'auto' }` + in-flow content siblings (absolute `<Background />` paints the sized zone) |
 | Flex alignment | Zone preset / `uiTransform: { alignItems, justifyContent, … }` on the **Layer** (not inside Background). Only places **content-sized** body siblings — see **Zone alignment** |
@@ -154,7 +154,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 
 | Component | Prefer | Instead of |
 |---|---|---|
-| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize: scaleFontSize(…), … }}` |
+| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize, … }}` |
 | `Background` / `Row` / `Column` / `UiBox` fill | `backgroundColor` | `uiBackground={{ color }}` |
 | Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
 | Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
@@ -163,7 +163,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 | Same icon components | `backgroundColor` | chip / panel fill behind the glyph (wrapper or container — never the texture tint) |
 | `FlashColor` / `FlashBorder` | `flashColor` (target) | ambiguous bare `color` |
 
-**`fontSize` shorthand** takes a **theme base px** number (e.g. `theme.typography.size.small`) and auto-wraps `scaleFontSize` inside the component. Do **not** pre-scale when using the shorthand. If you nest `uiText.fontSize`, you must still call `scaleFontSize` yourself.
+**`fontSize` shorthand** takes a **theme-base px** number. Prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). `UiBox` auto-wraps `scaleThemeFontSize` — do **not** pre-scale. Nested `uiText.fontSize` numbers are scaled the same way. Do not use SDK `scaleFontSize` on kit components.
 
 ```tsx
 // GOOD — chrome sibling + content sibling (zone keeps flex)
@@ -178,7 +178,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 ]
 
 // AVOID when a shorthand exists
-<Text value="Hello" uiText={{ fontSize: scaleFontSize(theme.typography.size.small) }} />
+<Text value="Hello" uiText={{ fontSize: theme.typography.size.small }} />
 <Background uiBackground={{ color: theme.colors.primary }} />
 ```
 
@@ -250,7 +250,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 
 Reserve `Row` + `flexWrap` + `cols` for mixed 12-col spans (unequal cell widths). DCL has no CSS `gap`, so sticky `%` widths that sum to 100% still need padded wrappers when spaced.
 
-Optional platform overrides: `colsDesktop` / `colsMobile`. `uiTransform.height` is unrelated — keep using it for vertical size.
+Optional platform overrides: `colsDesktop` / `colsMobile`. These are resolved **at render** (`isDesktop()` / `isMobile()` inside `getColSelfTransform`) — a ternary like `cols={isMobile() ? 12 : 6}` in `body()` is also live each frame. Do **not** snapshot `isMobile()` into a module-level `const`. `uiTransform.height` is unrelated — keep using it for vertical size.
 
 ### Virtual canvas & UI scale
 
@@ -262,14 +262,14 @@ desktop until Setup runs.
 | Platform | Virtual size |
 |---|---|
 | Desktop | `1920×1080` |
-| Mobile | `800×360` |
+| Mobile | `1600×720` |
 
 SDK scale (mirrored by `getUiScaleFactor()`):
 
-`uiScale = min(physW / virtualW, physH / virtualH) / devicePixelRatio`
+`uiScale = min(physW / virtualW, physH / virtualH)`
 
+- **`devicePixelRatio` is not part of uiScale** (SDK 7.26+). DPR is a density hint for assets, not layout.
 - **Smaller virtual → larger on-screen UI** for numeric / `'Npx'` layout values (and numeric fonts after parse).
-- **DPR ÷ is intentional** — canvas size is physical; dividing maps to logical px (same units as `vw`/`vh`).
 - **`%` and native `'Nvw'` / `'Nvh'`** are **not** enlarged by shrinking the virtual canvas.
 - Phone landscape target: info HUD `uiScale` near **~0.9–1.2**. Portrait still fit-by-width and stays smaller.
 
@@ -280,46 +280,85 @@ For `uiTransform` sizes/positions, prefer native strings (`'30vw'`, `'10vh'`).
 `vwToPixels` / `vhToPixels` are for **numeric** math (clamping, offsets, off-screen
 travel). They convert against the **virtual** canvas — never the physical screen.
 
+**`getLeftZoneInset()`** is the left-rail clearance used by `Left` / `LeftTop` / `LeftBottom` (`0` on mobile, `3vw` on desktop). Call it at layout time — a module-level constant would freeze platform / virtual size at import.
+
 ### Typography / fontSize (critical)
 
 Theme `typography.size.*` values are **base pixel numbers only**. They must never call
-`scaleFontSize` — theme / `buildTheme` run once at load, before canvas size is known.
+`scaleFontSize` / `scaleThemeFontSize` — theme / `buildTheme` run once at load, before
+canvas size is known.
 
-**Prefer the `fontSize` shorthand** on `Text` / `H*` / `Code` / `Label` / etc. Pass the
-theme base number; the component calls `scaleFontSize` for you:
+**Always prefer a theme key** for UI copy:
+
+| Key | Typical use |
+|---|---|
+| `theme.typography.size.default` | Body text, `ButtonText` labels |
+| `theme.typography.size.small` | Captions, hints, dense UI |
+| `theme.typography.size.code` | Monospace / debug (`Code`) |
+| `theme.typography.size.h1`–`h6` | Headings (`H1`–`H6`, `Header` / `SectionHeader` use `h2`) |
+
+Omitting `fontSize` on `Text` / `Label` / `ButtonText` uses `default` (headings use their level).
+
+**Platform-aware sizing:** `UiBox` (every kit text path) calls `scaleThemeFontSize(base)` on
+numeric `fontSize` / `uiText.fontSize`. That applies `theme.typography.scale.mobile` /
+`.desktop` at render time, then SDK `scaleFontSize`. Override scales in
+`SetupUiComponentKit({ theme: { typography: { scale: { mobile: 1.4, desktop: 1.1 } } } })`.
+
+**Prefer the `fontSize` shorthand** on `Text` / `H*` / `Code` / `Label` / `ButtonText`. Pass the
+theme base number; do **not** pre-scale:
 
 ```tsx
 <Text value="Hello" fontSize={theme.typography.size.default} />
 ```
 
-If you nest `uiText.fontSize` (escape hatch), you **must** wrap with `scaleFontSize` at
-render time (when the UI function / `body()` runs and canvas info exists):
+Ad-hoc sizes are still **theme-base px** (same units as the theme keys) and auto-scale.
+Prefer adding a theme key over a magic number. If you must:
 
 ```tsx
-import { scaleFontSize } from '@dcl/sdk/react-ecs'
+<Text value="Hello" fontSize={12} />
+```
 
+Nested `uiText.fontSize` is also theme-base px (auto-scaled by `UiBox`):
+
+```tsx
 uiText={{
 	value   : 'Hello',
-	fontSize: scaleFontSize(theme.typography.size.default),
+	fontSize: theme.typography.size.default,
 }}
 ```
 
-Optional second arg overrides the viewport scale unit (SDK default `0.39` width-based):
-`scaleFontSize(16, '1.5vw')`. Do not pass a third string like `"100vh"` — the third
-arg is an optional `ScaleContext` object, not a unit.
+**Raw `UiEntity` only** (skips `UiBox`) — wrap with `scaleThemeFontSize` from this package,
+never SDK `scaleFontSize` (that skips the theme platform multiplier):
+
+```tsx
+import { scaleThemeFontSize } from '@stom66/dcl-ui-component-kit'
+
+uiText={{
+	value   : 'Hello',
+	fontSize: scaleThemeFontSize(theme.typography.size.default),
+}}
+```
+
+Optional second arg on `scaleThemeFontSize` / SDK `scaleFontSize` overrides the viewport
+scale unit (SDK default `0.39` width-based): `scaleThemeFontSize(16, '1.5vw')`. Do not pass
+a third string like `"100vh"` — the third arg is an optional `ScaleContext` object, not a unit.
 
 | Wrong | Right |
 |---|---|
-| `fontSize={scaleFontSize(theme.typography.size.h1)}` on Text shorthand | `fontSize={theme.typography.size.h1}` (auto-scaled) |
-| `uiText={{ fontSize: theme.typography.size.h1 }}` | `uiText={{ fontSize: scaleFontSize(theme.typography.size.h1) }}` or use shorthand |
+| `fontSize={scaleFontSize(theme.typography.size.h1)}` on kit Text | `fontSize={theme.typography.size.h1}` |
+| `fontSize={scaleThemeFontSize(theme.typography.size.h1)}` on kit Text | `fontSize={theme.typography.size.h1}` (double-scales) |
+| Magic `fontSize={12}` when a theme key fits | `fontSize={theme.typography.size.h5}` (or `.small` / `.default`) |
+| `uiText={{ fontSize: scaleFontSize(16) }}` on kit components | `uiText={{ fontSize: theme.typography.size.default }}` |
 | `scaleFontSize(...)` inside `defaultTheme` / `buildTheme` | Keep theme sizes as plain numbers |
-| Pre-scaling the shorthand | Pass the raw theme number |
+| SDK `scaleFontSize` on raw `UiEntity` | `scaleThemeFontSize(theme.typography.size.*)` |
 
-If a caller overrides `uiText.fontSize`, that override must also use `scaleFontSize`.
+**`scaleThemeFontSize` / `scaleFontSize` are for fonts only** — do not use them on
+`borderRadius`, padding, or other layout numbers. Those are plain theme/virtual px and
+already × `uiScale` at parse time.
 
-**`scaleFontSize` is for fonts only** — do not use it on `borderRadius`, padding, or other layout numbers. Those are plain theme/virtual px and already × `uiScale` at parse time.
-
-Fonts go through two steps: `scaleFontSize(base)` (additive fluid boost from viewport width) **then** × `uiScale`. Layout numbers only get the multiply.
+Fonts go through three steps: `resolveTypographySize(base)` (optional theme platform scale)
+→ `scaleFontSize(...)` (additive fluid boost from viewport width) → × `uiScale` at parse.
+Layout numbers only get the multiply.
 
 **`textWrap`:** `@dcl/react-ecs` defaults **unset** `textWrap` to **`wrap`** (not `nowrap`, despite some docs). Button / nav labels should set `textWrap="nowrap"` — otherwise a first-frame narrow flex width can mid-word-break short strings (`List` → `Lis`/`t`) until layout settles. `ButtonText` defaults `nowrap` for `textLabel`; nested `Text` children must set it themselves.
 
@@ -380,6 +419,9 @@ export const myCtaLayer   = new MyCtaLayer()
 | Wrong | Right |
 |---|---|
 | Override `render()` to wrap `ScreenInsetArea` / `ZoneRoot` / `Zone` | Base `Layer.render()`; only implement `body()` |
+| `ZoneTop` / `ZoneLeft` / other named zone components | `zone: ZoneType.*` on the Layer, or `<Zone type={ZoneType.Top}>` (`type` required) |
+| `const IS_MOBILE = isMobile()` at module import | Call `isMobile()` in `body()` / `getUiTransform()`; use `colsDesktop` / `colsMobile` / `getLeftZoneInset()` (live at render) |
+| Wrap every layer in a 100% hit-target shell | Setup already shells **only** `ZoneType.Default`; edge zones are absolute |
 | Hand-build edge layout | `zone: ZoneType.*` |
 | Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / sibling `<Background />` |
 | Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |
@@ -387,8 +429,9 @@ export const myCtaLayer   = new MyCtaLayer()
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `fontColor`, `backgroundColor`, `flexWrap`, `padding`, …) |
-| `fontSize={scaleFontSize(theme.typography.size.*)}` on Text shorthand | `fontSize={theme.typography.size.*}` (component scales) |
-| Bare `uiText.fontSize: theme.typography.size.*` | `fontSize: scaleFontSize(theme.typography.size.*)` or use the shorthand |
+| `fontSize={scaleFontSize(theme.typography.size.*)}` or `scaleThemeFontSize(...)` on kit Text | `fontSize={theme.typography.size.*}` (`UiBox` scales) |
+| Bare magic `fontSize={12}` when a theme key fits | `theme.typography.size.small` / `.default` / `h1`–`h6` / `.code` |
+| SDK `scaleFontSize` on kit `uiText.fontSize` | Raw theme-base px — `UiBox` scales. Raw `UiEntity`: `scaleThemeFontSize(theme.typography.size.*)` |
 | `scaleFontSize(...)` on `borderRadius` / padding / layout px | Raw theme / virtual number (SDK × `uiScale` at parse) |
 | `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**); `Row` is always full width |
 | Inventory / equal-cell board built with `Row` + `flexWrap` + `cols` | Prefer `<Grid limit={n}>` — equal cells, spacer gutters, no padded wrappers |
@@ -533,6 +576,8 @@ When creating any kind of button element, ask the user if this is meant to be an
 
 Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `src/ui-component-kit/components/buttons/`.
 
+**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `mouseUp` after hover. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). `Toggle` uses the same rule.
+
 **Sizing:** omit `cols` for a content-sized HUD control (theme aspect ratio — this is what edge zones need). Use `cols` only inside a grid / panel `Row`. Do **not** put `cols={12}` on a lone button that should sit in a corner or bottom-center zone.
 
 ```tsx
@@ -617,7 +662,7 @@ super({
 
 Ephemeral notifications via an always-mounted **ToastHost** (not one Layer per toast).
 
-1. Include `toastHostLayer` in `SetupUiComponentKit({ layers })` (demos already do).
+1. Include `toastHostLayer` in `SetupUiComponentKit({ layers })` (demos already do). The host is `ZoneType.None` and renders toast views only — **no** full-screen wrapper (that steals clicks from layers underneath).
 2. Call `showToast({ position, content, … })` / `hideToast(id)` / `clearToastGroup(group)`.
 
 | Field | Notes |
@@ -670,7 +715,7 @@ export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: 
 			{...props}
 			uiTransform={{ width: 'auto', ...uiTransform }}
 			uiBackground={mergeUiBackground({ color: theme.colors.body }, uiBackground)}
-			uiText={{ value: value ?? '', ...uiText }}
+			uiText={{ value: value ?? '', fontSize: theme.typography.size.default, ...uiText }}
 		/>
 	)
 }

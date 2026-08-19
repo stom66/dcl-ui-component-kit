@@ -17,6 +17,7 @@ export { getCanvasInfo }                                              from './si
 export { getUiScaleFactor }                                           from './sizing'
 export { readVirtualCanvasDimensions as readCanvasDimensions }        from './sizing'
 export { readPhysicalCanvasDimensions }                               from './sizing'
+export { resolveLayoutFontSize, resolveTypographySize, scaleThemeFontSize, scaleUiTextFontSize } from './typography'
 export { syncVirtualCanvasToPlatform, vHeight, vWidth }               from './sizing'
 export { vhToPixels }                                                 from './sizing'
 export { vwToPixels }                                                 from './sizing'

@@ -10,9 +10,8 @@ import { createVisibilityForZone, ZoneType } from '../zones/zone.presets'
 export type LayerOptions = {
 	id              : string
 	/**
-	 * Zone preset. Defaults to `ZoneType.Default` (inside `ScreenInsetArea`).
-	 * Use `ZoneType.FullScreen` for loading / splash — those mount edge-to-edge
-	 * outside the hardware inset wrapper.
+	 * Zone preset. Defaults to `ZoneType.Default`.
+	 * Use `ZoneType.FullScreen` for loading / splash (edge-to-edge canvas).
 	 */
 	zone?           : ZoneType
 	canBeHidden?    : boolean
@@ -52,8 +51,8 @@ export abstract class Layer {
 
 	constructor(options: LayerOptions) {
 		this.id              = options.id
-		// Default stays inside ScreenInsetArea. FullScreen is edge-to-edge
-		// (outside the inset) — reserve it for loading / splash layers.
+		// Default zone is a centered panel. FullScreen is edge-to-edge —
+		// reserve it for loading / splash layers.
 		this.zone            = options.zone ?? ZoneType.Default
 		this.canBeHidden     = options.canBeHidden ?? false
 		this.startHidden     = options.startHidden ?? false
@@ -116,9 +115,8 @@ export abstract class Layer {
 	// MARK: render
 	/**
 	 * Mounts this layer as one Zone (preset + uiTransform / uiBackground).
-	 * The canvas is owned by SetupUiComponentKit: most zones sit inside
-	 * `ScreenInsetArea`; `ZoneType.FullScreen` is mounted edge-to-edge outside
-	 * that inset (loading / splash). Do not re-wrap `ScreenInsetArea` here.
+	 * The canvas is owned by SetupUiComponentKit. Do not wrap `ScreenInsetArea`
+	 * / `InteractableArea` here — inset is the renderer `screenInset` option.
 	 * `showCloseButton` is configured on the Layer and applied by the Zone.
 	 * For fill / border, return a sibling empty `Background` from `body()`
 	 * (do not nest content inside it — preserves zone flex alignment).
@@ -155,8 +153,8 @@ export abstract class Layer {
 				hideTo               = {this.hideTo}
 				uiBackground         = {this.uiBackground}
 				uiTransform          = {{
-					zIndex: this.zIndex,
 					...this.uiTransform,
+					...(this.zIndex !== undefined ? { zIndex: this.zIndex } : {}),
 					...(fullyHidden ? { display: 'none' as const } : {}),
 				}}
 			>

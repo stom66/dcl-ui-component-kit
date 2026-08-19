@@ -196,20 +196,19 @@ export const ButtonImage = ({
 					pressedStates.set(id, true)
 					currentIndex.set(id, ButtonIndex.PRESS)
 					onMouseDown?.()
+					if (isMobile()) {
+						callback?.()
+						currentIndex.set(id, ButtonIndex.DEFAULT)
+					}
 				}}
 				onMouseUp={() => {
 					pressedStates.set(id, false)
 
-					if (isMobile()) {
+					if (!isMobile() && hoverStates.get(id) === true) {
 						callback?.()
-						currentIndex.set(id, ButtonIndex.DEFAULT)
+						currentIndex.set(id, ButtonIndex.HOVER)
 					} else {
-						if (hoverStates.get(id) === true) {
-							callback?.()
-							currentIndex.set(id, ButtonIndex.HOVER)
-						} else {
-							currentIndex.set(id, ButtonIndex.DEFAULT)
-						}
+						currentIndex.set(id, ButtonIndex.DEFAULT)
 					}
 
 					onMouseUp?.()

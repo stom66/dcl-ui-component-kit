@@ -10,9 +10,8 @@ type ZoneRootProps = UiBoxProps & {
 // MARK: ZoneRoot
 /**
  * Full-size flex canvas helper for compositions outside SetupUiComponentKit.
- * Prefer SetupUiComponentKit's ScreenInsetArea stack for normal layers — that path
- * already provides a 100% × 100% inset-safe parent, so Layers should not wrap
- * themselves in ZoneRoot.
+ * Prefer SetupUiComponentKit's layer stack for normal layers. Layers should
+ * not wrap themselves in ZoneRoot.
  */
 export function ZoneRoot({
 	children,

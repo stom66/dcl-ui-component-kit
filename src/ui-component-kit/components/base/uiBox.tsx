@@ -4,6 +4,7 @@ import ReactEcs, { PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { resolveAspectDimensions } from '../../utils/aspect'
 import { darken } from '../../utils/colors'
+import { scaleUiTextFontSize } from '../../utils/typography'
 
 import { mergeTransformShorthands, type UiTransformShorthandProps } from './transformShorthands'
 
@@ -182,6 +183,9 @@ function resolveBoxSize(
  * Layout shorthands (`padding`, `alignItems`, `flexWrap`, …) and fill
  * (`backgroundColor`) are preferred over nesting `uiTransform` / `uiBackground`
  * when a single field is enough. Nested objects remain escape hatches; shorthands win.
+ *
+ * Numeric `uiText.fontSize` is theme-base px and is scaled via `scaleThemeFontSize`
+ * (prefer `theme.typography.size.*`). Viewport strings (`'2vw'`) pass through.
  */
 export function UiBox({
 	aspectRatio,
@@ -269,7 +273,7 @@ export function UiBox({
 				uiBackground
 			)}
 			uiBackground = {resolveUiBackground(uiBackground, fill)}
-			uiText       = {uiText}
+			uiText       = {scaleUiTextFontSize(uiText)}
 			onMouseDown  = {onMouseDown}
 			onMouseUp    = {onMouseUp}
 			onMouseEnter = {onMouseEnter}

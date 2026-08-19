@@ -38,7 +38,7 @@ import { timerLayer }                        from './timer.layer'
 
 /** Showcase demo layer list. Comment out entries to hide them. */
 export const layers: Layer[] = [
-	// Zone previews — zIndex 0; listed first so array-index fallback stays low.
+	// Zone previews.
 	demoSafeZoneDefaultLayer,
 	demoSafeZoneFullScreenLayer,
 	demoSafeZoneInteractableAreaLayer,

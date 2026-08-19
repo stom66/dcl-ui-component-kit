@@ -1,4 +1,6 @@
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
+
+import { resolveLayoutFontSize } from '../../utils/typography'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
@@ -30,7 +32,7 @@ export const SectionHeader = ({
 	...props
 }: SectionHeaderProps) => {
 	const theme           = getTheme()
-	const defaultFontSize = scaleFontSize(theme.typography.size.h2)
+	const defaultFontSize = theme.typography.size.h2
 	const uiTextMerged    = mergeTextShorthands(
 		{
 			fontSize : defaultFontSize,
@@ -41,7 +43,7 @@ export const SectionHeader = ({
 		uiText,
 		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
-	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
+	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 
 	return (
 		<UiBox
@@ -49,7 +51,7 @@ export const SectionHeader = ({
 			uiTransform={{
 				width     : '100%',
 				height    : 'auto',
-				minHeight : textMinHeight(typeof fontSize === 'number' ? fontSize : defaultFontSize),
+				minHeight : textMinHeight(layoutFontSize),
 				alignSelf : 'flex-start',
 				flexShrink: 0,
 				padding   : { top: 10, bottom: 5 },

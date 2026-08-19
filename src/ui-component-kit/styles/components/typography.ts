@@ -1,9 +1,17 @@
 export type ThemeFontFamily = 'monospace' | 'serif' | 'sans-serif'
 
 export type ThemeTypography = {
+	/** Optional per-platform multipliers applied at render time via `resolveTypographySize`. */
+	scale?: {
+		mobile? : number
+		desktop?: number
+	}
 	size: {
+		/** Monospace / debug readout size. Prefer this over a magic number. */
 		code   : number
+		/** Body copy and button labels. */
 		default: number
+		/** Captions, hints, dense UI. */
 		small  : number
 		h1     : number
 		h2     : number
@@ -25,6 +33,10 @@ export type ThemeTypography = {
 }
 
 export const typography: ThemeTypography = {
+	scale: {
+		mobile : 1600 / 1200,
+		desktop: 1,
+	},
 	size: {
 		code   : 6,
 		default: 10,

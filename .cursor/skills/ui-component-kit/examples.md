@@ -130,6 +130,8 @@ Do **not** put `cols={12}` or a bare `<Row>` on a lone HUD control in `BottomCen
 
 Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is unaffected — keep using `uiTransform.height` as needed.
 
+Optional **`colsDesktop` / `colsMobile`** override `cols` per platform. They are resolved **at render** (`isDesktop()` / `isMobile()`). A ternary like `cols={isMobile() ? 12 : 6}` in `body()` is also live each frame. Do **not** snapshot `isMobile()` into a module-level `const`.
+
 `Row` applies default `theme.spacing` gutters. Partial `cols` use sticky `%` widths (so `flexWrap` works). When any child uses `cols`, `Row` applies padded cell wrappers for gutters; content-sized (no `cols`) non-wrap rows use spacer entities. Avoid extra horizontal margins on `cols` children inside a spaced `Row`.
 
 **Equal-cell inventories** — prefer `Grid` (not `flexWrap` + `cols`):
@@ -163,7 +165,7 @@ Reserve `uiTransform.width` for non-grid sizes (`vw` / `vh` / px). `height` is u
 ]
 ```
 
-`fontSize` takes the theme base number (auto-scaled). Use `fontColor` on text, `backgroundColor` on fills (including icon chip wrappers), `iconColor` to tint icon textures.
+`fontSize` takes a **theme-base px** number — prefer `theme.typography.size.*` (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-scale; do not wrap with `scaleFontSize`. Ad-hoc numbers are still theme-base px. Raw `UiEntity` only: `scaleThemeFontSize(theme.typography.size.default)`. Use `fontColor` on text, `backgroundColor` on fills (including icon chip wrappers), `iconColor` to tint icon textures.
 
 ## Close button / framed panel
 
@@ -200,7 +202,7 @@ super({
 
 ## Toasts
 
-Include `toastHostLayer` in the `SetupUiComponentKit` layer list, then:
+Include `toastHostLayer` in the `SetupUiComponentKit` layer list. The host uses `ZoneType.None` and renders toast views only (no full-screen wrapper). Then:
 
 ```tsx
 import { showToast, clearToastGroup } from '../../components/toasts'
@@ -236,6 +238,8 @@ Demo control panel: `demo.toasts.layer.tsx`.
 > **Variants:** procedural (`ButtonText`) · image-based (`ButtonImage`)
 
 Ask whether the control is an image button or a simple text button, then use `ButtonImage` or `ButtonText`. Never hand-roll `UiBox` + mouse handlers.
+
+On **mobile**, `callback` fires on `mouseDown`; on **desktop**, on `mouseUp` after hover. The kit uses `isMobile()` for that split (not `!isDesktop()`).
 
 ```tsx
 // Text — procedural, no dedicated image asset

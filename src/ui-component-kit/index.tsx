@@ -1,4 +1,4 @@
-import ReactEcs, { ReactEcsRenderer, ScreenInsetArea, UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 
 import type { Layer } from './components/layers'
 import { ZoneType } from './components/zones'
@@ -11,13 +11,14 @@ import { syncVirtualCanvasToPlatform } from './utils/sizing'
 export { Layer }                  from './components/layers'
 export type { LayerOptions }      from './components/layers'
 
-export { VisibilityController, Zone, ZoneBottom, ZoneBottomCenter, ZoneBottomLeft, ZoneBottomRight, ZoneDefault, ZoneFullScreen, ZoneLeft, ZoneLeftBottom, ZoneLeftTop, ZoneRight, ZoneRightBottom, ZoneRightTop, ZoneRoot, ZoneTop, ZoneTopCenter, ZoneTopLeft, ZoneTopRight, ZoneType } from './components/zones'
+export { VisibilityController, Zone, ZoneRoot, ZoneType, getLeftZoneInset } from './components/zones'
 export type { VisibilityPosition, ZoneProps } from './components/zones'
 
 export { AvatarIcon, Background, BackgroundGradient, Bounce, ButtonImage, ButtonImageClose, ButtonText, clearToastGroup, Code, Column, ColumnReverse, DEFAULT_AVATAR_USER_ID, Divider, FlashBorder, FlashColor, getToggleProps, Grid, H1, H2, H3, H4, H5, H6, Header, hideToast, Icon, IconCharacter, IconNumber, IconString, IconSymbol, isPlaying, Label, mergeUiBackground, playOnce, ProgressBar, ProgressBarImage, Pulse, resolveContentInset, resolveSpriteLocalFrame, resolveUiBackground, Row, RowReverse, SectionHeader, setLooping, setPlaying, Shake, showToast, Spinner, spriteCycleFrameCount, spriteFrameToUvCell, SpriteIcon, Text, Toggle, toastHostLayer, ToastHostLayer, UiBox, Wiggle } from './components'
 export type { ShowToastOptions, ToastGroupPolicy, ToastItem, ToastPhase, ToastPosition } from './components'
 
 export { darken, lighten, alpha } from './utils/colors'
+export { resolveLayoutFontSize, resolveTypographySize, scaleThemeFontSize, scaleUiTextFontSize } from './utils/typography'
 export { resolveAspectDimensions, sizeValueToPixels } from './utils/aspect'
 export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDimensions } from './utils/aspect'
 export { flipUVs, getUVCell, getUVColumn, getUVRow, getRotatedUVs, mirrorUVs, rotateUvIndexes } from './utils/uvs'
@@ -30,30 +31,46 @@ export type { AtlasCell, AtlasLayout, AtlasTexture, AtlasTextureFilterMode, Atla
 
 export type { AnimationPlaybackState, AvatarIconProps, BounceProps, BurstAnimationProps, BurstSample, ContentInset, ContentInsetEdges, FillFrom, FlashBorderProps, FlashColorProps, GradientDirection, GridDirection, GridProps, IconProps, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, PulseProps, ResolvedContentInset, ShakeProps, SpinnerProps, SpriteIconProps, TextureSlices, ToggleProps, WiggleProps } from './components'
 export type { Theme, ThemeCustomize }
+
+/**
+ * Passed straight to `ReactEcsRenderer.setUiRenderer`. SDK 7.26+ defaults to
+ * `'device'` (hardware safe area); this kit defaults to `'none'` so layout
+ * matches pre-7.26. Do not also wrap the tree in `ScreenInsetArea` /
+ * `InteractableArea` — that double-applies the margin.
+ */
+export type KitScreenInset = 'none' | 'device' | 'interactable'
+
 export type SetupUiComponentKitOptions = {
-	theme? : ThemeCustomize
-	layers : Layer[]
-	debug? : {
+	theme?       : ThemeCustomize
+	layers       : Layer[]
+	screenInset? : KitScreenInset
+	debug?       : {
 		showDesktopSafeZones?: boolean
 		showMobileSafeZones ?: boolean
 	}
 }
 
-// MARK: IS_DEV?
-declare var process: { env: { NODE_ENV: string } }
-export const IS_DEV = process.env.NODE_ENV == 'development'
-
 
 // MARK: renderLayerShell
 /**
- * Absolute full-parent shell for one layer. `zIndex` comes from the layer or
- * its original index in the SetupUiComponentKit stack.
+ * Mounts one layer into the renderer stack.
+ *
+ * `ZoneType.Default` is a relative, centered box — it needs a full-canvas flex
+ * parent. Every other zone is already `position: absolute` against the canvas.
+ * Wrapping those in a 100% shell leaves an invisible hit-target over the rest
+ * of the screen (the left nav at z 1000 covered the Safe Zones panel).
  */
-function renderLayerShell(
-	layer : Layer,
-	zIndex: number,
-): ReactEcs.JSX.Element {
-	return (
+function renderLayerShell(layer: Layer): ReactEcs.JSX.Element[] {
+	const content = layer.render()
+	const nodes   = content == null
+		? []
+		: Array.isArray(content)
+			? content
+			: [content]
+
+	if (layer.zone !== ZoneType.Default) return nodes
+
+	return [
 		<UiEntity
 			key={layer.id}
 			uiTransform={{
@@ -66,12 +83,12 @@ function renderLayerShell(
 				alignItems    : 'center',
 				justifyContent: 'center',
 				flexShrink    : 0,
-				zIndex,
+				...(layer.zIndex !== undefined ? { zIndex: layer.zIndex } : {}),
 			}}
 		>
-			{layer.render()}
-		</UiEntity>
-	)
+			{nodes}
+		</UiEntity>,
+	]
 }
 
 
@@ -79,17 +96,14 @@ function renderLayerShell(
 /**
  * Mounts the UI Component Kit renderer with the given theme and layer instances.
  *
- * Most layers render inside `ScreenInsetArea` (device hardware safe margins:
- * notch, status bar, home indicator). **`ZoneType.FullScreen` layers are
- * mounted as edge-to-edge siblings outside that inset** — intended for loading
- * / splash screens that must cover the whole virtual canvas.
- *
- * Debug safe-zone overlays are appended last and stacked above scene layers.
+ * Layers render as a flat list. `screenInset` is the SDK renderer option
+ * (default `'none'`). Debug safe-zone overlays are appended last.
  */
 export function SetupUiComponentKit({
-	theme = {},
+	theme       = {},
 	layers,
-	debug = {},
+	screenInset = 'none',
+	debug       = {},
 }: SetupUiComponentKitOptions) {
 	const activeTheme = setTheme(theme)
 	const stack       = [...layers]
@@ -99,24 +113,12 @@ export function SetupUiComponentKit({
 	if (debug.showDesktopSafeZones) stack.push(safeZonesDesktopLayer)
 	if (debug.showMobileSafeZones)  stack.push(safeZonesMobileLayer)
 
-	const zById = new Map(stack.map((layer, index) => [layer.id, layer.zIndex ?? index]))
-
-	const fullScreenLayers = stack.filter((layer) => layer.zone === ZoneType.FullScreen)
-	const insetLayers      = stack.filter((layer) => layer.zone !== ZoneType.FullScreen)
-
 	ReactEcsRenderer.setUiRenderer(
-		() => [
-			<ScreenInsetArea key="ui-kit-inset">
-				{insetLayers.map((layer) => renderLayerShell(layer, zById.get(layer.id) ?? 0))}
-			</ScreenInsetArea>,
-			// After inset stack so loading/splash FullScreen layers paint on top
-			// when z-index ties; explicit layer.zIndex still wins across siblings.
-			...fullScreenLayers.map((layer) => renderLayerShell(layer, zById.get(layer.id) ?? 0)),
-		],
+		() => stack.flatMap(renderLayerShell),
 		{
 			virtualHeight: virtual.height,
 			virtualWidth : virtual.width,
-			screenInset  : 'none'
+			screenInset,
 		}
 	)
 

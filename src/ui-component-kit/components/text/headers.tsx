@@ -1,4 +1,6 @@
-import ReactEcs, { scaleFontSize } from '@dcl/sdk/react-ecs'
+import ReactEcs from '@dcl/sdk/react-ecs'
+
+import { resolveLayoutFontSize } from '../../utils/typography'
 
 import { getTheme } from '../../styles'
 import { UiBox, type UiBoxProps } from '../base'
@@ -35,7 +37,7 @@ function Heading({
 	...props
 }: HeadingProps & { level: HeaderLevel }) {
 	const theme           = getTheme()
-	const defaultFontSize = scaleFontSize(theme.typography.size[level])
+	const defaultFontSize = theme.typography.size[level]
 	const uiTextMerged    = mergeTextShorthands(
 		{
 			fontSize : defaultFontSize,
@@ -47,7 +49,7 @@ function Heading({
 		uiText,
 		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
 	)
-	const fontSize = uiTextMerged.fontSize ?? defaultFontSize
+	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 
 	return (
 		<UiBox
@@ -55,7 +57,7 @@ function Heading({
 			uiTransform={{
 				width     : '100%',
 				height    : 'auto',
-				minHeight : textMinHeight(typeof fontSize === 'number' ? fontSize : defaultFontSize),
+				minHeight : textMinHeight(layoutFontSize),
 				alignSelf : 'flex-start',
 				flexShrink: 0,
 				...uiTransform,
