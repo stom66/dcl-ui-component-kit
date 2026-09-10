@@ -1,6 +1,7 @@
+import { engine, type Entity } from '@dcl/sdk/ecs'
 import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 
-import type { Layer } from './components/layers'
+import type { KitScreenInset, Layer } from './components/layers'
 import { ZoneType } from './components/zones'
 import { safeZonesDesktopLayer, safeZonesMobileLayer } from './debug'
 import { setTheme } from './styles/theme'
@@ -9,7 +10,7 @@ import { syncVirtualCanvasToPlatform } from './utils/sizing'
 
 // MARK: Exports
 export { Layer }                  from './components/layers'
-export type { LayerOptions }      from './components/layers'
+export type { KitScreenInset, LayerOptions } from './components/layers'
 
 export { VisibilityController, Zone, ZoneRoot, ZoneType, getLeftZoneInset } from './components/zones'
 export type { VisibilityPosition, ZoneProps } from './components/zones'
@@ -32,17 +33,14 @@ export type { AtlasCell, AtlasLayout, AtlasTexture, AtlasTextureFilterMode, Atla
 export type { AnimationPlaybackState, AvatarIconProps, BounceProps, BurstAnimationProps, BurstSample, ContentInset, ContentInsetEdges, FillFrom, FlashBorderProps, FlashColorProps, GradientDirection, GridDirection, GridProps, IconProps, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, PulseProps, ResolvedContentInset, ShakeProps, SpinnerProps, SpriteIconProps, TextureSlices, ToggleProps, WiggleProps } from './components'
 export type { Theme, ThemeCustomize }
 
-/**
- * Passed straight to `ReactEcsRenderer.setUiRenderer`. SDK 7.26+ defaults to
- * `'device'` (hardware safe area); this kit defaults to `'none'` so layout
- * matches pre-7.26. Do not also wrap the tree in `ScreenInsetArea` /
- * `InteractableArea` — that double-applies the margin.
- */
-export type KitScreenInset = 'none' | 'device' | 'interactable'
-
 export type SetupUiComponentKitOptions = {
 	theme?       : ThemeCustomize
 	layers       : Layer[]
+	/**
+	 * Default inset for layers that omit `inset`. Kit default `'none'`.
+	 * Layers that share the same resolved inset share one SDK UI renderer.
+	 * Do not also wrap the tree in `ScreenInsetArea` / `InteractableArea`.
+	 */
 	screenInset? : KitScreenInset
 	debug?       : {
 		showDesktopSafeZones?: boolean
@@ -51,14 +49,32 @@ export type SetupUiComponentKitOptions = {
 }
 
 
+const INSET_ORDER: KitScreenInset[] = ['none', 'device', 'interactable']
+
+/** Stable dummy entities for `addUiRenderer` (one per non-main inset bucket). */
+const insetRendererEntities = new Map<KitScreenInset, Entity>()
+
+
+// MARK: getInsetRendererEntity
+/** Returns a stable engine entity for an additional inset renderer. */
+function getInsetRendererEntity(inset: KitScreenInset): Entity {
+	let entity = insetRendererEntities.get(inset)
+	if (entity === undefined) {
+		entity = engine.addEntity()
+		insetRendererEntities.set(inset, entity)
+	}
+	return entity
+}
+
+
 // MARK: renderLayerShell
 /**
- * Mounts one layer into the renderer stack.
+ * Mounts one layer into its inset renderer stack.
  *
  * `ZoneType.Default` is a relative, centered box — it needs a full-canvas flex
- * parent. Every other zone is already `position: absolute` against the canvas.
- * Wrapping those in a 100% shell leaves an invisible hit-target over the rest
- * of the screen (the left nav at z 1000 covered the Safe Zones panel).
+ * parent (relative to that renderer’s already-inset canvas). Every other zone
+ * is already `position: absolute`. Wrapping those in a 100% shell leaves an
+ * invisible hit-target over the rest of the screen.
  */
 function renderLayerShell(layer: Layer): ReactEcs.JSX.Element[] {
 	const content = layer.render()
@@ -92,12 +108,57 @@ function renderLayerShell(layer: Layer): ReactEcs.JSX.Element[] {
 }
 
 
+// MARK: bucketLayersByInset
+/**
+ * Groups layers by resolved inset (`layer.inset ?? defaultInset`).
+ * Relative order within each bucket matches the input stack.
+ */
+function bucketLayersByInset(
+	layers      : Layer[],
+	defaultInset: KitScreenInset,
+): Record<KitScreenInset, Layer[]> {
+	const buckets: Record<KitScreenInset, Layer[]> = {
+		none         : [],
+		device       : [],
+		interactable : [],
+	}
+
+	for (const layer of layers) {
+		const inset = layer.inset ?? defaultInset
+		buckets[inset].push(layer)
+	}
+
+	return buckets
+}
+
+
+// MARK: pickMainInset
+/**
+ * Prefers the Setup default bucket when non-empty; otherwise first non-empty
+ * in none → device → interactable order.
+ */
+function pickMainInset(
+	buckets     : Record<KitScreenInset, Layer[]>,
+	defaultInset: KitScreenInset,
+): KitScreenInset {
+	if (buckets[defaultInset].length > 0) return defaultInset
+
+	for (const inset of INSET_ORDER) {
+		if (buckets[inset].length > 0) return inset
+	}
+
+	return defaultInset
+}
+
+
 // MARK: SetupUiComponentKit
 /**
- * Mounts the UI Component Kit renderer with the given theme and layer instances.
+ * Mounts the UI Component Kit with the given theme and layer instances.
  *
- * Layers render as a flat list. `screenInset` is the SDK renderer option
- * (default `'none'`). Debug safe-zone overlays are appended last.
+ * Layers are grouped by resolved `inset` (Layer option, else Setup
+ * `screenInset`, default `'none'`). At most three SDK UI renderers:
+ * `setUiRenderer` for the main bucket (owns virtual canvas size) and
+ * `addUiRenderer` for the others. Cross-inset stacking uses Layer `zIndex`.
  */
 export function SetupUiComponentKit({
 	theme       = {},
@@ -113,14 +174,35 @@ export function SetupUiComponentKit({
 	if (debug.showDesktopSafeZones) stack.push(safeZonesDesktopLayer)
 	if (debug.showMobileSafeZones)  stack.push(safeZonesMobileLayer)
 
+	const buckets   = bucketLayersByInset(stack, screenInset)
+	const mainInset = pickMainInset(buckets, screenInset)
+
 	ReactEcsRenderer.setUiRenderer(
-		() => stack.flatMap(renderLayerShell),
+		() => buckets[mainInset].flatMap(renderLayerShell),
 		{
 			virtualHeight: virtual.height,
 			virtualWidth : virtual.width,
-			screenInset,
-		}
+			screenInset  : mainInset,
+		},
 	)
+
+	for (const inset of INSET_ORDER) {
+		if (inset === mainInset) continue
+		if (buckets[inset].length === 0) {
+			const existing = insetRendererEntities.get(inset)
+			if (existing !== undefined) {
+				ReactEcsRenderer.removeUiRenderer(existing)
+			}
+			continue
+		}
+
+		const entity = getInsetRendererEntity(inset)
+		ReactEcsRenderer.addUiRenderer(
+			entity,
+			() => buckets[inset].flatMap(renderLayerShell),
+			{ screenInset: inset },
+		)
+	}
 
 	return activeTheme
 }

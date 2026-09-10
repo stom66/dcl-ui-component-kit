@@ -35,10 +35,10 @@ Do not mark install/setup complete until `assets/images/ui-component-kit/` is po
 
 ## Core model
 
-1. **`SetupUiComponentKit({ theme, layers })`** mounts a flat layer list. SDK 7.26+ defaults `screenInset` to `'device'`; the kit passes `'none'` unless you set `screenInset: 'device' | 'interactable'` on Setup (renderer option only — do **not** also wrap in `ScreenInsetArea` / `InteractableArea`). **`ZoneType.FullScreen`** is an edge-to-edge zone preset for loading / splash.
+1. **`SetupUiComponentKit({ theme, layers, screenInset? })`** mounts layers grouped by resolved **`inset`** (Layer option, else Setup `screenInset`, kit default `'none'`). At most three SDK renderers (`setUiRenderer` + `addUiRenderer`). Do **not** wrap `ScreenInsetArea` / `InteractableArea` in `body()`. **`ZoneType.FullScreen`** fills the Layer’s inset canvas (loading / splash, or fill an `inset: 'interactable'` renderer).
 2. **One Layer = one Zone.** The layer fills that zone. Implement **`body()` only**.
-3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Base `Layer.render()` mounts **one `<Zone type={…}>`** (the canvas is owned by SetupUiComponentKit — do not wrap layers in `ZoneRoot` / `ScreenInsetArea`). There are no `ZoneTop` / `ZoneLeft` helper components.
-4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset. **`zIndex`** is applied only when the Layer sets it (not from array index).
+3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Optional **`inset`** picks canvas chrome. Base `Layer.render()` mounts **one `<Zone type={…}>`**. There are no `ZoneTop` / `ZoneLeft` helpers. **`ZoneType.InteractableArea` is deprecated** — use `inset: 'interactable'` with `FullScreen` / `Default`.
+4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset. **`zIndex`** is applied only when the Layer sets it (not from array index) — use it for stacking across inset groups.
 5. Compose content with **`Row` / `Column` / `UiBox` / …** inside `body()`. Panel chrome is a sibling **`Background`** (empty), not a wrapper around content.
 
 **All imports under `src/` must be relative** (`./`, `../`) — never absolute `src/...`.
@@ -420,8 +420,9 @@ export const myCtaLayer   = new MyCtaLayer()
 |---|---|
 | Override `render()` to wrap `ScreenInsetArea` / `ZoneRoot` / `Zone` | Base `Layer.render()`; only implement `body()` |
 | `ZoneTop` / `ZoneLeft` / other named zone components | `zone: ZoneType.*` on the Layer, or `<Zone type={ZoneType.Top}>` (`type` required) |
+| `ZoneType.InteractableArea` | `inset: 'interactable'` + `ZoneType.FullScreen` (or `Default`) |
 | `const IS_MOBILE = isMobile()` at module import | Call `isMobile()` in `body()` / `getUiTransform()`; use `colsDesktop` / `colsMobile` / `getLeftZoneInset()` (live at render) |
-| Wrap every layer in a 100% hit-target shell | Setup already shells **only** `ZoneType.Default`; edge zones are absolute |
+| Wrap every layer in a 100% hit-target shell | Setup already shells **only** `ZoneType.Default` inside its inset renderer; edge zones are absolute |
 | Hand-build edge layout | `zone: ZoneType.*` |
 | Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / sibling `<Background />` |
 | Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |

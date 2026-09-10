@@ -9,13 +9,14 @@ Class-based UI surface. Implement **`body()` only**. Base `render()` mounts the 
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | required | Unique layer id |
-| `zone` | `ZoneType` | `Default` | Preset layout slot (`FullScreen` is edge-to-edge splash / loading) |
+| `zone` | `ZoneType` | `Default` | Preset layout slot (`FullScreen` is edge-to-edge of the Layer’s inset canvas) |
+| `inset` | `'none'` / `'device'` / `'interactable'` | Setup `screenInset` | Per-layer canvas chrome. Layers with the same resolved inset share one SDK UI renderer. |
 | `canBeHidden` | `boolean` | `false` | Enables `show()` / `hide()` / `toggle()` |
 | `startHidden` | `boolean` | `false` | Begin off-screen (needs `canBeHidden`) |
 | `showCloseButton` | `boolean` | `false` | Injects `ButtonImageClose` into the zone |
 | `showFrom` | `VisibilityPosition` | zone preset | Edge used when showing |
 | `hideTo` | `VisibilityPosition` | `showFrom` / preset | Edge used when hiding |
-| `zIndex` | `number` | — | Applied only when set. Not derived from layer-list index. Later siblings still paint on top when unset. |
+| `zIndex` | `number` | — | Applied only when set. Use for stacking within and across inset groups. Not derived from layer-list index. |
 | `uiTransform` | `UiTransform` | — | Forwarded to the Zone (size / flex) |
 | `uiBackground` | `UiBackground` | — | Forwarded to the Zone |
 
@@ -107,22 +108,48 @@ Live values belong on `this.props` (`PropsController`) — see `src/exampleTheme
 
 ## Zones
 
-Zones are preset layout slots on the virtual canvas. **One Layer = one Zone.** Layers pick the slot via `zone: ZoneType.*`. There are no `ZoneTop` / `ZoneLeft` helper components.
+Zones are preset layout slots on the Layer’s **inset canvas**. **One Layer = one Zone.** Layers pick the slot via `zone: ZoneType.*`. There are no `ZoneTop` / `ZoneLeft` helper components.
 
-`SetupUiComponentKit` mounts layers as a **flat** list. SDK 7.26+ renderer `screenInset` defaults to `'device'`; the kit passes **`'none'`** unless you override it. Do **not** also wrap the tree in `ScreenInsetArea` / `InteractableArea` (that double-insets). Only `ZoneType.Default` is wrapped in a full-canvas flex parent (so the modal can center). Every other zone is already `position: absolute` — a 100% shell over those would steal pointer events.
+### Layer `inset` / Setup `screenInset`
+
+Canvas chrome is **not** a zone. Each Layer may set `inset: 'none' | 'device' | 'interactable'`. When omitted, Setup’s `screenInset` applies (kit default `'none'`).
+
+Setup groups layers by resolved inset into at most **three** SDK UI renderers (`setUiRenderer` for the main bucket + `addUiRenderer` for the others). The SDK wraps each renderer — do **not** also wrap `ScreenInsetArea` / `InteractableArea` in `body()` (that double-insets and can steal pointer events).
+
+| Value | Meaning |
+|---|---|
+| `'none'` | Full physical canvas |
+| `'device'` | Device safe area (notch / home indicator) |
+| `'interactable'` | Explorer HUD-free rect |
+
+Cross-inset stacking: use Layer **`zIndex`**.
+
+Only `ZoneType.Default` is wrapped in a full-size flex parent **inside its renderer** (so the modal can center). Every other zone is already `position: absolute` against that renderer’s canvas.
+
+```tsx
+SetupUiComponentKit({
+	screenInset: 'none',
+	layers: [
+		splashLayer,     // inherits none
+		settingsLayer,   // inset: 'interactable'
+	],
+})
+
+super({ id: 'settings', zone: ZoneType.Default, inset: 'interactable' })
+```
 
 ### `ZoneType`
 
 | Value | Typical use |
 |---|---|
 | `Default` | Centered modal / panel |
-| `FullScreen` | Full canvas overlay |
-| `InteractableArea` | Fits the explorer interactable area |
+| `FullScreen` | Edge-to-edge of the Layer’s inset canvas (loading / splash, or fill an inset renderer) |
+| `InteractableArea` | **Deprecated** — use `inset: 'interactable'` + `FullScreen` / `Default` |
 | `Top` / `Bottom` | Edge chrome |
 | `TopCenter` / `BottomCenter` | Centered edge bars (`width: 50%`, pinned with `left: 25%`) |
 | `TopLeft` / `TopRight` | Same band as `Top` (`flexDirection: row`); content `flex-start` / `flex-end` |
 | `BottomLeft` / `BottomRight` | Corner HUD slots (`BottomLeft` `25vw` side inset) |
-| `LeftTop` / `Left` / `LeftBottom` | Left strip. `left` uses `getLeftZoneInset()` (0 on mobile, `3vw` on desktop — live at render, not import) |
+| `LeftTop` / `Left` / `LeftBottom` | Left strip. `left` uses `getLeftZoneInset()` (live at render) |
 | `RightTop` / `Right` / `RightBottom` | Right strip (mirror of left) |
 | `None` | Raw content (no zone wrapper) |
 
@@ -138,9 +165,9 @@ If you need a zone outside a `Layer` (rare), use the single component with a req
 <Zone type={ZoneType.Top}>{/* … */}</Zone>
 ```
 
-Do **not** remount `ScreenInsetArea`, `InteractableArea`, `ZoneRoot`, or `Zone` inside a layer’s `render()` — `SetupUiComponentKit` owns the canvas (`screenInset` option). `Layer.render()` already mounts `Zone`.
+Do **not** remount `ScreenInsetArea`, `InteractableArea`, `ZoneRoot`, or `Zone` inside a layer’s `render()` — Setup owns the canvas via Layer `inset` / Setup `screenInset`. `Layer.render()` already mounts `Zone`.
 
-Left-edge strips (`Left` / `LeftTop` / `LeftBottom`) inset with **`getLeftZoneInset()`** (0 on mobile, `3vw` on desktop). It is a function so platform + virtual canvas are live — do not cache `isMobile()` or `vwToPixels` at module import.
+Left-edge strips (`Left` / `LeftTop` / `LeftBottom`) use **`getLeftZoneInset()`** for explorer-rail clearance. Call it at layout time — do not cache `isMobile()` or `vwToPixels` at module import.
 
 ---
 

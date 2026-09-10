@@ -33,7 +33,7 @@ const SAFE_ZONE_TOGGLES: SafeZoneToggle[][] = [
 	[
 		{ id: 'btn_safe_zone_default',           label: 'Default',          layer: demoSafeZoneDefaultLayer },
 		{ id: 'btn_safe_zone_full_screen',       label: 'FullScreen',       layer: demoSafeZoneFullScreenLayer },
-		{ id: 'btn_safe_zone_interactable_area', label: 'InteractableArea', layer: demoSafeZoneInteractableAreaLayer },
+		{ id: 'btn_safe_zone_interactable_inset', label: 'Interactable inset', layer: demoSafeZoneInteractableAreaLayer },
 	],
 	[
 		{ id: 'btn_safe_zone_top_left',          label: 'TopLeft',          layer: demoSafeZoneTopLeftLayer },

@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, getTheme, Layer, Text, UiBox, ZoneType, type Theme } from '../../../ui-component-kit'
+import { alpha, Background, getTheme, Layer, Text, UiBox, ZoneType, type KitScreenInset, type Theme } from '../../../ui-component-kit'
 
 /** Stack order for zone preview overlays — below info / nav / control panels. */
 export const DEMO_SAFE_ZONE_Z_INDEX = 0
@@ -10,6 +10,8 @@ export const DEMO_SAFE_ZONE_Z_INDEX = 0
 export type CreateSafeZoneDemoLayerOptions = {
 	/** Override layer stack order (e.g. temporary BottomRight test above info HUD). */
 	zIndex?: number
+	/** Per-layer canvas chrome (defaults to Setup `screenInset`). */
+	inset?: KitScreenInset
 }
 
 
@@ -71,6 +73,7 @@ export function createSafeZoneDemoLayer(
 			super({
 				id,
 				zone,
+				inset      : options.inset,
 				canBeHidden: true,
 				startHidden: true,
 				zIndex     : options.zIndex ?? DEMO_SAFE_ZONE_Z_INDEX,

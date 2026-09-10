@@ -8,9 +8,9 @@ alwaysApply: false
 
 Before adding or changing a Layer, read `.cursor/skills/ui-component-kit/SKILL.md` and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`.
 
-- One Layer = one Zone. Implement **`body()` only**. Base `render()` mounts `<Zone type={…}>`. There are no `ZoneTop` / `ZoneLeft` helpers. `SetupUiComponentKit` owns the canvas (`screenInset` option; kit default `'none'`). Only `ZoneType.Default` gets a full-canvas centering shell — do not re-wrap `ScreenInsetArea` / `InteractableArea`.
+- One Layer = one Zone + optional **`inset`**. Implement **`body()` only**. Base `render()` mounts `<Zone type={…}>`. There are no `ZoneTop` / `ZoneLeft` helpers. Setup groups layers by resolved inset (`layer.inset ?? screenInset`, default `'none'`) into at most three SDK renderers — do not re-wrap `ScreenInsetArea` / `InteractableArea`. Only `ZoneType.Default` gets a centering shell inside its renderer. Prefer `inset: 'interactable'` over deprecated `ZoneType.InteractableArea`.
 - Select layout with `zone: ZoneType.*`. Override size/alignment via **`uiTransform`** / **`uiBackground`** only (no Layer shorthands like `backgroundColor` / `borderRadius` / `showFrame`). Panel fill / border → sibling empty **`<Background />`** in `body()` (**never nest content inside it** — keeps zone flex).
-- **`zIndex`** only when the Layer sets it (not from list index).
+- **`zIndex`** only when the Layer sets it (not from list index); use it for stacking across inset groups.
 - **Do not** snapshot `isMobile()` / `isDesktop()` at module import. `colsDesktop` / `colsMobile` and `getLeftZoneInset()` are live at render. A ternary in `body()` is also live each frame.
 - **Zone flex only places content-sized children.** Edge / corner HUDs: omit `cols` on lone `ButtonText` / `Label`; do not wrap them in `<Row>` or `<Column cols={12}>`. Panels: size the Layer with `uiTransform`, then use `cols={12}` inside that box. See skill → **Zone alignment needs content-sized children**.
 - **Do not** invent new Layer option fields. **Do not** override `render()` to re-wrap zones.

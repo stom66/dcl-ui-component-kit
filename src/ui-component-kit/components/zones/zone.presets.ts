@@ -3,7 +3,7 @@ import { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { VisibilityController, type VisibilityPosition } from '../../classes/visibilityController'
 import { getUiScaleFactor, readPhysicalCanvasDimensions, vhToPixels } from '../../utils'
-import { getCanvasInfo, vwToPixels } from '../../utils/sizing'
+import { vwToPixels } from '../../utils/sizing'
 
 export type { VisibilityPosition }
 
@@ -15,6 +15,10 @@ export enum ZoneType {
 	None             = 'none',
 	Default          = 'default',
 	FullScreen       = 'fullScreen',
+	/**
+	 * @deprecated Use Layer `inset: 'interactable'` with `ZoneType.FullScreen`
+	 * (or `Default`). Kept as a FullScreen-equivalent fill of the renderer box.
+	 */
 	InteractableArea = 'interactableArea',
 	Top              = 'top',
 	TopCenter        = 'topCenter',
@@ -74,25 +78,14 @@ export function resolveVisibilityEdges(
 	return { showFrom: presetEdge, hideTo: presetEdge }
 }
 
-function getInteractableArea(): { top: number; right: number; bottom: number; left: number } {
-	const canvas = getCanvasInfo()
-	if (!canvas) return { top: 0, right: 0, bottom: 0, left: 0 }
-	return {
-		top   : canvas.interactableArea?.top ?? 0,
-		right : canvas.interactableArea?.right ?? 0,
-		bottom: canvas.interactableArea?.bottom ?? 0,
-		left  : canvas.interactableArea?.left ?? 0,
-	}
-}
-
 
 // MARK: getLeftZoneInset
 /**
  * Left-edge clearance from the explorer rail (settings / places / events).
  * Evaluated at call time so `isMobile()` and `vwToPixels` match the live
  * platform / virtual canvas — do not cache this at module import.
- * Device / explorer insets are the SetupUiComponentKit `screenInset` renderer
- * option (`'none'` default). Do not wrap layers in `ScreenInsetArea`.
+ * Device / explorer insets are Layer `inset` / Setup `screenInset` (SDK
+ * renderers). Do not wrap layers in `ScreenInsetArea`.
  */
 export function getLeftZoneInset(): number {
 	return isMobile() ? vwToPixels(4) : vwToPixels(3)
@@ -129,25 +122,22 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		visibilityPosition: 'bottom',
 	},
 
-	// Inset the zone box itself to the explorer interactable rect (not padding —
-	// absolute children would ignore padding and still paint full-bleed).
-	// Explorer HUD rect from `UiCanvasInformation.interactableArea`. Independent
-	// of Setup `screenInset` — this zone insets itself from the canvas.
+	/**
+	 * @deprecated Prefer `inset: 'interactable'` + `ZoneType.FullScreen`.
+	 * Same fill as FullScreen so it does not double-inset the renderer canvas.
+	 */
 	[ZoneType.InteractableArea]: {
-		getUiTransform: () => {
-			const area = getInteractableArea()
-			return {
-				positionType  : 'absolute',
-				position      : {
-					top   : area.top,
-					right : area.right,
-					bottom: area.bottom,
-					left  : area.left,
-				},
-				justifyContent: 'center',
-				alignItems    : 'center',
-			}
-		},
+		getUiTransform: () => ({
+			positionType  : 'absolute',
+			position      : {
+				top   : 0,
+				right : 0,
+				bottom: 0,
+				left  : 0,
+			},
+			justifyContent: 'center',
+			alignItems    : 'center',
+		}),
 		visibilityPosition: 'bottom',
 	},
 

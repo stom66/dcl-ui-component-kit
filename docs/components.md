@@ -8,17 +8,17 @@ Import from `@stom66/dcl-ui-component-kit`. Each section starts with an **Option
 
 ### `SetupUiComponentKit`
 
-Mounts the renderer (theme + layers) as a **flat** list. SDK 7.26+ defaults `screenInset` to `'device'`; the kit passes `'none'` unless you override it. Only `ZoneType.Default` gets a full-canvas centering shell; other zones are already absolute. Layers: [layers-and-zones.md](layers-and-zones.md) (one Layer = one `<Zone type={…}>`; named helpers like `ZoneTop` were removed in 0.2.0).
+Mounts theme + layers. Layers are grouped by resolved `inset` (Layer option, else Setup `screenInset`, kit default `'none'`) into at most three SDK UI renderers. Only `ZoneType.Default` gets a centering shell inside its renderer. Layers: [layers-and-zones.md](layers-and-zones.md).
 
 | Option | Type | Description |
 |---|---|---|
 | `theme` | `ThemeCustomize` | Partial theme overrides (optional) |
 | `layers` | `Layer[]` | Layer instances to mount |
-| `screenInset` | `'none'` / `'device'` / `'interactable'` | SDK renderer option. Default `'none'` (full canvas). Do not also wrap the tree in `ScreenInsetArea` / `InteractableArea`. |
+| `screenInset` | `'none'` / `'device'` / `'interactable'` | Default inset for layers that omit `inset`. Kit default `'none'`. Do not also wrap `ScreenInsetArea` / `InteractableArea` in layer `body()`. |
 | `debug.showDesktopSafeZones` | `boolean` | Overlay desktop safe zones |
 | `debug.showMobileSafeZones` | `boolean` | Overlay mobile safe zones |
 
-`getLeftZoneInset()` — left-rail clearance (0 on mobile, `3vw` on desktop). Call at layout/render time; do not cache at import.
+`getLeftZoneInset()` — left-rail clearance for left-edge zones. Call at layout/render time; do not cache at import.
 
 ### `PropsController`
 

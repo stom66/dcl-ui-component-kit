@@ -103,7 +103,7 @@ Layer notes (short):
 3. Override size / align with **`uiTransform`** / **`uiBackground`** (no Layer shorthands like `backgroundColor`).
 4. Panel chrome via **sibling** empty **`<Background />`** in `body()` (do **not** nest content inside it).
 5. Prefer **`cols={12}`** (etc.) on `Column` / `Label` / `ButtonText` for grid widths **inside panels**. For edge / corner HUDs, omit `cols` so zone flex can place content-sized controls — see [docs/layers-and-zones.md](docs/layers-and-zones.md) → Zone alignment.
-6. SDK **7.26+**: `screenInset` is a `SetupUiComponentKit` option (kit default `'none'`). Do **not** also wrap the tree in `ScreenInsetArea` / `InteractableArea`.
+6. **`inset`** on a Layer picks canvas chrome (`'none'` / `'device'` / `'interactable'`). Setup `screenInset` is the default when omitted (kit default `'none'`). Layers with the same resolved inset share one SDK renderer — do **not** wrap `ScreenInsetArea` / `InteractableArea` in `body()`.
 7. `colsDesktop` / `colsMobile` and `getLeftZoneInset()` are evaluated **at render**. Do not snapshot `isMobile()` into a module-level `const`.
 
 ## Building blocks
@@ -122,7 +122,7 @@ Deeper guides and per-component **options tables** live under [`docs/`](docs/):
 
 | Guide | Contents |
 |---|---|
-| [docs/layers-and-zones.md](docs/layers-and-zones.md) | Layer / Zone options, `screenInset`, hideable popups, toasts |
+| [docs/layers-and-zones.md](docs/layers-and-zones.md) | Layer / Zone / `inset`, hideable popups, toasts |
 | [docs/themes.md](docs/themes.md) | Affinity template, `init-theme`, agent wiring |
 | [docs/custom-textures.md](docs/custom-textures.md) | Atlases, UV helpers (1-based) |
 | [docs/components.md](docs/components.md) | Component reference with options tables |
@@ -146,8 +146,9 @@ Breaking / behaviour changes vs 0.1.x (SDK **7.26** UI):
 - **`IS_DEV` removed** (unused).
 - **`LEFT_ZONE_INSET` → `getLeftZoneInset()`** — call it at layout time; a module constant froze `isMobile()` / `vwToPixels` at import.
 - **`colsDesktop` / `colsMobile`** still exist and are resolved at render (same live-platform rule).
-- **`screenInset`** is passed straight to `ReactEcsRenderer` (kit default `'none'`). Do not wrap layers in `ScreenInsetArea` / `InteractableArea`. Only `ZoneType.Default` gets a full-canvas centering shell; edge zones are already absolute.
-- **`zIndex`** is applied only when the Layer sets it (not from array index). Later siblings still paint on top when unset.
+- **`screenInset` / Layer `inset`** — Setup `screenInset` is the default for layers that omit `inset`. Layers are grouped into at most three SDK renderers (`setUiRenderer` + `addUiRenderer`). Do not wrap layers in `ScreenInsetArea` / `InteractableArea`. Only `ZoneType.Default` gets a centering shell inside its renderer.
+- **`ZoneType.InteractableArea` deprecated** — use `inset: 'interactable'` with `ZoneType.FullScreen` (or `Default`).
+- **`zIndex`** is applied only when the Layer sets it (not from array index). Use `zIndex` for stacking across inset groups. Later siblings still paint on top when unset.
 - **Buttons / Toggle:** on **mobile**, `callback` fires on `mouseDown`; on desktop, `mouseUp` after hover. Use `isMobile()`, not `!isDesktop()`.
 - Toast host uses `ZoneType.None` with no full-screen wrapper (so it does not steal clicks).
 

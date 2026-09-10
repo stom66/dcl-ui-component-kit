@@ -7,13 +7,31 @@ import { Zone } from '../zones/zone.default'
 import { createVisibilityForZone, ZoneType } from '../zones/zone.presets'
 
 
+/**
+ * Screen area for a Layer’s UI renderer (SDK `screenInset`).
+ * - `'none'` — full canvas
+ * - `'device'` — device safe area (notch / home indicator)
+ * - `'interactable'` — explorer HUD-free rect
+ *
+ * Omit on the Layer to inherit SetupUiComponentKit `screenInset` (default `'none'`).
+ */
+export type KitScreenInset = 'none' | 'device' | 'interactable'
+
+
 export type LayerOptions = {
 	id              : string
 	/**
 	 * Zone preset. Defaults to `ZoneType.Default`.
-	 * Use `ZoneType.FullScreen` for loading / splash (edge-to-edge canvas).
+	 * Use `ZoneType.FullScreen` for loading / splash (edge-to-edge of the
+	 * Layer’s inset canvas). Prefer `inset: 'interactable'` over the deprecated
+	 * `ZoneType.InteractableArea`.
 	 */
 	zone?           : ZoneType
+	/**
+	 * Per-layer canvas chrome. When omitted, SetupUiComponentKit `screenInset`
+	 * applies. Layers that share the same resolved inset share one SDK renderer.
+	 */
+	inset?          : KitScreenInset
 	canBeHidden?    : boolean
 	startHidden?    : boolean
 	showCloseButton?: boolean
@@ -30,6 +48,8 @@ export type LayerOptions = {
 export abstract class Layer {
 	readonly id              : string
 	readonly zone            : ZoneType
+	/** Raw option; may be undefined — Setup resolves against its `screenInset` default. */
+	readonly inset?          : KitScreenInset
 	readonly canBeHidden     : boolean
 	readonly startHidden     : boolean
 	readonly showCloseButton : boolean
@@ -54,6 +74,7 @@ export abstract class Layer {
 		// Default zone is a centered panel. FullScreen is edge-to-edge —
 		// reserve it for loading / splash layers.
 		this.zone            = options.zone ?? ZoneType.Default
+		this.inset           = options.inset
 		this.canBeHidden     = options.canBeHidden ?? false
 		this.startHidden     = options.startHidden ?? false
 		this.showCloseButton = options.showCloseButton ?? false
@@ -66,6 +87,12 @@ export abstract class Layer {
 			showFrom: options.showFrom,
 			hideTo  : options.hideTo,
 		})
+
+		if (this.zone === ZoneType.InteractableArea) {
+			console.error(
+				`Layer: id=${this.id} ZoneType.InteractableArea is deprecated — use inset: 'interactable' with ZoneType.FullScreen (or Default)`,
+			)
+		}
 
 		// startHidden layers stay content-unmounted until first show().
 		if (this.canBeHidden) {
@@ -115,8 +142,8 @@ export abstract class Layer {
 	// MARK: render
 	/**
 	 * Mounts this layer as one Zone (preset + uiTransform / uiBackground).
-	 * The canvas is owned by SetupUiComponentKit. Do not wrap `ScreenInsetArea`
-	 * / `InteractableArea` here — inset is the renderer `screenInset` option.
+	 * The canvas is owned by SetupUiComponentKit (per-layer `inset` / Setup
+	 * `screenInset`). Do not wrap `ScreenInsetArea` / `InteractableArea` here.
 	 * `showCloseButton` is configured on the Layer and applied by the Zone.
 	 * For fill / border, return a sibling empty `Background` from `body()`
 	 * (do not nest content inside it — preserves zone flex alignment).
