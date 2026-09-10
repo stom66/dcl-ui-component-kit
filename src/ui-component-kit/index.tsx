@@ -19,6 +19,8 @@ export { AvatarIcon, Background, BackgroundGradient, Bounce, ButtonImage, Button
 export type { ShowToastOptions, ToastGroupPolicy, ToastItem, ToastPhase, ToastPosition } from './components'
 
 export { darken, lighten, alpha } from './utils/colors'
+export { easingFunctions, lerp, tweenValue } from './utils/tweens'
+export type { EasingFn } from './utils/tweens'
 export { resolveLayoutFontSize, resolveTypographySize, scaleThemeFontSize, scaleUiTextFontSize } from './utils/typography'
 export { resolveAspectDimensions, sizeValueToPixels } from './utils/aspect'
 export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDimensions } from './utils/aspect'
