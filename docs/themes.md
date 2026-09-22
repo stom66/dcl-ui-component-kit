@@ -11,7 +11,7 @@ One workflow. The agent scaffolds folders; the human makes art; the agent wires 
 1. Scaffold a theme (`npx @stom66/dcl-ui-component-kit init-theme myGame`).
 2. Copy the Affinity template and customize buttons / progress bars / icons / etc.
 3. Export PNGs into `assets/images/themes/<name>/` — never into stock `assets/images/ui-component-kit/`.
-4. Ask the agent to register those PNGs in `atlases.ts` / `theme.ts` and use them on `ButtonImage`, `ProgressBarImage`, `Icon`, …
+4. Ask the agent to register those PNGs in `atlases.ts` / `theme.ts` and use them on `ButtonImage`, `ProgressBarImage`, `ProgressBarRadial`, `Icon`, …
 5. Mount with `SetupUiComponentKit({ theme, layers })`.
 
 Atlas / UV details: [custom-textures.md](./custom-textures.md).

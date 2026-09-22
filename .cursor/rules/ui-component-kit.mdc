@@ -18,5 +18,5 @@ Before adding or changing a Layer, read `.cursor/skills/ui-component-kit/SKILL.m
 - Prefer native `'30vw'` / `'10vh'` in `uiTransform`. Use `vwToPixels` / `vhToPixels` only for numeric math (virtual canvas, never physical screen size).
 - **Color props are always specific** — never bare `color=`: use `fontColor`, `backgroundColor`, `iconColor`, `borderColor`, `flashColor` (nested `uiText.color` / `uiBackground.color` remain DCL escape hatches).
 - Inside `src/ui-component-kit/**`, relative imports only.
-- Texture / atlas UVs: always use `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based**; totals are counts. Custom art starts from `design/ui-component-kit-assets.af` → `assets/images/example-themes/<theme>/` → declare in `src/exampleThemes/<theme>/` (see skill).
+- Texture / atlas UVs: always use `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based**; totals are counts. Custom art starts from `design/ui-component-kit-assets.af` → `assets/images/example-themes/<theme>/` → declare in `src/exampleThemes/<theme>/` (see skill). Stock radial progress: `ProgressBarRadial` + `atlasSpritesProgressRadial`.
 - Fail loud with `console.error`. Style: tabs, MARK comments, docstrings on public APIs.

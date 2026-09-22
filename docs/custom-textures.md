@@ -56,6 +56,7 @@ export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
 | `atlasCharsSymbols` | Symbol glyphs |
 | `atlasCharsAlphaNumeric` | Alphanumeric sheet |
 | `atlasGradientColors` | Gradient strips for progress fills |
+| `atlasSpritesProgressRadial` | 16×16 radial progress ring (256 frames) for `ProgressBarRadial` |
 
 Every `TextureAtlas` defaults `wrapMode` to `'clamp'`. Optional `filterMode`: `'point'` | `'bi-linear'` | `'tri-linear'`. Prefer `atlas.texture` over `{ src: atlas.source }` alone.
 

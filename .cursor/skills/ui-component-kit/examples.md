@@ -301,7 +301,7 @@ import { atlasBtn3x1, atlasIconsFontAwesome, ButtonImage, Icon, Row, Text } from
 
 ## Progress bars
 
-> **Variants:** procedural (`ProgressBar`) · image / hybrid (`ProgressBarImage`)
+> **Variants:** procedural (`ProgressBar`) · image / hybrid (`ProgressBarImage`) · sprite radial (`ProgressBarRadial`)
 
 ```tsx
 import { atlasGradientColors } from '../../atlases'
@@ -394,6 +394,16 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 	height       = {64}
 	contentInset = {{ top: 8, right: 16, bottom: 8, left: 16 }}
 />
+
+// Radial sprite sheet — progress 0–1, height defaults to width, circular chip
+<ProgressBarRadial progress={0.4} width={72} />
+<ProgressBarRadial
+	progress        = {0.75}
+	width           = {64}
+	fillColor       = {theme.colors.success}
+	backgroundColor = {theme.colors.dark}
+/>
+<ProgressBarRadial progress={0.4} width={72} mirror={true} />
 ```
 
 ## Icons (image-based)

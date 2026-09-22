@@ -190,6 +190,21 @@ export const atlasGradientColors = new TextureAtlas({
 })
 
 
+// MARK: atlasSpritesProgressRadial
+/**
+ * Radial progress sprite sheet (`sprites-progress-radial.png`) — 16×16
+ * (256 frames). PNG left → right, top → bottom: empty tick → full ring.
+ * UV Y is bottom → top; `ProgressBarRadial` maps `progress` `0…1` onto the
+ * linear frame index via `spriteFrameToUvCell`.
+ */
+export const atlasSpritesProgressRadial = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+
 // MARK: atlasIconsFontAwesome
 /**
  * Limited subset of Font Awesome Free (solid) — see docs/licensing.md and

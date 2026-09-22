@@ -205,9 +205,9 @@ Same image API as `ButtonImage`; default atlas column `1`. Usually injected via 
 
 ## Progress bars
 
-**Variants:** procedural (`ProgressBar`) · image / hybrid (`ProgressBarImage`)
+**Variants:** procedural (`ProgressBar`) · image / hybrid (`ProgressBarImage`) · sprite radial (`ProgressBarRadial`)
 
-Shared value API:
+Shared value API (`ProgressBar` / `ProgressBarImage`):
 
 | Option | Type | Description |
 |---|---|---|
@@ -284,6 +284,33 @@ import { ProgressBarImage, atlasGradientColors } from '@stom66/dcl-ui-component-
 ```
 
 Nine-slice note: corners keep absolute size from `texture size × slice fraction`. Design textures for the **smallest** display size you need, or keep bars at least `2 × corner size` on the constrained axis.
+
+### `ProgressBarRadial` (sprite sheet)
+
+Ring sampled from a grid of frames (default `atlasSpritesProgressRadial`: `sprites-progress-radial.png`, **16×16 / 256 frames**). `progress` is **`0…1`** (`0` = first cell, `1` = last). `height` defaults to `width`. The outer chip is circular (`borderRadius` = half the shortest axis).
+
+| Option | Type | Description |
+|---|---|---|
+| `progress` | `number` | Fill amount in `[0, 1]` |
+| `width` / `height` | — | Size; `height` defaults to `width` |
+| `fillColor` | `Color4` | Tint on the sprite (theme primary) |
+| `backgroundColor` | `Color4` | Circular chip fill (theme dark) |
+| `borderColor` / `borderWidth` | — | Optional stroke on the chip |
+| `mirror` | `boolean` | Horizontal UV mirror — fill anti-clockwise (default `false` / clockwise) |
+| `atlas` | `TextureAtlas` | Override sheet (any `columns` × `rows` grid) |
+
+```tsx
+import { ProgressBarRadial, getTheme } from '@stom66/dcl-ui-component-kit'
+
+<ProgressBarRadial progress={0.4} width={72} />
+<ProgressBarRadial
+	progress        = {0.75}
+	width           = {64}
+	fillColor       = {getTheme().colors.success}
+	backgroundColor = {getTheme().colors.dark}
+/>
+<ProgressBarRadial progress={0.4} width={72} mirror={true} />
+```
 
 ---
 

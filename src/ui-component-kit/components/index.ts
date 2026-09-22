@@ -51,8 +51,9 @@ export type { LayerOptions }      from './layers'
 // Progress bars
 export { ProgressBar }            from './progressBar'
 export { ProgressBarImage }       from './progressBar'
-export type { ContentInset, ContentInsetEdges, FillFrom, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, ResolvedContentInset, TextureSlices } from './progressBar'
-export { resolveContentInset } from './progressBar'
+export { ProgressBarRadial }      from './progressBar'
+export type { ContentInset, ContentInsetEdges, FillFrom, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, ProgressBarRadialProps, ResolvedContentInset, TextureSlices } from './progressBar'
+export { progressToRadialFrame, resolveContentInset } from './progressBar'
 
 
 // Props

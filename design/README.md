@@ -9,6 +9,7 @@ This folder (and `**/*.af` / lock files) are listed in `.dclignore` so Affinity 
 | File | Role |
 |---|---|
 | [`ui-component-kit-assets.af`](./ui-component-kit-assets.af) | Kit template: buttons, icons, numbers, progress bars, … |
+| [`ui-component-kit-assets-sprite-sheets.af`](./ui-component-kit-assets-sprite-sheets.af) | Sprite sheets (radial progress, …) |
 | `reference-uis.af` / `ui-assets.af` | Older reference boards |
 
 Export PNGs into the scene as usual (`assets/images/ui-component-kit/` for kit defaults, or `assets/images/themes/<name>/` for project art).
