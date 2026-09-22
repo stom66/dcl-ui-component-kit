@@ -16,4 +16,4 @@ alwaysApply: true
 - **Imports:** always relative (`./`, `../`) under `src/` — never absolute `src/...` paths. Inside `ui-component-kit/`, stay package-internal (do not `../../ui-component-kit/...`). See `.cursor/rules/relative-imports.mdc`.
 - **Box edges:** `margin` / `padding` / `position` keys always **top → right → bottom → left**. See `.cursor/rules/trbl-box-edges.mdc`.
 - **`ProgressBarImage.contentInset`:** `number` (uniform) or TRBL edges object. Insets fill/track only — not children. Not `textureSlices`.
-- **`ProgressBarRadial`:** sprite-sheet ring (`atlasSpritesProgressRadial`, 16×16 / 256 frames). `progress` is `0…1`. `fillColor` tints the ring; `backgroundColor` is the circular chip. `mirror` flips the fill anti-clockwise. `height` defaults to `width`.
+- **`ProgressBarRadial`:** sprite-sheet ring (`atlasSpritesProgressRadial`, 16×16 / 256 frames). `progress` is `0…1`. `fillColor` tints the ring; `backgroundColor` is the circular chip. `mirror` flips the fill anti-clockwise. `inset` (px, may be **negative**) sizes the sprite vs the chip so it can overlap the border. `height` defaults to `width`.

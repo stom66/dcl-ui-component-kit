@@ -4,10 +4,10 @@ import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
 import { atlasSpritesProgressRadial, type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
 import { clampNumber, mirrorUVs } from '../../utils'
-import { mergeUiBackground, type UiBoxProps } from '../base'
-import { Icon, spriteFrameToUvCell } from '../icons'
+import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { spriteFrameToUvCell } from '../icons'
 
-import { resolveDefaultBorderRadius } from './progressBar.shared'
+import { resolveDefaultBorderRadius, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
 
 
 /** Stable UV quads per sheet cell — new arrays every frame leak ReactEcs entities. */
@@ -37,6 +37,13 @@ export type ProgressBarRadialProps = Omit<
 	 * Pass explicitly to override.
 	 */
 	borderRadius?    : number
+	/**
+	 * Uniform pixel inset of the sprite relative to the chip / border.
+	 * Positive shrinks the ring inside the stroke; **negative grows it past
+	 * the border** so it can sit on top of the track (`zIndex` is above the
+	 * stroke). Defaults to `0` (sprite matches `width` / `height`).
+	 */
+	inset?           : number
 	/**
 	 * Sprite sheet to sample. Defaults to the bundled 16×16 radial progress
 	 * atlas (`atlasSpritesProgressRadial`, 256 frames).
@@ -76,6 +83,21 @@ export function progressToRadialFrame(
 }
 
 
+// MARK: resolveRadialInset
+/**
+ * Uniform sprite inset in virtual px. Negative values are kept (sprite grows
+ * past the chip). Non-finite input logs and falls back to `0`.
+ */
+export function resolveRadialInset(inset: number | undefined): number {
+	if (inset === undefined) return 0
+	if (!Number.isFinite(inset)) {
+		console.error('ProgressBarRadial: resolveRadialInset: non-finite inset', inset)
+		return 0
+	}
+	return inset
+}
+
+
 // MARK: getRadialFrameUvs
 /** Cached UV quad for a linear sprite-sheet frame on `atlas`. */
 function getRadialFrameUvs(
@@ -104,6 +126,8 @@ function getRadialFrameUvs(
  * 256 frames) from `progress` in `[0, 1]`. `fillColor` tints the ring;
  * `backgroundColor` fills a circular chip (`borderRadius` = half the shortest
  * axis). `height` defaults to `width`. Pass `mirror` to fill anti-clockwise.
+ * `inset` (px, may be negative) sizes the sprite relative to the chip so a
+ * negative value can overlap the border like a track.
  */
 export function ProgressBarRadial({
 	progress,
@@ -114,6 +138,7 @@ export function ProgressBarRadial({
 	borderColor,
 	borderWidth,
 	borderRadius,
+	inset        = 0,
 	atlas        = atlasSpritesProgressRadial,
 	mirror       = false,
 	uiTransform,
@@ -126,7 +151,15 @@ export function ProgressBarRadial({
 	const resolvedHeight = height ?? width  ?? DEFAULT_SIZE
 	const fill           = fillColor       ?? theme.colors.primary
 	const track          = backgroundColor ?? theme.colors.dark
+	const bWidth         = borderWidth     ?? (borderColor !== undefined ? theme.border.width : 0)
 	const bRadius        = borderRadius    ?? resolveDefaultBorderRadius(resolvedWidth, resolvedHeight)
+	const spriteInset    = resolveRadialInset(inset)
+	const spritePosition = {
+		top   : spriteInset,
+		right : spriteInset,
+		bottom: spriteInset,
+		left  : spriteInset,
+	}
 
 	const columns = atlas.columns
 	const rows    = atlas.rows
@@ -141,23 +174,72 @@ export function ProgressBarRadial({
 
 	const frame = progressToRadialFrame(progress, columns * rows)
 	const uvs   = getRadialFrameUvs(atlas, frame, mirror)
+	const showBorder = borderColor !== undefined && bWidth > 0
 
 	return (
-		<Icon
+		<UiBox
 			{...props}
-			src             = {atlas.source}
-			uvs             = {uvs}
-			iconColor       = {fill}
-			backgroundColor = {track}
-			borderColor     = {borderColor}
-			borderWidth     = {borderWidth}
-			borderRadius    = {bRadius}
-			width           = {resolvedWidth}
-			height          = {resolvedHeight}
-			uiTransform     = {uiTransform}
-			uiBackground    = {mergeUiBackground({ texture: atlas.texture }, uiBackground)}
+			overflow      = "visible"
+			width         = {resolvedWidth}
+			height        = {resolvedHeight}
+			uiTransform   = {{
+				display       : 'flex',
+				alignItems    : 'center',
+				justifyContent: 'center',
+				flexGrow      : 0,
+				flexShrink    : 0,
+				...(resolvedHeight !== 'auto' ? { minHeight: resolvedHeight } : {}),
+				...uiTransform,
+			}}
 		>
-			{children}
-		</Icon>
+			<UiBox
+				backgroundColor = {track}
+				borderRadius    = {bRadius}
+				uiTransform     = {{
+					positionType: 'absolute',
+					position    : { top: 0, right: 0, bottom: 0, left: 0 },
+					zIndex      : Z_INDEX_BACKGROUND,
+				}}
+			/>
+			{showBorder && (
+				<UiBox
+					borderColor  = {borderColor}
+					borderWidth  = {bWidth}
+					borderRadius = {bRadius}
+					uiTransform  = {{
+						positionType: 'absolute',
+						position    : { top: 0, right: 0, bottom: 0, left: 0 },
+						zIndex      : Z_INDEX_FILL,
+					}}
+				/>
+			)}
+			<UiBox
+				uiTransform={{
+					positionType: 'absolute',
+					position    : spritePosition,
+					zIndex      : Z_INDEX_BORDER,
+				}}
+				uiBackground={mergeUiBackground({
+					texture    : atlas.texture,
+					textureMode: 'stretch',
+					uvs,
+					color      : fill,
+				}, uiBackground)}
+			/>
+			{children != null && (
+				<UiBox
+					uiTransform={{
+						positionType  : 'absolute',
+						position      : { top: 0, right: 0, bottom: 0, left: 0 },
+						display       : 'flex',
+						alignItems    : 'center',
+						justifyContent: 'center',
+						zIndex        : Z_INDEX_CONTENT,
+					}}
+				>
+					{children}
+				</UiBox>
+			)}
+		</UiBox>
 	)
 }

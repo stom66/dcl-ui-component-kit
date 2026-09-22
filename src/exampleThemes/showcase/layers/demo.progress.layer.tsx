@@ -123,13 +123,19 @@ export class DemoProgressLayer extends Layer {
 								width           = {RADIAL_SIZE}
 								fillColor       = {theme.colors.success}
 								backgroundColor = {theme.colors.dark}
+								borderColor     = {theme.colors.secondary}
+								borderWidth     = {8}
+								inset           = {6}
 							/>
 							<ProgressBarRadial
 								key             = "demo_progress_radial_danger"
 								progress        = {radialProgress}
 								width           = {RADIAL_SIZE}
 								fillColor       = {theme.colors.danger}
-								backgroundColor = {theme.colors.light}
+								backgroundColor = {theme.colors.dark}
+								borderColor     = {theme.colors.light}
+								borderWidth     = {2}
+								inset           = {-4}
 								mirror          = {true}
 							/>
 							<ProgressBarRadial
@@ -140,6 +146,7 @@ export class DemoProgressLayer extends Layer {
 								backgroundColor = {theme.colors.dark}
 								borderColor     = {theme.colors.secondary}
 								borderWidth     = {2}
+								inset           = {-4}
 								mirror          = {true}
 							/>
 						</Column>

@@ -621,7 +621,7 @@ Shared value API (`ProgressBar` / `ProgressBarImage`): `id`, `value`, `minValue`
 - **`ProgressBarImage`** — same colour/border props as `ProgressBar`. Per-layer optional `textures.{background,fill,border}` (`nine-slices`) or `atlas` + `uvCell` fill (stretch, no tint). Omit both for the built-in full set; partial `textures` or `atlas` alone mixes image/atlas + procedural. Default `textureSlices` swap top/bottom ↔ left/right for vertical orientation. Define custom sets in `src/exampleThemes/<theme>/`. DCL has no nine-slice scale factor — only `textureSlices` fractions — so art must match intended display sizes (corners need room: ~`2 × corner px` on the constrained axis).
 - **Gradient / strip reveal (stock — no custom UV math):** `atlas` + `uvCell` + **`uvCropWithFill={true}`** crops the UV cell to the current fill % so the ramp is **revealed** instead of stretched. **`uvRotate` defaults to `0`** (as-authored — use this for custom vertical fill art). Set **`uvRotate={1}`** only when mapping a **horizontal** strip atlas (e.g. `atlasGradientColors`) onto a vertical bar. Pair with `uvMirror` / `uvFlip` as needed. Reference: `demo.progress.layer.tsx`. Do **not** reinvent per-frame UV insets — these props are the API.
 - **`contentInset`** — pixel inset for **fill + image track inside the border**. Accepts `number` (uniform, always supported) **or** `{ top?, right?, bottom?, left? }` (TRBL). Does **not** inset `children`; for arrow/label spacing use child `margin` / `padding`. Do not confuse with `textureSlices` (UV fractions) or claim it was “dropped” when a number still works.
-- **`ProgressBarRadial`** — sprite-sheet ring. Default atlas `atlasSpritesProgressRadial` (`sprites-progress-radial.png`, 16×16 / 256 frames). `progress` is **`0…1`**. `fillColor` tints the texture (`iconColor` internally). `backgroundColor` is the circular chip (`borderRadius` defaults to half the shortest axis). `height` defaults to `width`. **`mirror`** (boolean) horizontally flips the ring so it fills anti-clockwise. Override the sheet with `atlas`.
+- **`ProgressBarRadial`** — sprite-sheet ring. Default atlas `atlasSpritesProgressRadial` (`sprites-progress-radial.png`, 16×16 / 256 frames). `progress` is **`0…1`**. `fillColor` tints the texture. `backgroundColor` is the circular chip (`borderRadius` defaults to half the shortest axis). `height` defaults to `width`. **`mirror`** (boolean) horizontally flips the ring so it fills anti-clockwise. **`inset`** (px, **may be negative**) sizes the sprite vs the chip: positive sits inside the stroke, negative grows over it (sprite `zIndex` is above the border). Override the sheet with `atlas`.
 
 ```tsx
 // GOOD
@@ -629,6 +629,7 @@ Shared value API (`ProgressBar` / `ProgressBarImage`): `id`, `value`, `minValue`
 <ProgressBarImage id="xp2" value={60} contentInset={{ top: 8, right: 12, bottom: 8, left: 12 }} />
 <ProgressBarRadial progress={0.4} width={72} fillColor={theme.colors.success} />
 <ProgressBarRadial progress={0.4} width={72} mirror={true} />
+<ProgressBarRadial progress={0.4} width={72} borderColor={theme.colors.secondary} borderWidth={2} inset={-4} />
 
 // BAD — does not pad children; use margin on the icon instead
 <ProgressBarImage id="xp3" value={60} contentInset={{ left: 24 }}>

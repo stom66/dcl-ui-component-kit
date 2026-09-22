@@ -287,15 +287,16 @@ Nine-slice note: corners keep absolute size from `texture size × slice fraction
 
 ### `ProgressBarRadial` (sprite sheet)
 
-Ring sampled from a grid of frames (default `atlasSpritesProgressRadial`: `sprites-progress-radial.png`, **16×16 / 256 frames**). `progress` is **`0…1`** (`0` = first cell, `1` = last). `height` defaults to `width`. The outer chip is circular (`borderRadius` = half the shortest axis).
+Ring sampled from a grid of frames (default `atlasSpritesProgressRadial`: `sprites-progress-radial.png`, **16×16 / 256 frames**). `progress` is **`0…1`** (`0` = first cell, `1` = last). `height` defaults to `width`. The outer chip is circular (`borderRadius` = half the shortest axis). The sprite paints **above** the border; use `inset` to sit inside the stroke or overlap it.
 
 | Option | Type | Description |
 |---|---|---|
 | `progress` | `number` | Fill amount in `[0, 1]` |
-| `width` / `height` | — | Size; `height` defaults to `width` |
+| `width` / `height` | — | Size of the chip / border; `height` defaults to `width` |
 | `fillColor` | `Color4` | Tint on the sprite (theme primary) |
 | `backgroundColor` | `Color4` | Circular chip fill (theme dark) |
 | `borderColor` / `borderWidth` | — | Optional stroke on the chip |
+| `inset` | `number` | Uniform px inset of the sprite vs the chip. **Negative** grows over the border (track). Default `0` |
 | `mirror` | `boolean` | Horizontal UV mirror — fill anti-clockwise (default `false` / clockwise) |
 | `atlas` | `TextureAtlas` | Override sheet (any `columns` × `rows` grid) |
 
@@ -310,6 +311,7 @@ import { ProgressBarRadial, getTheme } from '@stom66/dcl-ui-component-kit'
 	backgroundColor = {getTheme().colors.dark}
 />
 <ProgressBarRadial progress={0.4} width={72} mirror={true} />
+<ProgressBarRadial progress={0.4} width={72} borderColor={getTheme().colors.secondary} borderWidth={2} inset={-4} />
 ```
 
 ---

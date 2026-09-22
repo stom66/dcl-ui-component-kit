@@ -404,6 +404,8 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 	backgroundColor = {theme.colors.dark}
 />
 <ProgressBarRadial progress={0.4} width={72} mirror={true} />
+<ProgressBarRadial progress={0.4} width={72} borderWidth={8} inset={6} />
+<ProgressBarRadial progress={0.4} width={72} borderColor={theme.colors.secondary} borderWidth={2} inset={-4} />
 ```
 
 ## Icons (image-based)
