@@ -52,9 +52,8 @@ export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
 |---|---|
 | `atlasIconsFontAwesome` | Font Awesome solid UI icons — default `Icon` `src` |
 | `atlasBtnIcons` / `atlasBtnIconsStyled` | Button variants × states |
-| `atlasCharsNumbers` | Digits / operators for `IconNumber` |
-| `atlasCharsSymbols` | Symbol glyphs |
-| `atlasCharsAlphaNumeric` | Alphanumeric sheet |
+| `atlasCharsAlphaNumeric` | Letters and digits (`IconCharacter`, `IconNumber` digits) |
+| `atlasCharsSymbols` | Punctuation and operators (`IconSymbol`, `IconNumber` formulas) |
 | `atlasGradientColors` | Gradient strips for progress fills |
 | `atlasSpritesProgressRadial` | 16×16 radial progress ring (256 frames) for `ProgressBarRadial` |
 
@@ -67,14 +66,14 @@ Atlas-level UV crop defaults: `inset` (both axes), or independent `insetX` / `in
 Always use `getUVCell` / `getUVColumn` / `getUVRow`, or `TextureAtlas` methods. **Cell / column / row numbers start at `1`.** Totals are counts. Ends (`xEnd` / `yEnd`) are inclusive.
 
 ```tsx
-import { atlasCharsNumbers, atlasIconsFontAwesome } from '@stom66/dcl-ui-component-kit'
+import { atlasCharsAlphaNumeric, atlasIconsFontAwesome } from '@stom66/dcl-ui-component-kit'
 
 atlasIconsFontAwesome.texture
 atlasIconsFontAwesome.uv.star
 atlasIconsFontAwesome.cell({ xStart: 1, yStart: 1 })
 atlasIconsFontAwesome.row(1)
 atlasIconsFontAwesome.column(1)
-atlasCharsNumbers.char('5', { insetX: 0.15 })
+atlasCharsAlphaNumeric.char('5', { insetX: 0.15 })
 ```
 
 - **`atlas.named.<name>`** = cell options (for `uvCell` / `.cell()`)

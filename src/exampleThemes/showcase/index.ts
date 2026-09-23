@@ -3,7 +3,7 @@ import { theme } from './theme'
 
 export { theme } from './theme'
 export { layers } from './layers'
-export { exampleBtnIconsAtlas, exampleIconsAtlas, exampleNumbersAtlas, exampleProgressBarTexturesHorizontal, exampleProgressBarTexturesVertical, exampleSpriteSheetAtlas } from './atlases'
+export { exampleBtnIconsAtlas, exampleIconsAtlas, exampleProgressBarTexturesHorizontal, exampleProgressBarTexturesVertical, exampleSpriteSheetAtlas } from './atlases'
 
 
 /**

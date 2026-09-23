@@ -28,9 +28,10 @@ type IconSymbolProps = Omit<UiBoxProps, 'uiText'> & {
 // MARK: IconSymbol
 /**
  * Renders punctuation / symbol glyphs from `atlasCharsSymbols` by default
- * (e.g. `= $ % @ # ? !`). Prefer `IconNumber` when you only need digits and
- * operators from the numbers sheet. Unsupported characters render as a
- * warning-coloured box; spaces are blank spacers. Tint with `iconColor`
+ * (e.g. `= $ % @ # ? !`). Prefer `IconNumber` for digits plus operators —
+ * digits come from `atlasCharsAlphaNumeric`, operators from this sheet.
+ * Unsupported characters render as a warning-coloured box; spaces are blank
+ * spacers. Tint with `iconColor`
  * (texture × color multiply).
  */
 export const IconSymbol = ({

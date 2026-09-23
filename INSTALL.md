@@ -29,6 +29,8 @@ ls assets/images/ui-component-kit
 
 If the directory is missing or empty, textures will not load in Decentraland.
 
+An existing folder is not proof the PNGs match the installed code. `npm update` replaces the package in `node_modules` and leaves the scene copies untouched whenever postinstall does not run. After any upgrade from an older install, run `copy-assets` again so the scene sheets match the new code.
+
 ## Optional: allow our postinstall
 
 Only if the user wants automatic copy on install:
@@ -55,11 +57,18 @@ consumer `package.json`:
 
 1. After `npm install` / `npm update` of `@stom66/dcl-ui-component-kit`, check that
    `assets/images/ui-component-kit/` exists and contains texture files.
-2. If missing or empty: **warn the user clearly**, then run
-   `npx @stom66/dcl-ui-component-kit copy-assets` (or ask to run it).
-3. Do **not** tell users the UI is ready until that folder is present.
-4. Mention the `allow-scripts` warning is normal; `copy-assets` is the supported fix.
-5. Do not invent alternate asset paths — DCL only serves textures from the scene
+2. If the folder is missing or empty, **or the scene was first installed on an
+   older version of this package than the one just installed**: warn the user,
+   then run `npx @stom66/dcl-ui-component-kit copy-assets` (or ask them to).
+   A populated folder can still be stale. `npm update` does not replace those PNGs
+   when postinstall is blocked.
+3. If symbols, letters, or digits look sliced, swapped, or like the wrong glyph,
+   treat that as an old scene texture. Current code reads `atlas-chars-symbols.png`
+   as 6×6; copies from before that change are 4×4. Run `copy-assets` before
+   changing UV or inset code.
+4. Do **not** tell users the UI is ready until stock textures match the installed package.
+5. Mention the `allow-scripts` warning is normal; `copy-assets` is the supported fix.
+6. Do not invent alternate asset paths — DCL only serves textures from the scene
    `assets/` tree; the kit expects `assets/images/ui-component-kit/`.
 
 Opt out (advanced): `UI_COMPONENT_KIT_SKIP_ASSETS=1` or

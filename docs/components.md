@@ -420,14 +420,14 @@ import { playOnce, setPlaying, SpriteIcon } from '@stom66/dcl-ui-component-kit'
 | Option | Type | Description |
 |---|---|---|
 | `value` | `string \| number` | Digits / short math string |
-| `atlas` | `TextureAtlas` | Override numbers atlas |
+| `atlas` | `TextureAtlas` | Override the digit sheet (`atlasCharsAlphaNumeric`) |
 
 ```tsx
 <IconNumber value={42} />
 <IconNumber value="+12" />
 ```
 
-Supported glyphs and atlas grids: see the Affinity numbers / symbols artboards, or the showcase demos in this repo.
+Digits are on `atlasCharsAlphaNumeric`. Operators and punctuation (`+`, `/`, `=`, `:`, …) come from `atlasCharsSymbols`. Grids are the `layout` arrays on those atlases in `src/ui-component-kit/atlases/atlases.ts`.
 
 ---
 

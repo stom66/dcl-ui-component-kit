@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
-import { atlasCharsNumbers, atlasCharsSymbols, type TextureAtlas } from '../../atlases'
+import { atlasCharsAlphaNumeric, atlasCharsSymbols, type TextureAtlas } from '../../atlases'
 import { type UiBoxProps } from '../base'
 import { charGlyph, IconAtlasText, missingGlyph } from './icon.atlasText'
 
@@ -15,8 +15,10 @@ type IconNumberProps = Omit<UiBoxProps, 'uiText'> & {
 	/** Degrees to rotate each glyph's UVs (same as `Icon.rotate`). */
 	rotate?  : number
 	/**
-	 * Glyph atlas with a `layout`. Defaults to `atlasCharsNumbers`.
-	 * Pass a custom `TextureAtlas` to use your own number sheet.
+	 * Glyph atlas with a `layout`. Defaults to `atlasCharsAlphaNumeric`
+	 * (digits). Operators and punctuation fall back to `atlasCharsSymbols`
+	 * when this default sheet is in use. Pass a custom `TextureAtlas` to
+	 * use your own sheet with no symbols fallback.
 	 */
 	atlas?   : TextureAtlas
 	width?   : PositionUnit | 'auto' | undefined
@@ -27,18 +29,22 @@ type IconNumberProps = Omit<UiBoxProps, 'uiText'> & {
 
 // MARK: resolveNumberGlyphAtlas
 /**
- * Picks the atlas sheet for one glyph. Default `atlasCharsNumbers` falls back to
- * `atlasCharsSymbols` for punctuation (e.g. `=` `$` `%`) so formulas work.
+ * Picks the atlas sheet for one glyph. The default alphanumeric sheet holds
+ * digits (and letters). Operators and punctuation, including `x` → `×`, come
+ * from `atlasCharsSymbols` so formulas work. A custom `atlas` is used alone.
  */
 function resolveNumberGlyphAtlas(
 	atlas: TextureAtlas,
 	glyph: string,
 ): TextureAtlas | null {
+	if (atlas === atlasCharsAlphaNumeric) {
+		const onAlphaSheet = atlas.hasChar(glyph) && glyph !== 'x'
+		if (!onAlphaSheet && atlasCharsSymbols.hasChar(glyph)) {
+			return atlasCharsSymbols
+		}
+	}
 	if (atlas.hasChar(glyph)) {
 		return atlas
-	}
-	if (atlas === atlasCharsNumbers && atlasCharsSymbols.hasChar(glyph)) {
-		return atlasCharsSymbols
 	}
 	return null
 }
@@ -46,20 +52,19 @@ function resolveNumberGlyphAtlas(
 
 // MARK: IconNumber
 /**
- * Renders a numeric / operator string from `atlasCharsNumbers` by default.
- * Prefer this over `IconString` / `IconCharacter` for scores, timers, and
- * formulas — the numbers sheet is smaller and has less texture overhead.
+ * Renders a numeric / operator string. Digits come from `atlasCharsAlphaNumeric`;
+ * operators and punctuation come from `atlasCharsSymbols` (for example `+`,
+ * `/`, `=`, `:`).
  *
  * Digit aspect follows each glyph's effective `insetX` (theme `horizontalInset`,
  * overridden by atlas `charInsets`). Specify `height` or `width` alone — the
  * other axis is computed from the sum of glyph aspects.
- * When using the default numbers atlas, missing glyphs (e.g. `=`) resolve from
- * `atlasCharsSymbols`. Unsupported characters render as a warning-coloured box;
- * spaces are blank spacers. Tint with `iconColor` (texture × color multiply).
+ * Unsupported characters render as a warning-coloured box; spaces are blank
+ * spacers. Tint with `iconColor` (texture × color multiply).
  */
 export const IconNumber = ({
 	value = 0,
-	atlas = atlasCharsNumbers,
+	atlas = atlasCharsAlphaNumeric,
 	...props
 }: IconNumberProps) => {
 	return (

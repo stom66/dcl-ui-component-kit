@@ -29,7 +29,7 @@ export type { GetUVCellOptions } from './utils/uvs'
 export { PropsController }        from './classes/propsController'
 export { buildTheme, defaultTheme, getTheme, setTheme, theme } from './styles/theme'
 
-export { TextureAtlas, atlasBtn1x1, atlasBtn3x1, atlasBtnIcons, atlasBtnIconsStyled, atlasCharsAlphaNumeric, atlasCharsNumbers, atlasCharsSymbols, atlasGradientColors, atlasIconsFontAwesome, atlasSpritesProgressRadial, findAtlasCell } from './atlases'
+export { TextureAtlas, atlasBtn1x1, atlasBtn3x1, atlasBtnIcons, atlasBtnIconsStyled, atlasCharsAlphaNumeric, atlasCharsSymbols, atlasGradientColors, atlasIconsFontAwesome, atlasSpritesProgressRadial, findAtlasCell } from './atlases'
 export type { AtlasCell, AtlasLayout, AtlasTexture, AtlasTextureFilterMode, AtlasTextureSlices, AtlasTextureWrapMode, TextureAtlasCellOptions, TextureAtlasCharInset, TextureAtlasNamedCell, TextureAtlasOptions } from './atlases'
 
 export type { AnimationPlaybackState, AvatarIconProps, BounceProps, BurstAnimationProps, BurstSample, ContentInset, ContentInsetEdges, FillFrom, FlashBorderProps, FlashColorProps, GradientDirection, GridDirection, GridProps, IconProps, ProgressBarImageProps, ProgressBarImageTextures, ProgressBarOrientation, ProgressBarProps, ProgressBarRadialProps, PulseProps, ResolvedContentInset, ShakeProps, SpinnerProps, SpriteIconProps, TextureSlices, ToggleProps, WiggleProps } from './components'

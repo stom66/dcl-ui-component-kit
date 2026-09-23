@@ -29,7 +29,11 @@ When `@stom66/dcl-ui-component-kit` is **installed or upgraded in a consumer pro
    and/or add `"postinstall": "dcl-ui-component-kit copy-assets"` to the **consumer** `package.json`.
 5. Full checklist: package root **`INSTALL.md`** (also linked from the README).
 
-Do not mark install/setup complete until `assets/images/ui-component-kit/` is populated.
+**Upgrades do not refresh scene PNGs.** `npm update` replaces kit code in `node_modules`. The scene renders textures from its own `assets/images/ui-component-kit/` copies. Those copies are written only when `copy-assets` (or an allowed postinstall) runs. A folder that already has PNGs is not up to date.
+
+If the consumer already had this package installed, or the scene was first installed on an older version than the one just installed, **run** `npx @stom66/dcl-ui-component-kit copy-assets` (or tell the user to). That overwrites stock PNGs with the sheets shipped in the installed package. It does not delete files the package no longer ships (the old `atlas-chars-numbers.png` can remain; nothing should reference it).
+
+**Wrong or sliced symbol / number / letter glyphs are a stale texture until proven otherwise.** Current code samples `atlas-chars-symbols.png` as **6×6** and digits from `atlas-chars-alphaNumeric.png`. An older scene copy of the symbols sheet is **4×4**. Do not debug UV math or `charInsets` first. Refresh the scene assets with `copy-assets`, then look at the code.
 
 **Layout widths:** for every `Column` / `Label` / `ButtonText` that needs a fractional or full width **inside a panel / grid**, set **`cols`** (`cols={12}` = full width). `Row` is always full parent width (no `cols` — wrap in a `Column` to narrow). Use `cols="auto"` to fill leftover row space (sibling autos share equally). Omit `cols` on `Column` for no grid sizing; omit `cols` on `ButtonText` / `Label` for shrink-to-content (required for edge-zone HUDs — see **Zone alignment** below). Do **not** copy `width: '100%'` / `'50%'` / `'25%'` from older demos — some examples still use percentages; that is legacy, not the pattern to follow.
 
@@ -463,7 +467,7 @@ When a user wants **their own images, atlases, or styles**, walk them through th
 
 1. **Open the Affinity template** at `design/ui-component-kit-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
 2. **Export PNGs** into `assets/images/example-themes/<theme>/` (never into `assets/images/ui-component-kit/` unless they intend to replace framework defaults).
-3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleThemes/<theme>/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, `exampleNumbersAtlas`, progress-bar sets).
+3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleThemes/<theme>/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, progress-bar sets). Character glyph sheets are the bundled `atlasCharsAlphaNumeric` (8×8 letters + digits) and `atlasCharsSymbols` (6×6). Their `layout` arrays live in `src/ui-component-kit/atlases/atlases.ts`.
 4. **Sample UVs only via framework APIs** — never hand-write UV arrays:
 	- Prefer `TextureAtlas.cell` / `.row` / `.column` / `.char`; named regions via `.named.<name>` (cell options) or `.uv.<name>` (UV quad)
 	- Fall back to `getUVCell` / `getUVColumn` / `getUVRow` from `utils/uvs.tsx` for one-off / non-atlas cases
@@ -786,21 +790,21 @@ return [
 
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasCharsNumbers`, `atlasSpritesProgressRadial`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `design/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `design/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
 
 `TextureAtlas` defaults `wrapMode` to `'clamp'` (avoids neighbour-cell bleed). Optional `filterMode` (`'point'` | `'bi-linear'` | `'tri-linear'`) applies to the whole sheet. Use `atlas.texture` (or `mergeUiBackground`) instead of `{ src: atlas.source }` alone. `Spinner` is an animation wrapper around a child `Icon` — there are no dedicated spinner presets / atlas.
 
 **Always use** `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based inclusive**; totals are counts.
 
 ```tsx
-import { atlasIconsFontAwesome, atlasCharsNumbers } from '../../atlases'
+import { atlasIconsFontAwesome, atlasCharsAlphaNumeric } from '../../atlases'
 
 atlasIconsFontAwesome.source
 atlasIconsFontAwesome.uv.star                        // named cell UV quad
 atlasIconsFontAwesome.cell({ xStart: 1, yStart: 1 }) // first cell
 atlasIconsFontAwesome.row(1)                         // full bottom row
 atlasIconsFontAwesome.column(1)                      // full first column
-atlasCharsNumbers.char('5', { insetX: 0.15 })
+atlasCharsAlphaNumeric.char('5', { insetX: 0.15 })
 ```
 
 ### Atlas glyph text (`IconNumber` / `IconSymbol` / `IconCharacter` / `IconString`)
@@ -809,12 +813,12 @@ Image-based “font” rows from the bundled char atlases. Prefer the **narrowes
 
 | Component | Default atlas | Use when |
 |---|---|---|
-| `IconNumber` | `atlasCharsNumbers` (+ symbols fallback for punctuation like `=`) | Scores, timers, formulas — **prefer this** when digits/operators are enough |
+| `IconNumber` | `atlasCharsAlphaNumeric` digits + `atlasCharsSymbols` operators | Scores, timers, formulas |
 | `IconSymbol` | `atlasCharsSymbols` | Punctuation / symbols only |
 | `IconCharacter` | `atlasCharsAlphaNumeric` | Letters (`a–z` / `A–Z`) and digits from that sheet |
-| `IconString` | Cascade: alphanumeric → symbols → numbers | Arbitrary mixed strings |
+| `IconString` | Cascade: alphanumeric → symbols | Arbitrary mixed strings |
 
-Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols, numbers }}` on `IconString`. Tint with `iconColor`; rotate glyphs with `rotate` (degrees) — same as `Icon` / `SpriteIcon`.
+Shared behaviour: spaces → blank spacer; unsupported glyphs → solid `theme.colors.warning` box (obvious missing marker). Override sheets with `atlas` (single-sheet components) or `atlases={{ characters, symbols }}` on `IconString`. Tint with `iconColor`; rotate glyphs with `rotate` (degrees) — same as `Icon` / `SpriteIcon`.
 
 ```tsx
 <IconNumber value={1250} height={32} iconColor={theme.colors.primary} />

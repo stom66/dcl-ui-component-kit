@@ -1,5 +1,15 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Code, Column, Divider, getTheme, H1, H2, H3, H4, H5, H6, Icon, IconNumber, Label, Layer, Row, SectionHeader, Text, ZoneType } from '../../../ui-component-kit'
+import { atlasIconsFontAwesome, Background, Code, Column, Divider, getTheme, H1, H2, H3, H4, H5, H6, Icon, IconNumber, IconString, Label, Layer, Row, SectionHeader, Text, ZoneType } from '../../../ui-component-kit'
+
+
+/** Bundled glyph specimen, atlas order. Each alphabet is two lines; symbols are two lines. */
+const GLYPH_LOWER_A   = 'abcdefghijklm'
+const GLYPH_LOWER_B   = 'nopqrstuvwxyz'
+const GLYPH_UPPER_A   = 'ABCDEFGHIJKLM'
+const GLYPH_UPPER_B   = 'NOPQRSTUVWXYZ'
+const GLYPH_DIGITS    = '0123456789'
+const GLYPH_SYMBOLS_A = '.\'";()!?&%@#÷=$_×:'
+const GLYPH_SYMBOLS_B = ',/+-£€¥~^*\\|<>[]{}'
 
 // MARK: DemoTextLayer
 /** Demo panel for headers, body text, labels, code, and icons. */
@@ -11,6 +21,9 @@ export class DemoTextLayer extends Layer {
 			canBeHidden    : true,
 			startHidden    : true,
 			showCloseButton: true,
+			uiTransform    : {
+				height: 'auto',
+			},
 		})
 	}
 
@@ -21,11 +34,16 @@ export class DemoTextLayer extends Layer {
 
 		return [
 			<Background key="chrome" />,
-			<Row>
+			<Column
+				key            = "panel"
+				cols           = {12}
+				alignItems     = "flex-start"
+				justifyContent = "flex-start"
+			>
+			<Row key="main">
 				<Column
-					key            = "body"
+					key            = "headers"
 					cols           = {4}
-					height         = "100%"
 					alignItems     = "flex-start"
 					justifyContent = "flex-start"
 					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
@@ -38,9 +56,8 @@ export class DemoTextLayer extends Layer {
 						<H6 value="Header 6" />
 				</Column>
 				<Column
-					key            = "body"
+					key            = "copy"
 					cols           = {8}
-					height         = "100%"
 					alignItems     = "flex-start"
 					justifyContent = "flex-start"
 					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
@@ -106,6 +123,47 @@ export class DemoTextLayer extends Layer {
 						</Row>
 				</Column>
 			</Row>
+			<Divider key="glyphs-rule" />
+			<Row
+				key        = "glyphs"
+				alignItems = "flex-start"
+				padding    = {{ top: 4, right: 16, bottom: 16, left: 16 }}
+			>
+				<Column
+					key            = "symbols"
+					cols           = {6}
+					alignItems     = "flex-start"
+					justifyContent = "flex-start"
+					spacing        = {4}
+				>
+					<Text
+						key      = "symbols-label"
+						value    = "Symbols"
+						fontSize = {theme.typography.size.small}
+					/>
+					<IconString key="symbols-a" value={GLYPH_SYMBOLS_A} height={36} />
+					<IconString key="symbols-b" value={GLYPH_SYMBOLS_B} height={36} />
+				</Column>
+				<Column
+					key            = "alphanumeric"
+					cols           = {6}
+					alignItems     = "flex-start"
+					justifyContent = "flex-start"
+					spacing        = {4}
+				>
+					<Text
+						key      = "alphanumeric-label"
+						value    = "Alphanumeric"
+						fontSize = {theme.typography.size.small}
+					/>
+					<IconString key="lower-a" value={GLYPH_LOWER_A} height={36} />
+					<IconString key="lower-b" value={GLYPH_LOWER_B} height={36} />
+					<IconString key="upper-a" value={GLYPH_UPPER_A} height={36} />
+					<IconString key="upper-b" value={GLYPH_UPPER_B} height={36} />
+					<IconString key="digits" value={GLYPH_DIGITS} height={36} />
+				</Column>
+			</Row>
+			</Column>
 		]
 	}
 }

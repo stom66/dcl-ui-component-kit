@@ -251,7 +251,7 @@ export class DemoIconsLayer extends Layer {
 						>
 							<Label cols={12} value="IconNumber" margin={{ bottom: 4 }} />
 							<Text
-								value    = "Countdown timer (MM:SS) — digits + colon from the numbers atlas."
+								value    = "Countdown timer (MM:SS) — digits from the alphanumeric atlas, colon from symbols."
 								fontSize = {theme.typography.size.small}
 							/>
 							<Column

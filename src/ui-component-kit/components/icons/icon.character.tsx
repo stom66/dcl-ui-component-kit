@@ -28,8 +28,8 @@ type IconCharacterProps = Omit<UiBoxProps, 'uiText'> & {
 // MARK: IconCharacter
 /**
  * Renders letters and digits from `atlasCharsAlphaNumeric` by default
- * (`a–z`, `A–Z`, `0–9`). Prefer `IconNumber` when you only need the numbers
- * sheet — this atlas is larger and has more texture overhead.
+ * (`a–z`, `A–Z`, `0–9`). Prefer `IconNumber` for scores and formulas — it
+ * reads digits from this sheet and operators from `atlasCharsSymbols`.
  * Unsupported characters (including most punctuation) render as a
  * warning-coloured box; spaces are blank spacers. For mixed letters +
  * symbols, use `IconString`. Tint with `iconColor` (texture × color multiply).

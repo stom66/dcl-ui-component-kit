@@ -63,29 +63,6 @@ export const exampleIconsAtlas = new TextureAtlas({
 })
 
 
-// MARK: exampleNumbersAtlas
-/**
- * Example number / operator atlas for `IconNumber`.
- * Requires a `layout` (top → bottom as in the PNG) so `.char()` can resolve glyphs.
- */
-export const exampleNumbersAtlas = new TextureAtlas({
-	source : 'assets/images/example-themes/showcase/atlas-chars-numbers.png',
-	columns: 4,
-	rows   : 4,
-	layout : [
-		'/+-×',
-		'89,:',
-		'4567',
-		'0123',
-	],
-	aliases: {
-		'*': '×',
-		'x': '×',
-	},
-	filterMode: 'bi-linear',
-})
-
-
 // MARK: exampleSpriteSheetAtlas
 /**
  * Showcase sprite sheets from CraftPix.net (demo only — not kit stock).

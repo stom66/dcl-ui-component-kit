@@ -411,7 +411,7 @@ import { exampleProgressBarTexturesHorizontal } from '../../exampleThemes/showca
 ## Icons (image-based)
 
 ```tsx
-import { exampleIconsAtlas, exampleNumbersAtlas } from '../../exampleThemes/showcase'
+import { exampleIconsAtlas } from '../../exampleThemes/showcase'
 import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconCharacter, IconNumber, IconString, IconSymbol } from '../../components'
 import { getTheme } from '../../styles'
 
@@ -427,11 +427,11 @@ import { getTheme } from '../../styles'
 	width           = {48}
 	height          = {48}
 />
-{/* Prefer IconNumber for scores/timers — smallest atlas, least overhead */}
-<IconNumber value={42} atlas={exampleNumbersAtlas} iconColor={getTheme().colors.primary} />
+{/* Digits from atlasCharsAlphaNumeric; operators from atlasCharsSymbols */}
+<IconNumber value={42} iconColor={getTheme().colors.primary} />
 <IconSymbol value="$%#" iconColor={getTheme().colors.warning} rotate={-15} />
 <IconCharacter value="HELLO" />
-{/* Mixed letters + symbols + numbers — cascades alphanumeric → symbols → numbers */}
+{/* Mixed letters + symbols — cascades alphanumeric → symbols */}
 <IconString value="HI $120!" iconColor={getTheme().colors.success} />
 <AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
 ```

@@ -62,71 +62,90 @@ export const atlasBtn1x1 = new TextureAtlas({
 })
 
 
-// MARK: atlasCharsNumbers
-/**
- * Number / operator atlas (`atlas-chars-numbers.png`), top → bottom in the PNG.
- * UV Y is bottom → top, so `char()` inverts row index via `findAtlasCell`.
- * Default sheet for `IconNumber` — prefer that over `IconString` / `IconCharacter`
- * when only digits and operators are needed (smaller texture, less overhead).
- *
- * Grid (PNG top → bottom):
- *   / + - ×
- *   8 9 , :
- *   4 5 6 7
- *   0 1 2 3
- */
-export const atlasCharsNumbers = new TextureAtlas({
-	source : 'assets/images/ui-component-kit/atlas-chars-numbers.png',
-	columns: 4,
-	rows   : 4,
-	layout : [
-		"/+-×",
-		"89,:",
-		"4567",
-		"0123",
-	],
-	aliases: {
-		'*': '×',
-		'x': '×',
-	},
-	charInsets: {
-		'1': { insetX: 0.3  },
-		',': { insetX: 0.35 },
-		':': { insetX: 0.35 },
-	},
-})
-
-
 // MARK: atlasCharsSymbols
 /**
- * Symbol atlas (`atlas-chars-symbols.png`), top → bottom in the PNG.
- * Used by `IconSymbol`, as `IconNumber`'s punctuation fallback, and in the
- * `IconString` cascade.
+ * Symbol atlas (`atlas-chars-symbols.png`) — 6×6, top → bottom in the PNG.
+ * UV Y is bottom → top, so `char()` inverts row index via `findAtlasCell`.
+ * Used by `IconSymbol`, as `IconNumber`'s operator / punctuation sheet, and
+ * as the second cascade sheet for `IconString`.
+ *
+ * `x` aliases to `×` so formulas typed with a letter x still resolve.
+ * `*` is its own glyph (not an alias).
  *
  * Grid (PNG top → bottom):
- *   . ' " ;
- *   ( ) ! ?
- *   & % @ #
- *   ÷ = $ _
+ *   . ' " ; ( )
+ *   ! ? & % @ #
+ *   ÷ = $ _ × :
+ *   , / + - £ €
+ *   ¥ ~ ^ * \ |
+ *   < > [ ] { }
  */
 export const atlasCharsSymbols = new TextureAtlas({
 	source : 'assets/images/ui-component-kit/atlas-chars-symbols.png',
-	columns: 4,
-	rows   : 4,
+	columns: 6,
+	rows   : 6,
 	layout : [
-		".'\";",
-		"()!?",
-		"&%@#",
-		"÷=$_",
+		".'\";()",
+		"!?&%@#",
+		"÷=$_×:",
+		",/+-£€",
+		"¥~^*\\|",
+		"<>[]{}",
 	],
+	aliases: {
+		'x': '×',
+	},
+	/**
+	 * Overrides theme `horizontalInset` (0.15). Measured to the shadow edge
+	 * with a small margin. `0` means the glyph already fills the cell.
+	 */
+	charInsets: {
+		'.' : { insetX: 0.27 },
+		"'" : { insetX: 0.32 },
+		'"' : { insetX: 0.22 },
+		';' : { insetX: 0.29 },
+		'(' : { insetX: 0.26 },
+		')' : { insetX: 0.27 },
+		'!' : { insetX: 0.30 },
+		'&' : { insetX: 0.07 },
+		'%' : { insetX: 0.00 },
+		'@' : { insetX: 0.00 },
+		'#' : { insetX: 0.00 },
+		'÷' : { insetX: 0.12 },
+		'$' : { insetX: 0.12 },
+		'×' : { insetX: 0.17 },
+		':' : { insetX: 0.28 },
+		',' : { insetX: 0.32 },
+		'/' : { insetX: 0.23 },
+		'€' : { insetX: 0.10 },
+		'¥' : { insetX: 0.10 },
+		'*' : { insetX: 0.11 },
+		'\\': { insetX: 0.12 },
+		'|' : { insetX: 0.32 },
+		'[' : { insetX: 0.29 },
+		']' : { insetX: 0.29 },
+		'{' : { insetX: 0.29 },
+		'}' : { insetX: 0.29 },
+	},
 })
 
 
 // MARK: atlasCharsAlphaNumeric
 /**
- * Alphanumeric atlas (`atlas-chars-alphaNumeric.png`) — 8×8.
- * Used by `IconCharacter` and as the first cascade sheet for `IconString`
- * (`a–z`, `A–Z`, `0–9`). Prefer `IconNumber` when digits/operators alone suffice.
+ * Alphanumeric atlas (`atlas-chars-alphaNumeric.png`) — 8×8, top → bottom
+ * in the PNG. Digits live on this sheet (there is no separate numbers atlas).
+ * Used by `IconCharacter`, as `IconNumber`'s digit sheet, and as the first
+ * cascade sheet for `IconString` (`a–z`, `A–Z`, `0–9`).
+ *
+ * Grid (PNG top → bottom). The last row has two empty cells:
+ *   a b c d e f g h
+ *   i j k l m n o p
+ *   q r s t u v w x
+ *   y z A B C D E F
+ *   G H I J K L M N
+ *   O P Q R S T U V
+ *   W X Y Z 0 1 2 3
+ *   4 5 6 7 8 9
  */
 export const atlasCharsAlphaNumeric = new TextureAtlas({
 	source : 'assets/images/ui-component-kit/atlas-chars-alphaNumeric.png',
@@ -142,6 +161,30 @@ export const atlasCharsAlphaNumeric = new TextureAtlas({
 		"WXYZ0123",
 		"456789",
 	],
+	/**
+	 * Overrides theme `horizontalInset` (0.15). Higher crops side gaps on
+	 * narrow glyphs; lower keeps wide glyphs from being clipped.
+	 */
+	charInsets: {
+		'f': { insetX: 0.21 },
+		'i': { insetX: 0.32 },
+		'j': { insetX: 0.28 },
+		'k': { insetX: 0.18 },
+		'l': { insetX: 0.33 },
+		'm': { insetX: 0.00 },
+		'o': { insetX: 0.18 },
+		'r': { insetX: 0.21 },
+		't': { insetX: 0.23 },
+		'w': { insetX: 0.03 },
+		'y': { insetX: 0.18 },
+		'I': { insetX: 0.33 },
+		'J': { insetX: 0.20 },
+		'L': { insetX: 0.17 },
+		'M': { insetX: 0.01 },
+		'W': { insetX: 0.00 },
+		'X': { insetX: 0.02 },
+		'1': { insetX: 0.34 },
+	},
 })
 
 
