@@ -6,6 +6,7 @@ import { ZoneType } from './components/zones'
 import { safeZonesDesktopLayer, safeZonesMobileLayer } from './debug'
 import { setTheme } from './styles/theme'
 import type { Theme, ThemeCustomize } from './styles/theme'
+import { installPointerInputWorkaround } from './utils/pointerInputPatch'
 import { syncVirtualCanvasToPlatform } from './utils/sizing'
 
 // MARK: Exports
@@ -171,6 +172,9 @@ export function SetupUiComponentKit({
 	screenInset = 'none',
 	debug       = {},
 }: SetupUiComponentKitOptions) {
+	// TEAR-OUT: SDK stale-click workaround — `utils/pointerInputPatch.ts`
+	installPointerInputWorkaround()
+
 	const activeTheme = setTheme(theme)
 	const stack       = [...layers]
 	// isMobile() is unreliable at module import — resolve virtual canvas here.

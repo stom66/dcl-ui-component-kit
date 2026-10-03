@@ -320,8 +320,7 @@ export function Toggle({
 				}
 			}}
 			onMouseUp = {() => {
-				// Child visuals can win the ray for a frame and clear hover; mouseUp already implies the pointer is on this box.
-				if (!isMobile() && pressedStates.get(id) === true) {
+				if (!isMobile()) {
 					const next = !resolved
 					if (!controlled) {
 						const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)

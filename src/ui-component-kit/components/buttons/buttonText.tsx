@@ -170,10 +170,7 @@ export const ButtonText = ({
 				if (isMobile()) callback?.()
 			}}
 			onMouseUp = {() => {
-				// Child glyphs can win the ray for a frame and clear hover; mouseUp already implies the pointer is on this box.
-				if (!isMobile() && pressedStates.get(id) === true) {
-					callback?.()
-				}
+				if (!isMobile()) callback?.()
 
 				onMouseUp?.()
 				pressedStates.set(id, false)

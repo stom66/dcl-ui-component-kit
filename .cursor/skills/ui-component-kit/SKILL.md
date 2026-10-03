@@ -581,9 +581,11 @@ When creating any kind of button element, ask the user if this is meant to be an
 
 Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `src/ui-component-kit/components/buttons/`.
 
-**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `mouseUp` after a `mouseDown` on the same button (press latch — hover only drives visuals, since a child glyph winning the ray for one frame clears it). Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). `Toggle` uses the same rule.
+**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `callback` fires on any `onMouseUp` on the button (Explorer only sends UP to the element under the pointer, so release-off still cancels). Hover is visual only — do not gate the click on it. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). `Toggle` uses the same rule.
 
 **Pointer filter:** react-ecs defaults every element to `PFM_NONE`; `onMouseDown` does **not** make a box pickable. `ButtonText` / `ButtonImage` force `pointerFilter="block"` on the box that owns the handlers. In any hand-rolled clickable box, set `pointerFilter="block"` on the handler owner and `pointerFilter="none"` on decorative children (icons, glyphs, spinners).
+
+**Temporary SDK workaround (tear-out):** Explorer posts each UI click on the button **and** `RootEntity` with the same timestamp. `@dcl/ecs` input uses one global watermark, so a root copy arriving a frame earlier drops the button’s `onMouseDown` / `onMouseUp`. `SetupUiComponentKit` installs `utils/pointerInputPatch.ts` to re-deliver that copy once. Disable with `ENABLE_POINTER_INPUT_WORKAROUND = false`, or delete the file and its Setup call. Full report + suggested SDK patch: `dclcontext/bugs/sdk-ui-pointer-stale-click.md`. Review after the next SDK bump.
 
 **Sizing:** omit `cols` for a content-sized HUD control (theme aspect ratio — this is what edge zones need). Use `cols` only inside a grid / panel `Row`. Do **not** put `cols={12}` on a lone button that should sit in a corner or bottom-center zone.
 

@@ -204,8 +204,7 @@ export const ButtonImage = ({
 					}
 				}}
 				onMouseUp={() => {
-					// Child glyphs can win the ray for a frame and clear hover; mouseUp already implies the pointer is on this box.
-					if (!isMobile() && pressedStates.get(id) === true) {
+					if (!isMobile()) {
 						callback?.()
 						currentIndex.set(id, hoverStates.get(id) === true ? ButtonIndex.HOVER : ButtonIndex.DEFAULT)
 					} else {
