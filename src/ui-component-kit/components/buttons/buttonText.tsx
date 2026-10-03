@@ -152,8 +152,9 @@ export const ButtonText = ({
 				uiText,
 				{ fontSize: fontSizeProp, fontColor, font, textAlign, textWrap, value: textLabel },
 			)}
-			uiBackground = {uiBackground}
-			onMouseEnter = {() => {
+			uiBackground  = {uiBackground}
+			pointerFilter = "block"
+			onMouseEnter  = {() => {
 				hoverStates.set(id, true)
 				tweenBackgroundColor(button, hoverColor)
 				onMouseEnter?.()
@@ -169,7 +170,8 @@ export const ButtonText = ({
 				if (isMobile()) callback?.()
 			}}
 			onMouseUp = {() => {
-				if (!isMobile() && hoverStates.get(id) === true) {
+				// Child glyphs can win the ray for a frame and clear hover; mouseUp already implies the pointer is on this box.
+				if (!isMobile() && pressedStates.get(id) === true) {
 					callback?.()
 				}
 

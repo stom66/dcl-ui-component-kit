@@ -581,7 +581,9 @@ When creating any kind of button element, ask the user if this is meant to be an
 
 Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `src/ui-component-kit/components/buttons/`.
 
-**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `mouseUp` after hover. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). `Toggle` uses the same rule.
+**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `mouseUp` after a `mouseDown` on the same button (press latch — hover only drives visuals, since a child glyph winning the ray for one frame clears it). Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). `Toggle` uses the same rule.
+
+**Pointer filter:** react-ecs defaults every element to `PFM_NONE`; `onMouseDown` does **not** make a box pickable. `ButtonText` / `ButtonImage` force `pointerFilter="block"` on the box that owns the handlers. In any hand-rolled clickable box, set `pointerFilter="block"` on the handler owner and `pointerFilter="none"` on decorative children (icons, glyphs, spinners).
 
 **Sizing:** omit `cols` for a content-sized HUD control (theme aspect ratio — this is what edge zones need). Use `cols` only inside a grid / panel `Row`. Do **not** put `cols={12}` on a lone button that should sit in a corner or bottom-center zone.
 

@@ -88,6 +88,8 @@ function renderLayerShell(layer: Layer): ReactEcs.JSX.Element[] {
 
 	if (layer.zone !== ZoneType.Default) return nodes
 
+	const shellHidden = layer.canBeHidden && layer.visibility.isFullyHidden
+
 	return [
 		<UiEntity
 			key={layer.id}
@@ -96,7 +98,8 @@ function renderLayerShell(layer: Layer): ReactEcs.JSX.Element[] {
 				height        : '100%',
 				positionType  : 'absolute',
 				position      : { top: 0, left: 0 },
-				display       : 'flex',
+				display       : shellHidden ? 'none' : 'flex',
+				pointerFilter : 'none',
 				flexDirection : 'column',
 				alignItems    : 'center',
 				justifyContent: 'center',

@@ -17,6 +17,7 @@ const TOGGLE_HEIGHT_DEFAULT = 32
 const TOGGLE_LERP_DURATION  = 0.2
 
 const hoverStates         = new Map<string, boolean>()
+const pressedStates       = new Map<string, boolean>()
 const slideTweenGeneration = new Map<string, number>()
 const colorTweenGeneration = new Map<string, number>()
 
@@ -281,6 +282,7 @@ export function Toggle({
 			{...props}
 			backgroundColor = {colors.backgroundColor}
 			uiBackground    = {uiBackground}
+			pointerFilter   = "block"
 			uiTransform={{
 				width         : trackWidth as PositionUnit,
 				height        : trackHeight as PositionUnit,
@@ -305,6 +307,7 @@ export function Toggle({
 				onMouseLeave?.()
 			}}
 			onMouseDown = {() => {
+				pressedStates.set(id, true)
 				onMouseDown?.()
 				if (isMobile()) {
 					const next = !resolved
@@ -317,7 +320,8 @@ export function Toggle({
 				}
 			}}
 			onMouseUp = {() => {
-				if (!isMobile() && hoverStates.get(id) === true) {
+				// Child visuals can win the ray for a frame and clear hover; mouseUp already implies the pointer is on this box.
+				if (!isMobile() && pressedStates.get(id) === true) {
 					const next = !resolved
 					if (!controlled) {
 						const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)
@@ -327,6 +331,7 @@ export function Toggle({
 					onChange?.(next)
 				}
 				onMouseUp?.()
+				pressedStates.set(id, false)
 			}}
 		>
 			{/* Visuals only — pointerFilter none so the track receives all clicks (thumb would otherwise steal hits). */}

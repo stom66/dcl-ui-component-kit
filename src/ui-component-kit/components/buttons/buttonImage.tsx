@@ -176,6 +176,7 @@ export const ButtonImage = ({
 					uvs,
 					color        : Color4.White(),
 				}, uiBackground)}
+				pointerFilter="block"
 				onMouseEnter={() => {
 					hoverStates.set(id, true)
 					currentIndex.set(id, ButtonIndex.HOVER)
@@ -194,6 +195,7 @@ export const ButtonImage = ({
 				}}
 				onMouseDown={() => {
 					pressedStates.set(id, true)
+					hoverStates.set(id, true)
 					currentIndex.set(id, ButtonIndex.PRESS)
 					onMouseDown?.()
 					if (isMobile()) {
@@ -202,16 +204,16 @@ export const ButtonImage = ({
 					}
 				}}
 				onMouseUp={() => {
-					pressedStates.set(id, false)
-
-					if (!isMobile() && hoverStates.get(id) === true) {
+					// Child glyphs can win the ray for a frame and clear hover; mouseUp already implies the pointer is on this box.
+					if (!isMobile() && pressedStates.get(id) === true) {
 						callback?.()
-						currentIndex.set(id, ButtonIndex.HOVER)
+						currentIndex.set(id, hoverStates.get(id) === true ? ButtonIndex.HOVER : ButtonIndex.DEFAULT)
 					} else {
 						currentIndex.set(id, ButtonIndex.DEFAULT)
 					}
 
 					onMouseUp?.()
+					pressedStates.set(id, false)
 				}}
 			>
 				{children}
