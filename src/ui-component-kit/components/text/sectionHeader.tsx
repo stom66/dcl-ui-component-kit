@@ -25,6 +25,7 @@ export const SectionHeader = ({
 	fontColor,
 	fontSize: fontSizeProp,
 	font,
+	fontSrc,
 	textAlign,
 	textWrap,
 	uiText,
@@ -41,7 +42,7 @@ export const SectionHeader = ({
 			value    : '',
 		},
 		uiText,
-		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, fontSrc, textAlign, textWrap },
 	)
 	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 

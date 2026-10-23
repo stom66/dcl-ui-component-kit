@@ -6,6 +6,17 @@ Breaking and behavioural changes when moving between versions of `@stom66/dcl-ui
 
 ---
 
+## 0.2.8 (from ≤ 0.2.7)
+
+Custom fonts (`fontSrc`) and atlas glyph deprecation:
+
+- **`@dcl/sdk` ≥ 7.31 required.** The kit ships as TypeScript and writes `fontSrc` on `uiText`. Scenes on 7.30.1 or earlier will fail to typecheck when upgrading the kit — bump `@dcl/sdk` (and matching `@dcl/js-runtime` if you pin it) first or in the same install.
+- **Theme is non-breaking.** `typography.fontSrc` is optional (`sansSerif` / `serif` / `monospace` / catch-all `default`). Omit it to keep built-in faces only. No changes required to existing `family` / `size` / `scale` overrides.
+- **`IconNumber` / `IconString` / `IconCharacter` / `IconSymbol` are deprecated** but still exported. Prefer `Text` / `Label` with `fontSrc` or `theme.typography.fontSrc` for custom typefaces. No code change required to keep using the atlas glyph components.
+- **Optional — custom TTFs:** put `.ttf` files (plus redistributable licence) under the scene (e.g. `assets/fonts/`), set `theme.typography.fontSrc` and/or the `fontSrc` shorthand, and always pair with a built-in `font` fallback. Unity local preview shows the fallback; Bevy preview and deployed asset bundles show the custom face. The kit does not ship stock fonts; no `copy-assets` refresh is needed for this feature alone.
+
+---
+
 ## 0.2.0 (from 0.1.x)
 
 Breaking / behaviour changes vs 0.1.x (SDK **7.26** UI):

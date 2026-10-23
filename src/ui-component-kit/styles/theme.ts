@@ -23,9 +23,10 @@ export type ThemeCustomize = Partial<ThemeBase> & {
 		numbers?: Partial<ThemeIcons['numbers']>
 	}
 	typography?: {
-		scale ?: Partial<ThemeTypography['scale']>
-		size  ?: Partial<ThemeTypography['size']>
-		family?: Partial<ThemeTypography['family']>
+		scale  ?: Partial<ThemeTypography['scale']>
+		size   ?: Partial<ThemeTypography['size']>
+		family ?: Partial<ThemeTypography['family']>
+		fontSrc?: Partial<NonNullable<ThemeTypography['fontSrc']>>
 	}
 }
 
@@ -91,17 +92,21 @@ export function buildTheme(
 		},
 		typography  : {
 			...baseTheme.typography,
-			scale : {
+			scale  : {
 				...baseTheme.typography.scale,
 				...overrides.typography?.scale,
 			},
-			size  : {
+			size   : {
 				...baseTheme.typography.size,
 				...overrides.typography?.size,
 			},
-			family: {
+			family : {
 				...baseTheme.typography.family,
 				...overrides.typography?.family,
+			},
+			fontSrc: {
+				...baseTheme.typography.fontSrc,
+				...overrides.typography?.fontSrc,
 			},
 		},
 	}

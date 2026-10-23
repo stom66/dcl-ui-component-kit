@@ -159,7 +159,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 
 | Component | Prefer | Instead of |
 |---|---|---|
-| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize, … }}` |
+| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize, fontSrc, … }}` |
 | `Background` / `Row` / `Column` / `UiBox` fill | `backgroundColor` | `uiBackground={{ color }}` |
 | Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
 | Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
@@ -360,6 +360,63 @@ a third string like `"100vh"` — the third arg is an optional `ScaleContext` ob
 **`scaleThemeFontSize` / `scaleFontSize` are for fonts only** — do not use them on
 `borderRadius`, padding, or other layout numbers. Those are plain theme/virtual px and
 already × `uiScale` at parse time.
+
+### Custom fonts (`fontSrc`)
+
+SDK `@dcl/sdk` **≥ 7.31** supports scene `.ttf` files via `fontSrc` on `uiText` / `Label`.
+Always set built-in `font` beside `fontSrc` (Unity local preview and missing-file fallback).
+
+**Theme** — additive `typography.fontSrc` (non-breaking; built-ins stay in `family`):
+
+| Key | Maps to `font` | Use |
+|---|---|---|
+| `sansSerif` | `'sans-serif'` | Body when `family.default` is sans-serif |
+| `serif` | `'serif'` | Headings when `family.h*` is serif |
+| `monospace` | `'monospace'` | `Code` when `family.code` is monospace |
+| `default` | catch-all | Face key unset → use this path (one TTF for the whole project) |
+
+Resolution per rendered face: face key → else `fontSrc.default` → else omit (built-in only).
+
+```tsx
+// One custom font everywhere
+SetupUiComponentKit({
+	theme: { typography: { fontSrc: { default: 'assets/fonts/MySans.ttf' } } },
+	layers: [/* … */],
+})
+
+// Body / headings / code TTFs (body falls through to `default` when sansSerif unset)
+SetupUiComponentKit({
+	theme: {
+		typography: {
+			fontSrc: {
+				default  : 'assets/fonts/Body.ttf',
+				serif    : 'assets/fonts/Display.ttf',
+				monospace: 'assets/fonts/Mono.ttf',
+			},
+		},
+	},
+	layers: [/* … */],
+})
+
+// Built-ins + one accent face
+SetupUiComponentKit({
+	theme: { typography: { fontSrc: { serif: 'assets/fonts/Display.ttf' } } },
+	layers: [/* … */],
+})
+```
+
+**Shorthand** (wins over theme) on `Text` / `H*` / `Code` / `Label` / `ButtonText` / headers:
+
+```tsx
+<Text
+	value   = "Hello"
+	font    = "sans-serif"
+	fontSrc = "assets/fonts/MySans.ttf"
+	fontSize={theme.typography.size.default}
+/>
+```
+
+Kit does **not** ship stock `.ttf` files — put fonts under the scene’s `assets/fonts/` with a redistributable licence. Unity **local preview always shows the `font` fallback**; Bevy preview and deployed asset bundles show the TTF.
 
 Fonts go through three steps: `resolveTypographySize(base)` (optional theme platform scale)
 → `scaleFontSize(...)` (additive fluid boost from viewport width) → × `uiScale` at parse.
@@ -812,7 +869,9 @@ atlasIconsFontAwesome.column(1)                      // full first column
 atlasCharsAlphaNumeric.char('5', { insetX: 0.15 })
 ```
 
-### Atlas glyph text (`IconNumber` / `IconSymbol` / `IconCharacter` / `IconString`)
+### Atlas glyph text (`IconNumber` / `IconSymbol` / `IconCharacter` / `IconString`) — deprecated
+
+**Deprecated.** Prefer kit `Text` / `Label` with SDK `fontSrc` or `theme.typography.fontSrc` for custom typefaces. These atlas glyph components remain exported for existing UIs.
 
 Image-based “font” rows from the bundled char atlases. Prefer the **narrowest** component that covers the charset — larger sheets cost more texture overhead:
 

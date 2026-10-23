@@ -1,6 +1,7 @@
 import { isMobile } from '@dcl/sdk/platform'
-import { scaleFontSize, type ScaleContext, type ScaleUnit } from '@dcl/sdk/react-ecs'
+import { scaleFontSize, type ScaleContext, type ScaleUnit, type UiFontType } from '@dcl/sdk/react-ecs'
 
+import type { ThemeFontFamily } from '../styles/components/typography'
 import { getTheme } from '../styles/theme'
 
 
@@ -11,6 +12,27 @@ const MOBILE_VIRTUAL_WIDTH_CURRENT  = 1600
 
 /** Default mobile typography boost — offsets larger mobile virtual canvas (1600 vs 1200). */
 const DEFAULT_MOBILE_TYPOGRAPHY_SCALE = MOBILE_VIRTUAL_WIDTH_CURRENT / MOBILE_VIRTUAL_WIDTH_BASELINE
+
+
+// MARK: resolveThemeFontSrc
+/**
+ * Resolves an optional scene TTF path for a built-in `font` face from
+ * `theme.typography.fontSrc`. Face key (`sansSerif` / `serif` / `monospace`)
+ * wins; otherwise `fontSrc.default` (project-wide catch-all). Returns
+ * `undefined` when no custom font is configured for that face.
+ */
+export function resolveThemeFontSrc(
+	font: ThemeFontFamily | UiFontType | undefined = 'sans-serif',
+): string | undefined {
+	const fontSrc = getTheme().typography.fontSrc
+	if (!fontSrc) return undefined
+
+	const face = (font ?? 'sans-serif') as ThemeFontFamily
+	if (face === 'sans-serif' && fontSrc.sansSerif) return fontSrc.sansSerif
+	if (face === 'serif' && fontSrc.serif) return fontSrc.serif
+	if (face === 'monospace' && fontSrc.monospace) return fontSrc.monospace
+	return fontSrc.default
+}
 
 
 // MARK: resolveTypographySize

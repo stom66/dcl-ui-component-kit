@@ -66,6 +66,10 @@ function resolveStringGlyphAtlas(
  * - `IconCharacter` — letters and digits from the alphanumeric sheet
  *
  * Tint with `iconColor` (texture × color multiply).
+ *
+ * @deprecated Prefer SDK text with a custom TTF — kit `Text` / `Label` /
+ *   `fontSrc` shorthand or `theme.typography.fontSrc`. Kept for existing
+ *   atlas glyph UIs.
  */
 export const IconString = ({
 	value   = '',

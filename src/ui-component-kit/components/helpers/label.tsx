@@ -17,6 +17,8 @@ type LabelProps = Omit<UiBoxProps, 'uiText'> & {
 	/** Theme-base font size in px — prefer `theme.typography.size.*`. Auto-scaled by `UiBox`. */
 	fontSize?   : number
 	font?       : UiFontType
+	/** Scene-relative `.ttf` path. Prefer theme `typography.fontSrc` for project-wide faces. */
+	fontSrc?    : string
 	textAlign?  : TextAlignType
 	textWrap?   : UiTextWrapType
 	cols?       : ColSpanInput
@@ -33,7 +35,7 @@ type LabelProps = Omit<UiBoxProps, 'uiText'> & {
  * `uiTransform` / `uiBackground` / `uiText` are optional and merge over defaults.
  * `value` overrides `uiText.value`. `backgroundColor` / `uiBackground.color`
  * override the default primary **fill**. Use `fontColor` (or `uiText.color`) for font tint.
- * Prefer `fontSize` / `font` / `textAlign` / `textWrap` / `fontColor` shorthands over nesting `uiText`.
+ * Prefer `fontSize` / `font` / `fontSrc` / `textAlign` / `textWrap` / `fontColor` shorthands over nesting `uiText`.
  * Multiline copy (`\n` and soft-wrap when width is a known px size) grows `minHeight`
  * so the chip expands with the text. Prefer a numeric `width` for wrapped captions.
  */
@@ -47,6 +49,7 @@ export function Label({
 	fontColor,
 	fontSize: fontSizeProp,
 	font,
+	fontSrc,
 	textAlign,
 	textWrap,
 	cols,
@@ -69,7 +72,7 @@ export function Label({
 			value    : '',
 		},
 		uiText,
-		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, fontSrc, textAlign, textWrap },
 	)
 	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 	const fill           = backgroundColor ?? theme.colors.primary

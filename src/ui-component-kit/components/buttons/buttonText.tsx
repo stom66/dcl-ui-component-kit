@@ -21,7 +21,7 @@ type ButtonTextPropsState = {
 
 const buttonProps = new Map<string, PropsController<ButtonTextPropsState>>()
 
-type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio' | 'uiText'> & Pick<TextShorthandProps, 'fontSize' | 'fontColor' | 'font' | 'textAlign' | 'textWrap'> & {
+type ButtonTextProps = Omit<UiBoxProps, 'uiTransform' | 'aspectRatio' | 'uiText'> & Pick<TextShorthandProps, 'fontSize' | 'fontColor' | 'font' | 'fontSrc' | 'textAlign' | 'textWrap'> & {
 	id           : string
 	textLabel?   : string | undefined
 	width?       : PositionUnit | 'auto' | undefined
@@ -99,6 +99,7 @@ export const ButtonText = ({
 	fontSize: fontSizeProp,
 	fontColor,
 	font,
+	fontSrc,
 	textAlign,
 	textWrap,
 	...props
@@ -147,10 +148,11 @@ export const ButtonText = ({
 				{
 					value   : textLabel ?? '',
 					fontSize: theme.typography.size.default,
+					font    : theme.typography.family.default,
 					textWrap: 'nowrap',
 				},
 				uiText,
-				{ fontSize: fontSizeProp, fontColor, font, textAlign, textWrap, value: textLabel },
+				{ fontSize: fontSizeProp, fontColor, font, fontSrc, textAlign, textWrap, value: textLabel },
 			)}
 			uiBackground  = {uiBackground}
 			pointerFilter = "block"

@@ -100,7 +100,7 @@ export class DemoTextLayer extends Layer {
 
 						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
 							<Text
-								value  = "Icons, and custom font support via texture atlases (see Icons):"
+								value  = "Icons, and deprecated atlas glyph text (prefer Text + fontSrc / theme.typography.fontSrc):"
 								margin = {{ right: 8 }}
 								width = "auto"
 							/>

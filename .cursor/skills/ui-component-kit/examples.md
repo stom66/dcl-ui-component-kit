@@ -165,7 +165,7 @@ Optional **`colsDesktop` / `colsMobile`** override `cols` per platform. They are
 ]
 ```
 
-`fontSize` takes a **theme-base px** number — prefer `theme.typography.size.*` (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-scale; do not wrap with `scaleFontSize`. Ad-hoc numbers are still theme-base px. Raw `UiEntity` only: `scaleThemeFontSize(theme.typography.size.default)`. Use `fontColor` on text, `backgroundColor` on fills (including icon chip wrappers), `iconColor` to tint icon textures.
+`fontSize` takes a **theme-base px** number — prefer `theme.typography.size.*` (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-scale; do not wrap with `scaleFontSize`. Ad-hoc numbers are still theme-base px. Raw `UiEntity` only: `scaleThemeFontSize(theme.typography.size.default)`. Use `fontColor` on text, `backgroundColor` on fills (including icon chip wrappers), `iconColor` to tint icon textures. Custom TTFs: `fontSrc` shorthand or `theme.typography.fontSrc` (always set built-in `font` beside `fontSrc`).
 
 ## Close button / framed panel
 
@@ -427,6 +427,7 @@ import { getTheme } from '../../styles'
 	width           = {48}
 	height          = {48}
 />
+{/* Deprecated atlas glyph text — prefer Text + fontSrc / theme.typography.fontSrc */}
 {/* Digits from atlasCharsAlphaNumeric; operators from atlasCharsSymbols */}
 <IconNumber value={42} iconColor={getTheme().colors.primary} />
 <IconSymbol value="$%#" iconColor={getTheme().colors.warning} rotate={-15} />
@@ -434,6 +435,14 @@ import { getTheme } from '../../styles'
 {/* Mixed letters + symbols — cascades alphanumeric → symbols */}
 <IconString value="HI $120!" iconColor={getTheme().colors.success} />
 <AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={32} height={32} />
+
+{/* Custom TTF (SDK ≥ 7.31) — always set font beside fontSrc */}
+<Text
+	value   = "Branded"
+	font    = "sans-serif"
+	fontSrc = "assets/fonts/MySans.ttf"
+	fontSize={getTheme().typography.size.default}
+/>
 ```
 
 ## Anti-patterns

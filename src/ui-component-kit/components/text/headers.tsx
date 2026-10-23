@@ -19,7 +19,7 @@ export type HeadingProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
 // MARK: Heading
 /**
  * Shared H1–H6 renderer — theme size/family per level.
- * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap`)
  * over nesting `uiText`. Uses `flexShrink: 0` + `minHeight` so height-capped columns
  * cannot crush text (default Yoga `flexShrink: 1` was collapsing `height: 'auto'` boxes to 0).
  */
@@ -30,6 +30,7 @@ function Heading({
 	fontColor,
 	fontSize: fontSizeProp,
 	font,
+	fontSrc,
 	textAlign,
 	textWrap,
 	uiText,
@@ -47,7 +48,7 @@ function Heading({
 			value    : '',
 		},
 		uiText,
-		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, fontSrc, textAlign, textWrap },
 	)
 	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 

@@ -33,6 +33,10 @@ type IconSymbolProps = Omit<UiBoxProps, 'uiText'> & {
  * Unsupported characters render as a warning-coloured box; spaces are blank
  * spacers. Tint with `iconColor`
  * (texture × color multiply).
+ *
+ * @deprecated Prefer SDK text with a custom TTF — kit `Text` / `Label` /
+ *   `fontSrc` shorthand or `theme.typography.fontSrc`. Kept for existing
+ *   atlas glyph UIs.
  */
 export const IconSymbol = ({
 	value = '',

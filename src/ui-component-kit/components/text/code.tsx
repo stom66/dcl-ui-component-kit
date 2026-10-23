@@ -17,7 +17,7 @@ export type CodeProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
 // MARK: Code
 /**
  * Monospace / code text block. Pass copy via `value` (or `uiText.value`).
- * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap`)
  * over nesting `uiText`. Multiline strings use `\n` in a single `uiText`.
  */
 export const Code = ({
@@ -26,6 +26,7 @@ export const Code = ({
 	fontColor,
 	fontSize: fontSizeProp,
 	font,
+	fontSrc,
 	textAlign,
 	textWrap,
 	uiText,
@@ -43,7 +44,7 @@ export const Code = ({
 			value    : '',
 		},
 		uiText,
-		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, fontSrc, textAlign, textWrap },
 	)
 	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 

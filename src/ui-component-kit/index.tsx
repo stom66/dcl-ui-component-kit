@@ -22,7 +22,7 @@ export type { ShowToastOptions, ToastGroupPolicy, ToastItem, ToastPhase, ToastPo
 export { darken, lighten, alpha } from './utils/colors'
 export { easingFunctions, lerp, tweenValue } from './utils/tweens'
 export type { EasingFn } from './utils/tweens'
-export { resolveLayoutFontSize, resolveTypographySize, scaleThemeFontSize, scaleUiTextFontSize } from './utils/typography'
+export { resolveLayoutFontSize, resolveThemeFontSrc, resolveTypographySize, scaleThemeFontSize, scaleUiTextFontSize } from './utils/typography'
 export { resolveAspectDimensions, sizeValueToPixels } from './utils/aspect'
 export type { AspectSizeValue, ResolveAspectDimensionsOptions, ResolvedAspectDimensions } from './utils/aspect'
 export { flipUVs, getUVCell, getUVColumn, getUVRow, getRotatedUVs, mirrorUVs, rotateUvIndexes } from './utils/uvs'

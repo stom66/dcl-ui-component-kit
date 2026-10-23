@@ -18,8 +18,9 @@ export type TextProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
 /**
  * Default body text block. Pass copy via `value` (or `uiText.value`); nest element children as needed.
  *
- * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap`)
+ * Prefer text shorthands (`value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap`)
  * over nesting `uiText`. `fontSize` takes a theme base px number and is auto-scaled.
+ * `fontSrc` is a scene `.ttf` path; omit to use `theme.typography.fontSrc` for the face.
  *
  * Layout notes (DCL / Yoga):
  * - `alignSelf: 'flex-start'` so `height: 'auto'` can measure text (not `stretch`)
@@ -34,6 +35,7 @@ export const Text = ({
 	fontColor,
 	fontSize: fontSizeProp,
 	font,
+	fontSrc,
 	textAlign,
 	textWrap,
 	uiText,
@@ -51,7 +53,7 @@ export const Text = ({
 			value    : '',
 		},
 		uiText,
-		{ value, fontColor, fontSize: fontSizeProp, font, textAlign, textWrap },
+		{ value, fontColor, fontSize: fontSizeProp, font, fontSrc, textAlign, textWrap },
 	)
 	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 

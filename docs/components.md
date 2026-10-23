@@ -322,17 +322,51 @@ Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme-ba
 
 | Component | Shorthands | Role |
 |---|---|---|
-| `Text` | `value`, `fontColor`, `fontSize`, `font`, `textAlign`, `textWrap` | Body text |
+| `Text` | `value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap` | Body text |
 | `Code` | same | Monospace |
 | `Header` | same | Panel title (h2-sized helper; `H1`–`H6` stay the levelled headings) |
 | `SectionHeader` | same | Section title in a panel |
 | `H1` … `H6` | same | Heading levels from theme |
+| `Label` / `ButtonText` | same text shorthands (`ButtonText` uses `textLabel` for copy) | Chips / buttons |
 
 ```tsx
 <H2 value="Settings" />
 <Text value="Choose a difficulty." fontSize={theme.typography.size.small} />
 <Code value="score = 42" />
+<Text
+	value   = "Branded title"
+	font    = "serif"
+	fontSrc = "assets/fonts/Display.ttf"
+/>
 ```
+
+### Custom fonts (`fontSrc`)
+
+Requires `@dcl/sdk` ≥ 7.31. Scene-relative `.ttf` paths only (kit does not ship fonts). Always set built-in `font` beside `fontSrc` (Unity preview / missing-file fallback).
+
+Theme slice `typography.fontSrc`:
+
+| Key | Meaning |
+|---|---|
+| `sansSerif` / `serif` / `monospace` | TTF for that built-in face |
+| `default` | Catch-all when the face key is unset (one font for the whole project) |
+
+```tsx
+SetupUiComponentKit({
+	theme: {
+		typography: {
+			fontSrc: {
+				default  : 'assets/fonts/Body.ttf',
+				serif    : 'assets/fonts/Display.ttf',
+				monospace: 'assets/fonts/Mono.ttf',
+			},
+		},
+	},
+	layers: [/* … */],
+})
+```
+
+Unity **local preview shows the `font` fallback**; Bevy preview and deployed asset bundles show the custom TTF.
 
 ---
 
@@ -415,7 +449,9 @@ import { playOnce, setPlaying, SpriteIcon } from '@stom66/dcl-ui-component-kit'
 />
 ```
 
-### `IconNumber`
+### `IconNumber` (deprecated)
+
+**Deprecated** — prefer `Text` / `Label` with `fontSrc` or `theme.typography.fontSrc`. Still exported with `IconString` / `IconCharacter` / `IconSymbol` for existing atlas glyph UIs.
 
 | Option | Type | Description |
 |---|---|---|

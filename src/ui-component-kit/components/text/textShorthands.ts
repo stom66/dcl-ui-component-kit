@@ -1,6 +1,8 @@
 import { Color4 } from '@dcl/sdk/math'
 import { type TextAlignType, type UiFontType, type UiLabelProps, type UiTextWrapType } from '@dcl/sdk/react-ecs'
 
+import { resolveThemeFontSrc } from '../../utils/typography'
+
 
 /**
  * Top-level text shorthands for `Text` / `H*` / `Code` / `Header` / `SectionHeader` / `Label`.
@@ -17,8 +19,13 @@ export type TextShorthandProps = {
 	 * Auto-scaled by `UiBox` — do not wrap with `scaleThemeFontSize` / `scaleFontSize`.
 	 */
 	fontSize?  : number
-	/** Font family. Overrides `uiText.font`. */
+	/** Built-in font family. Overrides `uiText.font`. Always set beside `fontSrc` (SDK fallback). */
 	font?      : UiFontType
+	/**
+	 * Scene-relative `.ttf` path for a custom font (`uiText.fontSrc`). Prefer theme
+	 * `typography.fontSrc` for project-wide faces; use this for one-off overrides.
+	 */
+	fontSrc?   : string
 	/** Text alignment. Overrides `uiText.textAlign`. */
 	textAlign? : TextAlignType
 	/** Wrap behaviour. Overrides `uiText.textWrap`. */
@@ -43,22 +50,37 @@ function omitUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
 /**
  * Merges text defaults ← `uiText` ← top-level shorthands.
  * Shorthands win. Numeric `fontSize` values stay theme-base px — `UiBox` scales them.
+ * When `fontSrc` is still unset after merge, fills from `theme.typography.fontSrc`
+ * for the resolved `font` face (see `resolveThemeFontSrc`).
  */
 export function mergeTextShorthands(
 	defaults  : UiLabelProps,
 	uiText    : Partial<UiLabelProps> | undefined,
 	shorthands: TextShorthandProps,
 ): UiLabelProps {
-	return {
+	const merged: UiLabelProps = {
 		...defaults,
 		...uiText,
 		...omitUndefined({
 			fontSize : shorthands.fontSize,
 			font     : shorthands.font,
+			fontSrc  : shorthands.fontSrc,
 			textAlign: shorthands.textAlign,
 			textWrap : shorthands.textWrap,
 			color    : shorthands.fontColor,
 		}),
 		value: shorthands.value ?? uiText?.value ?? defaults.value ?? '',
 	}
+
+	if (merged.fontSrc === undefined) {
+		const themeFontSrc = resolveThemeFontSrc(merged.font)
+		if (themeFontSrc !== undefined) {
+			merged.fontSrc = themeFontSrc
+			if (merged.font === undefined) {
+				merged.font = 'sans-serif'
+			}
+		}
+	}
+
+	return merged
 }
