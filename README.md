@@ -126,6 +126,7 @@ Deeper guides and per-component **options tables** live under [`docs/`](docs/):
 | [docs/themes.md](docs/themes.md) | Affinity template, `init-theme`, agent wiring |
 | [docs/custom-textures.md](docs/custom-textures.md) | Atlases, UV helpers (1-based) |
 | [docs/components.md](docs/components.md) | Component reference with options tables |
+| [docs/upgrade-caveats.md](docs/upgrade-caveats.md) | Breaking / behavioural changes between versions |
 | [docs/licensing.md](docs/licensing.md) | MIT package license + credits / attributions |
 | [docs/media](docs/media/README.md) | Showcase GIF / media notes |
 
@@ -137,21 +138,6 @@ The package is **MIT**. Third-party art is credited separately:
 - **[CraftPix.net](https://craftpix.net)** — some showcase demo sprite sheets (not npm stock textures).
 
 Full notes: [docs/licensing.md](docs/licensing.md).
-
-## 0.2.0 notes
-
-Breaking / behaviour changes vs 0.1.x (SDK **7.26** UI):
-
-- **Named zone components removed** (`ZoneTop`, `ZoneBottomRight`, `ZoneDefault`, …). Use `zone: ZoneType.*` on a Layer, or `<Zone type={ZoneType.Top}>` (`type` is required).
-- **`IS_DEV` removed** (unused).
-- **`LEFT_ZONE_INSET` → `getLeftZoneInset()`** — call it at layout time; a module constant froze `isMobile()` / `vwToPixels` at import.
-- **`colsDesktop` / `colsMobile`** still exist and are resolved at render (same live-platform rule).
-- **`screenInset` / Layer `inset`** — Setup `screenInset` is the default for layers that omit `inset`. Layers are grouped into at most three SDK renderers (`setUiRenderer` + `addUiRenderer`). Do not wrap layers in `ScreenInsetArea` / `InteractableArea`. Only `ZoneType.Default` gets a centering shell inside its renderer.
-- **`ZoneType.InteractableArea` deprecated** — use `inset: 'interactable'` with `ZoneType.FullScreen` (or `Default`).
-- **`zIndex`** is applied only when the Layer sets it (not from array index). Use `zIndex` for stacking across inset groups. Later siblings still paint on top when unset.
-- **Buttons / Toggle:** on **mobile**, `callback` fires on `mouseDown`; on desktop, any `mouseUp` on the button. Use `isMobile()`, not `!isDesktop()`.
-- **Temporary:** `SetupUiComponentKit` installs `src/ui-component-kit/utils/pointerInputPatch.ts` so UI clicks are not dropped when Explorer’s root-entity copy of the click wins the SDK’s global timestamp race. Tear-out notes and the upstream report: `dclcontext/bugs/sdk-ui-pointer-stale-click.md`.
-- Toast host uses `ZoneType.None` with no full-screen wrapper (so it does not steal clicks).
 
 ## This repo as a demo scene
 
@@ -170,3 +156,4 @@ When creating or changing UI with this kit:
 - [`.cursor/skills/ui-component-kit/SKILL.md`](.cursor/skills/ui-component-kit/SKILL.md)
 - [`.cursor/rules/ui-component-kit.mdc`](.cursor/rules/ui-component-kit.mdc)
 - [`.cursor/rules/relative-imports.mdc`](.cursor/rules/relative-imports.mdc)
+- After an install or upgrade: [docs/upgrade-caveats.md](docs/upgrade-caveats.md)

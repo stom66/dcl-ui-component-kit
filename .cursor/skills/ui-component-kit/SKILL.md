@@ -28,6 +28,7 @@ When `@stom66/dcl-ui-component-kit` is **installed or upgraded in a consumer pro
    `npm approve-scripts @stom66/dcl-ui-component-kit` then `npm rebuild @stom66/dcl-ui-component-kit`,  
    and/or add `"postinstall": "dcl-ui-component-kit copy-assets"` to the **consumer** `package.json`.
 5. Full checklist: package root **`INSTALL.md`** (also linked from the README).
+6. **Upgrade caveats (required after install/upgrade):** read **[`docs/upgrade-caveats.md`](../../../docs/upgrade-caveats.md)** and apply any breaking / behavioural migrations for the version jump just installed. Do not assume existing Layer / Zone / button code still matches the previous major/minor API.
 
 **Upgrades do not refresh scene PNGs.** `npm update` replaces kit code in `node_modules`. The scene renders textures from its own `assets/images/ui-component-kit/` copies. Those copies are written only when `copy-assets` (or an allowed postinstall) runs. A folder that already has PNGs is not up to date.
 

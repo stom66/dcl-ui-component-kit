@@ -108,6 +108,6 @@ Desktop kit buttons also fire `callback` on any `onMouseUp` (no hover / press ga
 
 1. Confirm 10/10 real-mouse clicks on a kit button with the workaround **disabled**.
 2. Set `ENABLE_POINTER_INPUT_WORKAROUND = false` or delete `pointerInputPatch.ts` and the `installPointerInputWorkaround()` call in `SetupUiComponentKit`.
-3. Remove the Buttons workaround note in `.cursor/skills/ui-component-kit/SKILL.md` and the README 0.2.0 bullet.
+3. Remove the Buttons workaround note in `.cursor/skills/ui-component-kit/SKILL.md` and the matching bullet in `docs/upgrade-caveats.md`.
 
 Keep the fire-on-`mouseUp` behaviour and `pointerFilter="block"` on the handler owner. Those are not this bug.

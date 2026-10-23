@@ -70,6 +70,8 @@ consumer `package.json`:
 5. Mention the `allow-scripts` warning is normal; `copy-assets` is the supported fix.
 6. Do not invent alternate asset paths — DCL only serves textures from the scene
    `assets/` tree; the kit expects `assets/images/ui-component-kit/`.
+7. Read **[docs/upgrade-caveats.md](./docs/upgrade-caveats.md)** and apply any
+   breaking / behavioural migrations for the version jump just installed.
 
 Opt out (advanced): `UI_COMPONENT_KIT_SKIP_ASSETS=1` or
 `"config": { "dcl-ui-component-kit": { "skipAssets": true } }` — only when the
