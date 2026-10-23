@@ -155,7 +155,7 @@ Breaking / behaviour changes vs 0.1.x (SDK **7.26** UI):
 
 ## This repo as a demo scene
 
-This GitHub repo is also a runnable Decentraland scene. Local demos live under `src/exampleThemes/` (showcase kitchen-sink, skyChaser, …). Switch the active bundle in `src/index.ts`.
+This GitHub repo is also a runnable Decentraland scene. Local demos live under `src/exampleThemes/` (showcase kitchen-sink). Switch the active bundle in `src/index.ts`.
 
 The **npm package** only ships `src/ui-component-kit`, stock assets, and the CLI — not the example themes.
 

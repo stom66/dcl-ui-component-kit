@@ -1,8 +1,5 @@
 import { engine, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
 import { showcase } from './exampleThemes/showcase'
-// import { skyChaser } from './exampleThemes/skyChaser'
-// import { flagTag } from './exampleThemes/flagTag'
-// import { cleanTheClub } from './exampleThemes/cleanTheClub'
 
 import { SetupUiComponentKit } from './ui-component-kit'
 import { Color4 } from '@dcl/sdk/math'
@@ -10,9 +7,6 @@ import { Color4 } from '@dcl/sdk/math'
 
 // Enable exactly one example theme for the scene:
 const active = showcase
-// const active = skyChaser
-// const active = flagTag
-// const active = cleanTheClub
 
 
 export function main() {
