@@ -33,7 +33,9 @@
     "scripts/postinstall.js",
     "scripts/lib/assets.js",
     "scripts/lib/themeScaffold.js",
-    "INSTALL.md"
+    "INSTALL.md",
+    "docs/manual-install.md",
+    "docs/upgrade-caveats.md"
   ],
   "bin": {
     "dcl-ui-component-kit": "scripts/cli.js"

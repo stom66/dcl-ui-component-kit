@@ -2,7 +2,7 @@
 
 Breaking and behavioural changes when moving between versions of `@stom66/dcl-ui-component-kit`.
 
-**Agents:** after this package is **installed or upgraded** in a consumer scene, read this file and apply any migration steps that apply to the jump the user just made. Pair with stock-asset refresh (`npx @stom66/dcl-ui-component-kit copy-assets`) — see [INSTALL.md](../INSTALL.md) and the UI kit skill → **Stock assets after install**.
+**Agents:** after this package is **installed or upgraded** in a consumer scene, read this file and apply any migration steps that apply to the jump the user just made. Pair with stock-asset refresh (`npx @stom66/dcl-ui-component-kit copy-assets`) — see [manual-install.md](./manual-install.md) and the UI kit skill → **Stock assets after install**.
 
 ---
 
