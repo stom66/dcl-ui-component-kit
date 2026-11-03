@@ -1,0 +1,293 @@
+---
+name: add-interactivity
+description: Event-driven interactivity on Decentraland entities - clicks and
+  hover (pointerEventsSystem), E/F presses near an entity (proximity events),
+  enter/exit zones (TriggerArea), raycasts. For per-frame key polling, cursor
+  lock, InputModifier or the action bar see advanced-input; for screen buttons
+  see build-ui.
+---
+# Adding Interactivity to Decentraland Scenes
+
+## RULE: Fetch composite entities — never re-create them
+
+An entity defined in `assets/scene/main.composite` gets its handlers from code that looks it up by name (`engine.getEntityOrNullByName(EntityNames.Door_1)`) or tag (`engine.getEntitiesByTag('Crystal')`) inside `main()` or later; `engine.addEntity()` would create a duplicate. Patterns: `{baseDir}/../composites/composite-reference.md` → Referencing Composite Entities from Code.
+
+---
+
+## Decision Tree
+
+| Need                                                  | Approach         | API                                         |
+| ----------------------------------------------------- | ---------------- | ------------------------------------------- |
+| Click/hover on a specific entity                      | Pointer events   | `pointerEventsSystem.onPointerDown()`       |
+| Button press when player is nearby (no aiming needed) | Proximity events | `pointerEventsSystem.onProximityDown()`     |
+| Detect player entering an area                        | Trigger area     | `TriggerArea` + `triggerAreaEventsSystem`   |
+| Poll key state every frame                            | **advanced-input** | `inputSystem.isTriggered()` / `isPressed()` |
+| Detect objects in a direction                         | Raycasting       | `raycastSystem` or `Raycast` component      |
+| Read cursor position / lock state                     | **advanced-input** | `PointerLock`, `PrimaryPointerInfo`         |
+
+---
+
+## Pointer Events (Click / Hover)
+
+Use `pointerEventsSystem.onPointerDown()` to add click handlers to entities. Also available: `.onPointerUp()`, `.onPointerHoverEnter()`, `.onPointerHoverLeave()`. Set `maxDistance` in the opts (8–16m typical) to bound the interaction range, and set `hoverText` so players know the outcome. Remove with `.removeOnPointerDown(entity)` etc. — clean up handlers when the entity is removed.
+
+### Colliders
+
+- Pointer events reach only an entity with a collider on `ColliderLayer.CL_POINTER`. Primitive or invisible hitbox: `MeshCollider.setBox(entity)`. GLB: set its collision masks per **add-3d-models** → *RULE: Always check for built-in colliders* (`visibleMeshesCollisionMask` defaults to `0`, so a GLB without `_collider` meshes is not clickable until you set it).
+- **Register the handler on the entity that owns the collider.** Pointer events reach the entity whose collider the ray hits — a handler on a parent group, or on a child that has no collider of its own, never fires. When a model is an empty parent with the collider mesh on a child entity, register on the child (or give the parent its own `MeshCollider`).
+- Skinned / armature-rigged GLB (NPCs, characters) with no `_collider` mesh: the visible-mesh mask does not make it clickable — see *Skinned-mesh exception* below.
+
+### Skinned-mesh exception
+
+A skinned/rigged GLB with no `_collider` mesh does not receive pointer events through `visibleMeshesCollisionMask: ColliderLayer.CL_POINTER` (observed renderer behavior; the exact rigging conditions are undocumented, so verify per model). Add an invisible box collider on `CL_POINTER`, parented to the entity so it tracks movement, and register the handler on the collider:
+
+```typescript
+import { engine, MeshCollider, ColliderLayer, pointerEventsSystem, InputAction, Transform } from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
+
+// `npc` is the rigged GLB entity (with GltfContainer + Animator).
+const clicker = engine.addEntity()
+// scale to the avatar bounds; parent so it follows the NPC as it moves
+Transform.create(clicker, { position: Vector3.create(0, 0.45, 0), scale: Vector3.create(2, 2.9, 2), parent: npc })
+MeshCollider.setBox(clicker, ColliderLayer.CL_POINTER)
+
+pointerEventsSystem.onPointerDown(
+  { entity: clicker, opts: { button: InputAction.IA_PRIMARY, hoverText: 'Talk', showFeedback: true } },
+  () => { /* handle click */ }
+)
+```
+
+The `GltfContainer` itself can keep `visibleMeshesCollisionMask: 0`. For an AvatarShape NPC (no mesh collider at all), the same child-collider approach applies — see **npcs** Option A.
+
+### Distance rules (`maxDistance` / `maxCameraDistance` / `maxPlayerDistance`)
+
+- `maxDistance` is the distance from the **avatar**, not the camera; default `10`. Older SDK/protocol comments calling it a camera distance are wrong.
+- `maxCameraDistance` (`@dcl/sdk` 7.28.0+, unset by default) measures from the active camera and combines with `maxDistance` as an **OR**. Use it only when the check belongs to the camera (e.g. a fixed `VirtualCamera`).
+- `maxPlayerDistance` is a `[DEPRECATED]` alias of `maxDistance`.
+- Proximity events ignore `maxCameraDistance`, and their range can be clamped to ~3 m (see *Proximity Events*).
+
+When a range or outline behaves differently from what you computed, read `{baseDir}/references/input-reference.md#distance-and-outline-rules` (combination table, measurement origins, what the hover outline draws).
+
+### Feedback options: `showFeedback` gates `hoverText`
+
+Verified via `30,20-pointer-events-feedback`:
+
+- `showFeedback` (default `true`) — enables the hover UI. **`hoverText` only appears when `showFeedback` is true.** With `showFeedback: false`, no hover text shows regardless of `hoverText`.
+- `showHighlight` (default `true`) — the entity edge/outline highlight on hover. Independent of the text; requires `showFeedback` to be on to be visible.
+- With `showFeedback: true` and no/empty `hoverText`, the explorer shows its default action prompt (e.g. the button glyph) rather than nothing.
+- The outline covers the hit entity and its **descendants** only, so an invisible hitbox beside a model outlines nothing; make the visible parts children of the hitbox (details in the reference above).
+
+### PITFALL: never (re-)register a pointer handler from inside its own callback
+
+Calling `onPointerDown` / `removeOnPointerDown` (or the on/remove variants for Up / Hover) for an entity **from within that entity's own pointer callback** makes the same click fire the handler multiple times (observed: 3 fires from one click, as a state machine re-registered on each fire).
+
+**Why** (verified — `@dcl/ecs/dist/systems/events.js`): the `EventSystem` iterates a per-entity `Map` of handlers each frame. `onPointerDown` does `removeEvent(entity, EventType.Down)` then `getEvent(entity).set(EventType.Down, …)`, which re-inserts the `Down` key into that same `Map`. Re-inserting a key during the `Map`'s own `for…of` iteration causes it to be visited again in the same pass, and `inputSystem.getInputCommand(...)` still returns the same buffered down command → the callback re-fires.
+
+**Fix — to change hover text dynamically, mutate the existing `PointerEvents` component in place instead of re-registering:**
+
+```typescript
+import { PointerEvents } from '@dcl/sdk/ecs'
+
+function setHoverText(entity: Entity, hoverText: string) {
+  const pe = PointerEvents.getMutableOrNull(entity)
+  if (!pe) return
+  for (const entry of pe.pointerEvents) {
+    if (entry.eventInfo) entry.eventInfo.hoverText = hoverText
+  }
+}
+```
+
+Register the handler exactly once (e.g. at entity creation); never re-call it from a click/hover callback or from a per-frame system.
+
+### Input actions
+
+The `button` in `opts` is an `InputAction` (`IA_POINTER` left mouse, `IA_PRIMARY` E, `IA_SECONDARY` F, `IA_ACTION_3`–`IA_ACTION_6` keys 1–4, …). Full key map: **advanced-input** → *All InputAction Values*.
+
+### All Event Types
+
+```typescript
+PointerEventType.PET_DOWN; // Button or key pressed
+PointerEventType.PET_UP; // Button or key released
+PointerEventType.PET_HOVER_ENTER; // Cursor enters entity
+PointerEventType.PET_HOVER_LEAVE; // Cursor leaves entity
+PointerEventType.PET_PROXIMITY_ENTER; // Player walks within entity's proximity range
+PointerEventType.PET_PROXIMITY_LEAVE; // Player moves out of entity's proximity range
+```
+
+### Handler removal keeps the `PointerEvents` entry in step (`@dcl/sdk` 7.29.0+)
+
+- `removeOnPointerDown` / `removeOnClick` / `removeOnPointerUp` / the hover and proximity variants **remove the `PointerEvents` entry the registration created, whether or not `hoverText` was passed**, so the renderer stops advertising an interaction whose callback is gone, and re-registering does not grow the array.
+- The callback map is keyed by `eventType:interactionType`, so **`onProximityDown` and `onPointerDown` coexist** on the same entity: register both a cursor and a proximity handler for the same event type, and **both callbacks fire** when both conditions are met.
+- A removal takes only its own registration's entry: `removeOnClick` and `onPointerDown` (both `PET_DOWN` + `CURSOR`) are independent.
+- On an older pin, a removal without `hoverText` leaves its entry behind (the interaction stays advertised and re-registering grows the array), and `onProximityDown` replaces an existing `onPointerDown` on the same entity.
+
+---
+
+## Proximity Events (Nearby Interactions Without Aiming)
+
+Proximity events let entities react to button presses when the player is nearby and roughly facing the entity, **without requiring the player to aim their cursor at it**. The interactive area is a wide triangular slice projecting forward from the avatar's position — the avatar's facing direction matters, not the camera direction.
+
+Three gates must all pass for a proximity event to fire (verified against `34,20-pointer-events-distances` and the Unity explorer's proximity path):
+
+1. **Distance** — player distance <= `maxDistance` (default 10), measured from the capsule center (~1m above the feet).
+2. **Facing cone** — the entity must fall inside a ~120 degree horizontal cone in front of the avatar.
+3. **Occlusion raycast** — nothing may sit between the player and the entity.
+
+> **Gotcha — the 3m broad phase.** The Unity explorer's proximity broad phase is a hard-coded 3m `OverlapSphere`. A `maxDistance` larger than 3 on a proximity entry can be silently clamped to ~3m, so a proximity handler asking for 8m may go dead at ~3m. Design proximity interactions for close range and use a `TriggerArea` (or a cursor pointer event) when you need reach beyond ~3m.
+
+If the player is both in proximity of an entity with a proximity interaction AND aiming at an entity with a pointer interaction, the **pointer interaction always takes priority**. Among multiple proximity entities in range, only the closest one (or highest priority) is activated.
+
+Use `pointerEventsSystem.onProximityDown()` and `.onProximityUp()` — same signature as pointer events. Range comes from `maxDistance` (avatar distance, default 10); `maxPlayerDistance` is a deprecated alias of it. Only one proximity registration per event type per entity. Register once at setup, outside any system.
+
+Use `.onProximityEnter()` and `.onProximityLeave()` for detecting when a player walks into/out of range — useful for sounds, animations, or UI hints.
+
+Use the `priority` option (higher number wins) when multiple entities overlap. Closest entity wins ties. Remove with `.removeOnProximityDown(entity)` etc.
+
+### Proximity Options
+
+Same options as pointer events (`button`, `maxDistance`, `hoverText`, `showHighlight`, `showFeedback`, `priority`); `maxCameraDistance` is ignored on this path. Table: `{baseDir}/references/input-reference.md` → *Proximity Interactions* → *Options*. Full door example: `{baseDir}/references/interactivity-patterns.md` → *Proximity Door Example*.
+
+For the system-based approach (combining pointer + proximity on the same entity), use `InteractionType.PROXIMITY` with the `PointerEvents` component and `inputSystem.isTriggered()`: `{baseDir}/references/input-reference.md` → *System-Based Proximity*.
+
+---
+
+## Trigger Areas (Proximity Detection)
+
+Native ECS component for detecting when an entity enters a region. Prefer this over hand-rolled "check player position every frame" systems and over the older `@dcl-sdk/utils` `triggers.addTrigger()` helper — they exist as fallbacks but `TriggerArea` is the standard SDK7 primitive ([ADR-258](https://github.com/decentraland/adr/blob/2b30a5e2b4f359a7c22a68fb827db282f6e5f887/content/ADR-258-trigger-areas.md)).
+
+**The volume's size, position, and rotation come from the entity's `Transform`.** `Transform.scale` defines a unit box (or a unit sphere, so the radius is **half** the scale: `scale 6` → radius 3) at the entity's pose, respecting any parent chain.
+
+**Scene open in the Creator Hub?** Place the `utils` **Trigger Area** Smart Item instead of hand-building the entity; it arrives with the shape param, collider filter and Reactions wiring (see **creator-hub-mcp**).
+
+> **PITFALL — a thin trigger never fires.** A pressure plate or floor marker modelled as a ~0.1m slab has a trigger volume the avatar capsule **never overlaps** while standing on top of it, so the `TriggerArea` silently never fires. This looks like a broken component and is not.
+>
+> **Fix:** keep the thin slab as the *visual*, and put the trigger in a **separate invisible box ~2m tall** sitting on it (verified in `149,149-synthetic-input-showcase`, stations S2 and S3):
+>
+> ```typescript
+> // Visual plate stays where it is. Trigger is its own entity.
+> const plateTrigger = engine.addEntity()
+> Transform.create(plateTrigger, {
+>   position: Vector3.create(plate.x, plate.y + 1, plate.z), // centered 1m up
+>   scale: Vector3.create(3, 2, 3),                           // 2m tall
+> })
+> TriggerArea.setBox(plateTrigger)
+> ```
+
+> **PITFALL — overlapping zones: recompute from occupancy, never write from the handler.** When two trigger zones each install some state (an `InputModifier`, a camera mode, an ambience track), do **not** set it in `onTriggerEnter` and clear it in `onTriggerExit`. A teleport (`movePlayerTo`) that crosses both volumes can deliver the destination's **enter before** the origin's **exit**, and the stale exit then wipes what the enter just installed. The order is **not deterministic in either direction** — both have been measured in one session, one per direction of travel — so you cannot code against either ordering.
+>
+> **Fix:** handlers only flip an occupancy flag; a single function derives the state from all flags and is called after every enter and every exit:
+>
+> ```typescript
+> let insideZoneA = false
+> let insideZoneB = false
+>
+> function applyModifierFromOccupancy() {
+>   if (insideZoneA) InputModifier.createOrReplace(engine.PlayerEntity, { mode: { $case: 'standard', standard: { disableAll: true } } })
+>   else if (insideZoneB) InputModifier.createOrReplace(engine.PlayerEntity, { mode: { $case: 'standard', standard: { disableRun: true } } })
+>   else InputModifier.deleteFrom(engine.PlayerEntity)
+> }
+> // every enter/exit handler: set its flag, then call applyModifierFromOccupancy()
+> ```
+>
+> This makes event order irrelevant. Generalizes to any last-writer-wins state driven by more than one zone.
+
+**Minimal example — box that detects the local player:**
+```typescript
+import {
+  engine,
+  Transform,
+  TriggerArea,
+  triggerAreaEventsSystem,
+  ColliderLayer
+} from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
+
+const zone = engine.addEntity()
+Transform.create(zone, {
+  position: Vector3.create(8, 1, 8),
+  scale: Vector3.create(4, 2, 4) // 4m × 2m × 4m box
+})
+TriggerArea.setBox(zone, ColliderLayer.CL_PLAYER)
+
+triggerAreaEventsSystem.onTriggerEnter(zone, (result) => {
+  if (result.trigger?.entity !== engine.PlayerEntity) return // local player only
+  console.log('player entered')
+})
+triggerAreaEventsSystem.onTriggerExit(zone, () => {
+  console.log('player left')
+})
+```
+
+**Sphere variant:** `TriggerArea.setSphere(entity, ColliderLayer.CL_PLAYER)` — use uniform `Transform.scale`. The scale is the sphere's **diameter**: the Explorer spawns a unit sphere collider (radius 0.5) and lets the Transform scale it, so `scale 6` gives a 3 m radius (`SDKEntityTriggerAreaComponent.cs`). Keep the scale uniform; the Explorer does not define what a non-uniform scale does to the sphere.
+
+**Collision mask:** Default is `CL_PLAYER`. Pass other `ColliderLayer` values (bitwise-OR them, e.g. `CL_PLAYER | CL_CUSTOM4`) to react to physics or custom layers.
+
+**Sizing: the Transform *is* the volume — there is no size field.** `PBTriggerArea` carries only `mesh` and `collision_mask`; size **and rotation** come entirely from the entity's `Transform`, and the volume tracks scale changes made at any time, on the entity or on a parent. This is the opposite of the sibling area components: `AvatarModifierArea` and `CameraModeArea` take an explicit `area: Vector3` that overrides `Transform.scale` for the life of the component, so scaling those entities later changes nothing. Do not carry a habit from one to the other (see **player-avatar** and **camera-control**).
+
+**Detecting non-player entities:** a `TriggerArea` fires for any entity whose own collider is on a layer the area listens for. To make a scene entity trip an area, give it a `MeshCollider`/`GltfContainer` collider on a matching custom layer and set the area's mask to include it (verified `75,-9-trigger-areas`: a `GltfContainer` with `visibleMeshesCollisionMask: ColliderLayer.CL_CUSTOM4` trips an area created with `TriggerArea.setBox(entity, ColliderLayer.CL_PLAYER | ColliderLayer.CL_CUSTOM4)`). You can also put a `TriggerArea` on a moving/falling entity to detect when *it* enters another volume.
+
+**Callbacks:**
+- `triggerAreaEventsSystem.onTriggerEnter(entity, cb)` — fires once on entry
+- `triggerAreaEventsSystem.onTriggerStay(entity, cb)` — fires every tick while inside (SDK-synthesized from the ENTER/EXIT state machine)
+- `triggerAreaEventsSystem.onTriggerExit(entity, cb)` — fires once on exit
+- Detach with `removeOnTriggerEnter/Stay/Exit(entity)`
+
+**Callback shape — common gotcha:**
+The callback receives a `PBTriggerAreaResult`. `result.trigger?.entity` is the entity that entered (compare with `engine.PlayerEntity` to filter to the local player). `result.triggeredEntity` is the trigger area itself, despite its name — comparing it to the player is always true and the guard never fires. All fields: `{baseDir}/references/input-reference.md#trigger-area-callback-fields`.
+
+**Multiplayer note:** With `CL_PLAYER`, the trigger fires for every player that enters — remote players included. Always guard physics/UI side-effects with `if (result.trigger?.entity !== engine.PlayerEntity) return`.
+
+**Underlying components:** `TriggerArea` (config) and `TriggerAreaResult` (CRDT result). You normally don't read `TriggerAreaResult` directly — use the events system.
+
+### Pickups / collectibles: polish details
+
+- **Delay the removal ~0.12 s.** On collect, start the feedback (sound, particle burst, scale-out tween) and remove the entity with `timers.setTimeout(() => engine.removeEntityWithChildren(coin), 120)` (`timers` from `@dcl/sdk/ecs`, never the JS global). Removing it the same tick makes the item blink out before the effect reads. Gate the handler with a `collected` flag so it cannot fire twice during the delay.
+- **Play the pickup sound from a separate, persistent entity**, not the item itself: removing an entity removes its `AudioSource` and cuts the sound. Vary its pitch per pickup (see **audio-video**).
+- **A flat coin edge-on is invisible.** `MeshRenderer.setCylinder` is Y-axis aligned, so a thin disc (`scale` y ≈ 0.06) lies flat like a manhole and shows only its rim from eye level. Put the disc on a **child** rotated 90° on X so it stands upright, and spin the **parent** around Y (`Tween.setRotateContinuous`) so its face sweeps past the player.
+- Full example: `{baseDir}/references/interactivity-patterns.md` → *Collectible Pickup*.
+
+---
+
+## Raycasting
+
+Four direction modes: local direction (relative to entity rotation), global direction (world-space), global target (aim at position), target entity (aim at another entity).
+
+**Callback-based** (recommended): `raycastSystem.registerLocalDirectionRaycast()`, `.registerGlobalDirectionRaycast()`, `.registerGlobalTargetRaycast()`, `.registerTargetEntityRaycast()`. Remove with `.removeRaycasterEntity()`.
+
+**Component-based**: Create `Raycast` component, read `RaycastResult` in a system. Set `continuous: false` unless you genuinely need per-frame results (`true` re-casts every frame and costs accordingly). Fields (verified `77,-1-raycast-unit-tests`): `direction: { $case: 'localDirection'|'globalDirection'|'globalTarget'|'targetEntity', ... }`, `originOffset`, `maxDistance`, `queryType`, `continuous`, `timestamp`. `RaycastResult` (added a frame later) contains `globalOrigin`, a normalized `direction`, `hits[]`, `timestamp`, and `tickNumber`.
+
+**Ray origin respects the world transform:** the ray starts at the entity's world position (parent chain applied) plus `originOffset`, so a raycast entity nested under moved/scaled parents casts from its resolved world pose. `localDirection` is rotated by the entity's world rotation; `globalDirection` ignores it.
+
+PITFALL: `RaycastQueryType.RQT_HIT_FIRST` picks the **first** hit in range, **not necessarily the closest** (verified enum doc). Use `RQT_QUERY_ALL` and sort by distance if you need the nearest. `RQT_NONE` skips the cast and returns empty hits.
+
+**Camera raycast**: Use `engine.CameraEntity` as the entity to detect what the player is looking at. To cast along the cursor (works locked or free), use `PrimaryPointerInfo.worldRayDirection` as the direction (see advanced-input).
+
+---
+
+## Global Input and Cursor State
+
+Key presses not tied to an entity (`inputSystem.isTriggered` / `isPressed` in a system), pointer lock and the cursor's screen position and world ray: **advanced-input** (*Input Polling with inputSystem*, *Pointer Lock State*, *Cursor Position and World Ray*). Design for mobile too: it has no keyboard, so rely on pointer events and on-screen UI buttons rather than key presses.
+
+## Toggle Pattern
+
+Common pattern: track state in a module-level boolean, flip it in the click handler, and update the entity accordingly.
+
+For complex interactions (multi-step sequences, cooldowns, several entities reacting to shared state), move beyond a single boolean: track state in a module-level object or custom component and drive updates from a system.
+
+## Smart Items: behavior is Script code, not a trigger graph
+
+Most catalog Smart Items are `asset-packs::Script` code with `@action` methods, not an Actions/Triggers graph: their "When X" hooks are optional `ActionCallback` params and their state is a synced `asset-packs::States`. Before inspecting or extending one: **script-components** → *Script-based Smart Items*.
+
+## Example scenes
+
+Engine-team test scenes exercising these APIs (ground truth):
+
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/3,2-proximity-interactions — `onProximityDown/Enter/Leave`, cursor vs proximity priority, declarative `PointerEvents` with two buttons, proximity door.
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/30,20-pointer-events-feedback — `showFeedback`/`showHighlight`/`hoverText` combinations (hover text needs `showFeedback: true`).
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/34,20-pointer-events-distances — the **distance rules**: eight lanes proving `maxDistance` (player), the deprecated `maxPlayerDistance` alias (larger wins), `maxCameraDistance`, the OR combination, the implicit 10m default, and that proximity ignores `maxCameraDistance`. Each cube predicts LIVE/DEAD every frame from the resolve-then-branch logic, so a mismatch with in-world behavior is the signal. Includes a probe for the explorer's hard-coded 3m proximity broad phase. Pins `@dcl/sdk@next`.
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/149,149-synthetic-input-showcase — the tall-invisible-`TriggerArea` fix (S2/S3) and the occupancy-recompute `InputModifier` pattern, driven live through the Unity Explorer MCP.
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/75,-9-trigger-areas — `TriggerArea.setBox/setSphere`, `onTriggerEnter/Stay/Exit`, `result.trigger?.entity`, custom collider-layer masks so non-player entities trip the area.
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/0,0-cube-spawner — declarative `PointerEvents` read in a system via `inputSystem.isTriggered(IA_POINTER, PET_DOWN, entity)`.
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/77,-1-raycast-unit-tests — component-based `Raycast`/`RaycastResult` for all four direction modes, incl. origin under a transformed parent chain.
+
+Code for each section above (click, hover, removal, proximity, trigger areas, raycasts, toggle): `{baseDir}/references/interactivity-patterns.md`. Declarative `PointerEvents` component, proximity option table, raycast direction types: `{baseDir}/references/input-reference.md`.

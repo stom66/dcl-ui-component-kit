@@ -278,7 +278,7 @@ import { exampleBtnIconsAtlas } from '../../exampleThemes/showcase'
 Wide blank sheet (`atlasBtn3x1`) as the button texture with nested icon + label (see `demo.buttons.layer.tsx`). Prefer `atlas={…}` so atlas `inset` / `insetX` / `insetY` apply:
 
 ```tsx
-import { atlasBtn3x1, atlasIconsFontAwesome, ButtonImage, Icon, Row, Text } from '../../../ui-component-kit'
+import { atlasBtn3x1, ButtonImage, FontAwesome, Row, Text } from '../../../ui-component-kit'
 
 <ButtonImage
 	id          = "btn_click_me"
@@ -293,7 +293,7 @@ import { atlasBtn3x1, atlasIconsFontAwesome, ButtonImage, Icon, Row, Text } from
 	}}
 >
 	<Row height="100%" alignItems="center" justifyContent="center" spacing={8}>
-		<Icon uvs={atlasIconsFontAwesome.uv.handPointer} width={28} height={28} iconColor={theme.colors.dark} />
+		<FontAwesome name="hand-pointer" fontSize={28} fontColor={theme.colors.dark} />
 		<Text value="Click me" width="auto" fontColor={theme.colors.dark} textWrap="nowrap" />
 	</Row>
 </ButtonImage>

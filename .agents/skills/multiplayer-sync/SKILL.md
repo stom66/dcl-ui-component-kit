@@ -1,0 +1,375 @@
+---
+name: multiplayer-sync
+description: Serverless (peer-to-peer) multiplayer in Decentraland with CRDT syncEntity and MessageBus. Use when the user wants synced entities, shared world state, broadcast events, player-to-player communication without a server, or to test a scene with two local players. For server-authoritative state, anti-cheat or persistence see authoritative-server.
+---
+
+# Multiplayer Synchronization in Decentraland
+
+> **Smart wearables:** none of this works there — no `syncEntity`, no `MessageBus`. Only the wearer's avatar position and emotes reach other players; anything else needs a third-party server. See **smart-wearables** → Multiplayer.
+
+## Sync Strategy Decision Tree
+
+Choose the right networking approach based on what you need:
+
+| Strategy           | Use When                                                             | Persistence                                                                                                                                          | Example                                         |
+| ------------------ | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `syncEntity`       | Shared state that all players see and that persists for new arrivals | Yes — state survives player join/leave, but only as long as at least one player remains in the scene. The state resets as soon as the scene is empty | Doors, switches, scoreboards, elevators         |
+| `MessageBus`       | Ephemeral events that only matter in the moment                      | No — late joiners miss past messages                                                                                                                 | Chat messages, sound effects, particle triggers |
+| `fetch` / REST API | Reading or writing data to an external server                        | Server-dependent                                                                                                                                     | Leaderboards, inventory, external game state    |
+| `signedFetch`      | Authenticated requests that prove player identity                    | Server-dependent                                                                                                                                     | Claiming rewards, submitting verified scores    |
+| `WebSocket`        | Real-time bidirectional communication with a server                  | Connection-dependent                                                                                                                                 | Live game servers, real-time chat.              |
+
+**Decision flow:**
+
+1. Does every player need to see the same state, including late joiners? --> `syncEntity`
+2. Is it a fire-and-forget event only for players currently in the scene? --> `MessageBus`
+3. Do you need the information to be persisted even after all players leave, or to run secure validations on that information? --> `fetch` or `signedFetch`
+4. Do you need continuous real-time server communication? --> `WebSocket`
+5. Combine approaches freely: use `syncEntity` for world state, `MessageBus` for effects, and `fetch` for persistence.
+
+---
+
+## syncEntity Essentials
+
+### Import and Basic Usage
+
+```typescript
+import { engine, Transform, MeshRenderer, Material } from '@dcl/sdk/ecs'
+import { syncEntity } from '@dcl/sdk/network'
+import { Vector3, Color4 } from '@dcl/sdk/math'
+```
+
+Signature: `syncEntity(entity, componentIds[], syncId?)`
+
+- `entity` — the entity to synchronize
+- `componentIds[]` — array of component IDs to keep in sync (e.g., `[Transform.componentId]`)
+- `syncId` — unique numeric identifier (required for predefined entities, optional for player-spawned entities)
+
+### Enum Sync IDs (Predefined Entities)
+
+Every predefined synced entity MUST have a unique numeric ID. Use an enum to avoid collisions:
+
+```typescript
+enum SyncIds {
+	DOOR = 1,
+	ELEVATOR = 2,
+	SCOREBOARD = 3,
+}
+
+const door = engine.addEntity()
+Transform.create(door, { position: Vector3.create(8, 1, 8) })
+MeshRenderer.setBox(door)
+syncEntity(
+	door,
+	[Transform.componentId, MeshRenderer.componentId],
+	SyncIds.DOOR
+)
+```
+
+Predefined entities (with a sync ID) persist after the creating player leaves. Player-created entities (no sync ID) are removed when the player disconnects.
+
+> **Best practice — always give singletons a stable sync ID.** Auto IDs derive identity from the creating peer + its local engine entity number (which the engine recycles). A singleton synced entity that is destroyed and recreated repeatedly with an auto ID is fragile over real network comms: it may fail to reconcile on remote clients (they see only default component data) even though it works perfectly in local single-process preview. Assign any singleton or small fixed set of well-known synced entities a STABLE explicit sync ID from a reserved enum. Reserve auto IDs for genuinely dynamic, many-instance, create-and-forget entities. Also: never `removeEntity` a fixed-ID synced entity and recreate it with the same ID in the SAME frame — the internal `NetworkEntity` survives until a later CRDT flush, so recreating immediately throws `id provided is already in use`; defer the re-spawn to a later tick. See `{baseDir}/references/networking-patterns.md` (syncEntity identity section) for the full failure-mode signature, fix, and the optimistic-prediction companion pattern.
+
+### Auto-Generated IDs (Player-Spawned Entities)
+
+Entities created at runtime by players do not need an explicit sync ID:
+
+```typescript
+function createProjectile() {
+	const projectile = engine.addEntity()
+	Transform.create(projectile, { position: Vector3.create(4, 1, 4) })
+	MeshRenderer.setSphere(projectile)
+	syncEntity(projectile, [Transform.componentId])
+	return projectile
+}
+```
+
+## Custom Synced Components
+
+Define custom components and sync them between players:
+
+```typescript
+import { engine, Schemas } from '@dcl/sdk/ecs'
+import { syncEntity } from '@dcl/sdk/network'
+
+const ScoreBoard = engine.defineComponent('scoreBoard', {
+	score: Schemas.Int,
+	playerName: Schemas.String,
+	lastUpdated: Schemas.Int64,
+})
+
+const board = engine.addEntity()
+ScoreBoard.create(board, { score: 0, playerName: '', lastUpdated: 0 })
+syncEntity(board, [ScoreBoard.componentId])
+
+function addScore(points: number) {
+	const data = ScoreBoard.getMutable(board)
+	data.score += points
+	data.lastUpdated = Date.now()
+}
+```
+
+> **Use `Schemas.Int64` for timestamps and other large numbers.** `Schemas.Number` / `Schemas.Int` corrupt values over 13 digits (like `Date.now()`) — always store such values in `Schemas.Int64` (as `lastUpdated` above does).
+
+**Custom schemas must be deterministic:** the same component name must map to the same schema across all clients.
+
+## Player-Specific Data
+
+Use `PlayerIdentityData` to distinguish players:
+
+```typescript
+import { engine, PlayerIdentityData } from '@dcl/sdk/ecs'
+
+engine.addSystem(() => {
+	for (const [entity] of engine.getEntitiesWith(PlayerIdentityData)) {
+		const data = PlayerIdentityData.get(entity)
+		console.log('Player:', data.address, 'Guest:', data.isGuest)
+	}
+})
+```
+
+## Schema Types
+
+Available schema types for custom components:
+
+| Type                          | Usage                       |
+| ----------------------------- | --------------------------- |
+| `Schemas.Boolean`             | true/false (there is no `Schemas.Bool`) |
+| `Schemas.Int`                 | Integer numbers             |
+| `Schemas.Float`               | Decimal numbers             |
+| `Schemas.String`              | Text strings                |
+| `Schemas.Int64`               | Large integers (timestamps) |
+| `Schemas.Vector3`             | 3D coordinates              |
+| `Schemas.Quaternion`          | Rotations                   |
+| `Schemas.Color3`              | RGB colors                  |
+| `Schemas.Color4`              | RGBA colors                 |
+| `Schemas.Entity`              | Entity reference            |
+| `Schemas.Array(innerType)`    | Array of values             |
+| `Schemas.Map(spec, default?)` | Nested struct — `spec` is named fields (`{ x: Schemas.Int, ... }`), NOT a homogeneous key→value map |
+| `Schemas.Optional(innerType)` | Nullable values             |
+| `Schemas.EnumNumber(enumObj, default)` | Numeric enum; `default` is required (e.g. `Schemas.EnumNumber(State, State.Lobby)`) |
+| `Schemas.EnumString(enumObj, default)` | String enum; `default` is required |
+| `Schemas.OneOf({ ... })`      | Discriminated union (`$case` + payload) |
+
+Example with the less common schema types:
+
+```typescript
+enum Rarity { Common = 0, Rare = 1, Legendary = 2 }
+
+const Loot = engine.defineComponent('game::Loot', {
+	rarity: Schemas.EnumNumber<Rarity>(Rarity, Rarity.Common),
+	payload: Schemas.OneOf({
+		coins: Schemas.Int,
+		item: Schemas.String,
+	}),
+	label: Schemas.Optional(Schemas.String),
+})
+```
+
+### Schema behavior to rely on (`@dcl/sdk` 7.28.0+)
+
+On an older pin these do not hold: never leave a `OneOf` field unset (serializing it throws and stops the engine tick for the whole scene), and treat `false`, `0` and `''` in an `Optional` or primitive-schema component as unset.
+
+- `Schemas.Optional(...)` holds falsy values: `false`, `0` and `''` round-trip, so `Optional(Schemas.Boolean)` is a real tri-state.
+- A `Schemas.OneOf(...)` field the scene never sets is safe: it serializes and reads back as `{}` with no `$case`.
+- A component defined directly from a primitive or array schema may hold `0`, `false` or `''`; every accessor treats that as present.
+- Component reads are deeply readonly: an array read is a `ReadonlyArray`, so `.push()` does not type-check. Copy it (`[...arr]`) before mutating and write the result back through `getMutable`.
+
+## Parent-Child Sync Relationships
+
+For synced entities with parent-child relationships, use `parentEntity()` instead of setting `Transform.parent`:
+
+```typescript
+import {
+	syncEntity,
+	parentEntity,
+	getParent,
+	getChildren,
+	removeParent,
+} from '@dcl/sdk/network'
+
+const parent = engine.addEntity()
+const child = engine.addEntity()
+
+syncEntity(parent, [Transform.componentId], 1)
+syncEntity(child, [Transform.componentId], 2)
+
+// Use parentEntity() — NOT Transform.parent
+parentEntity(child, parent)
+
+const parentRef = getParent(child)
+const childrenArray = Array.from(getChildren(parent))
+
+// Remove parent relationship
+removeParent(child)
+```
+
+## Connection State
+
+Check if the player is connected to the sync room:
+
+```typescript
+import { isStateSyncronized } from '@dcl/sdk/network'
+
+engine.addSystem(() => {
+	if (!isStateSyncronized()) return // wait for sync
+	// safe to read/write synced state
+})
+```
+
+**Note:** The function is spelled `isStateSyncronized` (not "Synchronized") in the SDK.
+
+---
+
+## MessageBus
+
+Send custom messages between players (fire-and-forget, no persistence). The SDK marks `MessageBus` `@deprecated` and the docs say it may be removed in a future version; it still works. Use `syncEntity` for anything late joiners need (the docs' recommendation for most cases), and keep `MessageBus` for transient effects.
+
+```typescript
+import { MessageBus } from '@dcl/sdk/message-bus'
+
+const bus = new MessageBus()
+
+bus.on('hit', (data: { damage: number }) => {
+	console.log('Took damage:', data.damage)
+})
+
+bus.emit('hit', { damage: 10 })
+```
+
+> **Authoritative-server scenes:** construct `MessageBus` only inside the client branch (`if (!isServer())`); a module-scope `new MessageBus()` fails on the server. Use `registerMessages` instead: **authoritative-server** → Messages.
+
+### syncEntity vs MessageBus
+
+- `syncEntity`: late joiners get current state, automatic conflict resolution — CRDT last-write-wins, so if two players change the same component simultaneously the last write wins. The state persists as long as at least one player remains in the scene
+- `MessageBus`: fire-and-forget, late joiners miss past messages, good for transient effects
+
+### Binary MessageBus (Performance Optimization)
+
+The regular `MessageBus` JSON-encodes every payload before sending. For high-frequency messages or large payloads, there's a lower-level binary alternative that sends raw `Uint8Array` data directly — faster to process because it skips JSON serialization on both ends. This is the same transport `syncEntity` uses internally.
+
+Use it when:
+
+- You are emitting many messages per second (e.g., continuous movement streams, particle triggers in tight loops)
+- Payload size matters (binary encoding is more compact than JSON)
+- You already have binary data (e.g., pre-encoded buffers, CRDT deltas)
+
+Stick with the regular `MessageBus` for low-frequency events where ergonomics beat performance.
+
+```typescript
+import { sendBinary } from '~system/CommunicationsController'
+import { executeTask } from '@dcl/sdk/ecs'
+
+// Send a binary message to all peers (or a specific subset via peerData)
+executeTask(async () => {
+	const payload = new Uint8Array([1, 2, 3, 4]) // your encoded data
+	const response = await sendBinary({
+		data: [payload],
+		peerData: undefined, // optional: target specific peers
+	})
+	// response.data is a Uint8Array[] of messages received from other peers
+	for (const incoming of response.data) {
+		handleBinaryMessage(incoming)
+	}
+})
+```
+
+You are responsible for encoding/decoding the `Uint8Array` payloads yourself (e.g., with `DataView`, `TextEncoder`/`TextDecoder`, or protobuf). There's no on/emit/topic layer — `sendBinary` is a single call that both sends pending outgoing messages and returns incoming ones, so you typically drive it from a system on each tick.
+
+---
+
+## REST API and Signed Fetch
+
+For communicating with your own backend (leaderboards, game state persistence, player auth), use `fetch` or `signedFetch`. All network calls must run inside `executeTask`. `signedFetch` attaches a cryptographic proof of the player's wallet identity — use it when your server needs to verify who is making the request.
+
+See the **scene-runtime** skill for full `fetch` and `signedFetch` patterns.
+
+---
+
+## WebSocket Connections
+
+WebSocket connect, reconnect with backoff, heartbeat and message format: `{baseDir}/references/networking-patterns.md`. Raw `WebSocket` API in the scene runtime: **scene-runtime**.
+
+---
+
+## Player Enter/Leave Events
+
+Detect players entering or leaving the scene:
+
+```typescript
+import { onEnterScene, onLeaveScene } from '@dcl/sdk/src/players'
+
+onEnterScene((player) => {
+	console.log('Player entered:', player.userId)
+})
+onLeaveScene((userId) => {
+	console.log('Player left:', userId)
+})
+```
+
+### SDK Observables (low-level)
+
+The SDK also exposes lower-level observables (`onPlayerClickedObservable`, `onEnterSceneObservable`, `onLeaveSceneObservable`, `onRealmChangedObservable`, `onPlayerExpressionObservable`, `onProfileChangedObservable`) from `@dcl/sdk/observables`. These are the primitives underlying the `onEnterScene`/`onLeaveScene` helpers above.
+
+## Remote players' Transforms are scene-relative
+
+Another player's `Transform` is in the same scene-relative frame as the local player's (desktop, and mobile app 1.15.0+), which is what distance checks, proximity leaderboards and follow cameras that iterate `PlayerIdentityData` rely on. Older mobile apps report world coordinates; the conditional conversion and the safety-critical rule are in **player-avatar** → *Remote players' positions are scene-relative*.
+
+## Per-player visuals are NOT automatically shared
+
+Some components that *look* multiplayer are evaluated or stored **per client**, so each player can see something different:
+
+- **`Billboard`** (camera-facing) is recomputed in each client, so every player sees it facing their own camera; it needs no `syncEntity`. A `Billboard` with a `targetEntity` faces that entity instead, so all players see it oriented the same way: use it when the orientation must agree (e.g. a sign pointing at a shared object). Details: **advanced-rendering** → *Billboard (Face the Camera)*.
+- **`AvatarNametag`** (the rank/role plate above an avatar, `@dcl/sdk` 7.28.0+) is client-local: writing it on a remote player's entity changes only what the writing client sees, and `syncEntity` cannot relay it (player entities are engine-owned). If every player should see the same plate on everyone, each client must compute and write the whole set itself. It is not rendered on mobile, so never make it the only carrier of information a player needs (**player-avatar** → *Custom Nametag Plates* → Gotchas).
+
+Two ways to make a client-local visual agree across clients:
+
+1. **Derive it** from data every client already has. E.g. sort all `PlayerIdentityData` addresses and index a fixed roster — same address list, same result on every client, independent of join order. No messages, no drift. This is the pattern in `scenes/4,24-avatar-nametag`; the full roster code (diff check, throttled re-scan) is in **player-avatar** `references/avatar-nametag.md`.
+2. **Replicate the *input*, not the visual.** Sync the assignment (a synced component or a `MessageBus` message), then have every client apply it locally to the player entity it resolves for that user id.
+
+In both cases: resolve the target `Entity` from the user id on **every** write. Player entity ids are recycled across disconnects, so a cached `Entity` can land the write on a different player.
+
+## Multiplayer Testing
+
+Every client connected to the local preview realm counts as a separate player — but **the desktop Explorer only allows one instance at a time**. Pressing **Play** a second time in the Creator Hub re-focuses the window that is already open; it does not add a second player. Two ways to get a second local client:
+
+- **Second desktop instance**: in Creator Hub open **Play Options** (the dropdown arrow on the **Play** button), hover the **Desktop Client** row to open its flyout, and tick **Multi-Instance Preview** (requires `@dcl/sdk` >= 7.20.4); or run `npx sdk-commands start --multi-instance`. Then press **Play** / run the command again. Multi-instance needs each window to authenticate as a *different* account, so it disables Skip Auth Screen — expect an auth screen per instance and sign in with a different wallet in each, otherwise both windows are the same player. `--multi-instance` is the flag that lifts the single-instance lock. The `start` command's `-n` flag is not a substitute: it adds an `open-deeplink-in-new-instance` deep-link parameter that the Explorer rejects with an unsafe-parameters dialog, and it starts no second instance.
+- **Desktop + browser**: leave the desktop client open and add the Bevy web client as player 2 — **Play Options** → select the **Web (Bevy)** client row, or `npx sdk-commands start --web` (alias `--bevy-web`), which opens `https://decentraland.org/bevy-web/?preview=true&realm=<local realm origin>` (`.zone` under `--dclenv zone`). Browser tabs have no instance limit.
+
+The `decentraland://` deep link Preview fires (`realm=…&position=…&dclenv=…&local-scene=true`) is subject to the same single-instance rule unless it carries `multi-instance=true`; let the CLI or Creator Hub build it rather than typing it by hand.
+
+### Offline Mode
+
+For Decentraland Worlds that do not need multiplayer:
+
+```json
+{
+	"worldConfiguration": {
+		"fixedAdapter": "offline:offline"
+	}
+}
+```
+
+## Troubleshooting
+
+| Problem                                                  | Cause                                                                  | Solution                                                                                                                                                                                        |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Profile not initialized. Call syncEntity inside main()` | `syncEntity` called at module top-level (e.g. in a module initialiser) | Move all `syncEntity` calls (and entity creation that depends on them) into a function called from `main()`. Never call `syncEntity` at module load time. Same applies to `engine.addSystem()`. |
+| State not syncing between players                        | Missing `syncEntity()` call                                            | Every entity you want shared must call `syncEntity(entity, [ComponentId1, ComponentId2])`                                                                                                       |
+| Sync ID collision                                        | Two entities share the same numeric sync ID                            | Use an enum to assign unique IDs to every predefined synced entity                                                                                                                              |
+| State not ready on join                                  | Reading synced state before sync completes                             | Guard with `if (!isStateSyncronized()) return` in your system                                                                                                                                   |
+| MessageBus messages lost                                 | Late joiner expecting past messages                                    | MessageBus is fire-and-forget. Use `syncEntity` for persistent state                                                                                                                            |
+
+> **Need guaranteed consistency, server-side validation, or anti-cheat?** `syncEntity` and `MessageBus` are not entirely reliable — if it's important that all players see the same state change, see the **authoritative-server** skill for the headless server pattern. For a complete competitive game architecture (anti-cheat with server-side proximity validation, checkpoint-only Storage persistence, atomic component splits by change rate), see the Gem Rush reference scene ([`92,-9-authoritative-server-gem-rush`](https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/92,-9-authoritative-server-gem-rush)).
+
+## Example scenes
+
+Engine-team test scenes exercised against the real engine:
+
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/88,-13-avatar-masks — **serverless** `syncEntity`, the pattern this skill documents: an `enum SyncId` giving two singletons stable IDs, `syncEntity(crateAnchorEntity, [AvatarAttach.componentId], SyncId.CRATE_ANCHOR)` and `syncEntity(crateEntity, [Transform.componentId], SyncId.CRATE)`, plus `parentEntity`/`removeParent` from `@dcl/sdk/network` to hand a shared crate between players. Any client may mutate it — there is no `validateBeforeChange` and no `isServer()` branch. (The scene's headline feature is emote masks; the sync is the supporting half of it.)
+
+For contrast, the other multiplayer scene in the set is server-authoritative — use it to see how that pattern differs from the serverless one described here:
+
+- https://github.com/decentraland/sdk7-test-scenes/tree/main/scenes/90,-9-authoritative-server-leaderboard — **authoritative** (NOT serverless): only the server calls `syncEntity`, and synced components are locked with `validateBeforeChange` so clients can only read them and send messages. If you instead want any client to mutate shared state directly (the pattern this skill documents), each client calls `syncEntity` on its own and there is no `validateBeforeChange`. See the **authoritative-server** skill for that scene's full breakdown.
+
+Published games in the docs example catalog (`{baseDir}/../sdk-scenes/references/example-scenes.md`) that sync without a server: **Clean The Club** (one shared component poll feeding several systems; other players' carried props via `AvatarAttach`), **Kick Off** (kick message plus immediate local ball motion), **Alien Scrapyard** (round-state cinematic cameras). Player queues and scoreboards for multiplayer mini games: `@dcl-sdk/mini-games` (catalog id `mini-games-library`).

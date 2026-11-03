@@ -364,7 +364,9 @@ already × `uiScale` at parse time.
 ### Custom fonts (`fontSrc`)
 
 SDK `@dcl/sdk` **≥ 7.31** supports scene `.ttf` files via `fontSrc` on `uiText` / `Label`.
-Always set built-in `font` beside `fontSrc` (Unity local preview and missing-file fallback).
+Always set built-in `font` beside `fontSrc` (fallback when the file is missing, on mobile, or before Unity has optimized assets).
+
+**Unity Desktop preview:** `fontSrc` only loads after optimized asset bundles (Creator Hub **Compress Assets**, or `npm run start -- --asset-bundles` / kit `npm run start:bundles`). Without that, custom / icon fonts render as empty squares (tofu) because the fallback face has no PUA glyphs. Bevy / web loads the `.ttf` directly.
 
 **Theme** — additive `typography.fontSrc` (non-breaking; built-ins stay in `family`):
 
@@ -416,7 +418,7 @@ SetupUiComponentKit({
 />
 ```
 
-Kit does **not** ship stock `.ttf` files — put fonts under the scene’s `assets/fonts/` with a redistributable licence. Unity **local preview always shows the `font` fallback**; Bevy preview and deployed asset bundles show the TTF.
+Kit ships Font Awesome Free as `assets/fonts/duck-font-awesome-*.ttf` (via `copy-assets`). Other custom faces: put `.ttf` files under the scene’s `assets/fonts/` with a redistributable licence. Always pair `fontSrc` with a built-in `font` fallback. Prefer native TrueType sources over CFF→glyf re-conversion when shipping icon fonts. When debugging FA tofu in Unity, confirm the preview was started with `--asset-bundles` before blaming conversion.
 
 Fonts go through three steps: `resolveTypographySize(base)` (optional theme platform scale)
 → `scaleFontSize(...)` (additive fluid boost from viewport width) → × `uiScale` at parse.
@@ -517,7 +519,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` / `ProgressBarRadial` | `textures?` (per-layer optional) / `atlas` + `uvCell` / radial sprite sheet |
-| Icons | — | `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | `uvs` (+ optional `src` for **custom images** — defaults to `atlasIconsFontAwesome`); `rotate` (degrees, UV rotate on every icon type); **tint only with `iconColor`**; `backgroundColor` is always a chip fill (wrapper `UiBox` on `Icon` / `SpriteIcon` / `AvatarIcon`, container row on atlas glyph text); `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid (`atlas` or `src`/`columns`/`rows`) plus optional `fps` / `offset` / `limit` / `pingPong` / `loopInterval` / `playing` / `looping` — trigger with `setPlaying` / `playOnce` (e.g. hover) |
+| Icons | — | `FontAwesome` / `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | **FA Free:** `<FontAwesome name="star" style="solid" />` (TTF via `copy-assets`). **Custom art:** `Icon` with required `src` + optional `uvs` from your `TextureAtlas`. `rotate` (UV) on texture icons; **tint** with `fontColor` (`FontAwesome`) or `iconColor` (texture icons); `backgroundColor` is always a chip fill; `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid plus optional playback props — trigger with `setPlaying` / `playOnce` |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -532,7 +534,7 @@ When a user wants **their own images, atlases, or styles**, walk them through th
 5. **Coordinates are 1-based and inclusive.** First column/row is `1`, not `0`. Totals (`columns`, `rows`, `xTotal`, `yTotal`, `uvColumnCount`) are counts. Example: first cell of a 4×4 → `{ xStart: 1, yStart: 1, xTotal: 4, yTotal: 4 }`; `ButtonImage` `uvColumn={1}` for the first variant.
 6. Point them at root `README.md` → **Custom textures** and the Affinity callout at the top of the README.
 
-**Icon packs / bulk icon atlases:** if the user asks about adding a large set of custom icons (Font Awesome, game-icons, etc.), tell them it is practical to generate a snap grid in Affinity, place icons programmatically, export one PNG, and register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Reference implementation: `atlasIconsFontAwesome` in `src/ui-component-kit/atlases/atlases.ts` + `assets/images/ui-component-kit/atlas-icons-font-awesome.png`.
+**Font Awesome Free:** prefer kit `<FontAwesome name="…" />` (TTFs from `copy-assets`). **Custom icon packs / bulk atlases** (game-icons, project art, etc.): generate a snap grid in Affinity, export one PNG, register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Showcase reference: `exampleIconsAtlas` in `src/exampleThemes/showcase/atlases.ts`.
 
 **Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `exampleThemes/` / `ui-component-kit/atlases/`.
 
@@ -852,20 +854,18 @@ return [
 
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasIconsFontAwesome`, `atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Project sheets: start from `design/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …; `atlasIconsFontAwesome` is deprecated). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Font Awesome Free icons: `FontAwesome` + TTFs under `assets/fonts/`. Project sheets: start from `design/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
 
 `TextureAtlas` defaults `wrapMode` to `'clamp'` (avoids neighbour-cell bleed). Optional `filterMode` (`'point'` | `'bi-linear'` | `'tri-linear'`) applies to the whole sheet. Use `atlas.texture` (or `mergeUiBackground`) instead of `{ src: atlas.source }` alone. `Spinner` is an animation wrapper around a child `Icon` — there are no dedicated spinner presets / atlas.
 
 **Always use** `TextureAtlas` or `getUVCell` / `getUVColumn` / `getUVRow`. Cell / column / row numbers are **1-based inclusive**; totals are counts.
 
 ```tsx
-import { atlasIconsFontAwesome, atlasCharsAlphaNumeric } from '../../atlases'
+import { FontAwesome } from '../components'
+import { atlasCharsAlphaNumeric } from '../../atlases'
 
-atlasIconsFontAwesome.source
-atlasIconsFontAwesome.uv.star                        // named cell UV quad
-atlasIconsFontAwesome.cell({ xStart: 1, yStart: 1 }) // first cell
-atlasIconsFontAwesome.row(1)                         // full bottom row
-atlasIconsFontAwesome.column(1)                      // full first column
+<FontAwesome name="star" />
+atlasCharsAlphaNumeric.char('5')
 atlasCharsAlphaNumeric.char('5', { insetX: 0.15 })
 ```
 
