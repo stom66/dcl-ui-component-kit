@@ -103,6 +103,7 @@ function DemoNavButton({ id, label, icon, layer }: NavEntry) {
 			uiText         = {{ value: '' }}
 		>
 			<Icon
+				src = {atlasIconsFontAwesome.source}
 				uvs    = {atlasIconsFontAwesome.uv[icon]}
 				width  = {NAV_ICON_SIZE}
 				height = {NAV_ICON_SIZE}

@@ -1,5 +1,7 @@
 export { AvatarIcon, DEFAULT_AVATAR_USER_ID } from './avatarIcon'
 export type { AvatarIconProps } from './avatarIcon'
+export { FontAwesome } from './fontAwesome'
+export type { FontAwesomeProps } from './fontAwesome'
 export { Icon } from './icon'
 export type { IconProps } from './icon'
 export { IconCharacter } from './icon.character'

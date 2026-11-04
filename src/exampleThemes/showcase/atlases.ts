@@ -31,8 +31,8 @@ export const exampleBtnIconsAtlas = new TextureAtlas({
 /**
  * Example general icon atlas for `Icon` — 4×4 grid (PNG top → bottom; UV Y is
  * bottom → top). Sample with `.cell({ xStart, yStart })`, `.named.<name>`, or
- * `.uv.<name>`. For the bundled Font Awesome sheet use `atlasIconsFontAwesome`
- * from UI Component Kit instead.
+ * `.uv.<name>`. For Font Awesome Free icons by name use kit `FontAwesome`
+ * instead of a texture atlas.
  */
 export const exampleIconsAtlas = new TextureAtlas({
 	source : 'assets/images/example-themes/showcase/atlas-icons.png',

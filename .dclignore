@@ -29,3 +29,9 @@ src
 cursor.config
 cursorignore
 .github
+# Desktop FA sources / convert scratch — only duck-font-awesome-*.ttf ship in scene content
+scripts/fa-desktop-sources
+scripts/fa-desktop-sources/**
+assets/fonts/*.otf
+assets/fonts/fa-*.ttf
+assets/fonts/Font Awesome*

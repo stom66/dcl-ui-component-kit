@@ -293,7 +293,8 @@ import { atlasBtn3x1, ButtonImage, FontAwesome, Row, Text } from '../../../ui-co
 	}}
 >
 	<Row height="100%" alignItems="center" justifyContent="center" spacing={8}>
-		<FontAwesome name="hand-pointer" fontSize={28} fontColor={theme.colors.dark} />
+		{/* FontAwesome: small curated sets only (~35–50 unique Unity atlas budget) */}
+		<FontAwesome icon="hand-pointer" fontSize={28} fontColor={theme.colors.dark} />
 		<Text value="Click me" width="auto" fontColor={theme.colors.dark} textWrap="nowrap" />
 	</Row>
 </ButtonImage>

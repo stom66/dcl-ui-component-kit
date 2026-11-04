@@ -108,6 +108,7 @@ export class DemoListLayer extends Layer {
 				>
 					{entry.icon ? (
 						<Icon
+							src = {atlasIconsFontAwesome.source}
 							uvs    = {atlasIconsFontAwesome.uv[entry.icon]}
 							width  = {ICON_SIZE}
 							height = {ICON_SIZE}

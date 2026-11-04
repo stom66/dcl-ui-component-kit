@@ -195,6 +195,7 @@ export class DemoButtonsLayer extends Layer {
 								spacing        = {8}
 							>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs       = {atlasIconsFontAwesome.uv.handPointer}
 									width     = {28}
 									height    = {28}
@@ -228,6 +229,7 @@ export class DemoButtonsLayer extends Layer {
 								justifyContent = "center"
 							>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs       = {atlasIconsFontAwesome.uv.check}
 									width     = {28}
 									height    = {28}

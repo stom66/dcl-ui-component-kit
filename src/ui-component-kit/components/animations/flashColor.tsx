@@ -28,10 +28,22 @@ export type FlashColorProps = UiBoxProps & BurstAnimationProps & {
 const theme = getTheme()
 
 
+// MARK: childIsFontAwesome
+/** `FontAwesome` leaf: `icon` prop, no texture `src` / `uvs` / `atlas`. */
+function childIsFontAwesome(child: ReactEcs.JSX.Element | undefined): boolean {
+	const props = child?.props
+	if (!props || props.icon === undefined) {
+		return false
+	}
+	return props.src === undefined && props.uvs === undefined && props.atlas === undefined
+}
+
+
 // MARK: childUsesIconTint
 /**
- * Texture-icon children tint via `iconColor` only. Detect them so we do not
- * inject `backgroundColor` (that would create a chip wrapper on `Icon`).
+ * Glyph / texture-icon children tint via `iconColor` / `fontColor` only. Detect
+ * them so we do not inject `backgroundColor` (that would create a chip wrapper
+ * on `Icon` / `FontAwesome`).
  */
 function childUsesIconTint(child: ReactEcs.JSX.Element | undefined): boolean {
 	const props = child?.props
@@ -39,14 +51,18 @@ function childUsesIconTint(child: ReactEcs.JSX.Element | undefined): boolean {
 		return false
 	}
 	return props.iconColor !== undefined
+		|| props.fontColor !== undefined
+		|| props.color !== undefined
 		|| props.uvs !== undefined
 		|| props.src !== undefined
 		|| props.atlas !== undefined
 		|| props.userId !== undefined
+		|| childIsFontAwesome(child)
 		|| (
 			props.value !== undefined
 			&& props.fontSize === undefined
 			&& props.fontColor === undefined
+			&& props.color === undefined
 			&& props.uiText === undefined
 		)
 }
@@ -54,13 +70,16 @@ function childUsesIconTint(child: ReactEcs.JSX.Element | undefined): boolean {
 
 // MARK: resolveChildBaseColor
 /**
- * Reads the child's tint from `iconColor` (icons) or `backgroundColor` /
- * `uiBackground.color` (fills). Falls back to white for untinted textures.
+ * Reads the child's tint from `iconColor` / `fontColor` / `color` (icons) or
+ * `backgroundColor` / `uiBackground.color` (fills). Falls back to white for
+ * untinted textures.
  */
 function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 {
 	if (childUsesIconTint(child)) {
 		return child?.props?.iconColor
-			?? child?.props?.uiBackground?.color
+			?? child?.props?.fontColor
+			?? child?.props?.color
+			?? (childIsFontAwesome(child) ? undefined : child?.props?.uiBackground?.color)
 			?? Color4.White()
 	}
 	return child?.props?.backgroundColor
@@ -72,7 +91,9 @@ function resolveChildBaseColor(child: ReactEcs.JSX.Element | undefined): Color4 
 // MARK: FlashColor
 /**
  * Flashes a single child's tint toward `flashColor` and back.
- * Icons flash via `iconColor` only (never invent a `backgroundColor` chip).
+ * Texture icons flash via `iconColor` / `uiBackground.color`.
+ * `FontAwesome` flashes via `fontColor` / `color` only — never `uiBackground`
+ * (a fill on the glyph box paints a solid square over the TTF).
  * Solid fills flash via `backgroundColor` / `uiBackground.color`.
  * Forwards `width` / `height` (including scaled sizes from an outer `Pulse`) to
  * the child so nested animation stacks keep sizing in sync.
@@ -142,23 +163,29 @@ export const FlashColor = ({
 			}}
 			uiBackground={uiBackground}
 		>
-			{child && cloneAnimChild(child, childUsesIconTint(child)
+			{child && cloneAnimChild(child, childIsFontAwesome(child)
 				? {
-					width       : w,
-					height      : h,
-					iconColor   : currentColor,
-					uiBackground: mergeUiBackground(child.props?.uiBackground, {
-						color: currentColor,
-					}),
+					fontColor: currentColor,
 				}
-				: {
-					width          : w,
-					height         : h,
-					backgroundColor: currentColor,
-					uiBackground   : mergeUiBackground(child.props?.uiBackground, {
-						color: currentColor,
-					}),
-				}
+				: childUsesIconTint(child)
+					? {
+						width       : w,
+						height      : h,
+						iconColor   : currentColor,
+						fontColor   : currentColor,
+						color       : currentColor,
+						uiBackground: mergeUiBackground(child.props?.uiBackground, {
+							color: currentColor,
+						}),
+					}
+					: {
+						width          : w,
+						height         : h,
+						backgroundColor: currentColor,
+						uiBackground   : mergeUiBackground(child.props?.uiBackground, {
+							color: currentColor,
+						}),
+					}
 			)}
 		</UiBox>
 	)
