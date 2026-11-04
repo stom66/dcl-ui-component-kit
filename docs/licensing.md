@@ -4,7 +4,7 @@
 
 The **npm package** (`@stom66/dcl-ui-component-kit`) is published under **MIT** (see `package.json`). That covers the kit source under `src/ui-component-kit/`.
 
-Third-party art bundled in this repository (kit stock textures and demo assets) may use **separate** licenses. Those terms still apply when you copy or reuse those files — do not assume everything in the repo is MIT.
+Third-party art bundled in this repository (kit stock textures, fonts, and demo assets) may use **separate** licenses. Those terms still apply when you copy or reuse those files — do not assume everything in the repo is MIT.
 
 Kit-authored UI chrome (buttons, progress bars, spinners, character/number sheets, etc.) under `assets/images/ui-component-kit/` is provided with the package for use in Decentraland scenes.
 
@@ -14,18 +14,23 @@ Kit-authored UI chrome (buttons, progress bars, spinners, character/number sheet
 
 ### Font Awesome Free
 
-This project includes a **limited subset** of icons from **[Font Awesome Free](https://fontawesome.com)** (solid-style glyphs baked into a Decentraland-friendly texture atlas).
+This project redistributes **[Font Awesome Free](https://fontawesome.com)** for Decentraland SDK7 UI:
 
 | Detail | |
 |---|---|
-| Atlas | `assets/images/ui-component-kit/atlas-icons-font-awesome.png` |
-| Binding | `atlasIconsFontAwesome` (default `Icon` source) |
-| Full kit | **[fontawesome.com](https://fontawesome.com)** — download Font Awesome Free (or Pro) if you need the complete icon set |
+| Component | `FontAwesome` — look up icons by name; renders TTF glyphs via `fontSrc` |
+| Fonts | `assets/fonts/duck-font-awesome-solid.ttf`, `…-regular.ttf`, `…-brands.ttf` |
+| Notice | `assets/fonts/LICENSE-OFL.txt` (must ship with the fonts) |
+| Full kit | **[fontawesome.com](https://fontawesome.com)** — Free (or Pro) download |
 | License | [Font Awesome Free license](https://fontawesome.com/license/free) (icons: CC BY 4.0; fonts: SIL OFL 1.1; code: MIT) |
 
-We only ship the icons used by the kit / demos — **not** the entire Font Awesome Free pack. For the whole catalog, icons in other styles, or newer releases, go to [fontawesome.com](https://fontawesome.com).
+The TTFs are **Modified Versions** under SIL OFL 1.1, renamed so they do **not** use the Reserved Font Name “Font Awesome” as the primary family (kit families: `DuckFa7FreeSolid` / `DuckFa7FreeRegular` / `DuckFa7Brands`; files: `duck-font-awesome-*.ttf`). You may bundle them with this software; you may not sell the fonts by themselves. Keep the copyright notice and OFL text with every copy.
 
-Font Awesome Free requires attribution under its licenses; this page is that credit.
+Brand icons are trademarks of their respective owners — use them only to represent that brand.
+
+**Known issue:** Unity Desktop’s `fontSrc` path uses one dynamic SDF atlas per font. After Latin prefill, only about **~35–50 unique** FA icons fit (results vary). Prefer the deprecated texture sheet `atlasIconsFontAwesome` or a project atlas when you need many icons. After install/upgrade, run `npx @stom66/dcl-ui-component-kit copy-assets` so stock textures and these TTFs land in the scene.
+
+Unity Desktop only applies `fontSrc` after optimized assets (Creator Hub **Compress Assets**, or `npm run start:bundles`). Plain preview without bundles falls back to the built-in face — PUA glyphs then show as tofu.
 
 ### CraftPix.net
 

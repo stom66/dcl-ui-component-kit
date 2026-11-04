@@ -170,7 +170,7 @@ Atlas layout: **columns = variants**, **rows = states** (UV bottom→top).
 | `uiTransform` | native | Extra layout |
 
 ```tsx
-import { atlasBtn3x1, atlasBtnIconsStyled, atlasIconsFontAwesome, ButtonImage, Icon, Row, Text } from '@stom66/dcl-ui-component-kit'
+import { atlasBtn3x1, atlasBtnIconsStyled, ButtonImage, FontAwesome, Row, Text } from '@stom66/dcl-ui-component-kit'
 
 // Icon-column atlas (default sheet when atlas / textureSrc omitted)
 <ButtonImage
@@ -191,7 +191,7 @@ import { atlasBtn3x1, atlasBtnIconsStyled, atlasIconsFontAwesome, ButtonImage, I
 	uiTransform = {{ positionType: 'relative', position: { top: 0, left: 0 } }}
 >
 	<Row height="100%" alignItems="center" justifyContent="center" spacing={8}>
-		<Icon uvs={atlasIconsFontAwesome.uv.handPointer} width={28} height={28} />
+		<FontAwesome icon="hand-pointer" fontSize={28} />
 		<Text value="Click me" width="auto" textWrap="nowrap" />
 	</Row>
 </ButtonImage>
@@ -342,7 +342,9 @@ Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme-ba
 
 ### Custom fonts (`fontSrc`)
 
-Requires `@dcl/sdk` ≥ 7.31. Scene-relative `.ttf` paths only (kit does not ship fonts). Always set built-in `font` beside `fontSrc` (Unity preview / missing-file fallback).
+Requires `@dcl/sdk` ≥ 7.31. Scene-relative `.ttf` paths only (OTF / WOFF rejected). Always set built-in `font` beside `fontSrc` (fallback when the file is missing, on mobile, or before Unity has optimized assets).
+
+**Unity Desktop:** custom fonts only appear after the scene’s assets are optimized (Creator Hub **Compress Assets**, or `npm run start -- --asset-bundles` / kit `npm run start:bundles`). Plain `npm start` serves the raw `.ttf` but Unity ignores it until then — icon fonts show as empty squares (tofu). Bevy / web loads the `.ttf` immediately.
 
 Theme slice `typography.fontSrc`:
 
@@ -366,28 +368,53 @@ SetupUiComponentKit({
 })
 ```
 
-Unity **local preview shows the `font` fallback**; Bevy preview and deployed asset bundles show the custom TTF.
+Always pair `fontSrc` with a built-in `font` fallback (missing file / clients that ignore `fontSrc`, e.g. mobile).
 
 ---
 
 ## Icons
 
-**Variants:** `Icon` / `IconNumber` · `AvatarIcon` · `SpriteIcon`
+**Variants:** `FontAwesome` · `Icon` / `IconNumber` · `AvatarIcon` · `SpriteIcon`
 
-### `Icon`
+### `FontAwesome`
+
+Font Awesome Free glyph via kit TTFs (`fontSrc`). Bare `UiEntity` — only the props below.
 
 | Option | Type | Description |
 |---|---|---|
-| `src` | `string` | Texture (default: Font Awesome atlas) |
+| `icon` | `string` | Icon name (`star`, `dice-d20`, `diceD20`, …) |
+| `fontSize` | `number` | Pixel size (defaults to `theme.icons.defaultSize`) |
+| `fontColor` | `Color4` | Glyph tint (defaults to theme light) |
+
+**Known issue (Unity Desktop):** each custom `fontSrc` uses **one** dynamic SDF atlas. After Latin / punctuation prefill there is only room for roughly **~35–50 unique** Private Use icons (results vary by glyph complexity). Repeating the same icon is fine; exceeding the budget shows empty squares (tofu). Prefer texture `Icon` / a project `TextureAtlas` when you need a large icon set.
+
+```tsx
+import { FontAwesome, getTheme } from '@stom66/dcl-ui-component-kit'
+
+<FontAwesome icon="cat" fontSize={64} />
+<FontAwesome icon="star" fontColor={getTheme().colors.primary} />
+<FontAwesome icon="github" />
+```
+
+Requires stock fonts from `copy-assets` (`assets/fonts/duck-font-awesome-*.ttf`). Rebuild with `npm run convert-fa-fonts` from desktop sources in `scripts/fa-desktop-sources/` (gitignored). Unity Desktop preview needs asset bundles (`npm run start:bundles`) or PUA glyphs show as tofu even within budget.
+
+### `Icon`
+
+Texture icon for **custom / project atlases** (not Font Awesome by name).
+
+| Option | Type | Description |
+|---|---|---|
+| `src` | `string` | Texture path / `TextureAtlas.source` (**required**) |
 | `uvs` | UV quad | Atlas cell (`atlas.uv.name`) |
 | `iconColor` | `Color4` | Tint multiply (texture × color; not `backgroundColor`) |
 | `width` / `height` | number | Size (theme default if omitted) |
 
 ```tsx
-import { Icon, atlasIconsFontAwesome, getTheme } from '@stom66/dcl-ui-component-kit'
+import { Icon, getTheme } from '@stom66/dcl-ui-component-kit'
+import { exampleIconsAtlas } from './atlases'
 
-<Icon uvs={atlasIconsFontAwesome.uv.cat} width={64} height={64} />
-<Icon uvs={atlasIconsFontAwesome.uv.star} iconColor={getTheme().colors.primary} width={64} height={64} />
+<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.cat} width={64} height={64} />
+<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} width={64} height={64} />
 ```
 
 ### `AvatarIcon`
@@ -525,14 +552,14 @@ Used by `Bounce`, `Pulse`, `Shake`, `Wiggle`, `FlashColor`, `FlashBorder`, and `
 | `degrees` | `number` | Degrees rotated during one `duration` (negative = reverse) |
 
 ```tsx
-import { Bounce, Icon, Spinner, atlasIconsFontAwesome } from '@stom66/dcl-ui-component-kit'
+import { Bounce, FontAwesome, Spinner } from '@stom66/dcl-ui-component-kit'
 
 <Spinner id="loader" duration={1} degrees={180} burstInterval={0}>
-	<Icon uvs={atlasIconsFontAwesome.uv.hourglass} width={48} height={48} />
+	<FontAwesome icon="hourglass" fontSize={48} />
 </Spinner>
 
 <Bounce duration={0.6}>
-	<Icon uvs={atlasIconsFontAwesome.uv.star} width={48} height={48} />
+	<FontAwesome icon="star" fontSize={48} />
 </Bounce>
 ```
 

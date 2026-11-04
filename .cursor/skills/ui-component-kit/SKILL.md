@@ -165,7 +165,7 @@ On kit components built on `UiBox`, **prefer top-level shorthands** over nesting
 | Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
 | `Label` | `value`, `fontColor`, `fontSize`, …; **`backgroundColor` = chip fill** | nesting `uiText` for size/align; use `fontColor` (or `uiText.color`) for font tint |
 | `Icon` / `SpriteIcon` / `AvatarIcon` / `IconNumber` / `IconCharacter` / `IconSymbol` / `IconString` | `iconColor` | texture tint (`uiBackground.color` on the glyph) |
-| Same icon components | `backgroundColor` | chip / panel fill behind the glyph (wrapper or container — never the texture tint) |
+| `Icon` / `AvatarIcon` (not `FontAwesome`) | `backgroundColor` | chip / panel fill behind the glyph (wrapper — never the texture tint) |
 | `FlashColor` / `FlashBorder` | `flashColor` (target) | ambiguous bare `color` |
 
 **`fontSize` shorthand** takes a **theme-base px** number. Prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). `UiBox` auto-wraps `scaleThemeFontSize` — do **not** pre-scale. Nested `uiText.fontSize` numbers are scaled the same way. Do not use SDK `scaleFontSize` on kit components.
@@ -418,7 +418,7 @@ SetupUiComponentKit({
 />
 ```
 
-Kit ships Font Awesome Free as `assets/fonts/duck-font-awesome-*.ttf` (via `copy-assets`). Other custom faces: put `.ttf` files under the scene’s `assets/fonts/` with a redistributable licence. Always pair `fontSrc` with a built-in `font` fallback. Prefer native TrueType sources over CFF→glyf re-conversion when shipping icon fonts. When debugging FA tofu in Unity, confirm the preview was started with `--asset-bundles` before blaming conversion.
+Kit ships Font Awesome Free as `assets/fonts/duck-font-awesome-*.ttf` (via `copy-assets`). Other custom faces: put `.ttf` files under the scene’s `assets/fonts/` with a redistributable licence. Always pair `fontSrc` with a built-in `font` fallback. **Known issue:** Unity allows only about **~35–50 unique** PUA icons per `fontSrc` atlas (after Latin prefill; varies by glyph). Prefer texture `Icon` / project atlases for large sets. Confirm `--asset-bundles` / `start:bundles` before debugging tofu.
 
 Fonts go through three steps: `resolveTypographySize(base)` (optional theme platform scale)
 → `scaleFontSize(...)` (additive fluid boost from viewport width) → × `uiScale` at parse.
@@ -519,7 +519,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` / `ProgressBarRadial` | `textures?` (per-layer optional) / `atlas` + `uvCell` / radial sprite sheet |
-| Icons | — | `FontAwesome` / `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | **FA Free:** `<FontAwesome name="star" style="solid" />` (TTF via `copy-assets`). **Custom art:** `Icon` with required `src` + optional `uvs` from your `TextureAtlas`. `rotate` (UV) on texture icons; **tint** with `fontColor` (`FontAwesome`) or `iconColor` (texture icons); `backgroundColor` is always a chip fill; `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid plus optional playback props — trigger with `setPlaying` / `playOnce` |
+| Icons | — | `FontAwesome` / `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | **FA Free (small sets):** `<FontAwesome icon="star" />` (TTF via `copy-assets`; only `icon` / `fontSize` / `fontColor`; Unity ~35–50 unique-glyph atlas limit). **Large / dense HUDs:** texture `Icon` with required `src` + optional `uvs`. `rotate` (UV) on texture icons; **tint** with `fontColor` (`FontAwesome`) or `iconColor` (texture icons); `backgroundColor` is always a chip fill; `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid plus optional playback props — trigger with `setPlaying` / `playOnce` |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -534,7 +534,7 @@ When a user wants **their own images, atlases, or styles**, walk them through th
 5. **Coordinates are 1-based and inclusive.** First column/row is `1`, not `0`. Totals (`columns`, `rows`, `xTotal`, `yTotal`, `uvColumnCount`) are counts. Example: first cell of a 4×4 → `{ xStart: 1, yStart: 1, xTotal: 4, yTotal: 4 }`; `ButtonImage` `uvColumn={1}` for the first variant.
 6. Point them at root `README.md` → **Custom textures** and the Affinity callout at the top of the README.
 
-**Font Awesome Free:** prefer kit `<FontAwesome name="…" />` (TTFs from `copy-assets`). **Custom icon packs / bulk atlases** (game-icons, project art, etc.): generate a snap grid in Affinity, export one PNG, register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Showcase reference: `exampleIconsAtlas` in `src/exampleThemes/showcase/atlases.ts`.
+**Font Awesome Free:** kit `<FontAwesome icon="…" />` for small curated sets (TTFs from `copy-assets`; props: `icon`, `fontSize`, `fontColor` only). **Unity known issue:** ~35–50 unique PUA icons per font atlas — use texture atlases beyond that. **Custom icon packs / bulk atlases** (game-icons, project art, etc.): generate a snap grid in Affinity, export one PNG, register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Showcase reference: `exampleIconsAtlas` in `src/exampleThemes/showcase/atlases.ts`.
 
 **Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `exampleThemes/` / `ui-component-kit/atlases/`.
 
@@ -864,7 +864,7 @@ Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atla
 import { FontAwesome } from '../components'
 import { atlasCharsAlphaNumeric } from '../../atlases'
 
-<FontAwesome name="star" />
+<FontAwesome icon="star" />
 atlasCharsAlphaNumeric.char('5')
 atlasCharsAlphaNumeric.char('5', { insetX: 0.15 })
 ```

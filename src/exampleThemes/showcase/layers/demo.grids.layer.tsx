@@ -102,6 +102,7 @@ export class DemoGridsLayer extends Layer {
 					{...cell}
 				>
 					<Icon
+						src = {atlasIconsFontAwesome.source}
 						uvs    = {atlasIconsFontAwesome.uv[name]}
 						width  = {28}
 						height = {28}
@@ -164,6 +165,7 @@ export class DemoGridsLayer extends Layer {
 					{...cell}
 				>
 					<Icon
+						src = {atlasIconsFontAwesome.source}
 						uvs    = {atlasIconsFontAwesome.uv[name]}
 						width  = {28}
 						height = {28}

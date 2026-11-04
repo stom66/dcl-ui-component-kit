@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasGradientColors, Background, Column, getTheme, H2, H3, IconNumber, Label, Layer, ProgressBar, ProgressBarImage, ProgressBarRadial, PropsController, Row, ZoneType } from '../../../ui-component-kit'
+import { atlasGradientColors, Background, Column, getTheme, H2, H3, Label, Layer, ProgressBar, ProgressBarImage, ProgressBarRadial, PropsController, Row, Text, ZoneType } from '../../../ui-component-kit'
 import { timers } from '../../../ui-component-kit/utils/timers'
 
 const DANGER_MIN_VALUE = 0
@@ -214,7 +214,7 @@ export class DemoProgressLayer extends Layer {
 								fillColor = {theme.colors.warning}
 								height    = {28}
 							>
-								<IconNumber value={`${Math.round(randomValue1 / 10)}/10`} height={22} />
+								<Text value={`${Math.round(randomValue1 / 10)}/10`} fontSize={theme.typography.size.small} textAlign="middle-center" />
 							</ProgressBar>
 							<ProgressBar
 								key      = "demo_progress_procedural_right"
@@ -261,7 +261,7 @@ export class DemoProgressLayer extends Layer {
 									border    : 'assets/images/ui-component-kit/progressBar-horizontal-border.png',
 								}}
 							>
-								<IconNumber value={randomValue2} height={24} />
+								<Text value={String(randomValue2)} fontSize={theme.typography.size.default} textAlign="middle-center" />
 							</ProgressBarImage>
 
 							{/* MARK: Hybrid
@@ -289,7 +289,7 @@ export class DemoProgressLayer extends Layer {
 									left  : 40 / 512,
 								}}
 							>
-								<IconNumber value={randomValue3} />
+								<Text value={String(randomValue3)} fontSize={theme.typography.size.default} textAlign="middle-center" />
 							</ProgressBarImage>
 							<ProgressBarImage
 								key    = "demo_progress_hybrid_fill"

@@ -119,7 +119,7 @@ function readExplicitSize(value: PositionUnit | 'auto' | undefined): PositionUni
  *
  * @example
  * <Spinner id="loader" duration={1} degrees={180} burstInterval={0}>
- *   <Icon uvs={atlasIconsFontAwesome.uv.hourglass} width={48} height={48} />
+ *   <FontAwesome icon="hourglass" fontSize={48} />
  * </Spinner>
  */
 export const Spinner = ({

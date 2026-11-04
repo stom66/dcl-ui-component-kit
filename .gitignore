@@ -16,3 +16,13 @@ yarn-error.log*
 .env.*
 !.env.example
 *.blend[0-9]
+# Font Awesome Free desktop sources (convert with npm run convert-fa-fonts; ship duck-*.ttf only)
+scripts/fa-desktop-sources/
+assets/fonts/*.otf
+assets/fonts/fa-*.ttf
+assets/fonts/Font Awesome*
+# Local scratch / investigation dumps
+tmp-unity-fonts/
+tmp-abgen/
+tmp-*.tgz
+tmp-*.py

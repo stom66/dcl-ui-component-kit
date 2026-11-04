@@ -1,5 +1,5 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { Background, getTheme, IconNumber, Layer, PropsController, ZoneType } from '../../../ui-component-kit'
+import { Background, getTheme, Layer, PropsController, Text, ZoneType } from '../../../ui-component-kit'
 import { timers } from '../../../ui-component-kit/utils/timers'
 
 // MARK: getSecondsRemainingInMinute
@@ -52,11 +52,12 @@ export class TimerLayer extends Layer {
 
 		return [
 			<Background key="chrome" backgroundColor={theme.colors.primary} />,
-			<IconNumber
-				key    = "timer-value"
-				// Fixed width so the digit entity count stays at 2 (no 9↔10 remount churn).
-				value  = {String(seconds).padStart(2, '0')}
-				height = {"80px"}
+			<Text
+				key       = "timer-value"
+				value     = {String(seconds).padStart(2, '0')}
+				fontSize  = {theme.typography.size.h2}
+				fontColor = {theme.colors.light}
+				textAlign = "middle-center"
 			/>,
 		]
 	}

@@ -93,6 +93,7 @@ export class DemoAnimationsLayer extends Layer {
 								burstInterval  = {0}
 							>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs    = {ICON_UVS}
 									width  = {64}
 									height = {64}
@@ -103,6 +104,7 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Bounce', theme.colors.info, (
 							<Bounce id={ID.bounce}>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs    = {atlasIconsFontAwesome.uv.gift}
 									width  = {64}
 									height = {64}
@@ -113,6 +115,7 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Shake', theme.colors.success, (
 							<Shake id={ID.shake}>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs    = {ICON_UVS}
 									width  = {64}
 									height = {64}
@@ -123,6 +126,7 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('FlashColor', theme.colors.warning, (
 							<FlashColor id={ID.flashColor} flashColor={theme.colors.danger}>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs    = {atlasIconsFontAwesome.uv.bomb}
 									width  = {64}
 									height = {64}
@@ -133,6 +137,7 @@ export class DemoAnimationsLayer extends Layer {
 						{this.renderAnimCell('Wiggle', theme.colors.danger, (
 							<Wiggle id={ID.wiggle}>
 								<Icon
+									src = {atlasIconsFontAwesome.source}
 									uvs    = {ICON_UVS}
 									width  = {64}
 									height = {64}
@@ -175,6 +180,7 @@ export class DemoAnimationsLayer extends Layer {
 									burstInterval = {0}
 								>
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {ICON_UVS}
 										width  = {64}
 										height = {64}
@@ -224,6 +230,7 @@ export class DemoAnimationsLayer extends Layer {
 									burstInterval  = {0}
 								>
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {atlasIconsFontAwesome.uv.rotateRight}
 										width  = {64}
 										height = {64}
@@ -256,6 +263,7 @@ export class DemoAnimationsLayer extends Layer {
 											duration       = {0.5}
 										>
 											<Icon
+												src = {atlasIconsFontAwesome.source}
 												uvs    = {atlasIconsFontAwesome.uv.cat}
 												width  = {64}
 												height = {64}
@@ -280,6 +288,7 @@ export class DemoAnimationsLayer extends Layer {
 									burstCount = {1}
 								>
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {ICON_UVS}
 										width  = {64}
 										height = {64}
@@ -302,6 +311,7 @@ export class DemoAnimationsLayer extends Layer {
 									burstInterval={0}
 								>
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {ICON_UVS}
 										width  = {64}
 										height = {64}
@@ -325,6 +335,7 @@ export class DemoAnimationsLayer extends Layer {
 									burstCount = {1}
 								>
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {ICON_UVS}
 										width  = {64}
 										height = {64}
@@ -347,6 +358,7 @@ export class DemoAnimationsLayer extends Layer {
 									burstCount = {1}
 								>
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {ICON_UVS}
 										width  = {64}
 										height = {64}

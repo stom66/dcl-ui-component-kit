@@ -97,6 +97,7 @@ export class InfoLayer extends Layer {
 					justifyContent = "flex-start"
 				>
 					<Icon
+						src = {atlasIconsFontAwesome.source}
 						uvs    = {platformUv}
 						width  = {iconSize}
 						height = {iconSize}

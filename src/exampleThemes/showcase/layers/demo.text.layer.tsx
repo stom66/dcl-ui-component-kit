@@ -109,6 +109,7 @@ export class DemoTextLayer extends Layer {
 						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
 							
 							<Icon
+								src = {atlasIconsFontAwesome.source}
 								uvs    = {atlasIconsFontAwesome.uv.gift}
 								width  = "48"
 								height = "48"

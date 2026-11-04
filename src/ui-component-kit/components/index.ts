@@ -34,7 +34,8 @@ export { RowReverse }             from './helpers'
 
 // Icons
 export { AvatarIcon, DEFAULT_AVATAR_USER_ID } from './icons'
-export type { AvatarIconProps, IconProps, SpriteIconProps } from './icons'
+export type { AvatarIconProps, FontAwesomeProps, IconProps, SpriteIconProps } from './icons'
+export { FontAwesome }            from './icons'
 export { Icon }                   from './icons'
 export { IconCharacter }          from './icons'
 export { IconNumber }             from './icons'

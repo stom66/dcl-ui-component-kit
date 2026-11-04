@@ -29,13 +29,18 @@
   "files": [
     "src/ui-component-kit",
     "assets/images/ui-component-kit",
+    "assets/fonts/*.ttf",
+    "assets/fonts/LICENSE-OFL.txt",
     "scripts/cli.js",
     "scripts/postinstall.js",
     "scripts/lib/assets.js",
     "scripts/lib/themeScaffold.js",
+    "scripts/convert-fa-fonts.py",
+    "scripts/generate-fa-icons.py",
     "INSTALL.md",
     "docs/manual-install.md",
-    "docs/upgrade-caveats.md"
+    "docs/upgrade-caveats.md",
+    "docs/licensing.md"
   ],
   "bin": {
     "dcl-ui-component-kit": "scripts/cli.js"
@@ -45,10 +50,13 @@
   },
   "scripts": {
     "start": "sdk-commands start",
+    "start:bundles": "sdk-commands start --asset-bundles",
     "deploy": "sdk-commands deploy",
     "build": "sdk-commands build",
     "postinstall": "node scripts/postinstall.js",
     "copy-assets": "node scripts/cli.js copy-assets",
+    "convert-fa-fonts": "python scripts/convert-fa-fonts.py",
+    "generate-fa-icons": "python scripts/generate-fa-icons.py",
     "init-theme": "node scripts/cli.js init-theme",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
@@ -66,8 +74,8 @@
   },
   "devDependencies": {
     "@dcl/asset-packs": "latest",
-    "@dcl/js-runtime": "7.31.0",
-    "@dcl/sdk": "^7.31.0"
+    "@dcl/js-runtime": "7.32.0",
+    "@dcl/sdk": "^7.32.0"
   },
   "engines": {
     "node": ">=16.0.0",
