@@ -250,12 +250,15 @@ export const atlasSpritesProgressRadial = new TextureAtlas({
 
 // MARK: atlasIconsFontAwesome
 /**
- * Limited subset of Font Awesome Free (solid) — see docs/licensing.md and
- * https://fontawesome.com for the full pack / license. 16×16 grid (PNG top →
- * bottom; UV Y is bottom → top). Cells are 128×128 with icons fit to an
- * **86px** max axis (~0.707 × cell, minus shadow budget) and centered so
- * rotations / wiggle animations do not clip into neighbours. Named keys are
- * camelCase FA names (e.g. `dice-d20` → `diceD20`). Default source for `Icon`.
+ * @deprecated Prefer `FontAwesome` for small curated TTF sets (Unity ~35–50 unique
+ * PUA glyph atlas limit). Keep this texture sheet for dense / many-icon UIs. This
+ * limited solid-style PNG subset remains exported for existing scenes.
+ *
+ * Font Awesome Free (solid) — see docs/licensing.md and https://fontawesome.com.
+ * 16×16 grid (PNG top → bottom; UV Y is bottom → top). Cells are 128×128 with
+ * icons fit to an **86px** max axis (~0.707 × cell, minus shadow budget) and
+ * centered so rotations / wiggle animations do not clip into neighbours. Named
+ * keys are camelCase FA names (e.g. `dice-d20` → `diceD20`).
  */
 export const atlasIconsFontAwesome = new TextureAtlas({
 	source : 'assets/images/ui-component-kit/atlas-icons-font-awesome.png',

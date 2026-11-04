@@ -12,7 +12,9 @@ Usage:
   npx @stom66/dcl-ui-component-kit <command> [options]
 
 Commands:
-  copy-assets              Copy stock textures into ./assets/images/ui-component-kit
+  copy-assets              Copy stock textures + Font Awesome TTFs into the scene
+                           (images → ./assets/images/ui-component-kit,
+                            fonts  → ./assets/fonts)
                            (required after npm install — postinstall may be blocked)
   init-theme [name]        Scaffold a theme folder under src/themes/<name>
   help                     Show this help
@@ -42,6 +44,9 @@ function runCopyAssets() {
 
 	if (result.ok) {
 		console.log(`${LOG_PREFIX} copied stock textures → ${result.dest}`)
+		if (result.fontsDest) {
+			console.log(`${LOG_PREFIX} copied Font Awesome TTFs → ${result.fontsDest}`)
+		}
 		return
 	}
 

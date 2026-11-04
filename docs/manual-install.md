@@ -1,6 +1,6 @@
 # Manual install
 
-Install `@stom66/dcl-ui-component-kit` into a Decentraland SDK7 scene, copy stock textures, and wire `SetupUiComponentKit`.
+Install `@stom66/dcl-ui-component-kit` into a Decentraland SDK7 scene, copy stock textures + Font Awesome TTFs, and wire `SetupUiComponentKit`.
 
 > **WARNING — stock assets are required.**  
 > Textured UI (icons, buttons, progress bars, spinners, …) will be blank or broken until  
@@ -20,7 +20,7 @@ Confirm the folder is populated (many `.png` files):
 ls assets/images/ui-component-kit
 ```
 
-An existing folder is not proof the PNGs match the installed code. `npm update` replaces the package in `node_modules` and leaves the scene copies untouched whenever postinstall does not run. After any upgrade from an older install, run `copy-assets` again so the scene sheets match the new code. Then read **[upgrade-caveats.md](./upgrade-caveats.md)**.
+An existing folder is not proof the PNGs/TTFs match the installed code. `npm update` replaces the package in `node_modules` and leaves the scene copies untouched whenever postinstall does not run. After any upgrade from an older install, run `copy-assets` again so scene sheets **and** `assets/fonts/duck-font-awesome-*.ttf` match the new code. Then read **[upgrade-caveats.md](./upgrade-caveats.md)**.
 
 ## Why postinstall may not run
 

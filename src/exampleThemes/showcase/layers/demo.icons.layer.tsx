@@ -1,35 +1,23 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, getTheme, H2, Icon, IconCharacter, IconNumber, IconString, IconSymbol, Label, Layer, PropsController, Row, Text, ZoneType } from '../../../ui-component-kit'
-import { timers } from '../../../ui-component-kit/utils/timers'
+import { alpha, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, FontAwesome, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
+import { exampleIconsAtlas } from '../atlases'
 
-/** 4×8 sample from `atlasIconsFontAwesome` (full sheet is 16×16 / 256 cells). */
+/** Tiny curated FA set — Unity `fontSrc` atlases only fit ~35–50 unique PUA glyphs. */
 const SAMPLE_ICONS = [
-	'cat', 'star', 'heart', 'coins',
-	'crown', 'dice', 'rocket', 'trophy',
-	'fire', 'cubes', 'gear', 'bolt',
-	'gem', 'key', 'shield', 'skull',
-	'gamepad', 'bomb', 'ghost', 'dragon',
-	'gift', 'medal', 'compass', 'bell',
+	'cat', 'star', 'heart', 'gift',
+	'fire', 'github',
 ] as const
 
-const COUNTDOWN_SECONDS = 3 * 60
-
-
-// MARK: formatClock
-/** Formats total seconds as `MM:SS` with leading zeros (always 5 glyphs). */
-function formatClock(totalSeconds: number): string {
-	const clamped = Math.max(0, Math.floor(totalSeconds))
-	const minutes = Math.floor(clamped / 60)
-	const seconds = clamped % 60
-	return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-}
+const ATLAS_SAMPLE = [
+	'prohibited', 'target', 'play', 'cat',
+	'starburst', 'check', 'coins', 'phone',
+] as const
 
 
 // MARK: DemoIconsLayer
 /**
- * Demo panel for Font Awesome icons, AvatarIcon, and atlas glyph text
- * (`IconNumber` / `IconCharacter` / `IconSymbol` / `IconString`).
+ * Demo panel for FontAwesome (TTF, small sets), custom atlas `Icon`, and AvatarIcon.
  */
 export class DemoIconsLayer extends Layer {
 	constructor() {
@@ -40,318 +28,95 @@ export class DemoIconsLayer extends Layer {
 			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
-				width : '52vw',
+				width : '48vw',
 				height: 'auto',
 			},
 		})
-
-		this.props = new PropsController<Record<string, unknown>>({
-			countdownSeconds: COUNTDOWN_SECONDS,
-		})
-
-		timers.setInterval(() => {
-			if (!this.props) {
-				console.error('DemoIconsLayer: tick: props controller missing')
-				return
-			}
-			const current = this.props.get('countdownSeconds') as number
-			const next    = current <= 0 ? COUNTDOWN_SECONDS : current - 1
-			this.props.set('countdownSeconds', next)
-		}, 1000)
 	}
 
 
 	// MARK: body
 	protected body() {
-		if (!this.props) {
-			console.error('DemoIconsLayer.body: props controller missing')
-			return null
-		}
-
-		const theme     = getTheme()
-		const countdown = this.props.get('countdownSeconds') as number
+		const theme = getTheme()
 
 		return [
 			<Background key="chrome" />,
 			<Column
 				key            = "body"
 				cols           = {12}
-				spacing        = {6}
+				spacing        = {10}
 				alignItems     = "flex-start"
 				justifyContent = "flex-start"
-				padding        = {{ top: 12, right: 20, bottom: 16, left: 20 }}
+				padding        = {{ top: 14, right: 20, bottom: 16, left: 20 }}
 			>
-					<H2 value="Icons" />
-					<Text value="Named Font Awesome cells via atlas.uv.<name>, AvatarIcon portraits, and atlas glyph text for scores / labels." />
+				<H2 value="Icons" />
+				<Text
+					value    = "FontAwesome (TTF) is for small curated sets only. Unity Desktop fits roughly ~35–50 unique FA icons per font atlas after Latin prefill — more unique glyphs show as tofu. Prefer Icon + TextureAtlas for large packs. Preview needs npm run start:bundles."
+					fontSize = {theme.typography.size.small}
+				/>
 
-					{/* MARK: Font Awesome named shortcut */}
-					<Label
-						cols   = {12}
-						value  = "Icons - Font Awesome"
-						margin = {{ top: 8, bottom: 8 }}
+				<Label cols={12} value="FontAwesome" margin={{ top: 4 }} />
+				<Row justifyContent="flex-start" alignItems="center" spacing={10} margin={{ top: 4 }}>
+					<FontAwesome icon="cat" fontSize={44} />
+					<FontAwesome icon="star" fontSize={44} />
+					<FontAwesome icon="github" fontSize={44} />
+				</Row>
+				<Code value={'<FontAwesome icon="star" fontSize={44} />'} textWrap="nowrap" />
+
+				<Label cols={12} value="Color" margin={{ top: 8 }} />
+				<Row justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
+					<FontAwesome icon="star" fontSize={36} fontColor={theme.colors.primary} />
+					<FontAwesome icon="star" fontSize={36} fontColor={theme.colors.danger} />
+					<FontAwesome icon="star" fontSize={36} fontColor={theme.colors.light} />
+				</Row>
+				<Code value={'<FontAwesome icon="star" fontColor={…} />'} textWrap="nowrap" />
+
+				<Label cols={12} value="Samples (keep unique count low)" margin={{ top: 8 }} />
+				<Row flexWrap="wrap" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
+					{SAMPLE_ICONS.map((icon) => (
+						<FontAwesome icon={icon} fontSize={28} />
+					))}
+				</Row>
+
+				<Label cols={12} value="Icon + custom TextureAtlas" margin={{ top: 8 }} />
+				<Row flexWrap="wrap" justifyContent="flex-start" alignItems="center" margin={{ top: 4 }}>
+					{ATLAS_SAMPLE.map((name) => (
+						<Icon
+							key    = {`atlas-${name}`}
+							src    = {exampleIconsAtlas.source}
+							uvs    = {exampleIconsAtlas.uv[name]}
+							width  = {40}
+							height = {40}
+							margin = {{ right: 8, bottom: 4 }}
+						/>
+					))}
+				</Row>
+				<Code value={'<Icon src={exampleIconsAtlas.source} uvs={…} />'} textWrap="nowrap" />
+
+				<Label cols={12} value="AvatarIcon" margin={{ top: 8 }} />
+				<Row justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4, bottom: 4 }}>
+					<AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={48} height={48} />
+					<AvatarIcon
+						userId       = {DEFAULT_AVATAR_USER_ID}
+						width        = {48}
+						height       = {48}
+						borderRadius = {24}
+						borderWidth  = {2}
+						borderColor  = {alpha(theme.colors.light, 0.8)}
 					/>
-					<Row
-						justifyContent = "flex-start"
-						alignItems     = "center"
-						margin         = {{ bottom: 4 }}
-					>
-						<Column cols = {8}>
-							<Row>
-								<Text
-									value    = "This kit ships 256 Font Awesome icons - use atlasIconsFontAwesome.uv.<name>."
-									fontSize = {theme.typography.size.small}
-									margin   = {{ top: 6 }}
-								/>
-							</Row>
-
-							<Row
-								justifyContent = "flex-start"
-								alignItems     = "center"
-								margin         = {{ bottom: 4 }}
-							>
-								<Icon
-									uvs    = {atlasIconsFontAwesome.uv.cat}
-									width  = "64"
-									height = "64"
-									margin = {{ right: 12 }}
-								/>
-								<Icon
-									uvs    = {atlasIconsFontAwesome.uv.cat}
-									width  = "64"
-									height = "64"
-									rotate = {45}
-									margin = {{ right: 12 }}
-								/>
-								<Code value="<Icon uvs={…} rotate={45} /> — custom art: src + optional uvs" />
-							</Row>
-
-
-							{/* MARK: Tints / avatars / sample grid */}
-							<Row
-								flexWrap       = "wrap"
-								justifyContent = "flex-start"
-								alignItems     = "flex-start"
-								margin         = {{ top: 8, bottom: 8 }}
-							>
-								<Column
-									cols           = {6}
-									alignItems     = "flex-start"
-									justifyContent = "flex-start"
-									padding        = {{ right: 8 }}
-								>
-									<Label
-										cols   = {12}
-										value  = "Icon - Color Tints"
-										margin = {{ bottom: 8 }}
-									/>
-									<Row
-										justifyContent = "flex-start"
-										alignItems     = "center"
-										margin         = {{ bottom: 6 }}
-									>
-										<Icon
-											uvs       = {atlasIconsFontAwesome.uv.star}
-											width     = "48"
-											height    = "48"
-											iconColor = {theme.colors.primary}
-											margin    = {{ right: 8 }}
-										/>
-										<Icon
-											uvs       = {atlasIconsFontAwesome.uv.star}
-											width     = "48"
-											height    = "48"
-											iconColor = {theme.colors.danger}
-											margin    = {{ right: 8 }}
-										/>
-										<Icon
-											uvs             = {atlasIconsFontAwesome.uv.star}
-											width           = "48"
-											height          = "48"
-											iconColor       = {theme.colors.light}
-											backgroundColor = {theme.colors.primary}
-											borderRadius    = {8}
-											padding         = {{ top: 6, right: 6, bottom: 6, left: 6 }}
-										/>
-									</Row>
-									<Code value="<Icon iconColor={…} backgroundColor={…} />" textWrap="nowrap" />
-								</Column>
-
-								<Column
-									cols           = {6}
-									alignItems     = "flex-start"
-									justifyContent = "flex-start"
-									padding        = {{ right: 4, left: 4 }}
-								>
-									<Label
-										cols   = {12}
-										value  = "Avatar Icons"
-										margin = {{ bottom: 8 }}
-									/>
-									<Row
-										justifyContent = "flex-start"
-										alignItems     = "center"
-										margin         = {{ bottom: 6 }}
-									>
-										<AvatarIcon
-											userId = {DEFAULT_AVATAR_USER_ID}
-											width  = {48}
-											height = {48}
-										/>
-										<AvatarIcon
-											userId       = {DEFAULT_AVATAR_USER_ID}
-											width        = {48}
-											height       = {48}
-											borderRadius = {24}
-											borderWidth  = {2}
-											borderColor  = {alpha(theme.colors.light, 0.8)}
-										/>
-										<AvatarIcon
-											userId       = {DEFAULT_AVATAR_USER_ID}
-											width        = {48}
-											height       = {48}
-											borderRadius = {theme.border.radiusDefault}
-											borderWidth  = {2}
-											borderColor  = {alpha(theme.colors.info, 0.8)}
-										/>
-										<AvatarIcon
-											userId          = {DEFAULT_AVATAR_USER_ID}
-											width           = {48}
-											height          = {48}
-											borderRadius    = {theme.border.radiusDefault}
-											borderWidth     = {2}
-											borderColor     = {alpha(theme.colors.info, 0.8)}
-											backgroundColor = {alpha(theme.colors.info, 0.8)}
-										/>
-									</Row>
-									<Code value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
-								</Column>
-
-							</Row>
-							
-						</Column>
-						<Column cols = {4}>
-							{this.renderSampleGrid()}							
-						</Column>
-					</Row>	
-
-					
-
-					{/* MARK: Atlas glyph examples */}
-					<Row
-						flexWrap       = "wrap"
-						justifyContent = "flex-start"
-						alignItems     = "flex-start"
-					>
-						<Column
-							cols           = {4}
-							spacing        = {6}
-							alignItems     = "flex-start"
-							justifyContent = "flex-start"
-							padding        = {{ right: 8 }}
-						>
-							<Label cols={12} value="IconNumber" margin={{ bottom: 4 }} />
-							<Text
-								value    = "Countdown timer (MM:SS) — digits from the alphanumeric atlas, colon from symbols."
-								fontSize = {theme.typography.size.small}
-							/>
-							<Column
-								cols           = {12}
-								alignItems     = "center"
-								justifyContent = "center"
-								borderWidth    = {theme.border.width}
-								borderRadius   = {theme.border.radiusDefault}
-								borderColor    = {alpha(theme.colors.light, 0.2)}
-								backgroundColor          = {alpha(theme.colors.primary, 0.35)}
-								padding        = {{ top: 10, right: 12, bottom: 10, left: 12 }}
-								margin         = {{ top: 4, bottom: 6 }}
-							>
-								<IconNumber value={formatClock(countdown)} height={36} />
-							</Column>
-							<Text value="Score / formula:" fontSize={theme.typography.size.small} />
-							<IconNumber value="+120/2=60" height={28} />
-							<Row justifyContent="flex-start" alignItems="center" margin={{ top: 4 }}>
-								<IconNumber value={42} height={28} iconColor={theme.colors.primary} margin={{ right: 8 }} />
-								<IconNumber value={42} height={28} iconColor={theme.colors.danger} margin={{ right: 8 }} />
-								<IconNumber value={42} height={28} iconColor={theme.colors.success} />
-							</Row>
-							<Code value={'<IconNumber value={42} iconColor={…} />'} textWrap="nowrap" />
-						</Column>
-
-						<Column
-							cols           = {4}
-							spacing        = {6}
-							alignItems     = "flex-start"
-							justifyContent = "flex-start"
-							padding        = {{ right: 4, left: 4 }}
-						>
-							<Label cols={12} value="IconCharacter" margin={{ bottom: 4 }} />
-							<Text
-								value    = "Letters from atlasCharsAlphaNumeric (a–z, A–Z, 0–9)."
-								fontSize = {theme.typography.size.small}
-							/>
-							<IconCharacter value="HELLO" height={28} />
-							<IconCharacter value="Player1" height={28} iconColor={theme.colors.primary} />
-							<IconCharacter value="WAVE 3" height={28} iconColor={theme.colors.success} />
-							<Code value={'<IconCharacter value="HELLO" iconColor={…} />'} textWrap="nowrap" />
-						</Column>
-
-						<Column
-							cols           = {4}
-							spacing        = {6}
-							alignItems     = "flex-start"
-							justifyContent = "flex-start"
-							padding        = {{ left: 8 }}
-						>
-							<Label cols={12} value="IconSymbol / IconString" margin={{ bottom: 4 }} />
-							<Text
-								value    = "Symbols alone, or IconString when you need mixed letters + punctuation."
-								fontSize = {theme.typography.size.small}
-							/>
-							<IconSymbol value="$%#?!" height={28} iconColor={theme.colors.warning} />
-							<IconSymbol value="(@)" height={28} iconColor={theme.colors.primary} />
-							<IconString value="HI $120!" height={28} iconColor={theme.colors.danger} />
-							<IconString value="A+B=C" height={28} iconColor={theme.colors.success} />
-							<Code value={'<IconString value="HI $120!" iconColor={…} />'} textWrap="nowrap" />
-						</Column>
-					</Row>
+					<AvatarIcon
+						userId          = {DEFAULT_AVATAR_USER_ID}
+						width           = {48}
+						height          = {48}
+						borderRadius    = {theme.border.radiusDefault}
+						borderWidth     = {2}
+						borderColor     = {alpha(theme.colors.info, 0.8)}
+						backgroundColor = {alpha(theme.colors.info, 0.8)}
+					/>
+				</Row>
+				<Code value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
 			</Column>,
 		]
-	}
-
-
-	// MARK: renderSampleGrid
-	/** Renders a 4×8 sample of named Font Awesome icons. */
-	private renderSampleGrid() {
-		const theme = getTheme()
-
-		return (
-			<Row
-				flexWrap       = "wrap"
-				justifyContent = "flex-start"
-				alignItems     = "flex-start"
-			>
-				{SAMPLE_ICONS.map((name) => (
-					<Column
-						key            = {`icon-sample-${name}`}
-						cols           = {3}
-						spacing        = {0}
-						borderWidth    = {theme.border.width}
-						borderRadius   = {theme.border.radiusSmall}
-						borderColor    = {alpha(theme.colors.light, 0.12)}
-						alignItems     = "center"
-						justifyContent = "center"
-						padding        = {{ top: 6, right: 2, bottom: 6, left: 2 }}
-						minHeight      = {40}
-					>
-						<Icon
-							uvs    = {atlasIconsFontAwesome.uv[name]}
-							width  = "26"
-							height = "26"
-						/>
-					</Column>
-				))}
-			</Row>
-		)
 	}
 }
 

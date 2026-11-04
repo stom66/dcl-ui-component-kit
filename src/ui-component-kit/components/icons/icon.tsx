@@ -1,7 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
 
-import { atlasIconsFontAwesome } from '../../atlases'
 import { getTheme } from '../../styles'
 import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 import { IconBackgroundWrap } from './icon.backgroundWrap'
@@ -21,9 +20,10 @@ export type IconProps = UiBoxProps & {
 	 */
 	backgroundColor?: Color4
 	/**
-	 * Texture path. Defaults to the bundled Font Awesome atlas.
-	 * Pass any scene-relative PNG (or a custom `TextureAtlas.source`) for your
-	 * own art — pair with `uvs` for atlas cells, or omit `uvs` for the full image.
+	 * Scene-relative texture path (or a custom `TextureAtlas.source`). Required
+	 * for a visible glyph — pair with `uvs` for atlas cells, or omit `uvs` for
+	 * the full image. For Font Awesome Free icons by name, use `FontAwesome`
+	 * instead.
 	 */
 	src?        : string
 	textureMode?: TextureMode | undefined
@@ -40,11 +40,12 @@ export type IconProps = UiBoxProps & {
 
 // MARK: Icon
 /**
- * Texture icon. Defaults to a square cell sized from `theme.icons.size` when
- * `width` / `height` are `"auto"` (virtual UI pixels, scaled by the client).
- * `src` defaults to `atlasIconsFontAwesome.source` and inherits that atlas's
- * `wrapMode` / `filterMode` (override via `uiBackground.texture` — deep-merged).
- * Override `src` (and optional `uvs`) for custom images / project atlases.
+ * Texture icon for custom / project atlases. Defaults to a square cell sized
+ * from `theme.icons.minSize` when `width` / `height` are `"auto"` (virtual UI
+ * pixels, scaled by the client). Pass `src` (and optional `uvs` from a
+ * `TextureAtlas`) — there is no default Font Awesome sheet anymore.
+ *
+ * For Font Awesome Free icons by name, use `FontAwesome` (TTF glyphs).
  *
  * Tint with `iconColor` only. `backgroundColor` paints a chip behind the glyph
  * (wrapper `UiBox`) — it never multiplies the texture. `rotate` turns the UVs.
@@ -58,7 +59,7 @@ export const Icon = ({
 	borderWidth,
 	padding,
 	margin,
-	src         = atlasIconsFontAwesome.source,
+	src,
 	textureMode,
 	uvs,
 	rotate,
@@ -73,9 +74,12 @@ export const Icon = ({
 	...props
 }: IconProps) => {
 	const size = getTheme().icons.minSize
-	const texture = src === atlasIconsFontAwesome.source
-		? atlasIconsFontAwesome.texture
-		: { src, wrapMode: 'clamp' as const }
+	if (!src) {
+		console.error('Icon: `src` is required (texture path or TextureAtlas.source). For Font Awesome by name, use <FontAwesome icon="…" />.')
+	}
+	const texture = src
+		? { src, wrapMode: 'clamp' as const }
+		: undefined
 
 	const wrapChip    = backgroundColor !== undefined
 	const resolvedUvs = resolveIconRotatedUvs(uvs, rotate)

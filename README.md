@@ -67,7 +67,7 @@ You do not need a custom theme to start — defaults look like Decentraland out 
 
 The package is **MIT**. Third-party art is credited separately:
 
-- **[Font Awesome Free](https://fontawesome.com)** — this kit ships a **limited subset** of the Free pack as `atlasIconsFontAwesome`. For the full icon set, get Font Awesome from [fontawesome.com](https://fontawesome.com) ([Free license](https://fontawesome.com/license/free)).
+- **[Font Awesome Free](https://fontawesome.com)** — `<FontAwesome icon="…" />` + TTFs under `assets/fonts/` (SIL OFL 1.1; see [docs/licensing.md](docs/licensing.md)). Unity Desktop only fits ~35–50 unique icons per font atlas — prefer texture atlases for large sets. Deprecated PNG subset: `atlasIconsFontAwesome`.
 - **[CraftPix.net](https://craftpix.net)** — some showcase demo sprite sheets (not npm stock textures).
 
 Full notes: [docs/licensing.md](docs/licensing.md).

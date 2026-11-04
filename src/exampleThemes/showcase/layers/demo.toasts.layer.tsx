@@ -32,7 +32,7 @@ function toastLabel(value: string) {
 			padding        = {{ top: 8, right: 12, bottom: 8, left: 12 }}
 		>
 			<Row>
-				<Icon uvs={atlasIconsFontAwesome.uv.cat} />
+				<Icon src = {atlasIconsFontAwesome.source} uvs={atlasIconsFontAwesome.uv.cat} />
 				<Text value={value} fontSize={theme.typography.size.default} />
 			</Row>
 		</UiBox>
@@ -193,6 +193,7 @@ export class DemoToastsLayer extends Layer {
 								isDismissable: true,
 								content      : () => (
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {atlasIconsFontAwesome.uv[name]}
 										width  = "100%"
 										height = "100%"
@@ -219,6 +220,7 @@ export class DemoToastsLayer extends Layer {
 								isDismissable: true,
 								content      : () => (
 									<Icon
+										src = {atlasIconsFontAwesome.source}
 										uvs    = {atlasIconsFontAwesome.uv[name]}
 										width  = "100%"
 										height = "100%"
