@@ -1,0 +1,27 @@
+---
+description: Release flow when asked to bump and publish
+alwaysApply: true
+---
+
+# Bump and publish
+
+When the user says "bump and publish", release `@stom66/dcl-ui-component-kit` by following `DEVNOTES.md`. Run the gates below first. Do not bump, tag, push, or publish until both gates pass.
+
+## Clean tree
+
+Check `git status` before anything else. If the working tree has uncommitted changes (modified, staged, or untracked), stop and ask what to do with them.
+
+## Bump level
+
+Run `patch`, `minor`, or `major` only when the user named that level in the same message. Otherwise stop and ask which level to use.
+
+## Then release
+
+Once the tree is clean and the level is known, follow `DEVNOTES.md`:
+
+1. `npm run bump:patch`, `npm run bump:minor`, or `npm run bump:major`
+2. `git push && git push --tags`
+3. `gh workflow run publish.yml`
+4. Confirm the published version on npm
+
+Use the GitHub Actions publish workflow. Do not publish from a local `/.npmrc` unless the user asks for that path.
