@@ -45,6 +45,9 @@
       }
     }
   ],
+  "requiredPermissions": [
+    "OPEN_EXTERNAL_LINK"
+  ],
   "featureToggles": {
     "voiceChat": "enabled",
     "portableExperiences": "enabled",
