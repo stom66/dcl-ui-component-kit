@@ -1,24 +1,84 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
+import { openExternalUrl } from '~system/RestrictedActions'
 
-import { alpha, AvatarIcon, Background, Code, Column, DEFAULT_AVATAR_USER_ID, FontAwesome, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
+import { alpha, AvatarIcon, Background, Column, DEFAULT_AVATAR_USER_ID, FontAwesome, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType, type Theme } from '../../../ui-component-kit'
 import { exampleIconsAtlas } from '../atlases'
 
-/** Tiny curated FA set — Unity `fontSrc` atlases only fit ~35–50 unique PUA glyphs. */
-const SAMPLE_ICONS = [
-	'cat', 'star', 'heart', 'gift',
-	'fire', 'github',
+const FONT_AWESOME_ICONS_URL = 'https://fontawesome.com/search?o=r&m=free'
+
+/** Common DCL-game FA sample — 3×6 grid (not the full Free catalog). */
+const GAME_FA_ICONS = [
+	'heart', 'star', 'coins', 'trophy', 'fire', 'bolt',
+	'key', 'gem', 'crown', 'gift', 'compass', 'clock',
+	'users', 'shield', 'rocket', 'bomb', 'gamepad', 'dice',
 ] as const
 
 const ATLAS_SAMPLE = [
-	'catButt', 'pigeonCowboy', 'pigeonWalk', 'dclLogo',
+	'catButt', 'dclLogo', 'pigeonCowboy', 'pigeonWalk',
 	'pigeonWaiter', 'pigeonBiker', 'pigeonGolfer', 'pigeonTracksuit',
 	'pigeonBowler', 'pigeonHoodie', 'pigeonFancy', 'pigeonStreet',
 ] as const
 
+const AVATAR_USER_A = '0xcec7e38e088a87d77f2b60fcae6840d00e018155'
+const AVATAR_USER_B = '0x327f74101F930c76653FD11aC7C8BA3C8694678f'
+
+const AVATAR_SIZE = 48
+const FA_SIZE     = AVATAR_SIZE
+const ATLAS_SIZE  = 48
+
+
+// MARK: chunk
+/** Split `items` into rows of `size` (last row may be shorter). */
+function chunk<T>(items: readonly T[], size: number): T[][] {
+	const rows: T[][] = []
+	for (let i = 0; i < items.length; i += size) {
+		rows.push(items.slice(i, i + size) as T[])
+	}
+	return rows
+}
+
+
+// MARK: ExampleCodeChip
+/**
+ * Muted grey rounded chip for example snippets (not the primary/orange section title).
+ */
+function ExampleCodeChip({
+	keyName,
+	value,
+	theme,
+}: {
+	keyName: string
+	value  : string
+	theme  : Theme
+}) {
+	return (
+		<Label
+			key             = {keyName}
+			cols            = {12}
+			value           = {value}
+			font            = "monospace"
+			fontSize        = {theme.typography.size.code}
+			fontColor       = {theme.colors.light}
+			textAlign       = "middle-left"
+			textWrap        = "nowrap"
+			backgroundColor = {alpha(theme.colors.dark, 0.5)}
+			borderRadius    = {theme.border.radiusSmall}
+			padding         = {{ top: 6, right: 10, bottom: 6, left: 10 }}
+		/>
+	)
+}
+
+
+// MARK: openFontAwesomeIcons
+/** Opens the Font Awesome Free icon browser (player confirms via Explorer). */
+function openFontAwesomeIcons() {
+	void openExternalUrl({ url: FONT_AWESOME_ICONS_URL })
+}
+
 
 // MARK: DemoIconsLayer
 /**
- * Demo panel for FontAwesome (TTF, small sets), custom atlas `Icon`, and AvatarIcon.
+ * Demo panel for AvatarIcon, FontAwesome (TTF), custom atlas `Icon`, and tint.
  */
 export class DemoIconsLayer extends Layer {
 	constructor() {
@@ -53,72 +113,165 @@ export class DemoIconsLayer extends Layer {
 				<H2 key="title" value="Icons" />
 				<Text
 					key      = "intro"
-					value    = "FontAwesome (TTF) is for small curated sets only. Unity Desktop fits roughly ~35–50 unique FA icons per font atlas after Latin prefill — more unique glyphs show as tofu. Prefer Icon + TextureAtlas for large packs. Preview needs npm run start:bundles."
+					value    = "This kit supports AvatarIcon and FontAwesome out of the box. Custom icons are also supported — see the documentation for more info on adding your own. Font Awesome has more icons than we show here — visit fontawesome.com for the full list."
 					fontSize = {theme.typography.size.small}
 				/>
+				<Text
+					key       = "fa-icons-link"
+					value     = "fontawesome.com/icons"
+					fontSize  = {theme.typography.size.small}
+					fontColor = {theme.colors.info}
+					width     = "auto"
+					textWrap  = "nowrap"
+					onMouseDown = {openFontAwesomeIcons}
+					margin    = {{ top: 2, bottom: 4 }}
+				/>
 
-				<Label key="fa-label" cols={12} value="FontAwesome" margin={{ top: 4 }} />
-				<Row key="fa-row" justifyContent="flex-start" alignItems="center" spacing={10} margin={{ top: 4 }}>
-					<FontAwesome key="fa-cat" icon="cat" fontSize={44} />
-					<FontAwesome key="fa-star" icon="star" fontSize={44} />
-					<FontAwesome key="fa-github" icon="github" fontSize={44} />
-				</Row>
-				<Code key="fa-code" value={'<FontAwesome icon="star" fontSize={44} />'} textWrap="nowrap" />
-
-				<Label key="color-label" cols={12} value="Color" margin={{ top: 8 }} />
-				<Row key="fa-color-row" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
-					<FontAwesome key="fa-color-primary" icon="star" fontSize={36} fontColor={theme.colors.primary} />
-					<FontAwesome key="fa-color-danger" icon="star" fontSize={36} fontColor={theme.colors.danger} />
-					<FontAwesome key="fa-color-light" icon="star" fontSize={36} fontColor={theme.colors.light} />
-				</Row>
-				<Code key="color-code" value={'<FontAwesome icon="star" fontColor={…} />'} textWrap="nowrap" />
-
-				<Label key="samples-label" cols={12} value="Samples (keep unique count low)" margin={{ top: 8 }} />
-				<Row key="fa-samples" flexWrap="wrap" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
-					{SAMPLE_ICONS.map((icon) => (
-						<FontAwesome key={`fa-sample-${icon}`} icon={icon} fontSize={28} />
-					))}
-				</Row>
-
-				<Label key="atlas-label" cols={12} value="Icon + custom TextureAtlas" margin={{ top: 8 }} />
-				<Row key="atlas-samples" flexWrap="wrap" justifyContent="flex-start" alignItems="center" margin={{ top: 4 }}>
-					{ATLAS_SAMPLE.map((name) => (
-						<Icon
-							key    = {`atlas-${name}`}
-							src    = {exampleIconsAtlas.source}
-							uvs    = {exampleIconsAtlas.uv[name]}
-							width  = {40}
-							height = {40}
-							margin = {{ right: 8, bottom: 4 }}
+				{/* AvatarIcon | FontAwesome */}
+				<Row key="row-avatar-fa" justifyContent="flex-start" alignItems="flex-start" spacing={12} margin={{ top: 4 }}>
+					<Column key="avatar-col" cols={6} spacing={8} alignItems="flex-start">
+						<Label key="avatar-label" cols={12} value="AvatarIcon" />
+						<ExampleCodeChip
+							keyName = "avatar-code"
+							theme   = {theme}
+							value   = {'<AvatarIcon userId="…" />'}
 						/>
-					))}
-				</Row>
-				<Code key="atlas-code" value={'<Icon src={exampleIconsAtlas.source} uvs={…} />'} textWrap="nowrap" />
+						<Row key="avatar-row-default" justifyContent="flex-start" alignItems="center" spacing={8}>
+							<AvatarIcon key="avatar-default-plain" userId={DEFAULT_AVATAR_USER_ID} width={AVATAR_SIZE} height={AVATAR_SIZE} />
+							<AvatarIcon
+								key          = "avatar-default-round"
+								userId       = {DEFAULT_AVATAR_USER_ID}
+								width        = {AVATAR_SIZE}
+								height       = {AVATAR_SIZE}
+								borderRadius = {AVATAR_SIZE / 2}
+								borderWidth  = {2}
+								borderColor  = {alpha(theme.colors.light, 0.8)}
+							/>
+							<AvatarIcon
+								key             = "avatar-default-chip"
+								userId          = {DEFAULT_AVATAR_USER_ID}
+								width           = {AVATAR_SIZE}
+								height          = {AVATAR_SIZE}
+								borderRadius    = {theme.border.radiusDefault}
+								borderWidth     = {2}
+								borderColor     = {alpha(theme.colors.info, 0.8)}
+								backgroundColor = {alpha(theme.colors.info, 0.8)}
+							/>
+						</Row>
+						<Row key="avatar-row-a" justifyContent="flex-start" alignItems="center" spacing={8}>
+							<AvatarIcon key="avatar-a-plain" userId={AVATAR_USER_A} width={AVATAR_SIZE} height={AVATAR_SIZE} />
+							<AvatarIcon
+								key          = "avatar-a-round"
+								userId       = {AVATAR_USER_A}
+								width        = {AVATAR_SIZE}
+								height       = {AVATAR_SIZE}
+								borderRadius = {AVATAR_SIZE / 2}
+								borderWidth  = {2}
+								borderColor  = {alpha(theme.colors.light, 0.8)}
+							/>
+							<AvatarIcon
+								key             = "avatar-a-chip"
+								userId          = {AVATAR_USER_A}
+								width           = {AVATAR_SIZE}
+								height          = {AVATAR_SIZE}
+								borderRadius    = {theme.border.radiusDefault}
+								borderWidth     = {2}
+								borderColor     = {alpha(theme.colors.primary, 0.8)}
+								backgroundColor = {alpha(theme.colors.primary, 0.8)}
+							/>
+						</Row>
+						<Row key="avatar-row-b" justifyContent="flex-start" alignItems="center" spacing={8}>
+							<AvatarIcon key="avatar-b-plain" userId={AVATAR_USER_B} width={AVATAR_SIZE} height={AVATAR_SIZE} />
+							<AvatarIcon
+								key          = "avatar-b-round"
+								userId       = {AVATAR_USER_B}
+								width        = {AVATAR_SIZE}
+								height       = {AVATAR_SIZE}
+								borderRadius = {AVATAR_SIZE / 2}
+								borderWidth  = {2}
+								borderColor  = {alpha(theme.colors.light, 0.8)}
+							/>
+							<AvatarIcon
+								key             = "avatar-b-chip"
+								userId          = {AVATAR_USER_B}
+								width           = {AVATAR_SIZE}
+								height          = {AVATAR_SIZE}
+								borderRadius    = {theme.border.radiusDefault}
+								borderWidth     = {2}
+								borderColor     = {alpha(theme.colors.danger, 0.8)}
+								backgroundColor = {alpha(theme.colors.danger, 0.8)}
+							/>
+						</Row>
+					</Column>
 
-				<Label key="avatar-label" cols={12} value="AvatarIcon" margin={{ top: 8 }} />
-				<Row key="avatars" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4, bottom: 4 }}>
-					<AvatarIcon key="avatar-plain" userId={DEFAULT_AVATAR_USER_ID} width={48} height={48} />
-					<AvatarIcon
-						key          = "avatar-round"
-						userId       = {DEFAULT_AVATAR_USER_ID}
-						width        = {48}
-						height       = {48}
-						borderRadius = {24}
-						borderWidth  = {2}
-						borderColor  = {alpha(theme.colors.light, 0.8)}
-					/>
-					<AvatarIcon
-						key             = "avatar-chip"
-						userId          = {DEFAULT_AVATAR_USER_ID}
-						width           = {48}
-						height          = {48}
-						borderRadius    = {theme.border.radiusDefault}
-						borderWidth     = {2}
-						borderColor     = {alpha(theme.colors.info, 0.8)}
-						backgroundColor = {alpha(theme.colors.info, 0.8)}
-					/>
+					<Column key="fa-col" cols={6} spacing={8} alignItems="flex-start">
+						<Label key="fa-label" cols={12} value="FontAwesome" />
+						<ExampleCodeChip
+							keyName = "fa-code"
+							theme   = {theme}
+							value   = {`<FontAwesome icon="star" fontSize={${FA_SIZE}} />`}
+						/>
+						{chunk(GAME_FA_ICONS, 6).map((row, rowIndex) => (
+							<Row
+								key            = {`fa-row-${rowIndex}`}
+								justifyContent = "flex-start"
+								alignItems     = "center"
+								spacing        = {8}
+							>
+								{row.map((icon) => (
+									<FontAwesome key={`fa-${icon}`} icon={icon} fontSize={FA_SIZE} />
+								))}
+							</Row>
+						))}
+					</Column>
 				</Row>
-				<Code key="avatar-code" value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
+
+				{/* Custom atlas | Color */}
+				<Row key="row-atlas-color" justifyContent="flex-start" alignItems="flex-start" spacing={12} margin={{ top: 8 }}>
+					<Column key="atlas-col" cols={6} spacing={8} alignItems="flex-start">
+						<Label key="atlas-label" cols={12} value="Custom icons" />
+						<ExampleCodeChip
+							keyName = "atlas-code"
+							theme   = {theme}
+							value   = {'<Icon src={exampleIconsAtlas.source} uvs={…} />'}
+						/>
+						{chunk(ATLAS_SAMPLE, 6).map((row, rowIndex) => (
+							<Row
+								key            = {`atlas-row-${rowIndex}`}
+								justifyContent = "flex-start"
+								alignItems     = "center"
+								spacing        = {8}
+							>
+								{row.map((name) => (
+									<Icon
+										key    = {`atlas-${name}`}
+										src    = {exampleIconsAtlas.source}
+										uvs    = {exampleIconsAtlas.uv[name]}
+										width  = {ATLAS_SIZE}
+										height = {ATLAS_SIZE}
+									/>
+								))}
+							</Row>
+						))}
+					</Column>
+
+					<Column key="color-col" cols={6} spacing={8} alignItems="flex-start">
+						<Label key="color-label" cols={12} value="Color" />
+						<ExampleCodeChip
+							keyName = "color-code"
+							theme   = {theme}
+							value   = {'<FontAwesome icon="star" fontColor={…} />'}
+						/>
+						<Row key="fa-color-row" justifyContent="flex-start" alignItems="center" spacing={8}>
+							<FontAwesome key="fa-color-primary" icon="star" fontSize={FA_SIZE} fontColor={theme.colors.primary} />
+							<FontAwesome key="fa-color-danger" icon="star" fontSize={FA_SIZE} fontColor={theme.colors.danger} />
+							<FontAwesome key="fa-color-light" icon="star" fontSize={FA_SIZE} fontColor={theme.colors.light} />
+							<FontAwesome key="fa-color-success" icon="heart" fontSize={FA_SIZE} fontColor={theme.colors.success} />
+							<FontAwesome key="fa-color-warning" icon="bolt" fontSize={FA_SIZE} fontColor={theme.colors.warning} />
+							<FontAwesome key="fa-color-info" icon="gem" fontSize={FA_SIZE} fontColor={theme.colors.info} />
+						</Row>
+					</Column>
+				</Row>
 			</Column>,
 		]
 	}
