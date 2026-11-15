@@ -7,7 +7,7 @@ import { clampNumber, mirrorUVs } from '../../utils'
 import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
 import { spriteFrameToUvCell } from '../icons'
 
-import { resolveDefaultBorderRadius, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
+import { progressBarContentTransform, resolveDefaultBorderRadius, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_FILL } from './progressBar.shared'
 
 
 /** Stable UV quads per sheet cell — new arrays every frame leak ReactEcs entities. */
@@ -227,16 +227,7 @@ export function ProgressBarRadial({
 				}, uiBackground)}
 			/>
 			{children != null && (
-				<UiBox
-					uiTransform={{
-						positionType  : 'absolute',
-						position      : { top: 0, right: 0, bottom: 0, left: 0 },
-						display       : 'flex',
-						alignItems    : 'center',
-						justifyContent: 'center',
-						zIndex        : Z_INDEX_CONTENT,
-					}}
-				>
+				<UiBox uiTransform={progressBarContentTransform()}>
 					{children}
 				</UiBox>
 			)}

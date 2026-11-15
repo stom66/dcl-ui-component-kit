@@ -7,7 +7,7 @@ import { flipUVs, mirrorUVs, rotateUvIndexes } from '../../utils/uvs'
 
 import { UiBox, type UiBoxProps } from '../base'
 
-import { type ContentInset, resolveContentInset, type FillFrom, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
+import { type ContentInset, resolveContentInset, type FillFrom, progressBarContentTransform, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_FILL } from './progressBar.shared'
 
 export type { ContentInset, ContentInsetEdges, ResolvedContentInset } from './progressBar.shared'
 
@@ -542,15 +542,8 @@ export function ProgressBarImage({
 
 			{children != null && (
 				<UiBox
-					key = {`${id}_content`}
-					uiTransform={{
-						positionType  : 'absolute',
-						position      : { top: 0, right: 0, bottom: 0, left: 0 },
-						display       : 'flex',
-						alignItems    : 'center',
-						justifyContent: 'center',
-						zIndex        : Z_INDEX_CONTENT,
-					}}
+					key         = {`${id}_content`}
+					uiTransform = {progressBarContentTransform()}
 				>
 					{children}
 				</UiBox>

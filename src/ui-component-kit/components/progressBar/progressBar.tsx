@@ -5,7 +5,7 @@ import { getTheme } from '../../styles'
 
 import { UiBox, type UiBoxProps } from '../base'
 
-import { type FillFrom, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_CONTENT, Z_INDEX_FILL } from './progressBar.shared'
+import { type FillFrom, progressBarContentTransform, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_FILL } from './progressBar.shared'
 
 
 export type ProgressBarProps = Omit<
@@ -161,15 +161,8 @@ export function ProgressBar({
 
 			{children != null && (
 				<UiBox
-					key = {`${id}_content`}
-					uiTransform={{
-						positionType  : 'absolute',
-						position      : { top: 0, right: 0, bottom: 0, left: 0 },
-						display       : 'flex',
-						alignItems    : 'center',
-						justifyContent: 'center',
-						zIndex        : Z_INDEX_CONTENT,
-					}}
+					key         = {`${id}_content`}
+					uiTransform = {progressBarContentTransform()}
 				>
 					{children}
 				</UiBox>

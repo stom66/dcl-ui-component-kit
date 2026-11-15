@@ -214,7 +214,12 @@ export class DemoProgressLayer extends Layer {
 								fillColor = {theme.colors.warning}
 								height    = {28}
 							>
-								<Text value={`${Math.round(randomValue1 / 10)}/10`} fontSize={theme.typography.size.small} textAlign="middle-center" />
+								<Text
+									value       = {`${Math.round(randomValue1 / 10)}/10`}
+									fontSize    = {theme.typography.size.small}
+									textAlign   = "middle-center"
+									uiTransform = {{ width: 'auto', alignSelf: 'center' }}
+								/>
 							</ProgressBar>
 							<ProgressBar
 								key      = "demo_progress_procedural_right"
@@ -261,7 +266,12 @@ export class DemoProgressLayer extends Layer {
 									border    : 'assets/images/ui-component-kit/progressBar-horizontal-border.png',
 								}}
 							>
-								<Text value={String(randomValue2)} fontSize={theme.typography.size.default} textAlign="middle-center" />
+								<Text
+									value       = {String(randomValue2)}
+									fontSize    = {theme.typography.size.default}
+									textAlign   = "middle-center"
+									uiTransform = {{ width: 'auto', alignSelf: 'center' }}
+								/>
 							</ProgressBarImage>
 
 							{/* MARK: Hybrid
@@ -289,7 +299,12 @@ export class DemoProgressLayer extends Layer {
 									left  : 40 / 512,
 								}}
 							>
-								<Text value={String(randomValue3)} fontSize={theme.typography.size.default} textAlign="middle-center" />
+								<Text
+									value       = {String(randomValue3)}
+									fontSize    = {theme.typography.size.default}
+									textAlign   = "middle-center"
+									uiTransform = {{ width: 'auto', alignSelf: 'center' }}
+								/>
 							</ProgressBarImage>
 							<ProgressBarImage
 								key    = "demo_progress_hybrid_fill"

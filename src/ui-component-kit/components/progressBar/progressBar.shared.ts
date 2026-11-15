@@ -17,6 +17,34 @@ export const Z_INDEX_FILL       = 11
 export const Z_INDEX_BORDER     = 12
 export const Z_INDEX_CONTENT    = 13
 
+
+// MARK: progressBarContentTransform
+/**
+ * Full-bleed overlay that centers progress-bar `children` (readouts, icons).
+ *
+ * Explicit `width` / `height` fill the bar. `flexDirection: 'row'` makes
+ * `justifyContent` the horizontal axis and `alignItems` the vertical axis.
+ *
+ * `Text` defaults to `width: '100%'` and `alignSelf: 'flex-start'`, which
+ * pins a readout to the start edge. Center one with
+ * `uiTransform={{ width: 'auto', alignSelf: 'center' }}` and
+ * `textAlign="middle-center"`.
+ */
+export function progressBarContentTransform(): UiTransformProps {
+	return {
+		positionType  : 'absolute',
+		position      : { top: 0, left: 0 },
+		width         : '100%',
+		height        : '100%',
+		display       : 'flex',
+		flexDirection : 'row',
+		alignItems    : 'center',
+		justifyContent: 'center',
+		zIndex        : Z_INDEX_CONTENT,
+	}
+}
+
+
 /**
  * Minimum pixel inset for fill inside a procedural border.
  * Prefer `Math.max(FILL_INSET_PX, borderWidth)` so the fill sits inside the stroke.
