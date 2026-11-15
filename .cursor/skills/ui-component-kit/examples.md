@@ -9,7 +9,7 @@
 - Panel chrome via **sibling** empty `<Background />` in `body()` — never nest content inside it (preserves zone flex)
 - **Edge / corner HUDs:** keep content content-sized (omit `cols` on `ButtonText` / `Label`; do not wrap a lone control in `<Row>` or `<Column cols={12}>`) so zone `alignItems` / `justifyContent` apply. **Panels:** size the Layer with `uiTransform`, then use `cols={12}` inside that box.
 
-Real references: `demo.safeZone.factory.tsx`, `timer.layer.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`
+Real references: `demo.safeZone.factory.tsx`, `info.layer.tsx`, `demo.grids.layer.tsx`, `demo.progress.layer.tsx`
 
 ## Edge-zone HUD (content-sized — zone flex applies)
 

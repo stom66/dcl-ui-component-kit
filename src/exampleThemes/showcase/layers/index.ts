@@ -33,7 +33,6 @@ import { demoTextLayer }                     from './demo.text.layer'
 import { demoToastsLayer }                   from './demo.toasts.layer'
 import { demoToggleLayer }                   from './demo.toggle.layer'
 import { infoLayer }                         from './info.layer'
-import { timerLayer }                        from './timer.layer'
 
 
 /** Showcase demo layer list. Comment out entries to hide them. */
@@ -72,6 +71,5 @@ export const layers: Layer[] = [
 	demoToggleLayer,
 	demoSafeZonesLayer,
 	infoLayer,
-	//timerLayer,
 	toastHostLayer,
 ]

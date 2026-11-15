@@ -899,7 +899,7 @@ Full guides: root `README.md` → Custom textures / Buttons / Progress bars / Ic
 
 ## Data / keys / style
 
-- Live values on `this.props` (`PropsController`) — see `timer.layer.tsx`
+- Live values on `this.props` (`PropsController`) — see `demo.progress.layer.tsx`
 - Sibling `key`s unique among siblings; `ButtonImage` / `ButtonText` `id`s unique among concurrent buttons
 - `console.error` over `throw`; tabs; MARK comments; relative imports inside `ui-component-kit/`
 
