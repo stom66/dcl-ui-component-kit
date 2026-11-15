@@ -31,26 +31,6 @@
       }
     },
     {
-      "name": "inspector::Selection",
-      "jsonSchema": {
-        "type": "object",
-        "properties": {
-          "gizmo": {
-            "type": "integer",
-            "serializationType": "int32"
-          }
-        },
-        "serializationType": "map"
-      },
-      "data": {
-        "0": {
-          "json": {
-            "gizmo": 0
-          }
-        }
-      }
-    },
-    {
       "name": "inspector::Nodes",
       "jsonSchema": {
         "type": "object",
@@ -111,7 +91,31 @@
       }
     },
     {
-      "name": "inspector::SceneMetadata-v5",
+      "name": "inspector::UIState",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "sceneInfoPanelVisible": {
+            "type": "boolean",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "boolean",
+              "serializationType": "boolean"
+            }
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "0": {
+          "json": {
+            "sceneInfoPanelVisible": false
+          }
+        }
+      }
+    },
+    {
+      "name": "inspector::SceneMetadata-v6",
       "jsonSchema": {
         "type": "object",
         "properties": {
@@ -445,6 +449,26 @@
               "type": "boolean",
               "serializationType": "boolean"
             }
+          },
+          "multiplayerServer": {
+            "type": "boolean",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "boolean",
+              "serializationType": "boolean"
+            }
+          },
+          "logsPermissions": {
+            "type": "array",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "serializationType": "utf8-string"
+              },
+              "serializationType": "array"
+            }
           }
         },
         "serializationType": "map"
@@ -454,22 +478,25 @@
           "json": {
             "name": "🦆 DCL UI Component Kit",
             "description": "Demo scene for the DCL UI Component Kit",
-            "thumbnail": "images/scene-thumbnail.png",
+            "thumbnail": "assets/Images/scene-thumbnail.png",
+            "ageRating": "A",
             "categories": [],
-            "author": "SDK",
+            "author": "stom",
             "email": "",
-            "tags": [],
+            "tags": [
+              ""
+            ],
             "layout": {
+              "base": {
+                "x": 0,
+                "y": 0
+              },
               "parcels": [
                 {
                   "x": 0,
                   "y": 0
                 }
-              ],
-              "base": {
-                "x": 0,
-                "y": 0
-              }
+              ]
             },
             "silenceVoiceChat": false,
             "disablePortableExperiences": false,
@@ -486,11 +513,8 @@
                     ]
                   },
                   "y": {
-                    "$case": "range",
-                    "value": [
-                      0,
-                      0
-                    ]
+                    "$case": "single",
+                    "value": 0
                   },
                   "z": {
                     "$case": "range",
@@ -507,10 +531,14 @@
                 }
               }
             ],
-            "skyboxConfig": {},
-            "creator": "",
+            "skyboxConfig": {
+              "transitionMode": 0
+            },
+            "creator": "0xCEC7e38e088A87D77F2B60Fcae6840D00E018155",
             "disableNearbyVoiceChat": false,
-            "hideLandscapeTerrain": false
+            "hideLandscapeTerrain": false,
+            "multiplayerServer": false,
+            "logsPermissions": []
           }
         }
       }
