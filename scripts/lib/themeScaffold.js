@@ -84,7 +84,7 @@ export const theme: ThemeCustomize = {
 //
 // Export PNGs into \`${assetDir}/\` and declare atlases / texture sets here.
 // Start from the Affinity template shipped with UI Component Kit
-// (\`design/ui-component-kit-assets.af\` in the package repo).
+// (\`assets/images/ui-component-kit/src/duck-assets.af\` in the package repo).
 //
 // Example:
 //
@@ -260,7 +260,7 @@ async function initTheme(argv) {
 		console.log(`${LOG_PREFIX} no src/index.ts found — create one using the snippet above`)
 	}
 
-	console.log(`${LOG_PREFIX} next: grab design/ui-component-kit-assets.af from https://github.com/stom66/dcl-ui-component-kit`)
+	console.log(`${LOG_PREFIX} next: grab assets/images/ui-component-kit/src/duck-assets.af from https://github.com/stom66/dcl-ui-component-kit`)
 	console.log(`${LOG_PREFIX} export PNGs into assets/images/themes/${name}/ (do not overwrite assets/images/ui-component-kit/)`)
 	console.log(`${LOG_PREFIX} then ask your agent to wire those files into atlases.ts / the theme`)
 }

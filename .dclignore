@@ -18,8 +18,8 @@ README.md
 **/*.af
 **/*.af~lock~
 **/*~lock~
-design
-design/**
+assets/images/ui-component-kit/src
+assets/images/ui-component-kit/src/**
 *.blend
 *.fbx
 *.zip

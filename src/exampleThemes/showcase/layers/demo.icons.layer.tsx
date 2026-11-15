@@ -10,8 +10,9 @@ const SAMPLE_ICONS = [
 ] as const
 
 const ATLAS_SAMPLE = [
-	'prohibited', 'target', 'play', 'cat',
-	'starburst', 'check', 'coins', 'phone',
+	'catButt', 'pigeonCowboy', 'pigeonWalk', 'dclLogo',
+	'pigeonWaiter', 'pigeonBiker', 'pigeonGolfer', 'pigeonTracksuit',
+	'pigeonBowler', 'pigeonHoodie', 'pigeonFancy', 'pigeonStreet',
 ] as const
 
 
@@ -49,37 +50,38 @@ export class DemoIconsLayer extends Layer {
 				justifyContent = "flex-start"
 				padding        = {{ top: 14, right: 20, bottom: 16, left: 20 }}
 			>
-				<H2 value="Icons" />
+				<H2 key="title" value="Icons" />
 				<Text
+					key      = "intro"
 					value    = "FontAwesome (TTF) is for small curated sets only. Unity Desktop fits roughly ~35–50 unique FA icons per font atlas after Latin prefill — more unique glyphs show as tofu. Prefer Icon + TextureAtlas for large packs. Preview needs npm run start:bundles."
 					fontSize = {theme.typography.size.small}
 				/>
 
-				<Label cols={12} value="FontAwesome" margin={{ top: 4 }} />
-				<Row justifyContent="flex-start" alignItems="center" spacing={10} margin={{ top: 4 }}>
-					<FontAwesome icon="cat" fontSize={44} />
-					<FontAwesome icon="star" fontSize={44} />
-					<FontAwesome icon="github" fontSize={44} />
+				<Label key="fa-label" cols={12} value="FontAwesome" margin={{ top: 4 }} />
+				<Row key="fa-row" justifyContent="flex-start" alignItems="center" spacing={10} margin={{ top: 4 }}>
+					<FontAwesome key="fa-cat" icon="cat" fontSize={44} />
+					<FontAwesome key="fa-star" icon="star" fontSize={44} />
+					<FontAwesome key="fa-github" icon="github" fontSize={44} />
 				</Row>
-				<Code value={'<FontAwesome icon="star" fontSize={44} />'} textWrap="nowrap" />
+				<Code key="fa-code" value={'<FontAwesome icon="star" fontSize={44} />'} textWrap="nowrap" />
 
-				<Label cols={12} value="Color" margin={{ top: 8 }} />
-				<Row justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
-					<FontAwesome icon="star" fontSize={36} fontColor={theme.colors.primary} />
-					<FontAwesome icon="star" fontSize={36} fontColor={theme.colors.danger} />
-					<FontAwesome icon="star" fontSize={36} fontColor={theme.colors.light} />
+				<Label key="color-label" cols={12} value="Color" margin={{ top: 8 }} />
+				<Row key="fa-color-row" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
+					<FontAwesome key="fa-color-primary" icon="star" fontSize={36} fontColor={theme.colors.primary} />
+					<FontAwesome key="fa-color-danger" icon="star" fontSize={36} fontColor={theme.colors.danger} />
+					<FontAwesome key="fa-color-light" icon="star" fontSize={36} fontColor={theme.colors.light} />
 				</Row>
-				<Code value={'<FontAwesome icon="star" fontColor={…} />'} textWrap="nowrap" />
+				<Code key="color-code" value={'<FontAwesome icon="star" fontColor={…} />'} textWrap="nowrap" />
 
-				<Label cols={12} value="Samples (keep unique count low)" margin={{ top: 8 }} />
-				<Row flexWrap="wrap" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
+				<Label key="samples-label" cols={12} value="Samples (keep unique count low)" margin={{ top: 8 }} />
+				<Row key="fa-samples" flexWrap="wrap" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4 }}>
 					{SAMPLE_ICONS.map((icon) => (
-						<FontAwesome icon={icon} fontSize={28} />
+						<FontAwesome key={`fa-sample-${icon}`} icon={icon} fontSize={28} />
 					))}
 				</Row>
 
-				<Label cols={12} value="Icon + custom TextureAtlas" margin={{ top: 8 }} />
-				<Row flexWrap="wrap" justifyContent="flex-start" alignItems="center" margin={{ top: 4 }}>
+				<Label key="atlas-label" cols={12} value="Icon + custom TextureAtlas" margin={{ top: 8 }} />
+				<Row key="atlas-samples" flexWrap="wrap" justifyContent="flex-start" alignItems="center" margin={{ top: 4 }}>
 					{ATLAS_SAMPLE.map((name) => (
 						<Icon
 							key    = {`atlas-${name}`}
@@ -91,12 +93,13 @@ export class DemoIconsLayer extends Layer {
 						/>
 					))}
 				</Row>
-				<Code value={'<Icon src={exampleIconsAtlas.source} uvs={…} />'} textWrap="nowrap" />
+				<Code key="atlas-code" value={'<Icon src={exampleIconsAtlas.source} uvs={…} />'} textWrap="nowrap" />
 
-				<Label cols={12} value="AvatarIcon" margin={{ top: 8 }} />
-				<Row justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4, bottom: 4 }}>
-					<AvatarIcon userId={DEFAULT_AVATAR_USER_ID} width={48} height={48} />
+				<Label key="avatar-label" cols={12} value="AvatarIcon" margin={{ top: 8 }} />
+				<Row key="avatars" justifyContent="flex-start" alignItems="center" spacing={8} margin={{ top: 4, bottom: 4 }}>
+					<AvatarIcon key="avatar-plain" userId={DEFAULT_AVATAR_USER_ID} width={48} height={48} />
 					<AvatarIcon
+						key          = "avatar-round"
 						userId       = {DEFAULT_AVATAR_USER_ID}
 						width        = {48}
 						height       = {48}
@@ -105,6 +108,7 @@ export class DemoIconsLayer extends Layer {
 						borderColor  = {alpha(theme.colors.light, 0.8)}
 					/>
 					<AvatarIcon
+						key             = "avatar-chip"
 						userId          = {DEFAULT_AVATAR_USER_ID}
 						width           = {48}
 						height          = {48}
@@ -114,7 +118,7 @@ export class DemoIconsLayer extends Layer {
 						backgroundColor = {alpha(theme.colors.info, 0.8)}
 					/>
 				</Row>
-				<Code value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
+				<Code key="avatar-code" value={'<AvatarIcon userId="…" />'} textWrap="nowrap" />
 			</Column>,
 		]
 	}

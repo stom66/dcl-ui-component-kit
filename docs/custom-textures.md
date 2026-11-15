@@ -13,7 +13,9 @@ When a family has both, docs mark it: **Variants:** procedural (`Foo`) · image-
 
 The kit ships a full Affinity source with every default atlas and progress-bar artboard:
 
-**[`design/ui-component-kit-assets.af`](../design/ui-component-kit-assets.af)** (in this repo — kept outside `assets/` so Affinity autosave does not reload the scene)
+**[`assets/images/ui-component-kit/src/duck-assets.af`](../assets/images/ui-component-kit/src/duck-assets.af)** — kit chrome (buttons, progress bars, spinners, gradients, backgrounds). `assets/images/ui-component-kit/src/**` is listed in `.dclignore` so Affinity autosave does not reload the scene.
+
+Showcase demo sheets (smoke sprites, `atlas-icons-showcase-4x4`) live in **[`assets/images/example-themes/showcase/duck-showcase-assets.af`](../assets/images/example-themes/showcase/duck-showcase-assets.af)**.
 
 1. Open the `.af` file in Affinity.
 2. Duplicate the artboard closest to what you need.

@@ -29,36 +29,32 @@ export const exampleBtnIconsAtlas = new TextureAtlas({
 
 // MARK: exampleIconsAtlas
 /**
- * Example general icon atlas for `Icon` — 4×4 grid (PNG top → bottom; UV Y is
- * bottom → top). Sample with `.cell({ xStart, yStart })`, `.named.<name>`, or
- * `.uv.<name>`. For Font Awesome Free icons by name use kit `FontAwesome`
- * instead of a texture atlas.
+ * Showcase icon atlas for `Icon` — 4×4 grid exported from
+ * `duck-showcase-assets.af` (`atlas-icons-showcase-4x4.png`).
+ * PNG top → bottom; UV Y is bottom → top. The bottom row is empty.
+ * Sample with `.cell({ xStart, yStart })`, `.named.<name>`, or `.uv.<name>`.
+ * For Font Awesome Free icons by name use kit `FontAwesome` instead.
  */
 export const exampleIconsAtlas = new TextureAtlas({
-	source : 'assets/images/example-themes/showcase/atlas-icons.png',
+	source : 'assets/images/example-themes/showcase/atlas-icons-showcase-4x4.png',
 	columns: 4,
 	rows   : 4,
 	named  : {
 		/** Top row. */
-		prohibited: { xStart: 1, yStart: 4 },
-		target    : { xStart: 2, yStart: 4 },
-		play      : { xStart: 3, yStart: 4 },
-		cat       : { xStart: 4, yStart: 4 },
+		catButt         : { xStart: 1, yStart: 4 },
+		pigeonCowboy    : { xStart: 2, yStart: 4 },
+		pigeonWalk      : { xStart: 3, yStart: 4 },
+		dclLogo         : { xStart: 4, yStart: 4 },
 		/** Second row. */
-		starburst : { xStart: 1, yStart: 3 },
-		check     : { xStart: 2, yStart: 3 },
-		coins     : { xStart: 3, yStart: 3 },
-		phone     : { xStart: 4, yStart: 3 },
-		/** Third row. */
-		crown     : { xStart: 1, yStart: 2 },
-		crosshair : { xStart: 2, yStart: 2 },
-		dice      : { xStart: 3, yStart: 2 },
-		ghost     : { xStart: 4, yStart: 2 },
-		/** Bottom row. */
-		gift      : { xStart: 1, yStart: 1 },
-		heart     : { xStart: 2, yStart: 1 },
-		stopwatch : { xStart: 3, yStart: 1 },
-		trash     : { xStart: 4, yStart: 1 },
+		pigeonWaiter    : { xStart: 1, yStart: 3 },
+		pigeonBiker     : { xStart: 2, yStart: 3 },
+		pigeonGolfer    : { xStart: 3, yStart: 3 },
+		pigeonTracksuit : { xStart: 4, yStart: 3 },
+		/** Third row. Bottom row is empty. */
+		pigeonBowler    : { xStart: 1, yStart: 2 },
+		pigeonHoodie    : { xStart: 2, yStart: 2 },
+		pigeonFancy     : { xStart: 3, yStart: 2 },
+		pigeonStreet    : { xStart: 4, yStart: 2 },
 	},
 })
 
@@ -76,7 +72,7 @@ export const exampleSpriteSheetAtlas = new TextureAtlas({
 })
 
 export const SpriteSmoke = new TextureAtlas({
-	source    : 'assets/images/example-themes/showcase/sprites-smoke.png',
+	source    : 'assets/images/example-themes/showcase/sprites-smoke-1.png',
 	columns   : 4,
 	rows      : 4,
 	filterMode: 'point',

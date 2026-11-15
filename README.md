@@ -49,7 +49,7 @@ Guides live under [`docs/`](docs/).
 
 You do not need a custom theme to start — defaults look like Decentraland out of the box. When you want your own art:
 
-- Get the Affinity template ([`design/ui-component-kit-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/design/ui-component-kit-assets.af)) and customize buttons / progress bars / icons / etc.
+- Get the Affinity template ([`assets/images/ui-component-kit/src/duck-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/assets/images/ui-component-kit/src/duck-assets.af)) and customize buttons / progress bars / icons / etc.
 - Export PNGs into the theme folder the CLI scaffolds (`assets/images/themes/<name>/`) — never into stock `assets/images/ui-component-kit/`.
 - Tell your agent to wire those files into the theme. Full walkthrough: [docs/themes.md](docs/themes.md).
 

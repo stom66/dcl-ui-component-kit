@@ -260,7 +260,7 @@ import { atlasBtnIconsStyled } from '../../atlases'
 />
 ```
 
-`uvColumn` is 1-based (first variant = `1`). Custom atlas (art from `design/ui-component-kit-assets.af` → export under `assets/images/example-themes/showcase/`, declare in `src/exampleThemes/showcase/`):
+`uvColumn` is 1-based (first variant = `1`). Custom atlas (kit art from `assets/images/ui-component-kit/src/duck-assets.af`, showcase sheets from `assets/images/example-themes/showcase/duck-showcase-assets.af` → export under `assets/images/example-themes/showcase/`, declare in `src/exampleThemes/showcase/`):
 
 ```tsx
 import { exampleBtnIconsAtlas } from '../../exampleThemes/showcase'
@@ -417,11 +417,11 @@ import { AvatarIcon, DEFAULT_AVATAR_USER_ID, Icon, IconCharacter, IconNumber, Ic
 import { getTheme } from '../../styles'
 
 {/* Custom image / atlas: override src (+ uvs for a cell). Full image = src only. */}
-<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.coins} />
-<Icon uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} rotate={45} />
+<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.catButt} />
+<Icon uvs={exampleIconsAtlas.uv.pigeonCowboy} iconColor={getTheme().colors.primary} rotate={45} />
 {/* backgroundColor = chip behind the glyph; iconColor = texture tint */}
 <Icon
-	uvs             = {exampleIconsAtlas.uv.star}
+	uvs             = {exampleIconsAtlas.uv.pigeonCowboy}
 	iconColor       = {getTheme().colors.light}
 	backgroundColor = {getTheme().colors.primary}
 	borderRadius    = {8}

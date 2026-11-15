@@ -39,7 +39,7 @@ Some **demo / showcase** sprite sheets come from **[CraftPix.net](https://craftp
 | File | Used by (showcase) |
 |---|---|
 | `sprites-pigeon.png` | `exampleSpriteSheetAtlas` |
-| `sprites-smoke.png` | `SpriteSmoke` |
+| `sprites-smoke-1.png` | `SpriteSmoke` |
 | `sprites-smoke-2.png` | `SpriteSmoke2` |
 | `sprites-smoke-3.png` | `SpriteSmoke3` |
 

@@ -525,7 +525,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 
 When a user wants **their own images, atlases, or styles**, walk them through this — do not invent a parallel path:
 
-1. **Open the Affinity template** at `design/ui-component-kit-assets.af`. Explain that every default atlas / progress-bar artboard lives there; they should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
+1. **Open the Affinity template** at `assets/images/ui-component-kit/src/duck-assets.af` (kit chrome: buttons, progress bars, spinners, gradients, backgrounds). Showcase demo sheets (smoke sprites, `atlas-icons-showcase-4x4`) are in `assets/images/example-themes/showcase/duck-showcase-assets.af`. They should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
 2. **Export PNGs** into `assets/images/example-themes/<theme>/` (never into `assets/images/ui-component-kit/` unless they intend to replace framework defaults).
 3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleThemes/<theme>/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, progress-bar sets). Character glyph sheets are the bundled `atlasCharsAlphaNumeric` (8×8 letters + digits) and `atlasCharsSymbols` (6×6). Their `layout` arrays live in `src/ui-component-kit/atlases/atlases.ts`.
 4. **Sample UVs only via framework APIs** — never hand-write UV arrays:
@@ -585,7 +585,7 @@ PNG row 0 = top of artboard. UV Y is **bottom → top**, so for a 16×16 atlas t
 
 ### Generation steps
 
-1. **Prepare artboard** in `ui-component-kit-assets.af` (or a duplicate): size, guides, name (e.g. `atlas-icons-font-awesome`). Use `doc.setArtboardSizeWithAnchor(artboard, w, h, SpatialAnchor.TopLeft)` / `DocumentCommand.createAddHorizontalGuide` / `createAddVerticalGuide`. Find artboards via `doc.artboards` + `ab.description`.
+1. **Prepare artboard** in `assets/images/ui-component-kit/src/duck-assets.af` (or a duplicate): size, guides, name (e.g. `atlas-icons-font-awesome`). Use `doc.setArtboardSizeWithAnchor(artboard, w, h, SpatialAnchor.TopLeft)` / `DocumentCommand.createAddHorizontalGuide` / `createAddVerticalGuide`. Find artboards via `doc.artboards` + `ab.description`.
 2. **Curate icons** from the pack (score / hand-pick for the use case). Prefer solid. Cap at `columns × rows` (e.g. 256).
 3. **Place icons** left → right, top → bottom:
 	- Host-side: parse SVG `d` with something like `svgpath` (`.abs().unshort().unarc()`).
@@ -854,7 +854,7 @@ return [
 
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …; `atlasIconsFontAwesome` is deprecated). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Font Awesome Free icons: `FontAwesome` + TTFs under `assets/fonts/`. Project sheets: start from `design/ui-component-kit-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …; `atlasIconsFontAwesome` is deprecated). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Font Awesome Free icons: `FontAwesome` + TTFs under `assets/fonts/`. Project sheets: start from `assets/images/ui-component-kit/src/duck-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. Showcase icon atlas: `assets/images/example-themes/showcase/atlas-icons-showcase-4x4.png` from `duck-showcase-assets.af`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
 
 `TextureAtlas` defaults `wrapMode` to `'clamp'` (avoids neighbour-cell bleed). Optional `filterMode` (`'point'` | `'bi-linear'` | `'tri-linear'`) applies to the whole sheet. Use `atlas.texture` (or `mergeUiBackground`) instead of `{ src: atlas.source }` alone. `Spinner` is an animation wrapper around a child `Icon` — there are no dedicated spinner presets / atlas.
 

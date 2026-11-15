@@ -22,7 +22,7 @@ Atlas / UV details: [custom-textures.md](./custom-textures.md).
 
 **Agents:** after scaffolding, tell the human:
 
-- Download / copy the Affinity template: [`design/ui-component-kit-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/design/ui-component-kit-assets.af) (GitHub repo — not shipped on npm).
+- Download / copy the Affinity template: [`assets/images/ui-component-kit/src/duck-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/assets/images/ui-component-kit/src/duck-assets.af) (GitHub repo — not shipped on npm).
 - Customize the artboards they need. Keep the same cell grid, guidelines, and margins so UV sampling stays aligned.
 - Export PNGs into `assets/images/themes/<name>/`.
 - Then ask you to wire those files (atlases, progress-bar texture sets, image-button sources).
@@ -31,7 +31,7 @@ Do not mark a custom look “done” until the PNGs exist in that folder **and**
 
 ## Human walkthrough
 
-1. Get the template: [`design/ui-component-kit-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/design/ui-component-kit-assets.af) (also in this repo under [`design/`](../design/README.md)).
+1. Get the template: [`assets/images/ui-component-kit/src/duck-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/assets/images/ui-component-kit/src/duck-assets.af) (also in this repo under [`assets/images/ui-component-kit/src/`](../assets/images/ui-component-kit/src/README.md)). Showcase demo sheets (smoke sprites, icon atlas) are in [`assets/images/example-themes/showcase/duck-showcase-assets.af`](../assets/images/example-themes/showcase/duck-showcase-assets.af).
 2. Duplicate the artboard closest to what you need. Keep the cell grid so atlas UVs still match.
 3. Export PNGs into **`assets/images/themes/<name>/`**. Leave `assets/images/ui-component-kit/` for kit stock textures (re-synced on upgrade / `copy-assets`).
 4. Tell your AI something like: *use the PNGs in `assets/images/themes/<name>/` for this theme’s buttons, progress bars, and icons.*

@@ -28,7 +28,7 @@
   },
   "files": [
     "src/ui-component-kit",
-    "assets/images/ui-component-kit",
+    "assets/images/ui-component-kit/*.png",
     "assets/fonts/*.ttf",
     "assets/fonts/LICENSE-OFL.txt",
     "scripts/cli.js",

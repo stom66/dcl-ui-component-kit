@@ -413,8 +413,8 @@ Texture icon for **custom / project atlases** (not Font Awesome by name).
 import { Icon, getTheme } from '@stom66/dcl-ui-component-kit'
 import { exampleIconsAtlas } from './atlases'
 
-<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.cat} width={64} height={64} />
-<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.star} iconColor={getTheme().colors.primary} width={64} height={64} />
+<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.catButt} width={64} height={64} />
+<Icon src={exampleIconsAtlas.source} uvs={exampleIconsAtlas.uv.pigeonCowboy} iconColor={getTheme().colors.primary} width={64} height={64} />
 ```
 
 ### `AvatarIcon`

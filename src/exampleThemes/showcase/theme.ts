@@ -11,9 +11,10 @@ import type { ThemeCustomize } from '../../ui-component-kit'
  * live in `ui-component-kit/styles/components/*` (e.g. `colors.ts`, `animation.ts`).
  *
  * Put project art under `assets/images/example-themes/showcase/` and define
- * atlases / texture sets in `./atlases.ts`. Start custom art from the Affinity
- * template at `design/ui-component-kit-assets.af` (duplicate artboards, keep
- * grids/margins). Cell coords on `TextureAtlas` are 1-based.
+ * atlases / texture sets in `./atlases.ts`. Kit chrome starts from
+ * `assets/images/ui-component-kit/src/duck-assets.af`. Showcase sheets (icons,
+ * smoke) start from `duck-showcase-assets.af` in this theme's image folder.
+ * Duplicate artboards and keep grids/margins. Cell coords on `TextureAtlas` are 1-based.
  */
 export const theme: ThemeCustomize = {
 	colors: {

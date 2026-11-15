@@ -47,7 +47,7 @@ function shouldSkipAssetCopy(consumerRoot) {
  * Copies a package-relative directory into the consumer project when the source exists.
  * @returns {{ ok: boolean, reason?: string, dest?: string, skipped?: boolean }}
  */
-function copyDirIfPresent(relPath, consumerRoot) {
+function copyDirIfPresent(relPath, consumerRoot, options = {}) {
 	const src  = path.join(PACKAGE_ROOT, relPath)
 	const dest = path.join(consumerRoot, relPath)
 
@@ -56,15 +56,34 @@ function copyDirIfPresent(relPath, consumerRoot) {
 	}
 
 	fs.mkdirSync(path.dirname(dest), { recursive: true })
-	fs.cpSync(src, dest, { recursive: true })
+	const cpOptions = { recursive: true }
+	if (options.filter) cpOptions.filter = options.filter
+	fs.cpSync(src, dest, cpOptions)
 	return { ok: true, dest }
+}
+
+
+// MARK: skipKitAffinitySources
+/**
+ * Keeps Affinity sources under `assets/images/ui-component-kit/src/` out of the consumer copy.
+ * @param {string} source
+ * @returns {boolean}
+ */
+function skipKitAffinitySources(source) {
+	const rel = path.relative(path.join(PACKAGE_ROOT, ASSET_REL), source)
+	if (!rel || rel === '') return true
+	const parts = rel.split(path.sep)
+	if (parts[0] === 'src') return false
+	const base = parts[parts.length - 1].toLowerCase()
+	if (base.endsWith('.af') || base.includes('~lock~')) return false
+	return true
 }
 
 
 // MARK: copyStockAssets
 /**
  * Copies stock textures (and Font Awesome TTFs) into the consumer scene.
- * Images → `assets/images/ui-component-kit/`
+ * Images → `assets/images/ui-component-kit/` (PNGs only; `src/*.af` stays in the repo)
  * Fonts  → `assets/fonts/` (TTFs + LICENSE-OFL.txt; OTFs are local sources only)
  * @returns {{ ok: boolean, reason?: string, dest?: string, fontsDest?: string }}
  */
@@ -81,7 +100,11 @@ function copyStockAssets(options = {}) {
 		return { ok: false, reason: `skip (${skipReason})` }
 	}
 
-	const images = copyDirIfPresent(ASSET_REL, consumerRoot)
+	const images = copyDirIfPresent(ASSET_REL, consumerRoot, { filter: skipKitAffinitySources })
+	if (images.ok) {
+		const leaked = path.join(images.dest, 'src')
+		if (fs.existsSync(leaked)) fs.rmSync(leaked, { recursive: true, force: true })
+	}
 	if (!images.ok && !images.skipped) {
 		console.error(`${LOG_PREFIX} copyStockAssets: source missing: ${path.join(PACKAGE_ROOT, ASSET_REL)}`)
 		return { ok: false, reason: 'source assets missing in package' }
