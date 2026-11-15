@@ -26,3 +26,6 @@ tmp-unity-fonts/
 tmp-abgen/
 tmp-*.tgz
 tmp-*.py
+
+# Creator Hub — holds a local connection token, do not commit
+.mcp.json
