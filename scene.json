@@ -4,12 +4,12 @@
   "display": {
     "title": "🦆 DCL UI Component Kit",
     "description": "Demo scene for the DCL UI Component Kit",
-    "navmapThumbnail": "images/scene-thumbnail.png",
+    "navmapThumbnail": "assets/Images/scene-thumbnail.png",
     "favicon": "favicon_asset"
   },
   "owner": "",
   "contact": {
-    "name": "SDK",
+    "name": "stom",
     "email": ""
   },
   "main": "bin/index.js",
@@ -50,11 +50,14 @@
     "portableExperiences": "enabled",
     "nearbyVoiceChat": "enabled"
   },
-  "creator": "",
-  "skyboxConfig": {},
+  "creator": "0xCEC7e38e088A87D77F2B60Fcae6840D00E018155",
+  "skyboxConfig": {
+    "transitionMode": 0
+  },
   "source": {
     "origin": "creator-hub",
     "projectId": "0506ce0b-5f3e-4e33-9ed3-3ff39f045d67"
   },
-  "landscapeTerrain": true
+  "landscapeTerrain": true,
+  "rating": "A"
 }
