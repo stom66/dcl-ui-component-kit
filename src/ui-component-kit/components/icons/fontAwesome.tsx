@@ -6,14 +6,16 @@ import { getTheme } from '../../styles'
 
 
 export type FontAwesomeProps = {
+	/** Sibling identity. react-ecs passes `key` through as a real prop. */
+	key?      : string
 	/** Icon name — kebab-case (`dice-d20`), camelCase (`diceD20`), or alias (`close` → `xmark`). */
-	icon: string
+	icon      : string
 	/**
 	 * Pixel size for the glyph box and `uiText.fontSize`.
 	 * Passed through raw (same as the fontSrc bugtest scene) — not theme-scaled.
 	 * Defaults to `theme.icons.defaultSize`.
 	 */
-	fontSize?: number
+	fontSize? : number
 	/** Glyph tint. Defaults to `theme.colors.light`. */
 	fontColor?: Color4
 }
@@ -21,8 +23,8 @@ export type FontAwesomeProps = {
 
 // MARK: FontAwesome
 /**
- * Font Awesome Free glyph via scene TTF (`fontSrc`). Bare `UiEntity` — only
- * `icon`, `fontSize`, and `fontColor`.
+ * Font Awesome Free glyph via scene TTF (`fontSrc`). Bare `UiEntity` — `key`
+ * is forwarded so sibling lists keep a stable identity.
  *
  * **Known issue (Unity Desktop):** each `fontSrc` gets one dynamic SDF atlas.
  * After Latin prefill there is only room for roughly **~35–50 unique** PUA
@@ -31,6 +33,7 @@ export type FontAwesomeProps = {
  * large sets. Preview needs asset bundles (`npm run start:bundles`).
  */
 export function FontAwesome({
+	key,
 	icon,
 	fontSize: fontSizeProp,
 	fontColor,
@@ -46,6 +49,7 @@ export function FontAwesome({
 
 	return (
 		<UiEntity
+			key={key}
 			uiTransform={{
 				width     : fontSize,
 				height    : fontSize,

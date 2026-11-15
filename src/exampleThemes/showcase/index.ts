@@ -3,6 +3,7 @@ import { theme } from './theme'
 
 export { theme } from './theme'
 export { layers } from './layers'
+export { startShowcaseShortcuts } from './shortcuts'
 export { exampleBtnIconsAtlas, exampleIconsAtlas, exampleProgressBarTexturesHorizontal, exampleProgressBarTexturesVertical, exampleSpriteSheetAtlas } from './atlases'
 
 
