@@ -1,10 +1,10 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { atlasSpritesProgressRadial, type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
 import { clampNumber, mirrorUVs } from '../../utils'
-import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 import { spriteFrameToUvCell } from '../icons'
 
 import { progressBarContentTransform, resolveDefaultBorderRadius, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_FILL } from './progressBar.shared'
@@ -17,7 +17,7 @@ const DEFAULT_SIZE = 64
 
 
 export type ProgressBarRadialProps = Omit<
-	UiBoxProps,
+	KitEntityProps,
 	'uiTransform' | 'backgroundColor' | 'borderColor' | 'borderWidth' | 'borderRadius'
 > & {
 	/** Progress in `[0, 1]`. `0` is the first sheet frame, `1` is the last. */
@@ -177,43 +177,49 @@ export function ProgressBarRadial({
 	const showBorder = borderColor !== undefined && bWidth > 0
 
 	return (
-		<UiBox
-			{...props}
-			overflow      = "visible"
-			width         = {resolvedWidth}
-			height        = {resolvedHeight}
-			uiTransform   = {{
-				display       : 'flex',
-				alignItems    : 'center',
-				justifyContent: 'center',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				...(resolvedHeight !== 'auto' ? { minHeight: resolvedHeight } : {}),
-				...uiTransform,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				overflow: 'visible',
+				width: resolvedWidth,
+				height: resolvedHeight,
+				uiTransform: {
+					display       : 'flex',
+					alignItems    : 'center',
+					justifyContent: 'center',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					...(resolvedHeight !== 'auto' ? { minHeight: resolvedHeight } : {}),
+					...uiTransform,
+				},
+			})}
 		>
-			<UiBox
-				backgroundColor = {track}
-				borderRadius    = {bRadius}
-				uiTransform     = {{
-					positionType: 'absolute',
-					position    : { top: 0, right: 0, bottom: 0, left: 0 },
-					zIndex      : Z_INDEX_BACKGROUND,
-				}}
-			/>
-			{showBorder && (
-				<UiBox
-					borderColor  = {borderColor}
-					borderWidth  = {bWidth}
-					borderRadius = {bRadius}
-					uiTransform  = {{
+			<UiEntity
+				{...resolveKitEntityProps({
+					backgroundColor: track,
+					borderRadius: bRadius,
+					uiTransform: {
 						positionType: 'absolute',
 						position    : { top: 0, right: 0, bottom: 0, left: 0 },
-						zIndex      : Z_INDEX_FILL,
-					}}
+						zIndex      : Z_INDEX_BACKGROUND,
+					},
+				})}
+			/>
+			{showBorder && (
+				<UiEntity
+					{...resolveKitEntityProps({
+						borderColor,
+						borderWidth: bWidth,
+						borderRadius: bRadius,
+						uiTransform: {
+							positionType: 'absolute',
+							position    : { top: 0, right: 0, bottom: 0, left: 0 },
+							zIndex      : Z_INDEX_FILL,
+						},
+					})}
 				/>
 			)}
-			<UiBox
+			<UiEntity
 				uiTransform={{
 					positionType: 'absolute',
 					position    : spritePosition,
@@ -227,10 +233,10 @@ export function ProgressBarRadial({
 				}, uiBackground)}
 			/>
 			{children != null && (
-				<UiBox uiTransform={progressBarContentTransform()}>
+				<UiEntity uiTransform={progressBarContentTransform()}>
 					{children}
-				</UiBox>
+				</UiEntity>
 			)}
-		</UiBox>
+		</UiEntity>
 	)
 }

@@ -1,14 +1,14 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getColSelfTransform, type ColSpanInput } from '../../utils'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 import { applySpacingToChildren } from './childSpacing'
 
 
-type ColumnProps = UiBoxProps & {
+type ColumnProps = KitEntityProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	cols?       : ColSpanInput
 	colsDesktop?: ColSpanInput
@@ -39,26 +39,28 @@ export function Column({
 	const gap   = spacing ?? getTheme().spacing
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				height        : 'auto',
-				display       : 'flex',
-				flexDirection : 'column',
-				alignItems    : 'center',
-				// flex-start so spacer gutters stay adjacent (space-between fights them)
-				justifyContent: 'flex-start',
-				...(col !== undefined ? {
-					width     : col.width,
-					flexGrow  : col.flexGrow,
-					flexShrink: col.flexShrink,
-					...(col.flexBasis !== undefined ? { flexBasis: col.flexBasis } : {}),
-					...(col.maxWidth  !== undefined ? { maxWidth : col.maxWidth  } : {}),
-				} : {}),
-				...uiTransform,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					height        : 'auto',
+					display       : 'flex',
+					flexDirection : 'column',
+					alignItems    : 'center',
+					// flex-start so spacer gutters stay adjacent (space-between fights them)
+					justifyContent: 'flex-start',
+					...(col !== undefined ? {
+						width     : col.width,
+						flexGrow  : col.flexGrow,
+						flexShrink: col.flexShrink,
+						...(col.flexBasis !== undefined ? { flexBasis: col.flexBasis } : {}),
+						...(col.maxWidth  !== undefined ? { maxWidth : col.maxWidth  } : {}),
+					} : {}),
+					...uiTransform,
+				},
+			})}
 		>
 			{applySpacingToChildren(children, gap, edge)}
-		</UiBox>
+		</UiEntity>
 	)
 }

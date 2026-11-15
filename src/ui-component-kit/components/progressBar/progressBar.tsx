@@ -1,15 +1,15 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 import { type FillFrom, progressBarContentTransform, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_FILL } from './progressBar.shared'
 
 
 export type ProgressBarProps = Omit<
-	UiBoxProps,
+	KitEntityProps,
 	'uiTransform' | 'backgroundColor' | 'borderColor' | 'borderWidth' | 'borderRadius'
 > & {
 	/** Unique id for the per-instance PropsController / lerp state. */
@@ -83,38 +83,42 @@ export function ProgressBar({
 	const layout   = resolveFillFrom(fillFrom, percent)
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : width,
-				height        : height,
-				...(height !== 'auto' ? { minHeight: height } : {}),
-				display       : 'flex',
-				flexDirection : layout.flexDirection,
-				alignItems    : layout.alignItems,
-				justifyContent: 'flex-start',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				overflow      : 'hidden',
-				borderRadius  : bRadius,
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : width,
+					height        : height,
+					...(height !== 'auto' ? { minHeight: height } : {}),
+					display       : 'flex',
+					flexDirection : layout.flexDirection,
+					alignItems    : layout.alignItems,
+					justifyContent: 'flex-start',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					overflow      : 'hidden',
+					borderRadius  : bRadius,
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{/* Background (back) */}
-			<UiBox
+			<UiEntity
 				key             = {`${id}_bg`}
-				backgroundColor = {track}
-				uiTransform={{
-					positionType: 'absolute',
-					position    : { top: 0, right: 0, bottom: 0, left: 0 },
-					borderRadius: bRadius,
-					zIndex      : Z_INDEX_BACKGROUND,
-				}}
+				{...resolveKitEntityProps({
+					backgroundColor: track,
+					uiTransform: {
+						positionType: 'absolute',
+						position    : { top: 0, right: 0, bottom: 0, left: 0 },
+						borderRadius: bRadius,
+						zIndex      : Z_INDEX_BACKGROUND,
+					},
+				})}
 			/>
 
 			{/* Fill (middle) — inset by border width so it stays inside the stroke */}
-			<UiBox
+			<UiEntity
 				key = {`${id}_fill_host`}
 				uiTransform={{
 					positionType  : 'absolute',
@@ -133,40 +137,44 @@ export function ProgressBar({
 					zIndex        : Z_INDEX_FILL,
 				}}
 			>
-				<UiBox
+				<UiEntity
 					key             = {`${id}_fill`}
-					backgroundColor = {fill}
-					uiTransform={{
-						width       : layout.fillWidth,
-						height      : layout.fillHeight,
-						borderRadius: fillRadius,
-						flexGrow    : 0,
-						flexShrink  : 0,
-					}}
+					{...resolveKitEntityProps({
+						backgroundColor: fill,
+						uiTransform: {
+							width       : layout.fillWidth,
+							height      : layout.fillHeight,
+							borderRadius: fillRadius,
+							flexGrow    : 0,
+							flexShrink  : 0,
+						},
+					})}
 				/>
-			</UiBox>
+			</UiEntity>
 
 			{/* Border (front) */}
-			<UiBox
+			<UiEntity
 				key          = {`${id}_border`}
-				borderColor  = {border}
-				borderWidth  = {bWidth}
-				borderRadius = {bRadius}
-				uiTransform={{
-					positionType: 'absolute',
-					position    : { top: 0, right: 0, bottom: 0, left: 0 },
-					zIndex      : Z_INDEX_BORDER,
-				}}
+				{...resolveKitEntityProps({
+					borderColor: border,
+					borderWidth: bWidth,
+					borderRadius: bRadius,
+					uiTransform: {
+						positionType: 'absolute',
+						position    : { top: 0, right: 0, bottom: 0, left: 0 },
+						zIndex      : Z_INDEX_BORDER,
+					},
+				})}
 			/>
 
 			{children != null && (
-				<UiBox
+				<UiEntity
 					key         = {`${id}_content`}
 					uiTransform = {progressBarContentTransform()}
 				>
 					{children}
-				</UiBox>
+				</UiEntity>
 			)}
-		</UiBox>
+		</UiEntity>
 	)
 }

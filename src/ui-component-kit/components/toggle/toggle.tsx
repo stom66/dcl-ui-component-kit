@@ -1,13 +1,13 @@
 import { Color4 } from '@dcl/sdk/math'
 import { isMobile } from '@dcl/sdk/platform'
-import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
 import { sizeValueToPixels } from '../../utils/aspect'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { Row } from '../helpers'
 
 
@@ -33,7 +33,7 @@ type TogglePropsState = {
 const toggleProps = new Map<string, PropsController<TogglePropsState>>()
 
 export type ToggleProps = Omit<
-	UiBoxProps,
+	KitEntityProps,
 	'uiTransform' | 'backgroundColor' | 'aspectRatio' | 'width' | 'height'
 > & {
 	/** Unique id for the per-instance PropsController / slide tween. */
@@ -278,60 +278,62 @@ export function Toggle({
 	const thumbRadius = thumbSize / 2
 
 	return (
-		<UiBox
-			{...props}
-			backgroundColor = {colors.backgroundColor}
-			uiBackground    = {uiBackground}
-			pointerFilter   = "block"
-			uiTransform={{
-				width         : trackWidth as PositionUnit,
-				height        : trackHeight as PositionUnit,
-				minHeight     : trackHeight,
-				display       : 'flex',
-				flexDirection : 'row',
-				alignItems    : 'center',
-				justifyContent: 'flex-start',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				overflow      : 'hidden',
-				padding       : TOGGLE_PADDING,
-				borderRadius  : trackRadius,
-				...uiTransform,
-			}}
-			onMouseEnter = {() => {
-				hoverStates.set(id, true)
-				onMouseEnter?.()
-			}}
-			onMouseLeave = {() => {
-				hoverStates.set(id, false)
-				onMouseLeave?.()
-			}}
-			onMouseDown = {() => {
-				pressedStates.set(id, true)
-				onMouseDown?.()
-				if (isMobile()) {
-					const next = !resolved
-					if (!controlled) {
-						const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)
-						controller.set('value', next)
-						tweenSlide(id, controller, next ? 1 : 0, lerpDuration)
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				backgroundColor: colors.backgroundColor,
+				uiBackground,
+				pointerFilter: 'block',
+				uiTransform: {
+					width         : trackWidth as PositionUnit,
+					height        : trackHeight as PositionUnit,
+					minHeight     : trackHeight,
+					display       : 'flex',
+					flexDirection : 'row',
+					alignItems    : 'center',
+					justifyContent: 'flex-start',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					overflow      : 'hidden',
+					padding       : TOGGLE_PADDING,
+					borderRadius  : trackRadius,
+					...uiTransform,
+				},
+				onMouseEnter: () => {
+					hoverStates.set(id, true)
+					onMouseEnter?.()
+				},
+				onMouseLeave: () => {
+					hoverStates.set(id, false)
+					onMouseLeave?.()
+				},
+				onMouseDown: () => {
+					pressedStates.set(id, true)
+					onMouseDown?.()
+					if (isMobile()) {
+						const next = !resolved
+						if (!controlled) {
+							const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)
+							controller.set('value', next)
+							tweenSlide(id, controller, next ? 1 : 0, lerpDuration)
+						}
+						onChange?.(next)
 					}
-					onChange?.(next)
-				}
-			}}
-			onMouseUp = {() => {
-				if (!isMobile()) {
-					const next = !resolved
-					if (!controlled) {
-						const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)
-						controller.set('value', next)
-						tweenSlide(id, controller, next ? 1 : 0, lerpDuration)
+				},
+				onMouseUp: () => {
+					if (!isMobile()) {
+						const next = !resolved
+						if (!controlled) {
+							const controller = getToggleProps(id, defaultValue, trackTarget, thumbTarget)
+							controller.set('value', next)
+							tweenSlide(id, controller, next ? 1 : 0, lerpDuration)
+						}
+						onChange?.(next)
 					}
-					onChange?.(next)
-				}
-				onMouseUp?.()
-				pressedStates.set(id, false)
-			}}
+					onMouseUp?.()
+					pressedStates.set(id, false)
+				},
+			})}
 		>
 			{/* Visuals only — pointerFilter none so the track receives all clicks (thumb would otherwise steal hits). */}
 			<Row
@@ -344,21 +346,23 @@ export function Toggle({
 					pointerFilter : 'none',
 				}}
 			>
-				<UiBox
+				<UiEntity
 					key             = {`${id}_thumb`}
-					backgroundColor = {colors.toggleColor}
-					uiTransform={{
-						width         : thumbSize,
-						height        : thumbSize,
-						flexGrow      : 0,
-						flexShrink    : 0,
-						borderRadius  : thumbRadius,
-						margin        : { left: slide * travel },
-						pointerFilter : 'none',
-					}}
+					{...resolveKitEntityProps({
+						backgroundColor: colors.toggleColor,
+						uiTransform: {
+							width         : thumbSize,
+							height        : thumbSize,
+							flexGrow      : 0,
+							flexShrink    : 0,
+							borderRadius  : thumbRadius,
+							margin        : { left: slide * travel },
+							pointerFilter : 'none',
+						},
+					})}
 				/>
 			</Row>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

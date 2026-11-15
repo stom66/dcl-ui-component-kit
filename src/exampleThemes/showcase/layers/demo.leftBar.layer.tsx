@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, Background, ButtonText, Column, getTheme, Icon, Layer, Text, UiBox, ZoneType } from '../../../ui-component-kit'
+import { alpha, atlasIconsFontAwesome, Background, ButtonText, Column, getTheme, Icon, Layer, Text, ZoneType } from '../../../ui-component-kit'
 
 import { demoAnimationsLayer } from './demo.animations.layer'
 import { demoBackgroundsLayer } from './demo.backgrounds.layer'
@@ -153,18 +153,16 @@ export class DemoLeftBarLayer extends Layer {
 		// height:auto shell sized by the Column; Background paints that shell only
 		// (height 100% was stretching the chrome to the full Left strip).
 		return (
-			<UiBox
+			<Column
 				key            = "demo_left_bar_shell"
+				spacing        = {0}
 				alignSelf      = "flex-start"
 				alignItems     = "stretch"
 				justifyContent = "flex-start"
 				zIndex         = {1000}
 				width          = "100%"
 				height         = "auto"
-				uiTransform    = {{
-					display : 'flex',
-					maxWidth: NAV_BAR_WIDTH,
-				}}
+				maxWidth       = {NAV_BAR_WIDTH}
 			>
 				<Background
 					key          = "demo_left_bar_chrome"
@@ -183,7 +181,7 @@ export class DemoLeftBarLayer extends Layer {
 						DemoNavButton(entry)
 					))}
 				</Column>
-			</UiBox>
+			</Column>
 		)
 	}
 }

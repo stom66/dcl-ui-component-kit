@@ -7,7 +7,7 @@ import { resolveThemeFontSrc } from '../../utils/typography'
 /**
  * Top-level text shorthands for `Text` / `H*` / `Code` / `Header` / `SectionHeader` / `Label`.
  * Prefer these over nesting `uiText={{ … }}`. `fontSize` is a theme-base px number
- * (`theme.typography.size.*`) — `UiBox` scales it. Do not pre-scale.
+ * (`theme.typography.size.*`) — kit components scale it. Do not pre-scale.
  */
 export type TextShorthandProps = {
 	/** Copy string. Prefer this over JSX text children / `uiText.value`. */
@@ -16,7 +16,7 @@ export type TextShorthandProps = {
 	fontColor? : Color4
 	/**
 	 * Theme-base font size in px (prefer `theme.typography.size.small` / `.default` / `h1`–`h6` / `.code`).
-	 * Auto-scaled by `UiBox` — do not wrap with `scaleThemeFontSize` / `scaleFontSize`.
+	 * Auto-scaled by kit components — do not wrap with `scaleThemeFontSize` / `scaleFontSize`.
 	 */
 	fontSize?  : number
 	/** Built-in font family. Overrides `uiText.font`. Always set beside `fontSrc` (SDK fallback). */
@@ -49,7 +49,7 @@ function omitUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
 // MARK: mergeTextShorthands
 /**
  * Merges text defaults ← `uiText` ← top-level shorthands.
- * Shorthands win. Numeric `fontSize` values stay theme-base px — `UiBox` scales them.
+ * Shorthands win. Numeric `fontSize` values stay theme-base px — kit components scale them.
  * When `fontSrc` is still unset after merge, fills from `theme.typography.fontSrc`
  * for the resolved `font` face (see `resolveThemeFontSrc`).
  */

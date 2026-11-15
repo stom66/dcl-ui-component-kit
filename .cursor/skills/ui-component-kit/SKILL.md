@@ -10,7 +10,9 @@ description: >-
 
 # UI Component Kit
 
-Lightweight reusable UI for Decentraland SDK7. Prefer framework primitives over raw `UiEntity` layout.
+Lightweight reusable UI for Decentraland SDK7. Use kit primitives for layout (`Row` / `Column` / `Grid`), text, buttons and icons. For a **plain box** (chip, cell, swatch, hit area) use the SDK `UiEntity` directly — the kit has no box primitive.
+
+**`UiBox` is deprecated.** It is still exported so old scenes keep working. Never use it in new code; when you meet it in existing code, offer to migrate it (table in [`docs/upgrade-caveats.md`](../../../docs/upgrade-caveats.md) → 0.4.0).
 
 **Before creating or editing a Layer:** read this skill and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`. Do not invent a parallel mount path or new Layer option fields for props Zone already accepts.
 
@@ -44,7 +46,7 @@ If the consumer already had this package installed, or the scene was first insta
 2. **One Layer = one Zone.** The layer fills that zone. Implement **`body()` only**.
 3. **`zone: ZoneType.*`** selects a preset (`zone.presets.ts`). Optional **`inset`** picks canvas chrome. Base `Layer.render()` mounts **one `<Zone type={…}>`**. There are no `ZoneTop` / `ZoneLeft` helpers. **`ZoneType.InteractableArea` is deprecated** — use `inset: 'interactable'` with `FullScreen` / `Default`.
 4. **`uiTransform` / `uiBackground`** on `LayerOptions` are passed straight through to that Zone and merge on top of the preset. **`zIndex`** is applied only when the Layer sets it (not from array index) — use it for stacking across inset groups.
-5. Compose content with **`Row` / `Column` / `UiBox` / …** inside `body()`. Panel chrome is a sibling **`Background`** (empty), not a wrapper around content.
+5. Compose content with **`Row` / `Column` / `Grid` / `Text` / …** inside `body()`; plain boxes are SDK `UiEntity`. Panel chrome is a sibling **`Background`** (empty), not a wrapper around content.
 
 **All imports under `src/` must be relative** (`./`, `../`) — never absolute `src/...`.
 Stay inside the package with sibling/parent paths (`../components`, `../../styles`) — do not climb out to `src/` and back in via a folder name (`../../ui-component-kit/...`). That hardcodes the package directory name and breaks when it is renamed. Keep multi-named imports on one line.
@@ -110,7 +112,7 @@ protected body() {
 
 ## Prop forwarding (critical)
 
-Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them to the Zone. Do not add UiBox shorthand props (`backgroundColor`, `borderRadius`, …) on `LayerOptions` — put those on the native objects, or add a sibling **`Background`** in `body()`:
+Layer accepts optional **`uiTransform`** and **`uiBackground`** and passes them to the Zone. Do not add kit shorthand props (`backgroundColor`, `borderRadius`, …) on `LayerOptions` — put those on the native objects, or add a sibling **`Background`** in `body()`:
 
 - Zone size / flex → `uiTransform: { width, height, alignItems, justifyContent, … }`
 - Panel fill / border → empty sibling `<Background />` in `body()` (not Layer options; **do not nest content inside it**)
@@ -155,20 +157,22 @@ return [
 
 ### Component shorthands (prefer over nesting)
 
-On kit components built on `UiBox`, **prefer top-level shorthands** over nesting `uiTransform` / `uiBackground` / `uiText` when a single field is enough. Nested objects remain escape hatches; shorthands win on conflict.
+On **kit components**, **prefer top-level shorthands** over nesting `uiTransform` / `uiBackground` / `uiText` when a single field is enough. Nested objects remain escape hatches; shorthands win on conflict.
+
+**Shorthands are kit-only.** A raw SDK `UiEntity` takes none of them — `<UiEntity padding={8} backgroundColor={…} />` is wrong (DCL treats unknown top-level keys as ECS component names). On `UiEntity`, nest: `uiTransform={{ padding: 8 }}` / `uiBackground={{ color }}`.
 
 | Component | Prefer | Instead of |
 |---|---|---|
 | `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize, fontSrc, … }}` |
-| `Background` / `Row` / `Column` / `UiBox` fill | `backgroundColor` | `uiBackground={{ color }}` |
+| `Background` / `Row` / `Column` fill | `backgroundColor` | `uiBackground={{ color }}` |
 | Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
-| Layout (`Row` / `Column` / `Background` / `UiBox` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
+| Layout (`Row` / `Column` / `Background` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
 | `Label` | `value`, `fontColor`, `fontSize`, …; **`backgroundColor` = chip fill** | nesting `uiText` for size/align; use `fontColor` (or `uiText.color`) for font tint |
 | `Icon` / `SpriteIcon` / `AvatarIcon` / `IconNumber` / `IconCharacter` / `IconSymbol` / `IconString` | `iconColor` | texture tint (`uiBackground.color` on the glyph) |
 | `Icon` / `AvatarIcon` (not `FontAwesome`) | `backgroundColor` | chip / panel fill behind the glyph (wrapper — never the texture tint) |
 | `FlashColor` / `FlashBorder` | `flashColor` (target) | ambiguous bare `color` |
 
-**`fontSize` shorthand** takes a **theme-base px** number. Prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). `UiBox` auto-wraps `scaleThemeFontSize` — do **not** pre-scale. Nested `uiText.fontSize` numbers are scaled the same way. Do not use SDK `scaleFontSize` on kit components.
+**`fontSize` shorthand** takes a **theme-base px** number. Prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-apply `scaleThemeFontSize` — do **not** pre-scale. Nested `uiText.fontSize` numbers are scaled the same way. Do not use SDK `scaleFontSize` on kit components.
 
 ```tsx
 // GOOD — chrome sibling + content sibling (zone keeps flex)
@@ -304,7 +308,7 @@ canvas size is known.
 
 Omitting `fontSize` on `Text` / `Label` / `ButtonText` uses `default` (headings use their level).
 
-**Platform-aware sizing:** `UiBox` (every kit text path) calls `scaleThemeFontSize(base)` on
+**Platform-aware sizing:** every kit text path calls `scaleThemeFontSize(base)` on
 numeric `fontSize` / `uiText.fontSize`. That applies `theme.typography.scale.mobile` /
 `.desktop` at render time, then SDK `scaleFontSize`. Override scales in
 `SetupUiComponentKit({ theme: { typography: { scale: { mobile: 1.4, desktop: 1.1 } } } })`.
@@ -323,7 +327,7 @@ Prefer adding a theme key over a magic number. If you must:
 <Text value="Hello" fontSize={12} />
 ```
 
-Nested `uiText.fontSize` is also theme-base px (auto-scaled by `UiBox`):
+Nested `uiText.fontSize` on a kit component is also theme-base px (auto-scaled):
 
 ```tsx
 uiText={{
@@ -332,7 +336,7 @@ uiText={{
 }}
 ```
 
-**Raw `UiEntity` only** (skips `UiBox`) — wrap with `scaleThemeFontSize` from this package,
+**Raw `UiEntity` only** (no kit scaling) — wrap with `scaleThemeFontSize` from this package,
 never SDK `scaleFontSize` (that skips the theme platform multiplier):
 
 ```tsx
@@ -492,11 +496,13 @@ export const myCtaLayer   = new MyCtaLayer()
 | Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |
 | Edge-zone HUD with `cols={12}`, bare `<Row>`, or `<Column cols={12}>` around a single control | Content-sized siblings (omit `cols` on `ButtonText` / `Label`) **or** size the Layer with `uiTransform` then fill that box — see **Zone alignment needs content-sized children** |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
-| `UiBox` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
+| `UiEntity` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
+| `UiBox` in new code | `Column` / `Row` for containers, SDK `UiEntity` for plain boxes (`UiBox` is deprecated) |
+| Kit shorthands on a raw `UiEntity` (`<UiEntity padding={8} />`) | Nest in `uiTransform` / `uiBackground`, or use a kit component |
 | Nesting `uiText` / `uiTransform` / `uiBackground` for a single field that has a shorthand | Use the shorthand (`fontSize`, `fontColor`, `backgroundColor`, `flexWrap`, `padding`, …) |
-| `fontSize={scaleFontSize(theme.typography.size.*)}` or `scaleThemeFontSize(...)` on kit Text | `fontSize={theme.typography.size.*}` (`UiBox` scales) |
+| `fontSize={scaleFontSize(theme.typography.size.*)}` or `scaleThemeFontSize(...)` on kit Text | `fontSize={theme.typography.size.*}` (the kit scales) |
 | Bare magic `fontSize={12}` when a theme key fits | `theme.typography.size.small` / `.default` / `h1`–`h6` / `.code` |
-| SDK `scaleFontSize` on kit `uiText.fontSize` | Raw theme-base px — `UiBox` scales. Raw `UiEntity`: `scaleThemeFontSize(theme.typography.size.*)` |
+| SDK `scaleFontSize` on kit `uiText.fontSize` | Raw theme-base px — the kit scales. Raw `UiEntity`: `scaleThemeFontSize(theme.typography.size.*)` |
 | `scaleFontSize(...)` on `borderRadius` / padding / layout px | Raw theme / virtual number (SDK × `uiScale` at parse) |
 | `Column` / `Label` / `ButtonText` with `width: '100%'` / `'50%'` / `'25%'` | `cols={12}` / `cols={6}` / `cols={3}` (see **Row / Column width**); `Row` is always full width |
 | Inventory / equal-cell board built with `Row` + `flexWrap` + `cols` | Prefer `<Grid limit={n}>` — equal cells, spacer gutters, no padded wrappers |
@@ -631,7 +637,7 @@ getNodeChildren(artboard.node.handle, NodeChildType.Main)
 
 > **Variants:** procedural (`ButtonText`) · image-based (`ButtonImage`)
 
-When creating any kind of button element, ask the user if this is meant to be an **image button** or just a **simple text button**, then use the appropriate component. Do not invent a clickable `UiBox`; do not guess.
+When creating any kind of button element, ask the user if this is meant to be an **image button** or just a **simple text button**, then use the appropriate component. Do not invent a clickable `UiEntity`; do not guess.
 
 | Kind | Component | Use when |
 |---|---|---|
@@ -770,29 +776,41 @@ See `demo.toasts.layer.tsx`. The host registry is generic enough for a future UI
 
 ## Component prop forwarding
 
-Custom components built on `UiBox` must accept and forward native overrides so callers can escape-hatch anything the shorthand API does not cover:
+Custom components render the SDK `UiEntity` and spread **`resolveKitEntityProps(…)`** onto it. The resolver turns kit shorthands into native props, scales numeric `uiText.fontSize`, and returns **only** keys `UiEntity` understands — so `...props` can never leak a shorthand onto the entity. Components must accept and forward native overrides so callers can escape-hatch anything the shorthand API does not cover:
 
-- Type as `UiBoxProps` (or `Omit<SpinnerProps, …>` / similar) — not a hand-rolled subset
-- Destructure known shorthands, then `...props`
+- Type as `KitEntityProps` (or `Omit<SpinnerProps, …>` / similar) — not a hand-rolled subset
+- Destructure `children` and your own props (`value`, `cols`, …), then `...props`
 - Merge `uiTransform` / `uiText` as `defaults → …overrides` (overrides last)
 - Merge `uiBackground` with **`mergeUiBackground(defaults, uiBackground)`** so nested `texture` / `avatarTexture` fields (`src`, `wrapMode`, `filterMode`) deep-merge instead of replacing the whole object
+- The resolver does not return `children` or `key` — render `{children}` yourself and keep `key` as a JSX attribute
+- Purely structural boxes with no caller props (spacers, cell shells) are a bare `<UiEntity uiTransform={…} />` — no resolver needed
 
 ```tsx
-import { mergeUiBackground } from '../base'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-export type MyThingProps = Omit<UiBoxProps, 'uiText'> & { value?: string }
+import { mergeUiBackground, resolveKitEntityProps, type KitEntityProps } from '../base'
 
-export function MyThing({ value, uiTransform, uiBackground, uiText, ...props }: MyThingProps) {
+export type MyThingProps = Omit<KitEntityProps, 'uiText'> & { value?: string }
+
+export function MyThing({ children, value, uiTransform, uiBackground, ...props }: MyThingProps) {
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{ width: 'auto', ...uiTransform }}
-			uiBackground={mergeUiBackground({ color: theme.colors.body }, uiBackground)}
-			uiText={{ value: value ?? '', fontSize: theme.typography.size.default, ...uiText }}
-		/>
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform : { width: 'auto', ...uiTransform },
+				uiBackground: mergeUiBackground({ color: theme.colors.body }, uiBackground),
+				uiText      : { value: value ?? '', fontSize: theme.typography.size.default },
+			})}
+		>
+			{children}
+		</UiEntity>
 	)
 }
 ```
+
+Do not build on `UiBox` (deprecated shim over the same resolver).
+
+**Raw `UiEntity` under kit wrappers:** `Pulse` / `Bounce` / `Shake` / `FlashColor` / `Wiggle` / `Spinner` size a `UiEntity` child through its `uiTransform`, so it is safe as an animation child. It cannot take `cols` — inside a `cols` `Row`, wrap it in a `Column cols={…}`.
 
 ## Background
 
@@ -850,7 +868,7 @@ return [
 | `height: 'auto'` with only absolute chrome (no in-flow children) | Add in-flow content siblings that contribute height |
 | Inner `Column` with `height: '100%'` under auto Zone | Omit height (Column defaults to `'auto'`) |
 
-`fitContent` is a rare escape for self-sized chrome chips — not the Layer panel pattern. Prefer `UiBox` for small labelled boxes. If the panel must stay inside a fixed viewport budget instead of growing, keep a definite Zone `height` and let children `flexShrink` — do not use `height: 'auto'`.
+`fitContent` is a rare escape for self-sized chrome chips — not the Layer panel pattern. Prefer `Label` (or a plain `UiEntity` + `Text`) for small labelled boxes. If the panel must stay inside a fixed viewport budget instead of growing, keep a definite Zone `height` and let children `flexShrink` — do not use `height: 'auto'`.
 
 ## Texture atlases & UV helpers
 

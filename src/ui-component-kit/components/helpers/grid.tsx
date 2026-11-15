@@ -1,9 +1,9 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getColSelfTransform, type ColSpanInput } from '../../utils'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 import { applySpacingToChildren, flattenChildren } from './childSpacing'
 
@@ -12,7 +12,7 @@ import { applySpacingToChildren, flattenChildren } from './childSpacing'
 export type GridDirection = 'horizontal' | 'vertical'
 
 
-export type GridProps = UiBoxProps & {
+export type GridProps = KitEntityProps & {
 	children?     : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/**
 	 * Items per row (`horizontal`) or per column (`vertical`).
@@ -62,7 +62,7 @@ function renderEqualCell(
 	const equalWidth = direction === 'horizontal'
 
 	return (
-		<UiBox
+		<UiEntity
 			key={key}
 			uiTransform={{
 				width         : equalWidth ? 0 : '100%',
@@ -77,7 +77,7 @@ function renderEqualCell(
 			}}
 		>
 			{child}
-		</UiBox>
+		</UiEntity>
 	)
 }
 
@@ -145,7 +145,7 @@ export function Grid({
 				const cells    = buildTrackCells(chunk, trackLen, padIncomplete, direction, trackKey)
 
 				return (
-					<UiBox
+					<UiEntity
 						key={trackKey}
 						uiTransform={{
 							width         : 0,
@@ -160,7 +160,7 @@ export function Grid({
 						}}
 					>
 						{applySpacingToChildren(cells, gap, 'bottom')}
-					</UiBox>
+					</UiEntity>
 				)
 			}),
 			gap,
@@ -172,7 +172,7 @@ export function Grid({
 				const cells    = buildTrackCells(chunk, trackLen, padIncomplete, direction, trackKey)
 
 				return (
-					<UiBox
+					<UiEntity
 						key={trackKey}
 						uiTransform={{
 							width         : '100%',
@@ -184,7 +184,7 @@ export function Grid({
 						}}
 					>
 						{applySpacingToChildren(cells, gap, 'right')}
-					</UiBox>
+					</UiEntity>
 				)
 			}),
 			gap,
@@ -192,27 +192,29 @@ export function Grid({
 		)
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				height        : 'auto',
-				display       : 'flex',
-				flexDirection : direction === 'vertical' ? 'row' : 'column',
-				alignItems    : 'stretch',
-				justifyContent: 'flex-start',
-				...(colSelf !== undefined ? {
-					width     : colSelf.width,
-					flexGrow  : colSelf.flexGrow,
-					flexShrink: colSelf.flexShrink,
-					...(colSelf.flexBasis !== undefined ? { flexBasis: colSelf.flexBasis } : {}),
-					...(colSelf.maxWidth  !== undefined ? { maxWidth : colSelf.maxWidth  } : {}),
-				} : {
-					width: '100%',
-				}),
-				...uiTransform,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					height        : 'auto',
+					display       : 'flex',
+					flexDirection : direction === 'vertical' ? 'row' : 'column',
+					alignItems    : 'stretch',
+					justifyContent: 'flex-start',
+					...(colSelf !== undefined ? {
+						width     : colSelf.width,
+						flexGrow  : colSelf.flexGrow,
+						flexShrink: colSelf.flexShrink,
+						...(colSelf.flexBasis !== undefined ? { flexBasis: colSelf.flexBasis } : {}),
+						...(colSelf.maxWidth  !== undefined ? { maxWidth : colSelf.maxWidth  } : {}),
+					} : {
+						width: '100%',
+					}),
+					...uiTransform,
+				},
+			})}
 		>
 			{body}
-		</UiBox>
+		</UiEntity>
 	)
 }

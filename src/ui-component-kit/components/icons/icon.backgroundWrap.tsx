@@ -1,11 +1,11 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 
 export type IconBackgroundWrapProps = Pick<
-	UiBoxProps,
+	KitEntityProps,
 	| 'borderColor'
 	| 'borderRadius'
 	| 'borderWidth'
@@ -17,7 +17,7 @@ export type IconBackgroundWrapProps = Pick<
 	| 'onMouseLeave'
 	| 'uiTransform'
 > & {
-	/** Chip / panel fill behind the glyph. When set, wraps `children` in a UiBox. */
+	/** Chip / panel fill behind the glyph. When set, wraps `children` in a `UiEntity`. */
 	backgroundColor: Color4
 	width?         : PositionUnit | 'auto' | undefined
 	height?        : PositionUnit | 'auto' | undefined
@@ -54,32 +54,34 @@ export function IconBackgroundWrap({
 	const heightAuto = height === undefined || height === 'auto'
 
 	return (
-		<UiBox
-			backgroundColor = {backgroundColor}
-			borderColor     = {borderColor}
-			borderRadius    = {borderRadius}
-			borderWidth     = {borderWidth}
-			padding         = {padding}
-			margin          = {margin}
-			width           = {width}
-			height          = {height}
-			onMouseDown     = {onMouseDown}
-			onMouseUp       = {onMouseUp}
-			onMouseEnter    = {onMouseEnter}
-			onMouseLeave    = {onMouseLeave}
-			uiTransform     = {{
-				display       : 'flex',
-				alignItems    : 'center',
-				justifyContent: 'center',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				overflow      : 'hidden',
-				...(widthAuto  && minSize !== undefined ? { minWidth : minSize } : {}),
-				...(heightAuto && minSize !== undefined ? { minHeight: minSize } : {}),
-				...uiTransform,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				backgroundColor,
+				borderColor,
+				borderRadius,
+				borderWidth,
+				padding,
+				margin,
+				width,
+				height,
+				onMouseDown,
+				onMouseUp,
+				onMouseEnter,
+				onMouseLeave,
+				uiTransform: {
+					display       : 'flex',
+					alignItems    : 'center',
+					justifyContent: 'center',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					overflow      : 'hidden',
+					...(widthAuto  && minSize !== undefined ? { minWidth : minSize } : {}),
+					...(heightAuto && minSize !== undefined ? { minHeight: minSize } : {}),
+					...uiTransform,
+				},
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

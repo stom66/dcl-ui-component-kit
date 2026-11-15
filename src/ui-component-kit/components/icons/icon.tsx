@@ -1,12 +1,12 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, TextureMode, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 import { IconBackgroundWrap } from './icon.backgroundWrap'
 import { resolveIconRotatedUvs } from './icon.uvs'
 
-export type IconProps = UiBoxProps & {
+export type IconProps = KitEntityProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/**
 	 * Tint multiply for the icon texture (applied as `uiBackground.color` on
@@ -16,7 +16,7 @@ export type IconProps = UiBoxProps & {
 	iconColor?  : Color4
 	/**
 	 * Chip / panel fill behind the glyph. When set, the icon is wrapped in an
-	 * extra `UiBox` that owns the fill (and border / padding chrome).
+	 * extra `UiEntity` that owns the fill (and border / padding chrome).
 	 */
 	backgroundColor?: Color4
 	/**
@@ -48,7 +48,7 @@ export type IconProps = UiBoxProps & {
  * For Font Awesome Free icons by name, use `FontAwesome` (TTF glyphs).
  *
  * Tint with `iconColor` only. `backgroundColor` paints a chip behind the glyph
- * (wrapper `UiBox`) — it never multiplies the texture. `rotate` turns the UVs.
+ * (wrapper `UiEntity`) — it never multiplies the texture. `rotate` turns the UVs.
  */
 export const Icon = ({
 	children,
@@ -85,41 +85,43 @@ export const Icon = ({
 	const resolvedUvs = resolveIconRotatedUvs(uvs, rotate)
 
 	const glyph = (
-		<UiBox
-			{...props}
-			{...(wrapChip
-				? {}
-				: {
-					borderColor,
-					borderRadius,
-					borderWidth,
-					padding,
-					margin,
-					onMouseDown,
-					onMouseUp,
-					onMouseEnter,
-					onMouseLeave,
-				}
-			)}
-			uiTransform={{
-				width     : wrapChip ? '100%' : width,
-				height    : wrapChip ? '100%' : height,
-				flexGrow  : 0,
-				flexShrink: 0,
-				overflow  : "visible",
-				...(!wrapChip && width  === "auto" ? { minWidth : size } : {}),
-				...(!wrapChip && height === "auto" ? { minHeight: size } : {}),
-				...(wrapChip ? {} : uiTransform),
-			}}
-			uiBackground={mergeUiBackground({
-				texture,
-				textureMode: textureMode ?? "stretch",
-				uvs        : resolvedUvs ?? [],
-				...(iconColor ? { color: iconColor } : {}),
-			}, uiBackground)}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				...(wrapChip
+					? {}
+					: {
+						borderColor,
+						borderRadius,
+						borderWidth,
+						padding,
+						margin,
+						onMouseDown,
+						onMouseUp,
+						onMouseEnter,
+						onMouseLeave,
+					}
+				),
+				uiTransform: {
+					width     : wrapChip ? '100%' : width,
+					height    : wrapChip ? '100%' : height,
+					flexGrow  : 0,
+					flexShrink: 0,
+					overflow  : "visible",
+					...(!wrapChip && width  === "auto" ? { minWidth : size } : {}),
+					...(!wrapChip && height === "auto" ? { minHeight: size } : {}),
+					...(wrapChip ? {} : uiTransform),
+				},
+				uiBackground: mergeUiBackground({
+					texture,
+					textureMode: textureMode ?? "stretch",
+					uvs        : resolvedUvs ?? [],
+					...(iconColor ? { color: iconColor } : {}),
+				}, uiBackground),
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 
 	if (!wrapChip) {

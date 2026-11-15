@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, getTheme, Layer, Text, UiBox, ZoneType, type KitScreenInset, type Theme } from '../../../ui-component-kit'
+import { alpha, Background, getTheme, Layer, Text, ZoneType, type KitScreenInset, type Theme } from '../../../ui-component-kit'
 
 /** Stack order for zone preview overlays — below info / nav / control panels. */
 export const DEMO_SAFE_ZONE_Z_INDEX = 0
@@ -31,18 +31,20 @@ function DemoChildBox({
 	theme: Theme
 }) {
 	return (
-		<UiBox
-			key            = {id}
-			backgroundColor          = {fill}
-			borderColor    = {theme.colors.dark}
-			borderRadius   = {theme.border.radiusSmall}
-			borderWidth    = {1}
-			width          = "auto"
-			height         = "auto"
-			margin         = {DEMO_CHILD_MARGIN}
-			padding        = {{ top: 10, right: 14, bottom: 10, left: 14 }}
-			alignItems     = "center"
-			justifyContent = "center"
+		<UiEntity
+			key={id}
+			uiTransform={{
+				width         : 'auto',
+				height        : 'auto',
+				margin        : DEMO_CHILD_MARGIN,
+				padding       : { top: 10, right: 14, bottom: 10, left: 14 },
+				alignItems    : 'center',
+				justifyContent: 'center',
+				borderColor   : theme.colors.dark,
+				borderRadius  : theme.border.radiusSmall,
+				borderWidth   : 1,
+			}}
+			uiBackground={{ color: fill }}
 		>
 			<Text
 				value     = {label}
@@ -51,7 +53,7 @@ function DemoChildBox({
 				fontSize  = {theme.typography.size.h3}
 				textAlign = "middle-center"
 			/>
-		</UiBox>
+		</UiEntity>
 	)
 }
 

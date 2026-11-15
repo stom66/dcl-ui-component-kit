@@ -4,7 +4,7 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { getTheme } from '../../styles'
 import { getUVCell, rotateUvIndexes } from '../../utils/uvs'
 
-import type { UiBoxProps } from '../base'
+import type { KitEntityProps } from '../base'
 import { Background } from './background'
 
 
@@ -20,7 +20,7 @@ const DIRECTION_ROTATION: Record<GradientDirection, number> = {
 	top   : 3,
 }
 
-type BackgroundGradientProps = UiBoxProps & {
+type BackgroundGradientProps = KitEntityProps & {
 	children?      : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Tint applied to the gradient texture. Defaults to `theme.colors.body`. */
 	backgroundColor?: Color4

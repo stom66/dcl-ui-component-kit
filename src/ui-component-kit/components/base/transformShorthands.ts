@@ -2,13 +2,13 @@ import type { UiTransformProps } from '@dcl/sdk/react-ecs'
 
 
 /**
- * Layout props lifted out of `uiTransform` onto kit components (`UiBox`, `Row`,
+ * Layout props lifted out of `uiTransform` onto kit components (`Row`,
  * `Column`, `Background`, …). Prefer these over nesting when a single field
  * is enough. Nested `uiTransform` remains the escape hatch; shorthands win.
  *
  * Not lifted (owned elsewhere):
- * - `width` / `height` — already `UiBox` shorthands
- * - `borderColor` / `borderRadius` / `borderWidth` — already `UiBox` shorthands
+ * - `width` / `height` — already kit shorthands (`resolveKitEntityProps`)
+ * - `borderColor` / `borderRadius` / `borderWidth` — already kit shorthands (`resolveKitEntityProps`)
  * - `flexDirection` — owned by `Row` / `Column` defaults
  */
 export type UiTransformShorthandProps = Omit<

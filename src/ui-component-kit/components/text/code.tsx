@@ -1,16 +1,16 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { resolveLayoutFontSize } from '../../utils/typography'
 
 import { getTheme } from '../../styles'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { textBlockMinHeight } from './textLayout'
 import { mergeTextShorthands, type TextShorthandProps } from './textShorthands'
 
 
-export type CodeProps = Omit<UiBoxProps, 'uiText'> & TextShorthandProps & {
+export type CodeProps = Omit<KitEntityProps, 'uiText'> & TextShorthandProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
-	uiText? : Partial<NonNullable<UiBoxProps['uiText']>>
+	uiText? : Partial<NonNullable<KitEntityProps['uiText']>>
 }
 
 
@@ -49,19 +49,21 @@ export const Code = ({
 	const layoutFontSize = resolveLayoutFontSize(uiTextMerged.fontSize, defaultFontSize)
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width     : '100%',
-				height    : 'auto',
-				minHeight : textBlockMinHeight(layoutFontSize, uiTextMerged.value),
-				alignSelf : 'flex-start',
-				flexShrink: 0,
-				...uiTransform,
-			}}
-			uiText={uiTextMerged}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width     : '100%',
+					height    : 'auto',
+					minHeight : textBlockMinHeight(layoutFontSize, uiTextMerged.value),
+					alignSelf : 'flex-start',
+					flexShrink: 0,
+					...uiTransform,
+				},
+				uiText: uiTextMerged,
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

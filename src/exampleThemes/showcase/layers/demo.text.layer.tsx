@@ -69,7 +69,7 @@ export class DemoTextLayer extends Layer {
 							fontSize = {theme.typography.size.small}
 						/>
 						<Code value="const tip = '<Code> uses the monospace theme font.</Code>'" />
-						<Code value={"// Ad-hoc size: pass theme-base px on fontSize — UiBox scales it. Raw UiEntity: scaleThemeFontSize(theme.typography.size.default)"} />
+						<Code value={"// Ad-hoc size: pass theme-base px on fontSize — kit components scale it. Raw UiEntity: scaleThemeFontSize(theme.typography.size.default)"} />
 
 						<Divider />
 

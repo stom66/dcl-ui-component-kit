@@ -1,14 +1,14 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: FlashColorProps Type
-export type FlashColorProps = UiBoxProps & BurstAnimationProps & {
+export type FlashColorProps = KitEntityProps & BurstAnimationProps & {
 	/** Seconds for one full flash (to target + back). Not the full burst — see `burstCount`. */
 	duration?       : number
 	/** Color to flash toward. Defaults to `theme.colors.primary`. */
@@ -150,18 +150,20 @@ export const FlashColor = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : w,
-				height        : h,
-				flexGrow      : 0,
-				flexShrink    : 0,
-				alignItems    : 'center',
-				justifyContent: 'center',
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : w,
+					height        : h,
+					flexGrow      : 0,
+					flexShrink    : 0,
+					alignItems    : 'center',
+					justifyContent: 'center',
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{child && cloneAnimChild(child, childIsFontAwesome(child)
 				? {
@@ -187,6 +189,6 @@ export const FlashColor = ({
 						}),
 					}
 			)}
-		</UiBox>
+		</UiEntity>
 	)
 }

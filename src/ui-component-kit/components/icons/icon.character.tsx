@@ -2,10 +2,10 @@ import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { PositionUnit } from '@dcl/sdk/react-ecs'
 
 import { atlasCharsAlphaNumeric, type TextureAtlas } from '../../atlases'
-import { type UiBoxProps } from '../base'
+import { type KitEntityProps } from '../base'
 import { charGlyph, IconAtlasText, missingGlyph } from './icon.atlasText'
 
-type IconCharacterProps = Omit<UiBoxProps, 'uiText'> & {
+type IconCharacterProps = Omit<KitEntityProps, 'uiText'> & {
 	value    : string
 	/**
 	 * Tint multiply for each glyph texture. Only way to recolour glyphs —

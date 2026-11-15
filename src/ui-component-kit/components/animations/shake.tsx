@@ -1,13 +1,13 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimBoxSize } from './animationChild'
 
 //MARK: ShakeProps Type
-export type ShakeProps = UiBoxProps & BurstAnimationProps & {
+export type ShakeProps = KitEntityProps & BurstAnimationProps & {
 	/** Seconds for one full shake sequence (all left/right moves + return). Not the full burst — see `burstCount`. */
 	duration?       : number
 	/** Number of left/right moves per sequence. Defaults to `3` (left, right, left). */
@@ -87,18 +87,20 @@ export const Shake = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : w,
-				height        : h,
-				flexGrow      : 0,
-				flexShrink    : 0,
-				alignItems    : 'center',
-				justifyContent: 'center',
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : w,
+					height        : h,
+					flexGrow      : 0,
+					flexShrink    : 0,
+					alignItems    : 'center',
+					justifyContent: 'center',
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{child && cloneAnimChild(child, {
 				width : w,
@@ -113,6 +115,6 @@ export const Shake = ({
 					},
 				},
 			})}
-		</UiBox>
+		</UiEntity>
 	)
 }

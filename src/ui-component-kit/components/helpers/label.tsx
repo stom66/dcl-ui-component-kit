@@ -1,20 +1,20 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { type TextAlignType, type UiFontType, type UiTextWrapType } from '@dcl/sdk/react-ecs'
+import ReactEcs, { type TextAlignType, type UiFontType, type UiTextWrapType, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getColSelfTransform, type ColSpanInput } from '../../utils'
 import { resolveLayoutFontSize } from '../../utils/typography'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { asPixelNumber, textBlockMinHeight, textLineCount, textWrappedLineCount } from '../text/textLayout'
 import { mergeTextShorthands } from '../text/textShorthands'
 
 
-type LabelProps = Omit<UiBoxProps, 'uiText'> & {
+type LabelProps = Omit<KitEntityProps, 'uiText'> & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	value?      : string
 	/** Font tint. Prefer this over nesting `uiText.color`. */
 	fontColor?  : Color4
-	/** Theme-base font size in px — prefer `theme.typography.size.*`. Auto-scaled by `UiBox`. */
+	/** Theme-base font size in px — prefer `theme.typography.size.*`. Auto-scaled by the kit. */
 	fontSize?   : number
 	font?       : UiFontType
 	/** Scene-relative `.ttf` path. Prefer theme `typography.fontSrc` for project-wide faces. */
@@ -24,7 +24,7 @@ type LabelProps = Omit<UiBoxProps, 'uiText'> & {
 	cols?       : ColSpanInput
 	colsDesktop?: ColSpanInput
 	colsMobile? : ColSpanInput
-	uiText?     : Partial<NonNullable<UiBoxProps['uiText']>>
+	uiText?     : Partial<NonNullable<KitEntityProps['uiText']>>
 }
 
 
@@ -94,41 +94,43 @@ export function Label({
 		: undefined
 
 	return (
-		<UiBox
-			{...props}
-			width={width}
-			height={height}
-			backgroundColor={fill}
-			uiTransform={{
-				height        : height ?? 'auto',
-				minHeight,
-				width         : width ?? col.width,
-				display       : 'flex',
-				flexGrow      : col.flexGrow,
-				flexShrink    : 0,
-				flexBasis     : col.flexBasis,
-				maxWidth      : col.maxWidth,
-				flexDirection : 'row',
-				alignSelf     : 'flex-start',
-				alignItems    : 'center',
-				justifyContent: 'space-between',
-				borderRadius  : theme.border.radiusSmall,
-				borderWidth   : 0,
-				padding       : {
-					top   : padY,
-					right : padding,
-					bottom: padY,
-					left  : padding,
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				width,
+				height,
+				backgroundColor: fill,
+				uiTransform: {
+					height        : height ?? 'auto',
+					minHeight,
+					width         : width ?? col.width,
+					display       : 'flex',
+					flexGrow      : col.flexGrow,
+					flexShrink    : 0,
+					flexBasis     : col.flexBasis,
+					maxWidth      : col.maxWidth,
+					flexDirection : 'row',
+					alignSelf     : 'flex-start',
+					alignItems    : 'center',
+					justifyContent: 'space-between',
+					borderRadius  : theme.border.radiusSmall,
+					borderWidth   : 0,
+					padding       : {
+						top   : padY,
+						right : padding,
+						bottom: padY,
+						left  : padding,
+					},
+					...uiTransform,
 				},
-				...uiTransform,
-			}}
-			uiBackground={{
-				...uiBackground,
-				color: fill,
-			}}
-			uiText={uiTextMerged}
+				uiBackground: {
+					...uiBackground,
+					color: fill,
+				},
+				uiText: uiTextMerged,
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

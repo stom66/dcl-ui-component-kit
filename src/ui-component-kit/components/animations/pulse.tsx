@@ -1,14 +1,14 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { scalePositionUnit } from '../../utils/positionUnit'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChild, resolveAnimContentSize } from './animationChild'
 
 //MARK: PulseProps Type
-export type PulseProps = UiBoxProps & BurstAnimationProps & {
+export type PulseProps = KitEntityProps & BurstAnimationProps & {
 	/** Seconds for one full pulse (grow + shrink). Not the full burst — see `burstCount`. */
 	duration?       : number
 	scaleMin?       : number
@@ -86,23 +86,25 @@ export const Pulse = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : w,
-				height        : h,
-				flexGrow      : 0,
-				flexShrink    : 0,
-				alignItems    : 'center',
-				justifyContent: 'center',
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : w,
+					height        : h,
+					flexGrow      : 0,
+					flexShrink    : 0,
+					alignItems    : 'center',
+					justifyContent: 'center',
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{child && cloneAnimChild(child, {
 				width : scalePositionUnit(w, scale),
 				height: scalePositionUnit(h, scale),
 			})}
-		</UiBox>
+		</UiEntity>
 	)
 }

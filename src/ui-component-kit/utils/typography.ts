@@ -57,9 +57,9 @@ export function resolveTypographySize(basePx: number): number {
 /**
  * Platform-aware theme font size: `resolveTypographySize` then SDK `scaleFontSize`.
  *
- * Kit components (`Text`, `Label`, `UiBox`, …) already call this — pass a raw
+ * Kit components (`Text`, `Label`, `ButtonText`, …) already call this — pass a raw
  * `theme.typography.size.*` (or other theme-base px) on `fontSize` / `uiText.fontSize`.
- * Use this helper only on raw `UiEntity` (or other paths that skip `UiBox`).
+ * Use this helper only on raw `UiEntity` (anything not rendered through `resolveKitEntityProps`).
  * Never use SDK `scaleFontSize` directly; it skips the theme platform multiplier.
  */
 export function scaleThemeFontSize(
@@ -74,7 +74,7 @@ export function scaleThemeFontSize(
 // MARK: scaleUiTextFontSize
 /**
  * Scales a numeric `uiText.fontSize` as theme-base px. Viewport strings (`'2vw'`) pass through.
- * `UiBox` applies this so kit text cannot skip scaling.
+ * `resolveKitEntityProps` applies this so kit text cannot skip scaling.
  */
 export function scaleUiTextFontSize<T extends { fontSize?: number | string }>(
 	uiText: T | undefined,

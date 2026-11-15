@@ -4,6 +4,9 @@ export type { AnimationPlaybackState, BounceProps, BurstAnimationProps, BurstSam
 
 
 // Base
+export { resolveKitEntityProps }  from './base'
+export type { KitEntityProps, ResolvedKitEntityProps } from './base'
+/** `UiBox` / `UiBoxProps` are deprecated — use `UiEntity` + `resolveKitEntityProps` / `KitEntityProps`. */
 export { UiBox }                  from './base'
 export type { UiBoxProps }        from './base'
 

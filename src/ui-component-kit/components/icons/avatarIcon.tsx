@@ -1,8 +1,8 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, TextureMode } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, TextureMode, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 import { IconBackgroundWrap } from './icon.backgroundWrap'
 import { resolveIconRotatedUvs } from './icon.uvs'
 
@@ -13,7 +13,7 @@ import { resolveIconRotatedUvs } from './icon.uvs'
 export const DEFAULT_AVATAR_USER_ID = '0x1E93E534C5E26B01Ed242410b43AE23dD0fAA52b' // ile
 
 
-export type AvatarIconProps = UiBoxProps & {
+export type AvatarIconProps = KitEntityProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/**
 	 * Player wallet / avatar id. Lowercased before use.
@@ -83,42 +83,44 @@ export function AvatarIcon({
 	const resolvedHeight = !hasWidth && !hasHeight ? defaultSize : (hasHeight ? height : undefined)
 
 	const glyph = (
-		<UiBox
-			{...props}
-			{...(wrapChip
-				? {}
-				: {
-					borderColor,
-					borderRadius,
-					borderWidth,
-					padding,
-					margin,
-					onMouseDown,
-					onMouseUp,
-					onMouseEnter,
-					onMouseLeave,
-				}
-			)}
-			aspectRatio = {wrapChip ? undefined : aspectRatio}
-			width       = {wrapChip ? '100%' : resolvedWidth}
-			height      = {wrapChip ? '100%' : resolvedHeight}
-			uiTransform = {{
-				flexGrow  : 0,
-				flexShrink: 0,
-				overflow  : 'hidden',
-				...(!wrapChip && !hasWidth  ? { minWidth : size } : {}),
-				...(!wrapChip && !hasHeight ? { minHeight: size } : {}),
-				...(wrapChip ? {} : uiTransform),
-			}}
-			uiBackground = {mergeUiBackground({
-				avatarTexture: { userId: resolvedUserId },
-				textureMode  : textureMode ?? 'stretch',
-				...(resolvedUvs ? { uvs: resolvedUvs } : {}),
-				...(iconColor ? { color: iconColor } : {}),
-			}, uiBackground)}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				...(wrapChip
+					? {}
+					: {
+						borderColor,
+						borderRadius,
+						borderWidth,
+						padding,
+						margin,
+						onMouseDown,
+						onMouseUp,
+						onMouseEnter,
+						onMouseLeave,
+					}
+				),
+				aspectRatio: wrapChip ? undefined : aspectRatio,
+				width: wrapChip ? '100%' : resolvedWidth,
+				height: wrapChip ? '100%' : resolvedHeight,
+				uiTransform: {
+					flexGrow  : 0,
+					flexShrink: 0,
+					overflow  : 'hidden',
+					...(!wrapChip && !hasWidth  ? { minWidth : size } : {}),
+					...(!wrapChip && !hasHeight ? { minHeight: size } : {}),
+					...(wrapChip ? {} : uiTransform),
+				},
+				uiBackground: mergeUiBackground({
+					avatarTexture: { userId: resolvedUserId },
+					textureMode  : textureMode ?? 'stretch',
+					...(resolvedUvs ? { uvs: resolvedUvs } : {}),
+					...(iconColor ? { color: iconColor } : {}),
+				}, uiBackground),
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 
 	if (!wrapChip) {

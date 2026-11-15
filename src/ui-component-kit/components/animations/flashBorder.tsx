@@ -1,15 +1,15 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { darken } from '../../utils/colors'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 
 
 //MARK: FlashBorderProps Type
-export type FlashBorderProps = UiBoxProps & BurstAnimationProps & {
+export type FlashBorderProps = KitEntityProps & BurstAnimationProps & {
 	/** Seconds for one full flash (to target + back). Not the full burst — see `burstCount`. */
 	duration?       : number
 	/** Border color to flash toward. Defaults to `theme.colors.primary`. */
@@ -33,7 +33,7 @@ const theme = getTheme()
 // MARK: resolveChildBaseBorderColor
 /**
  * Reads the child's border tint from `borderColor` / `uiTransform.borderColor`.
- * Falls back to `darken(fill, 0.2)` (UiBox border convention), then theme secondary.
+ * Falls back to `darken(fill, 0.2)` (kit border convention), then theme secondary.
  */
 function resolveChildBaseBorderColor(child: ReactEcs.JSX.Element | undefined): Color4 {
 	const fill =
@@ -63,7 +63,7 @@ function resolveChildBorderWidth(child: ReactEcs.JSX.Element | undefined): numbe
 // MARK: FlashBorder
 /**
  * Flashes a single child's border color toward `flashColor` and back.
- * The child's original `borderColor` (or UiBox-style darkened fill) is the base.
+ * The child's original `borderColor` (or kit-style darkened fill) is the base.
  * Ensures a `borderWidth` so the flash is visible.
  *
  * Wrapper defaults to full parent width / auto height so it works on Rows and
@@ -112,20 +112,22 @@ export const FlashBorder = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : '100%',
-				height        : 'auto',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				display       : 'flex',
-				flexDirection : 'column',
-				alignItems    : 'stretch',
-				justifyContent: 'flex-start',
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : '100%',
+					height        : 'auto',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					display       : 'flex',
+					flexDirection : 'column',
+					alignItems    : 'stretch',
+					justifyContent: 'flex-start',
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{child && ReactEcs.createElement(child.type, {
 				...child.props,
@@ -138,6 +140,6 @@ export const FlashBorder = ({
 				},
 				key: child.key,
 			})}
-		</UiBox>
+		</UiEntity>
 	)
 }

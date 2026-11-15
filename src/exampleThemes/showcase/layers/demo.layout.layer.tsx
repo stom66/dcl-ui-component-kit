@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, Column, Divider, getTheme, H2, H3, Layer, Row, Text, UiBox, ZoneType, type Theme } from '../../../ui-component-kit'
+import { alpha, Background, Column, Divider, getTheme, H2, H3, Layer, Row, Text, ZoneType, type Theme } from '../../../ui-component-kit'
 
 
 // MARK: DemoCell
@@ -16,20 +16,22 @@ function DemoCell({
 	theme: Theme
 }) {
 	return (
-		<UiBox
-			backgroundColor = {backgroundColor}
-			borderRadius   = {theme.border.radiusSmall}
-			padding        = {{ top: 8, right: 8, bottom: 8, left: 8 }}
-			alignItems     = "center"
-			justifyContent = "center"
-			width          = "100%"
+		<UiEntity
+			uiTransform={{
+				width         : '100%',
+				padding       : { top: 8, right: 8, bottom: 8, left: 8 },
+				alignItems    : 'center',
+				justifyContent: 'center',
+				borderRadius  : theme.border.radiusSmall,
+			}}
+			uiBackground={{ color: backgroundColor }}
 		>
 			<Text
 				value     = {label}
 				fontSize  = {theme.typography.size.small}
 				textAlign = "middle-center"
 			/>
-		</UiBox>
+		</UiEntity>
 	)
 }
 

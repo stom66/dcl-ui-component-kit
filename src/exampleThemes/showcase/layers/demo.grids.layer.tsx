@@ -1,6 +1,6 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, Background, Column, Divider, getTheme, Grid, H2, H3, Icon, IconNumber, Layer, Row, Text, UiBox, ZoneType } from '../../../ui-component-kit'
+import { alpha, atlasIconsFontAwesome, Background, Column, Divider, getTheme, Grid, H2, H3, Icon, IconNumber, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
 
 
 /** FA icons for cells after the numbered first track. */
@@ -45,7 +45,7 @@ export class DemoGridsLayer extends Layer {
 					padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 				>
 					<H2 value="Grids" />
-					<Text value="Equal-cell Grid with limit and direction. Horizontal fills rows left-to-right; vertical fills columns top-to-bottom. Numbers mark the first row or first column. Cells use aspectRatio={1} so they stay square inside the track." />
+					<Text value="Equal-cell Grid with limit and direction. Horizontal fills rows left-to-right; vertical fills columns top-to-bottom. Numbers mark the first row or first column. Cells are fixed-size squares (plain UiEntity boxes)." />
 
 					<Divider margin={{ top: 4, bottom: 4 }} />
 
@@ -71,7 +71,7 @@ export class DemoGridsLayer extends Layer {
 	private renderVerticalExample() {
 		const theme = getTheme()
 		const cell  = {
-			aspectRatio : 1,
+			width       : CELL_SIZE,
 			height      : CELL_SIZE,
 			alignSelf   : 'center' as const,
 			borderRadius: theme.border.radiusSmall,
@@ -84,22 +84,22 @@ export class DemoGridsLayer extends Layer {
 
 		for (let n = 1; n <= 5; n++) {
 			cells.push(
-				<UiBox
-					key   = {`vert-num-${n}`}
-					backgroundColor = {alpha(theme.colors.primary, 0.5)}
-					{...cell}
+				<UiEntity
+					key          = {`vert-num-${n}`}
+					uiTransform  = {cell}
+					uiBackground = {{ color: alpha(theme.colors.primary, 0.5) }}
 				>
 					<IconNumber value={n} height={28} />
-				</UiBox>
+				</UiEntity>
 			)
 		}
 		for (let i = 0; i < 7; i++) {
 			const name = DEMO_ICONS[i]
 			cells.push(
-				<UiBox
-					key   = {`vert-${name}`}
-					backgroundColor = {alpha(theme.colors.body, 0.45)}
-					{...cell}
+				<UiEntity
+					key          = {`vert-${name}`}
+					uiTransform  = {cell}
+					uiBackground = {{ color: alpha(theme.colors.body, 0.45) }}
 				>
 					<Icon
 						src = {atlasIconsFontAwesome.source}
@@ -107,7 +107,7 @@ export class DemoGridsLayer extends Layer {
 						width  = {28}
 						height = {28}
 					/>
-				</UiBox>
+				</UiEntity>
 			)
 		}
 
@@ -134,7 +134,7 @@ export class DemoGridsLayer extends Layer {
 	private renderHorizontalExample() {
 		const theme = getTheme()
 		const cell  = {
-			aspectRatio : 1,
+			width       : CELL_SIZE,
 			height      : CELL_SIZE,
 			alignSelf   : 'center' as const,
 			borderRadius: theme.border.radiusSmall,
@@ -147,22 +147,22 @@ export class DemoGridsLayer extends Layer {
 
 		for (let n = 1; n <= 7; n++) {
 			cells.push(
-				<UiBox
-					key   = {`horiz-num-${n}`}
-					backgroundColor = {alpha(theme.colors.primary, 0.5)}
-					{...cell}
+				<UiEntity
+					key          = {`horiz-num-${n}`}
+					uiTransform  = {cell}
+					uiBackground = {{ color: alpha(theme.colors.primary, 0.5) }}
 				>
 					<IconNumber value={n} height={28} />
-				</UiBox>
+				</UiEntity>
 			)
 		}
 		for (let i = 0; i < 11; i++) {
 			const name = DEMO_ICONS[i]
 			cells.push(
-				<UiBox
-					key   = {`horiz-${name}`}
-					backgroundColor = {alpha(theme.colors.body, 0.45)}
-					{...cell}
+				<UiEntity
+					key          = {`horiz-${name}`}
+					uiTransform  = {cell}
+					uiBackground = {{ color: alpha(theme.colors.body, 0.45) }}
 				>
 					<Icon
 						src = {atlasIconsFontAwesome.source}
@@ -170,7 +170,7 @@ export class DemoGridsLayer extends Layer {
 						width  = {28}
 						height = {28}
 					/>
-				</UiBox>
+				</UiEntity>
 			)
 		}
 

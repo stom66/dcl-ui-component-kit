@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Label, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, UiBox, Wiggle, ZoneType } from '../../../ui-component-kit'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Label, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Wiggle, ZoneType } from '../../../ui-component-kit'
 import { alpha, easingFunctions, vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
 
 const CELL = {
@@ -392,18 +392,20 @@ export class DemoAnimationsLayer extends Layer {
 				alignItems = "center"
 				margin     = {{ top: 8, right: 8, bottom: 8, left: 8 }}
 			>
-				<UiBox
-					width          = {CELL.width}
-					height         = {CELL.height}
-					alignItems     = "center"
-					justifyContent = "center"
-					onMouseEnter   = {events?.onMouseEnter}
-					onMouseLeave   = {events?.onMouseLeave}
-					onMouseDown    = {events?.onMouseDown}
+				<UiEntity
+					uiTransform={{
+						width         : CELL.width,
+						height        : CELL.height,
+						alignItems    : 'center',
+						justifyContent: 'center',
+					}}
+					onMouseEnter = {events?.onMouseEnter}
+					onMouseLeave = {events?.onMouseLeave}
+					onMouseDown  = {events?.onMouseDown}
 				>
 					<Background backgroundColor={bgColor} />
 					{children}
-				</UiBox>
+				</UiEntity>
 				<Label
 					value           = {label}
 					width           = {CELL.width}

@@ -1,14 +1,14 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getRotatedUVs, getUVCell } from '../../utils'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChildDeep, resolveAnimBoxSize } from './animationChild'
 
 //MARK: WiggleProps Type
-export type WiggleProps = UiBoxProps & BurstAnimationProps & {
+export type WiggleProps = KitEntityProps & BurstAnimationProps & {
 	/** Seconds for one full wiggle sequence (all rotations + return). Not the full burst — see `burstCount`. */
 	duration?       : number
 	/** Number of alternating rotations per sequence. Defaults to `3` (-max, +max, -max). */
@@ -99,18 +99,20 @@ export const Wiggle = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : w,
-				height        : h,
-				flexGrow      : 0,
-				flexShrink    : 0,
-				alignItems    : 'center',
-				justifyContent: 'center',
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : w,
+					height        : h,
+					flexGrow      : 0,
+					flexShrink    : 0,
+					alignItems    : 'center',
+					justifyContent: 'center',
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{child && cloneAnimChildDeep(child, {
 				width : w,
@@ -122,6 +124,6 @@ export const Wiggle = ({
 				),
 				rotate: 0,
 			})}
-		</UiBox>
+		</UiEntity>
 	)
 }

@@ -1,8 +1,6 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getColSelfTransform } from '../../utils'
-
-import { UiBox } from '../base'
 
 
 type ChildList = ReactEcs.JSX.Element | ReactEcs.JSX.Element[] | undefined
@@ -53,7 +51,7 @@ function listHasCols(list: ReactEcs.JSX.Element[]): boolean {
 
 // MARK: insertSpacers
 /**
- * Inserts stably keyed spacer `UiBox`es between children.
+ * Inserts stably keyed spacer `UiEntity`s between children.
  *
  * Do **not** `createElement`-clone children to apply margin — ReactEcs leaks
  * UiEntities when those clones are recreated every frame (left-bar Column with
@@ -75,7 +73,7 @@ function insertSpacers(
 		if (i >= list.length - 1) continue
 
 		out.push(
-			<UiBox
+			<UiEntity
 				key={`__gap_${edge}_${i}`}
 				uiTransform={{
 					width     : vertical ? 1 : spacing,
@@ -142,7 +140,7 @@ function applyPaddedRowGutters(
 			: child
 
 		return (
-			<UiBox
+			<UiEntity
 				key={key}
 				uiTransform={{
 					...(colSelf !== undefined ? {
@@ -163,7 +161,7 @@ function applyPaddedRowGutters(
 				}}
 			>
 				{inner}
-			</UiBox>
+			</UiEntity>
 		)
 	})
 }

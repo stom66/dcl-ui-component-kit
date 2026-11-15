@@ -1,13 +1,13 @@
-import ReactEcs, { type PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs, { type PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { getRotatedUVs, getUVCell } from '../../utils'
 import { easingFunctions, type EasingFn } from '../../utils/tweens'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { applyBurstSample, sampleBurstTime, syncAnimationPlayback, type BurstAnimationProps } from './animationPlayback'
 import { cloneAnimChildDeep } from './animationChild'
 
-export type SpinnerProps = UiBoxProps & BurstAnimationProps & {
+export type SpinnerProps = KitEntityProps & BurstAnimationProps & {
 	/** Seconds for one spin of `degrees`. Not the full burst — see `burstCount`. */
 	duration?       : number
 	/** Degrees rotated during one `duration`. Negative = reverse. Defaults to theme `spinnerDegreesDefault`. */
@@ -177,20 +177,22 @@ export const Spinner = ({
 	if (explicitH !== undefined) childOverrides.height = explicitH
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : width  ?? '100%',
-				height        : height ?? '100%',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				alignItems    : 'center',
-				justifyContent: 'center',
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : width  ?? '100%',
+					height        : height ?? '100%',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					alignItems    : 'center',
+					justifyContent: 'center',
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{child && cloneAnimChildDeep(child, childOverrides)}
-		</UiBox>
+		</UiEntity>
 	)
 }

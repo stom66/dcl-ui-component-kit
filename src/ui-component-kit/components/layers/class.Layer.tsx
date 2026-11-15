@@ -2,7 +2,7 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { PropsController } from '../../classes/propsController'
 import { VisibilityController, type VisibilityPosition } from '../../classes/visibilityController'
-import type { UiBoxProps } from '../base'
+import type { KitEntityProps } from '../base'
 import { Zone } from '../zones/zone.default'
 import { createVisibilityForZone, ZoneType } from '../zones/zone.presets'
 
@@ -40,8 +40,8 @@ export type LayerOptions = {
 	/** Edge the layer slides out to when hidden. Defaults to `showFrom` / zone preset. */
 	hideTo?         : VisibilityPosition
 	zIndex?         : number
-	uiTransform?    : UiBoxProps['uiTransform']
-	uiBackground?   : UiBoxProps['uiBackground']
+	uiTransform?    : KitEntityProps['uiTransform']
+	uiBackground?   : KitEntityProps['uiBackground']
 }
 
 
@@ -56,8 +56,8 @@ export abstract class Layer {
 	readonly showFrom?       : VisibilityPosition
 	readonly hideTo?         : VisibilityPosition
 	readonly zIndex?         : number
-	readonly uiTransform?    : UiBoxProps['uiTransform']
-	readonly uiBackground?   : UiBoxProps['uiBackground']
+	readonly uiTransform?    : KitEntityProps['uiTransform']
+	readonly uiBackground?   : KitEntityProps['uiBackground']
 	readonly visibility      : VisibilityController
 
 	protected props?: PropsController<Record<string, unknown>>

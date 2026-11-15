@@ -1,8 +1,8 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
-type ZoneRootProps = UiBoxProps & {
+type ZoneRootProps = KitEntityProps & {
 	children?: ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 }
 
@@ -19,21 +19,23 @@ export function ZoneRoot({
 	...props
 }: ZoneRootProps) {
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				height        : '100%',
-				width         : '100%',
-				positionType  : 'absolute',
-				display       : 'flex',
-				flexShrink    : 0,
-				flexDirection : 'column',
-				alignItems    : 'center',
-				justifyContent: 'center',
-				...uiTransform
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					height        : '100%',
+					width         : '100%',
+					positionType  : 'absolute',
+					display       : 'flex',
+					flexShrink    : 0,
+					flexDirection : 'column',
+					alignItems    : 'center',
+					justifyContent: 'center',
+					...uiTransform
+				},
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

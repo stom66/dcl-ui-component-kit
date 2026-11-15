@@ -40,21 +40,54 @@ Methods: `.cell` / `.row` / `.column` / `.char` / `.texture` / `.uv`.
 
 ## Base
 
-### `UiBox`
+### Plain boxes — use the SDK `UiEntity`
 
-Primary layout primitive — themed `UiEntity` wrapper.
+The kit has no box primitive of its own. For a plain chip / cell / swatch / hit area, use `UiEntity` from `@dcl/sdk/react-ecs`. For a layout container, use `Column` / `Row`.
+
+```tsx
+import { UiEntity } from '@dcl/sdk/react-ecs'
+
+<UiEntity
+	uiTransform={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}
+	uiBackground={{ color: theme.colors.primary }}
+>
+	<Icon src={…} uvs={…} />
+</UiEntity>
+```
+
+Raw `UiEntity` takes **no kit shorthands** (`padding={8}` / `backgroundColor={…}` at the top level are wrong) and does not auto-scale `uiText.fontSize` — wrap with `scaleThemeFontSize`, or use `Text` / `Label`.
+
+### Shared kit shorthands (`KitEntityProps` / `resolveKitEntityProps`)
+
+Every kit component (`Row`, `Column`, `Text`, `Label`, `Background`, buttons, icons, …) accepts these on top of the native `UiEntity` props:
 
 | Option | Type | Description |
 |---|---|---|
 | `backgroundColor` | `Color4` | Fill shorthand → `uiBackground.color`  |
-| `borderColor` / `borderWidth` / `borderRadius` | — | Border shorthands |
+| `borderColor` / `borderWidth` / `borderRadius` | — | Border shorthands (`borderColor` defaults to a darkened fill when a width is set) |
 | `aspectRatio` | `number` | Derive missing axis |
 | `width` / `height` | `PositionUnit` | Size |
 | `flexWrap` / `alignItems` / `justifyContent` / `padding` / `margin` / … | — | Layout shorthands (lifted from `uiTransform`; shorthands win) |
 | `uiTransform` / `uiBackground` / `uiText` | native | Escape hatches |
 | `children` | JSX | Content |
 
-Prefer shorthands over nesting when a single field is enough. Also exported as type `UiComponentKitProps` for the shared shorthand subset.
+Prefer shorthands over nesting when a single field is enough.
+
+For your own components, type props as `KitEntityProps` and spread `resolveKitEntityProps(props)` onto a `UiEntity` — it turns the shorthands into native props, scales numeric `uiText.fontSize`, and drops anything `UiEntity` does not understand. `UiComponentKitProps` is the shorthand-only subset.
+
+```tsx
+export function MyChip({ children, uiTransform, ...props }: KitEntityProps) {
+	return (
+		<UiEntity {...resolveKitEntityProps({ ...props, uiTransform: { height: 'auto', ...uiTransform } })}>
+			{children}
+		</UiEntity>
+	)
+}
+```
+
+### `UiBox` (deprecated)
+
+Old themed `UiEntity` wrapper. Still exported so existing scenes keep working; do not use it in new code. Migration table: [upgrade-caveats.md](upgrade-caveats.md) → 0.4.0.
 
 ---
 
@@ -97,7 +130,7 @@ Full-size panel chrome (theme body fill + border by default).
 
 **Sibling chrome only** — render `<Background />` as a peer of content under the Zone / parent. Do **not** nest body content inside it; nesting creates a new flex root and discards zone `alignItems` / `justifyContent`. See safe-zone demos (`demo.safeZone.factory.tsx`).
 
-Default layout is absolute fill (out of flex flow). For Layer `height: 'auto'`, keep absolute chrome and let in-flow content siblings size the Zone. Prefer `UiBox` for small self-sized chips; `fitContent` is a rare escape hatch.
+Default layout is absolute fill (out of flex flow). For Layer `height: 'auto'`, keep absolute chrome and let in-flow content siblings size the Zone. For small self-sized chips use a plain `UiEntity` (or `Label`); `fitContent` is a rare escape hatch.
 
 | Option | Type | Description |
 |---|---|---|
@@ -318,7 +351,7 @@ import { ProgressBarRadial, getTheme } from '@stom66/dcl-ui-component-kit'
 
 ## Text
 
-Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme-base px** number — prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-scale via `UiBox` (`scaleThemeFontSize`). Do not pre-scale. Ad-hoc numbers use the same theme-base units. Raw `UiEntity` only: wrap with `scaleThemeFontSize`. Use **`fontColor`** for font tint (not fill).
+Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme-base px** number — prefer **`theme.typography.size.*`** (`small`, `default`, `code`, `h1`–`h6`). Kit components auto-scale (`scaleThemeFontSize`). Do not pre-scale. Ad-hoc numbers use the same theme-base units. Raw `UiEntity` only: wrap with `scaleThemeFontSize`. Use **`fontColor`** for font tint (not fill).
 
 | Component | Shorthands | Role |
 |---|---|---|
@@ -579,6 +612,7 @@ Demo: `src/exampleThemes/showcase/layers/demo.animations.layer.tsx` in this repo
 | `getLeftZoneInset` | Live left-rail inset for left-edge zones |
 | `vWidth` / `vHeight` / `getUiScaleFactor` | Virtual canvas constants + SDK scale mirror (`min(phys/virtual)`) |
 | `scaleThemeFontSize` / `resolveTypographySize` | Font scaling for raw `UiEntity` only — kit `Text` / `Label` auto-scale |
+| `resolveKitEntityProps` | Kit shorthands → native `UiEntity` props, for custom components |
 | `tweenValue` / `lerp` / `easingFunctions` | Shared easing |
 
 Virtual canvas (desktop `1920×1080`, mobile `1600×720`) is set once in `utils/sizing.ts` and passed to `ReactEcsRenderer`. Smaller virtual size makes numeric/`px` UI larger on screen; `%` / native `vw`/`vh` are unaffected. Use `scaleThemeFontSize` for fonts on raw `UiEntity` only — kit text auto-scales. Do not use either scaler on border radii or padding.

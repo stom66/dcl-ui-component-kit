@@ -1,13 +1,13 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 import { applyRowChildSpacing, applyWrapRowGutters } from './childSpacing'
 
 
-type RowProps = UiBoxProps & {
+type RowProps = KitEntityProps & {
 	children?   : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/**
 	 * Gap between children. Defaults to `theme.spacing`. Pass `0` to disable.
@@ -43,21 +43,23 @@ export function Row({
 		: applyRowChildSpacing(children, gap, edge)
 
 	return (
-		<UiBox
-			{...props}
-			flexWrap={flexWrap}
-			uiTransform={{
-				height        : 'auto',
-				width         : '100%',
-				display       : 'flex',
-				flexDirection : 'row',
-				alignItems    : 'center',
-				// flex-start so spacer gutters stay adjacent (space-between fights them)
-				justifyContent: 'flex-start',
-				...uiTransform,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				flexWrap,
+				uiTransform: {
+					height        : 'auto',
+					width         : '100%',
+					display       : 'flex',
+					flexDirection : 'row',
+					alignItems    : 'center',
+					// flex-start so spacer gutters stay adjacent (space-between fights them)
+					justifyContent: 'flex-start',
+					...uiTransform,
+				},
+			})}
 		>
 			{body}
-		</UiBox>
+		</UiEntity>
 	)
 }

@@ -1,12 +1,12 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { VisibilityController, type VisibilityPosition } from '../../classes/visibilityController'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { ButtonImageClose } from '../buttons'
 import { ZoneType, zonePresets } from './zone.presets'
 
 
-export type ZoneProps = UiBoxProps & {
+export type ZoneProps = KitEntityProps & {
 	type                 : Exclude<ZoneType, ZoneType.None>
 	canBeHidden?         : boolean
 	startHidden?         : boolean
@@ -202,25 +202,27 @@ export function Zone({
 		?? (hideable ? 'relative' as const : undefined)
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				display       : 'flex',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				flexDirection : 'column',
-				alignItems    : 'center',
-				justifyContent: 'center',
-				padding       : 0,
-				borderWidth   : 0,
-				...presetTransform,
-				...uiTransform,
-				positionType,
-				position      : animatedPosition,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					display       : 'flex',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					flexDirection : 'column',
+					alignItems    : 'center',
+					justifyContent: 'center',
+					padding       : 0,
+					borderWidth   : 0,
+					...presetTransform,
+					...uiTransform,
+					positionType,
+					position      : animatedPosition,
+				},
+				uiBackground,
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

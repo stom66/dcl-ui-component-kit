@@ -5,7 +5,7 @@ import type { TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
 import { getUVCell } from '../../utils'
 import { syncAnimationPlayback } from '../animations/animationPlayback'
-import { mergeUiBackground, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground } from '../base'
 import { Icon } from './icon'
 
 
@@ -13,7 +13,7 @@ import { Icon } from './icon'
 const spriteUvCache = new Map<string, number[]>()
 
 
-export type SpriteIconProps = UiBoxProps & {
+export type SpriteIconProps = KitEntityProps & {
 	/** Unique playback instance key (shared animation clock). */
 	id           : string
 	children?    : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]

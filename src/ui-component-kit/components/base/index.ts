@@ -1,4 +1,6 @@
-export { mergeUiBackground, resolveUiBackground, resolveUiTransform, UiBox } from './uiBox'
-export type { UiComponentKitProps, UiBoxProps } from './uiBox'
+export { mergeUiBackground, resolveKitEntityProps, resolveUiBackground, resolveUiTransform } from './kitEntityProps'
+export type { KitEntityProps, ResolvedKitEntityProps, UiComponentKitProps } from './kitEntityProps'
+export { UiBox } from './uiBox'
+export type { UiBoxProps } from './uiBox'
 export { mergeTransformShorthands, pickTransformShorthands } from './transformShorthands'
 export type { UiTransformShorthandProps } from './transformShorthands'

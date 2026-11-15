@@ -1,7 +1,6 @@
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { scalePositionUnit } from '../../utils/positionUnit'
-import { UiBox } from '../base'
 import { getToastDockTransform } from './toast.dock'
 import { toastRegistry } from './toast.registry'
 import type { ToastItem } from './toast.types'
@@ -26,7 +25,7 @@ export function ToastView({ item, key }: { item: ToastItem; key?: string }) {
 		: undefined
 
 	return (
-		<UiBox
+		<UiEntity
 			key={key ?? `toast_dock_${item.id}`}
 			uiTransform={{
 				...dock,
@@ -36,7 +35,7 @@ export function ToastView({ item, key }: { item: ToastItem; key?: string }) {
 				flexShrink  : 0,
 			}}
 		>
-			<UiBox
+			<UiEntity
 				key={`toast_root_${item.id}`}
 				uiTransform={{
 					width         : w,
@@ -52,7 +51,7 @@ export function ToastView({ item, key }: { item: ToastItem; key?: string }) {
 				onMouseDown={dismissable ? () => toastRegistry.dismiss(item.id) : undefined}
 			>
 				{item.content()}
-			</UiBox>
-		</UiBox>
+			</UiEntity>
+		</UiEntity>
 	)
 }

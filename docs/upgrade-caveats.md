@@ -6,6 +6,91 @@ Breaking and behavioural changes when moving between versions of `@stom66/dcl-ui
 
 ---
 
+## 0.4.0 (`UiBox` deprecated)
+
+`UiBox` is **deprecated, not removed**. Existing scenes keep compiling and rendering exactly as before — no action is required to upgrade.
+
+What changed:
+
+- Kit components (`Row`, `Column`, `Text`, `Label`, buttons, icons, …) now render the SDK `UiEntity` directly. Their props and shorthands are unchanged.
+- `UiBox` / `UiBoxProps` are still exported, marked `@deprecated`. New code should not use them.
+- New exports for custom components: `resolveKitEntityProps` and the `KitEntityProps` type.
+
+**What to use instead of `UiBox`:**
+
+| The box is… | Use |
+|---|---|
+| A layout container (stack of children) | `Column` / `Row` — keeps every shorthand. Pass `spacing={0}` if you do not want gaps between children |
+| A plain chip / cell / swatch / hit area | SDK `UiEntity` |
+| Text | `Text` / `Label` / `H1`–`H6` |
+| Clickable | `ButtonText` / `ButtonImage` |
+
+**`UiBox` → `UiEntity` prop mapping.** `UiEntity` has no top-level shorthands; everything lives in `uiTransform` / `uiBackground` / `uiText`.
+
+| `UiBox` | `UiEntity` |
+|---|---|
+| `backgroundColor={c}` | `uiBackground={{ color: c }}` |
+| `width` / `height` / `padding` / `margin` / `alignItems` / `justifyContent` / `flexWrap` / `position` / `zIndex` / … | Same key inside `uiTransform={{ … }}` |
+| `borderRadius` / `borderWidth` / `borderColor` | Inside `uiTransform`. **Set `borderColor` explicitly** — `UiBox` derived it from the fill (`darken(fill, 0.2)`) when only a width was given; `UiEntity` does not |
+| `aspectRatio` | Set both axes, or spread `...resolveAspectDimensions({ width, height, aspectRatio })` into `uiTransform` |
+| `uiText={{ fontSize: n }}` | `uiText={{ fontSize: scaleThemeFontSize(n) }}` — `UiBox` scaled numeric font sizes; `UiEntity` does not. Prefer kit `Text` / `Label` |
+| `uiTransform` / `uiBackground` / `uiText` / `onMouseDown` / `onMouseUp` / `onMouseEnter` / `onMouseLeave` / `key` / children | Unchanged |
+
+```tsx
+// Before
+<UiBox
+	backgroundColor = {theme.colors.primary}
+	borderRadius    = {8}
+	padding         = {{ top: 8, right: 12, bottom: 8, left: 12 }}
+	alignItems      = "center"
+	width           = {140}
+>
+	<Text value="Hello" />
+</UiBox>
+
+// After
+import { UiEntity } from '@dcl/sdk/react-ecs'
+
+<UiEntity
+	uiTransform={{
+		width       : 140,
+		padding     : { top: 8, right: 12, bottom: 8, left: 12 },
+		alignItems  : 'center',
+		borderRadius: 8,
+	}}
+	uiBackground={{ color: theme.colors.primary }}
+>
+	<Text value="Hello" />
+</UiEntity>
+```
+
+**Custom components built on `UiBox`.** Swap the type and spread the resolver onto a `UiEntity`. `children` and `key` are not returned by the resolver — render / pass them yourself.
+
+```tsx
+// Before
+export function MyThing({ uiTransform, ...props }: UiBoxProps) {
+	return <UiBox {...props} uiTransform={{ width: 'auto', ...uiTransform }} />
+}
+
+// After
+import { UiEntity } from '@dcl/sdk/react-ecs'
+import { resolveKitEntityProps, type KitEntityProps } from '@stom66/dcl-ui-component-kit'
+
+export function MyThing({ children, uiTransform, ...props }: KitEntityProps) {
+	return (
+		<UiEntity {...resolveKitEntityProps({ ...props, uiTransform: { width: 'auto', ...uiTransform } })}>
+			{children}
+		</UiEntity>
+	)
+}
+```
+
+**Do not put kit shorthands on a raw `UiEntity`.** `<UiEntity padding={8} />` is wrong — DCL treats unknown top-level keys as ECS component names. Kit animation wrappers (`Pulse`, `Bounce`, …) handle a `UiEntity` child correctly (they size it through `uiTransform`).
+
+**Agents:** after upgrading a consumer scene to ≥ 0.4.0, search it for `UiBox`. If there are usages, tell the user it is deprecated and **offer** to migrate them with the tables above — do not migrate silently, and do not treat the remaining usages as errors. Never introduce `UiBox` in new code.
+
+---
+
 ## 0.3.x (FontAwesome TTFs)
 
 Font Awesome Free icons via custom TTF (`FontAwesome`) and `Icon` breaking change:

@@ -1,9 +1,9 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, type UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, type UiTransformProps, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { alpha } from '../../utils/colors'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 
 type DividerMargin = {
@@ -13,7 +13,7 @@ type DividerMargin = {
 	left?  : number
 }
 
-type DividerProps = Omit<UiBoxProps, 'margin' | 'backgroundColor' | 'width' | 'uiTransform'> & {
+type DividerProps = Omit<KitEntityProps, 'margin' | 'backgroundColor' | 'width' | 'uiTransform'> & {
 	children?        : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Line fill color. Defaults to `theme.colors.light` at 0.5 alpha. */
 	backgroundColor? : Color4
@@ -50,15 +50,17 @@ export const Divider = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform  = {transform}
-			uiBackground = {{
-				...uiBackground,
-				color: dividerColor,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: transform,
+				uiBackground: {
+					...uiBackground,
+					color: dividerColor,
+				},
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

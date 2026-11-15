@@ -4,13 +4,13 @@ import ReactEcs, { PositionUnit, UiEntity } from '@dcl/sdk/react-ecs'
 import { type TextureAtlas } from '../../atlases'
 import { getTheme } from '../../styles'
 import { formatPositionUnit, parsePositionUnit, scalePositionUnit, sumPositionUnits } from '../../utils/positionUnit'
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { resolveIconRotatedUvs } from './icon.uvs'
 
 /** Relative width of a space glyph vs digit height (blank spacer, no texture). */
 const SPACE_ASPECT = 0.4
 
-export type IconAtlasTextProps = Omit<UiBoxProps, 'uiText'> & {
+export type IconAtlasTextProps = Omit<KitEntityProps, 'uiText'> & {
 	value     : number | string
 	/**
 	 * Tint multiply for each glyph texture (`uiBackground.color` on digits).
@@ -302,7 +302,7 @@ function resolveIconAtlasTextSize(args: {
 /**
  * Shared row renderer for atlas-backed glyph strings (`IconNumber` / `IconSymbol` /
  * `IconCharacter` / `IconString`). Digits are raw `UiEntity`s with string keys —
- * wrapping through `Icon` / `UiBox` + numeric keys recreates entities every frame.
+ * wrapping through `Icon` + numeric keys recreates entities every frame.
  * Tint glyphs with `iconColor` (texture × color multiply), same as `Icon`.
  */
 export const IconAtlasText = ({
@@ -387,22 +387,24 @@ export const IconAtlasText = ({
 	}
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform = {{
-				width         : containerWidth,
-				height        : containerHeight,
-				display       : 'flex',
-				flexDirection : 'row',
-				alignItems    : 'center',
-				justifyContent: 'center',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				...uiTransform,
-			}}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : containerWidth,
+					height        : containerHeight,
+					display       : 'flex',
+					flexDirection : 'row',
+					alignItems    : 'center',
+					justifyContent: 'center',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					...uiTransform,
+				},
+			})}
 		>
 			{icons}
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

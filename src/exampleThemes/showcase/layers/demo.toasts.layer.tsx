@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { atlasIconsFontAwesome, Background, ButtonText, clearToastGroup, Column, getTheme, H2, Icon, IconNumber, Label, Layer, Row, showToast, Text, UiBox, ZoneType, type ToastPosition } from '../../../ui-component-kit'
+import { atlasIconsFontAwesome, Background, ButtonText, clearToastGroup, Column, getTheme, H2, Icon, IconNumber, Label, Layer, Row, showToast, Text, ZoneType, type ToastPosition } from '../../../ui-component-kit'
 
 const POSITIONS: ToastPosition[] = [
 	'topLeft',
@@ -22,20 +22,20 @@ function toastLabel(value: string) {
 	const theme = getTheme()
 
 	return (
-		<UiBox
-			backgroundColor          = {theme.colors.primary}
-			borderRadius   = {8}
-			width          = "140"
-			height         = "64"
-			alignItems     = "center"
-			justifyContent = "center"
-			padding        = {{ top: 8, right: 12, bottom: 8, left: 12 }}
+		<Column
+			backgroundColor = {theme.colors.primary}
+			borderRadius    = {8}
+			width           = "140"
+			height          = "64"
+			alignItems      = "center"
+			justifyContent  = "center"
+			padding         = {{ top: 8, right: 12, bottom: 8, left: 12 }}
 		>
 			<Row>
 				<Icon src = {atlasIconsFontAwesome.source} uvs={atlasIconsFontAwesome.uv.cat} />
 				<Text value={value} fontSize={theme.typography.size.default} />
 			</Row>
-		</UiBox>
+		</Column>
 	)
 }
 

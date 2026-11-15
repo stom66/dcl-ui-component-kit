@@ -1,11 +1,11 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
-import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 
 
-type BackgroundProps = UiBoxProps & {
+type BackgroundProps = KitEntityProps & {
 	children?  : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Optional texture path applied via `uiBackground.texture`. */
 	textureSrc?: string
@@ -39,7 +39,7 @@ type BackgroundProps = UiBoxProps & {
  * - Fill: `backgroundColor` → `uiBackground.color`
  * - Border: `borderColor` / `borderWidth` / `borderRadius`
  * - Texture: `textureSrc`
- * - Layout: `padding`, `alignItems`, `justifyContent`, … (UiBox transform shorthands)
+ * - Layout: `padding`, `alignItems`, `justifyContent`, … (kit transform shorthands)
  *
  * Override anything else via `uiTransform` / `uiBackground`.
  */
@@ -81,27 +81,29 @@ export function Background({
 		}
 
 	return (
-		<UiBox
-			{...props}
-			backgroundColor = {fill}
-			borderColor     = {borderColor}
-			borderRadius    = {borderRadius ?? theme.border.radiusDefault}
-			borderWidth     = {borderWidth  ?? theme.border.width}
-			uiTransform={{
-				...layout,
-				...uiTransform,
-			}}
-			uiBackground={mergeUiBackground({
-				color: fill,
-				...(textureSrc !== undefined
-					? {
-						texture    : { src: textureSrc, wrapMode: 'clamp' as const },
-						textureMode: 'stretch' as const,
-					}
-					: {}),
-			}, uiBackground)}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				backgroundColor: fill,
+				borderColor,
+				borderRadius: borderRadius ?? theme.border.radiusDefault,
+				borderWidth: borderWidth  ?? theme.border.width,
+				uiTransform: {
+					...layout,
+					...uiTransform,
+				},
+				uiBackground: mergeUiBackground({
+					color: fill,
+					...(textureSrc !== undefined
+						? {
+							texture    : { src: textureSrc, wrapMode: 'clamp' as const },
+							textureMode: 'stretch' as const,
+						}
+						: {}),
+				}, uiBackground),
+			})}
 		>
 			{children}
-		</UiBox>
+		</UiEntity>
 	)
 }

@@ -1,6 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
 import { isMobile } from '@dcl/sdk/platform'
-import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps, UiEntity } from '@dcl/sdk/react-ecs'
 
 import {
 	atlasBtnIconsStyled,
@@ -13,7 +13,7 @@ import { scalePositionUnit } from '../../utils/positionUnit'
 import { tweenValue } from '../../utils/tweens'
 import { getUVCell } from '../../utils/uvs'
 
-import { mergeUiBackground, UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 
 
 /** 1-based UV rows for button states (bottom → top in the atlas). */
@@ -37,7 +37,7 @@ type ButtonImagePropsState = {
 
 const buttonProps = new Map<string, PropsController<ButtonImagePropsState>>()
 
-type ButtonImageProps = Omit<UiBoxProps, 'uiTransform'> & {
+type ButtonImageProps = Omit<KitEntityProps, 'uiTransform'> & {
 	id            : string
 	/**
 	 * 1-based atlas column for this button (first column is `1`).
@@ -148,7 +148,7 @@ export const ButtonImage = ({
 		: { src, wrapMode: 'clamp' as const }
 
 	return (
-		<UiBox
+		<UiEntity
 			uiTransform={{
 				width         : width,
 				height        : height,
@@ -162,61 +162,63 @@ export const ButtonImage = ({
 				...uiTransform
 			}}
 		>
-			<UiBox
-				{...props}
-				uiTransform={{
-					width       : scalePositionUnit(width, scale),
-					height      : scalePositionUnit(height, scale),
-					borderWidth : 0,
-				}}
-				uiBackground={mergeUiBackground({
-					texture,
-					textureMode  : slices ? 'nine-slices' : 'stretch',
-					...(slices ? { textureSlices: slices } : {}),
-					uvs,
-					color        : Color4.White(),
-				}, uiBackground)}
-				pointerFilter="block"
-				onMouseEnter={() => {
-					hoverStates.set(id, true)
-					currentIndex.set(id, ButtonIndex.HOVER)
-					tweenValue(button.get('scale'), HOVER_SCALE, 0.2, (v) => {
-						button.set('scale', v)
-					})
-					onMouseEnter?.()
-				}}
-				onMouseLeave={() => {
-					hoverStates.set(id, false)
-					currentIndex.set(id, ButtonIndex.DEFAULT)
-					tweenValue(button.get('scale'), DEFAULT_SCALE, 0.2, (v) => {
-						button.set('scale', v)
-					})
-					onMouseLeave?.()
-				}}
-				onMouseDown={() => {
-					pressedStates.set(id, true)
-					hoverStates.set(id, true)
-					currentIndex.set(id, ButtonIndex.PRESS)
-					onMouseDown?.()
-					if (isMobile()) {
-						callback?.()
+			<UiEntity
+				{...resolveKitEntityProps({
+					...props,
+					uiTransform: {
+						width       : scalePositionUnit(width, scale),
+						height      : scalePositionUnit(height, scale),
+						borderWidth : 0,
+					},
+					uiBackground: mergeUiBackground({
+						texture,
+						textureMode  : slices ? 'nine-slices' : 'stretch',
+						...(slices ? { textureSlices: slices } : {}),
+						uvs,
+						color        : Color4.White(),
+					}, uiBackground),
+					pointerFilter: 'block',
+					onMouseEnter: () => {
+						hoverStates.set(id, true)
+						currentIndex.set(id, ButtonIndex.HOVER)
+						tweenValue(button.get('scale'), HOVER_SCALE, 0.2, (v) => {
+							button.set('scale', v)
+						})
+						onMouseEnter?.()
+					},
+					onMouseLeave: () => {
+						hoverStates.set(id, false)
 						currentIndex.set(id, ButtonIndex.DEFAULT)
-					}
-				}}
-				onMouseUp={() => {
-					if (!isMobile()) {
-						callback?.()
-						currentIndex.set(id, hoverStates.get(id) === true ? ButtonIndex.HOVER : ButtonIndex.DEFAULT)
-					} else {
-						currentIndex.set(id, ButtonIndex.DEFAULT)
-					}
+						tweenValue(button.get('scale'), DEFAULT_SCALE, 0.2, (v) => {
+							button.set('scale', v)
+						})
+						onMouseLeave?.()
+					},
+					onMouseDown: () => {
+						pressedStates.set(id, true)
+						hoverStates.set(id, true)
+						currentIndex.set(id, ButtonIndex.PRESS)
+						onMouseDown?.()
+						if (isMobile()) {
+							callback?.()
+							currentIndex.set(id, ButtonIndex.DEFAULT)
+						}
+					},
+					onMouseUp: () => {
+						if (!isMobile()) {
+							callback?.()
+							currentIndex.set(id, hoverStates.get(id) === true ? ButtonIndex.HOVER : ButtonIndex.DEFAULT)
+						} else {
+							currentIndex.set(id, ButtonIndex.DEFAULT)
+						}
 
-					onMouseUp?.()
-					pressedStates.set(id, false)
-				}}
+						onMouseUp?.()
+						pressedStates.set(id, false)
+					},
+				})}
 			>
 				{children}
-			</UiBox>
-		</UiBox>
+			</UiEntity>
+		</UiEntity>
 	)
 }

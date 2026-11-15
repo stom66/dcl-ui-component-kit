@@ -1,11 +1,11 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { PositionUnit, UiTransformProps } from '@dcl/sdk/react-ecs'
+import ReactEcs, { PositionUnit, UiTransformProps, UiEntity } from '@dcl/sdk/react-ecs'
 
 import { type TextureAtlas, type TextureAtlasCellOptions, type TextureAtlasNamedCell } from '../../atlases'
 import { getTheme } from '../../styles'
 import { flipUVs, mirrorUVs, rotateUvIndexes } from '../../utils/uvs'
 
-import { UiBox, type UiBoxProps } from '../base'
+import { type KitEntityProps, resolveKitEntityProps } from '../base'
 
 import { type ContentInset, resolveContentInset, type FillFrom, progressBarContentTransform, resolveDefaultBorderRadius, resolveFillFrom, resolveProceduralFillInset, syncDisplayValue, valueToPercent, Z_INDEX_BACKGROUND, Z_INDEX_BORDER, Z_INDEX_FILL } from './progressBar.shared'
 
@@ -68,7 +68,7 @@ const TEXTURES_VERTICAL: Required<ProgressBarImageTextures> = {
 }
 
 export type ProgressBarImageProps = Omit<
-	UiBoxProps,
+	KitEntityProps,
 	'uiTransform' | 'backgroundColor' | 'borderColor' | 'borderWidth' | 'borderRadius'
 > & {
 	/** Unique id for the per-instance PropsController / lerp state. */
@@ -445,44 +445,48 @@ export function ProgressBarImage({
 			: undefined
 
 	return (
-		<UiBox
-			{...props}
-			uiTransform={{
-				width         : width,
-				height        : height,
-				...(height !== 'auto' ? { minHeight: height } : {}),
-				display       : 'flex',
-				flexDirection : layout.flexDirection,
-				alignItems    : layout.alignItems,
-				justifyContent: 'flex-start',
-				flexGrow      : 0,
-				flexShrink    : 0,
-				overflow      : 'hidden',
-				borderRadius  : bRadius,
-				...uiTransform,
-			}}
-			uiBackground={uiBackground}
+		<UiEntity
+			{...resolveKitEntityProps({
+				...props,
+				uiTransform: {
+					width         : width,
+					height        : height,
+					...(height !== 'auto' ? { minHeight: height } : {}),
+					display       : 'flex',
+					flexDirection : layout.flexDirection,
+					alignItems    : layout.alignItems,
+					justifyContent: 'flex-start',
+					flexGrow      : 0,
+					flexShrink    : 0,
+					overflow      : 'hidden',
+					borderRadius  : bRadius,
+					...uiTransform,
+				},
+				uiBackground,
+			})}
 		>
 			{/* Background (back) */}
-			<UiBox
+			<UiEntity
 				key             = {`${id}_bg`}
-				backgroundColor = {useBgTex ? undefined : track}
-				uiTransform={{
-					positionType: 'absolute',
-					position    : {
-						top   : useBgTex ? inset.top    : 0,
-						right : useBgTex ? inset.right  : 0,
-						bottom: useBgTex ? inset.bottom : 0,
-						left  : useBgTex ? inset.left   : 0,
+				{...resolveKitEntityProps({
+					backgroundColor: useBgTex ? undefined : track,
+					uiTransform: {
+						positionType: 'absolute',
+						position    : {
+							top   : useBgTex ? inset.top    : 0,
+							right : useBgTex ? inset.right  : 0,
+							bottom: useBgTex ? inset.bottom : 0,
+							left  : useBgTex ? inset.left   : 0,
+						},
+						borderRadius: bRadius,
+						zIndex      : Z_INDEX_BACKGROUND,
 					},
-					borderRadius: bRadius,
-					zIndex      : Z_INDEX_BACKGROUND,
-				}}
-				uiBackground={useBgTex ? layerNineSlice(resolved.background!, slices) : undefined}
+					uiBackground: useBgTex ? layerNineSlice(resolved.background!, slices) : undefined,
+				})}
 			/>
 
 			{/* Fill (middle) — inset + clipped so textures stay inside the border */}
-			<UiBox
+			<UiEntity
 				key = {`${id}_fill_host`}
 				uiTransform={{
 					positionType  : 'absolute',
@@ -501,23 +505,25 @@ export function ProgressBarImage({
 					zIndex        : Z_INDEX_FILL,
 				}}
 			>
-				<UiBox
+				<UiEntity
 					key             = {`${id}_fill`}
-					backgroundColor = {fillBackground ? undefined : fill}
-					uiTransform={{
-						width       : layout.fillWidth,
-						height      : layout.fillHeight,
-						borderRadius: fillRadius,
-						flexGrow    : 0,
-						flexShrink  : 0,
-					}}
-					uiBackground={fillBackground}
+					{...resolveKitEntityProps({
+						backgroundColor: fillBackground ? undefined : fill,
+						uiTransform: {
+							width       : layout.fillWidth,
+							height      : layout.fillHeight,
+							borderRadius: fillRadius,
+							flexGrow    : 0,
+							flexShrink  : 0,
+						},
+						uiBackground: fillBackground,
+					})}
 				/>
-			</UiBox>
+			</UiEntity>
 
 			{/* Border (front) — image (tintable) or procedural */}
 			{useBorderTex ? (
-				<UiBox
+				<UiEntity
 					key = {`${id}_border`}
 					uiTransform={{
 						positionType: 'absolute',
@@ -527,27 +533,29 @@ export function ProgressBarImage({
 					uiBackground={layerNineSlice(resolved.border!, slices, borderColor)}
 				/>
 			) : (
-				<UiBox
+				<UiEntity
 					key          = {`${id}_border`}
-					borderColor  = {border}
-					borderWidth  = {bWidth}
-					borderRadius = {bRadius}
-					uiTransform={{
-						positionType: 'absolute',
-						position    : { top: 0, right: 0, bottom: 0, left: 0 },
-						zIndex      : Z_INDEX_BORDER,
-					}}
+					{...resolveKitEntityProps({
+						borderColor: border,
+						borderWidth: bWidth,
+						borderRadius: bRadius,
+						uiTransform: {
+							positionType: 'absolute',
+							position    : { top: 0, right: 0, bottom: 0, left: 0 },
+							zIndex      : Z_INDEX_BORDER,
+						},
+					})}
 				/>
 			)}
 
 			{children != null && (
-				<UiBox
+				<UiEntity
 					key         = {`${id}_content`}
 					uiTransform = {progressBarContentTransform()}
 				>
 					{children}
-				</UiBox>
+				</UiEntity>
 			)}
-		</UiBox>
+		</UiEntity>
 	)
 }

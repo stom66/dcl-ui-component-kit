@@ -1,4 +1,4 @@
-import ReactEcs, { type PositionUnit } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, type PositionUnit } from '@dcl/sdk/react-ecs'
 
 import type { SizeValue } from '../../utils/positionUnit'
 
@@ -68,12 +68,52 @@ export function resolveAnimBoxSize(
 }
 
 
+/** Top-level props a raw `UiEntity` accepts — anything else must not reach it. */
+const UI_ENTITY_PROP_KEYS = new Set([
+	'children',
+	'uiTransform',
+	'uiBackground',
+	'uiText',
+	'onMouseDown',
+	'onMouseUp',
+	'onMouseEnter',
+	'onMouseLeave',
+])
+
+
 // MARK: cloneAnimChild
-/** Clones a single animation child with prop overrides (preserves `key`). */
+/**
+ * Clones a single animation child with prop overrides (preserves `key`).
+ *
+ * Kit components take `width` / `height` (and other shorthands) as top-level
+ * props. A raw SDK `UiEntity` does not — DCL treats every top-level key as an
+ * ECS component name — so for those children `width` / `height` are written
+ * into `uiTransform` and other non-native overrides are dropped.
+ */
 export function cloneAnimChild(
 	child    : ReactEcs.JSX.Element,
 	overrides: Record<string, unknown>,
 ): ReactEcs.JSX.Element {
+	if (child.type === UiEntity) {
+		const { width, height, uiTransform, ...rest } = overrides
+		const native: Record<string, unknown> = {}
+		for (const key of Object.keys(rest)) {
+			if (UI_ENTITY_PROP_KEYS.has(key)) native[key] = rest[key]
+		}
+
+		return ReactEcs.createElement(child.type, {
+			...child.props,
+			...native,
+			uiTransform: {
+				...child.props?.uiTransform,
+				...(uiTransform as object | undefined),
+				...(width  !== undefined ? { width  } : {}),
+				...(height !== undefined ? { height } : {}),
+			},
+			key: child.key,
+		})
+	}
+
 	return ReactEcs.createElement(child.type, {
 		...child.props,
 		...overrides,

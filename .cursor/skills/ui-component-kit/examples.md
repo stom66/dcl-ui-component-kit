@@ -237,7 +237,7 @@ Demo control panel: `demo.toasts.layer.tsx`.
 
 > **Variants:** procedural (`ButtonText`) · image-based (`ButtonImage`)
 
-Ask whether the control is an image button or a simple text button, then use `ButtonImage` or `ButtonText`. Never hand-roll `UiBox` + mouse handlers.
+Ask whether the control is an image button or a simple text button, then use `ButtonImage` or `ButtonText`. Never hand-roll a `UiEntity` + mouse handlers.
 
 On **mobile**, `callback` fires on `mouseDown`; on **desktop**, on `mouseUp` after hover. The kit uses `isMobile()` for that split (not `!isDesktop()`).
 
@@ -449,11 +449,18 @@ import { getTheme } from '../../styles'
 ## Anti-patterns
 
 ```tsx
-// BAD — UiBox shorthands / parallel APIs on Layer
+// BAD — kit shorthands / parallel APIs on Layer
 super({ backgroundColor: …, borderRadius: 8, themeBackground: 'primary', showFrame: true })
 
 // BAD — fake button (no hover / press; bypasses ButtonImage / ButtonText)
-<UiBox uiText={{ value: 'Simple' }} onMouseDown={() => simpleLayer.toggle()} />
+<UiEntity uiText={{ value: 'Simple' }} onMouseDown={() => simpleLayer.toggle()} />
+
+// BAD — UiBox is deprecated; and kit shorthands do not exist on raw UiEntity
+<UiBox backgroundColor={theme.colors.primary} padding={8} />
+<UiEntity backgroundColor={theme.colors.primary} padding={8} />
+
+// GOOD — plain box: SDK UiEntity with nested native props (container → Column / Row)
+<UiEntity uiTransform={{ padding: 8 }} uiBackground={{ color: theme.colors.primary }} />
 
 // BAD — duplicate mount (canvas / zone already owned by SetupUiComponentKit + Layer.render)
 render() {
