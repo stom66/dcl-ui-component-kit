@@ -88,7 +88,7 @@ export function resolveVisibilityEdges(
  * renderers). Do not wrap layers in `ScreenInsetArea`.
  */
 export function getLeftZoneInset(): number {
-	return isMobile() ? vwToPixels(4) : vwToPixels(3)
+	return isMobile() ? vwToPixels(4) : vwToPixels(3.333)
 }
 
 /** Pixel inset for right-edge side strips. */
@@ -337,7 +337,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '20vh' : '12vh',
+				top   : isMobile() ? '20vh' : '200',
 				right : '75%',
 				bottom: isMobile() ? '40vh' : '6vh',
 				left  : getLeftZoneInset(),
@@ -354,7 +354,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 			// (height/flexGrow on an absolute top+bottom box cannot shrink the strip.)
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '25vh' : '12vh',
+				top   : isMobile() ? '25vh' : '200',
 				right : '75%',
 				bottom: isMobile() ? '40vh' : '6vh',
 				left  : getLeftZoneInset(),
@@ -369,7 +369,7 @@ export const zonePresets: Record<Exclude<ZoneType, ZoneType.None>, ZonePreset> =
 		getUiTransform: () => ({
 			positionType  : 'absolute',
 			position      : {
-				top   : isMobile() ? '25vh' : '12vh',
+				top   : isMobile() ? '25vh' : '200',
 				right : '75%',
 				bottom: isMobile() ? '40vh' : '6vh',
 				left  : getLeftZoneInset(),
