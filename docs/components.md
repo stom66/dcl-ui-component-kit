@@ -407,7 +407,7 @@ Always pair `fontSrc` with a built-in `font` fallback (missing file / clients th
 
 ## Icons
 
-**Variants:** `FontAwesome` · `Icon` / `IconNumber` · `AvatarIcon` · `SpriteIcon`
+**Variants:** `FontAwesome` · `Icon` · `AvatarIcon` · `SpriteIcon`
 
 ### `FontAwesome`
 
@@ -508,22 +508,6 @@ import { playOnce, setPlaying, SpriteIcon } from '@stom66/dcl-ui-component-kit'
 	height       = {64}
 />
 ```
-
-### `IconNumber` (deprecated)
-
-**Deprecated** — prefer `Text` / `Label` with `fontSrc` or `theme.typography.fontSrc`. Still exported with `IconString` / `IconCharacter` / `IconSymbol` for existing atlas glyph UIs.
-
-| Option | Type | Description |
-|---|---|---|
-| `value` | `string \| number` | Digits / short math string |
-| `atlas` | `TextureAtlas` | Override the digit sheet (`atlasCharsAlphaNumeric`) |
-
-```tsx
-<IconNumber value={42} />
-<IconNumber value="+12" />
-```
-
-Digits are on `atlasCharsAlphaNumeric`. Operators and punctuation (`+`, `/`, `=`, `:`, …) come from `atlasCharsSymbols`. Grids are the `layout` arrays on those atlases in `src/ui-component-kit/atlases/atlases.ts`.
 
 ---
 

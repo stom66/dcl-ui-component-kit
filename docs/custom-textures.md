@@ -48,14 +48,54 @@ export const myProgressBarTexturesHorizontal: ProgressBarImageTextures = {
 }
 ```
 
+## Example: custom icon sheet
+
+End to end: from a PNG of icons to `<Icon>` by name.
+
+**1. Export the sheet.** A grid of equally sized cells, e.g. 4 × 4, saved into your theme folder:
+
+```text
+assets/images/themes/myGame/atlas-icons.png
+```
+
+**2. Declare the atlas and name the cells.** Column and row numbers are **1-based**, and **rows count from the bottom of the PNG** (UV space), so the top row of a 4-row sheet is `yStart: 4`.
+
+```tsx
+import { TextureAtlas } from '@stom66/dcl-ui-component-kit'
+
+export const myIconsAtlas = new TextureAtlas({
+	source : 'assets/images/themes/myGame/atlas-icons.png',
+	columns: 4,
+	rows   : 4,
+	named  : {
+		coin : { xStart: 1, yStart: 4 }, // top row, first column
+		heart: { xStart: 2, yStart: 4 }, // top row, second column
+		key  : { xStart: 1, yStart: 3 }, // second row, first column
+	},
+})
+```
+
+**3. Use a cell by name.** Every entry in `named` gets a precomputed UV quad on `atlas.uv`:
+
+```tsx
+<Icon
+	src = {myIconsAtlas.source}
+	uvs = {myIconsAtlas.uv.coin}
+/>
+```
+
+Components that take the whole atlas instead of `src` + `uvs` (e.g. `ProgressBarImage`) use the cell options: `uvCell = {myIconsAtlas.named.coin}`. For a cell you haven't named, call `myIconsAtlas.cell({ xStart: 3, yStart: 2 })`.
+
+A working version lives in the demo scene: `exampleIconsAtlas` in [`src/exampleThemes/showcase/atlases.ts`](../src/exampleThemes/showcase/atlases.ts).
+
 ## Bundled framework atlases
 
 | Atlas | Use |
 |---|---|
 | `atlasIconsFontAwesome` | **Deprecated** PNG subset — still useful for dense HUDs (Unity `fontSrc` atlas fits ~35–50 unique FA TTFs) |
 | `atlasBtnIcons` / `atlasBtnIconsStyled` | Button variants × states |
-| `atlasCharsAlphaNumeric` | Letters and digits (`IconCharacter`, `IconNumber` digits) |
-| `atlasCharsSymbols` | Punctuation and operators (`IconSymbol`, `IconNumber` formulas) |
+| `atlasCharsAlphaNumeric` | Letters and digits |
+| `atlasCharsSymbols` | Punctuation and operators |
 | `atlasGradientColors` | Gradient strips for progress fills |
 | `atlasSpritesProgressRadial` | 16×16 radial progress ring (256 frames) for `ProgressBarRadial` |
 
