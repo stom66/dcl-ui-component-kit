@@ -113,7 +113,7 @@ export class DemoTextLayer extends Layer {
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
 			startHidden    : true,
-			showCloseButton: false,
+			showCloseButton: true,
 			uiTransform    : {
 				height: 'auto',
 			},
