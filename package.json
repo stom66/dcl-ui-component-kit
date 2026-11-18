@@ -1,6 +1,6 @@
 {
   "name": "@stom66/dcl-ui-component-kit",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "DCL UI Component Kit — reusable Decentraland SDK7 UI components, layers, zones, and themes",
   "keywords": [
     "decentraland",
@@ -63,7 +63,7 @@
     "bump:patch": "npm version patch",
     "bump:minor": "npm version minor",
     "bump:major": "npm version major",
-	"deploy:world": "npm run build && sdk-commands deploy --world"
+    "deploy:world": "npm run build && sdk-commands deploy --world"
   },
   "peerDependencies": {
     "@dcl/sdk": "*"
