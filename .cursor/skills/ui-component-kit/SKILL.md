@@ -839,6 +839,8 @@ return [
 Defaults: fills parent via absolute insets, theme body fill, theme border width/radius, no padding.
 Prefer `backgroundColor` over nesting `uiBackground.color`. Empty chrome normally needs no layout shorthands.
 
+`textureSrc` stretches the image (`textureMode` defaults to `stretch`, `wrapMode` `clamp`). Repeating a tile is `textureMode: 'stretch'` plus UVs past 0–1 and `uiBackground.texture.wrapMode: 'repeat'` — `center` draws the image once. Nine-slice: `textureMode: 'nine-slices'` and `textureSlices` fractions (0–1) of the texture; those margins stay fixed and the center stretches.
+
 ### Auto-height layers (`height: 'auto'`)
 
 Default `Background` is **absolutely positioned** (out of flex flow). That is correct for sibling chrome: the Zone sizes from in-flow content siblings, and absolute Background paints the resulting box.

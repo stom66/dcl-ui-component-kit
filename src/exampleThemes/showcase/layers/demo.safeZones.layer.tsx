@@ -84,7 +84,8 @@ export class DemoSafeZonesLayer extends Layer {
 			id             : 'demo-safe-zones',
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
-			startHidden    : false,
+			// Temporary: backgrounds demo opens on load instead of this panel.
+			startHidden    : true,
 			showCloseButton: true,
 			zIndex         : DEMO_SAFE_ZONES_PANEL_Z_INDEX,
 			uiTransform    : {

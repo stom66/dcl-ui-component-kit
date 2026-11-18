@@ -1,14 +1,27 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, type TextureMode, type UiBackgroundProps } from '@dcl/sdk/react-ecs'
 
 import { getTheme } from '../../styles'
 import { type KitEntityProps, mergeUiBackground, resolveKitEntityProps } from '../base'
 
 
+type TextureSlices = NonNullable<UiBackgroundProps['textureSlices']>
+
 type BackgroundProps = KitEntityProps & {
 	children?  : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Optional texture path applied via `uiBackground.texture`. */
 	textureSrc?: string
+	/**
+	 * How `textureSrc` fills the element. Defaults to `stretch` when a texture
+	 * is set. `nine-slices` keeps `textureSlices` margins fixed and stretches
+	 * the center.
+	 */
+	textureMode?: TextureMode
+	/**
+	 * Nine-slice margins as fractions of the texture (0–1).
+	 * Pair with `textureMode: 'nine-slices'`.
+	 */
+	textureSlices?: TextureSlices
 	/**
 	 * When true, sizes to children instead of filling the parent.
 	 * Required for Layer / Zone `height: 'auto'` — absolute fill is out of flow
@@ -38,7 +51,7 @@ type BackgroundProps = KitEntityProps & {
  * Shorthands (prefer over nesting):
  * - Fill: `backgroundColor` → `uiBackground.color`
  * - Border: `borderColor` / `borderWidth` / `borderRadius`
- * - Texture: `textureSrc`
+ * - Texture: `textureSrc`, `textureMode`, `textureSlices`
  * - Layout: `padding`, `alignItems`, `justifyContent`, … (kit transform shorthands)
  *
  * Override anything else via `uiTransform` / `uiBackground`.
@@ -50,13 +63,16 @@ export function Background({
 	borderRadius,
 	borderWidth,
 	textureSrc,
+	textureMode,
+	textureSlices,
 	fitContent,
 	uiTransform,
 	uiBackground,
 	...props
 }: BackgroundProps) {
-	const theme = getTheme()
+	const theme        = getTheme()
 	const fill: Color4 = backgroundColor ?? theme.colors.body
+	const resolvedMode = textureMode ?? (textureSrc !== undefined ? 'stretch' as const : undefined)
 
 	const layout = fitContent
 		? {
@@ -87,7 +103,7 @@ export function Background({
 				backgroundColor: fill,
 				borderColor,
 				borderRadius: borderRadius ?? theme.border.radiusDefault,
-				borderWidth: borderWidth  ?? theme.border.width,
+				borderWidth : borderWidth  ?? theme.border.width,
 				uiTransform: {
 					...layout,
 					...uiTransform,
@@ -95,11 +111,10 @@ export function Background({
 				uiBackground: mergeUiBackground({
 					color: fill,
 					...(textureSrc !== undefined
-						? {
-							texture    : { src: textureSrc, wrapMode: 'clamp' as const },
-							textureMode: 'stretch' as const,
-						}
+						? { texture: { src: textureSrc, wrapMode: 'clamp' as const } }
 						: {}),
+					...(resolvedMode !== undefined ? { textureMode: resolvedMode } : {}),
+					...(textureSlices !== undefined ? { textureSlices } : {}),
 				}, uiBackground),
 			})}
 		>
