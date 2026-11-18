@@ -2,19 +2,31 @@
 
 `@stom66/dcl-ui-component-kit` (aka **DUCK**) is a reusable UI toolkit for Decentraland SDK7.
 
-## Human? Here, take this
+[![See the demo scene: duckdemo.dcl.eth](https://img.shields.io/badge/%E2%96%B6%20See%20the%20demo%20scene-a530f0?style=for-the-badge)](https://play.decentraland.org/?realm=duckdemo.dcl.eth)
 
-**Good-looking Decentraland UI without hand-tuning flexbox.** DUCK gives you ready-made HUDs, buttons, progress bars, toasts and animations that look like Decentraland out of the box and re-skin with your own art. Point your AI agent at this repo and it can build the UI for you. The three ideas below are all you need to follow what it is doing.
+## Human? Here, watch this
 
 [![Watch: building a UI with DUCK](docs/media/duck-round-timer.gif)](docs/media/duck-round-timer.mp4)
 
-- **Layer**: a collection of UI that is shown or hidden **together**. One layer fills **one** zone.
-- **Zone**: a preset screen slot (`ZoneType.Top`, `BottomRight`, `Default`, …). Set `zone: ZoneType.*` on the Layer. There are no `ZoneTop` / `ZoneLeft` helper components.
-- **Components**: progress bars, icons, buttons and layout helpers go **inside that zone** (`body()`).
+**Good-looking Decentraland UI without hand-tuning flexbox.** DUCK gives you ready-made HUDs, buttons, progress bars, toasts and animations that look like Decentraland out of the box and re-skin with your own art. Point your AI agent at this repo and it can build the UI for you. The video above shows the whole pattern: add a layer, pick a zone, add components, animate.
+
+---
+
+## Get started
+
+Ask your AI. Point your agent at this repository (or `@stom66/dcl-ui-component-kit` on npm) and tell it to install the kit into your scene.
+
+```text
+Install @stom66/dcl-ui-component-kit into this Decentraland SDK7 scene.
+Copy stock UI assets, scaffold a custom theme, wire SetupUiComponentKit, and follow the package README.
+```
+
+Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
+
+---
 
 ## Contents
 
-- [Get started](#get-started)
 - [Docs](#docs)
 - [Making your own theme](#making-your-own-theme)
 - [Building blocks](#building-blocks)
@@ -70,16 +82,7 @@
 - [This repo as a demo scene](#this-repo-as-a-demo-scene)
 - [Agent guidance](#agent-guidance)
 
-## Get started
-
-Ask your AI. Point your agent at this repository (or `@stom66/dcl-ui-component-kit` on npm) and tell it to install the kit into your scene.
-
-```text
-Install @stom66/dcl-ui-component-kit into this Decentraland SDK7 scene.
-Copy stock UI assets, scaffold a custom theme, wire SetupUiComponentKit, and follow the package README.
-```
-
-Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
+---
 
 ## Docs
 
