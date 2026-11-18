@@ -62,7 +62,8 @@
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
     "bump:patch": "npm version patch",
     "bump:minor": "npm version minor",
-    "bump:major": "npm version major"
+    "bump:major": "npm version major",
+	"deploy:world": "npm run build && sdk-commands deploy --world"
   },
   "peerDependencies": {
     "@dcl/sdk": "*"
