@@ -116,3 +116,112 @@ export const exampleProgressBarTexturesVertical: ProgressBarImageTextures = {
 	fill      : 'assets/images/example-themes/showcase/progressBar-vertical-fill.png',
 	border    : 'assets/images/example-themes/showcase/progressBar-vertical-border.png',
 }
+
+
+// MARK: exampleFuelFillAtlas
+/**
+ * Sky Chaser fuel-gauge fill. One full-frame cell, revealed with
+ * `uvCropWithFill` (not stretched). Pair with `exampleFuelGaugeTextures`.
+ */
+export const exampleFuelFillAtlas = new TextureAtlas({
+	source : 'assets/images/example-themes/showcase/progressBar-fuel-fill.png',
+	columns: 1,
+	rows   : 1,
+})
+
+
+// MARK: exampleFuelGaugeTextures
+/**
+ * Sky Chaser fuel-gauge frame. The border art is twice the fill height
+ * (dial housing above the tube). Center the fill with `contentInset`.
+ * The rotating needle is a separate icon and is not part of this set.
+ */
+export const exampleFuelGaugeTextures: ProgressBarImageTextures = {
+	background: 'assets/images/example-themes/showcase/progressBar-fuel-bg.png',
+	border    : 'assets/images/example-themes/showcase/progressBar-fuel-fg.png',
+}
+
+
+// MARK: exampleBubblesAtlas
+/**
+ * Pictorial fill for an image-reveal bar — liquid with bubbles (1024×128,
+ * tiles seamlessly left ↔ right). Exported from `duck-showcase-assets.af`
+ * (`progressBar-bubbles` artboard). Replace `progressBar-bubbles.png`
+ * in place to change the art.
+ */
+export const exampleBubblesAtlas = new TextureAtlas({
+	source : 'assets/images/example-themes/showcase/progressBar-bubbles.png',
+	columns: 1,
+	rows   : 1,
+})
+
+
+// MARK: ExampleLayeredBarArt
+/**
+ * Three-layer horizontal bar art from `duck-showcase-assets.af`
+ * — one artboard per PNG, named to match (`progressBar-<name>-background`,
+ * `-border`, `-fill`); export the artboards over these files to update the art.
+ *
+ * - `background` / `border` are full-frame `artWidth × artHeight` and are
+ *   stretched over the whole bar (display at the same aspect ratio).
+ * - `fill` is cropped to the fill's own bounds and revealed with
+ *   `uvCropWithFill`; `fillInset` is where that crop sits inside the frame,
+ *   in art pixels — scale it to the display size for `contentInset`.
+ * - The border hides the fill / background seams.
+ */
+export type ExampleLayeredBarArt = {
+	artWidth  : number
+	artHeight : number
+	background: string
+	border    : string
+	fill      : TextureAtlas
+	fillInset : { top: number, right: number, bottom: number, left: number }
+	/**
+	 * Art pixels from each horizontal edge that must not stretch (angled /
+	 * rounded ends, chevrons, studs). The middle stretches so the bar can fill
+	 * any width; the fill uses the same split. `0` = fixed-size art only.
+	 */
+	capArt    : number
+}
+
+const LAYERED_BAR_DIR = 'assets/images/example-themes/showcase'
+
+// MARK: createLayeredBarArt
+/** Builds an `ExampleLayeredBarArt` from the `progressBar-<name>-*.png` naming. */
+function createLayeredBarArt(
+	name     : string,
+	fillInset: ExampleLayeredBarArt['fillInset'],
+	capArt   : number,
+	artWidth  = 1024,
+	artHeight = 128,
+): ExampleLayeredBarArt {
+	return {
+		capArt,
+		artWidth,
+		artHeight,
+		background: `${LAYERED_BAR_DIR}/progressBar-${name}-background.png`,
+		border    : `${LAYERED_BAR_DIR}/progressBar-${name}-border.png`,
+		fill      : new TextureAtlas({
+			source : `${LAYERED_BAR_DIR}/progressBar-${name}-fill.png`,
+			columns: 1,
+			rows   : 1,
+		}),
+		fillInset,
+	}
+}
+
+/** Angled sci-fi bar: striped cyan fill, gunmetal frame, chevron caps. */
+export const exampleNeonSlantBar = createLayeredBarArt('neon-slant', { top: 26, right: 119, bottom: 26, left: 119 }, 176)
+
+/** Rounded capsule: glossy orange fill, gold rim, gem studs. */
+export const exampleEmberCapsuleBar = createLayeredBarArt('ember-capsule', { top: 28, right: 66, bottom: 28, left: 66 }, 120)
+
+/** Chamfered corners: segmented green fill, brushed-steel frame, rivets. */
+export const exampleTacticalChamferBar = createLayeredBarArt('tactical-chamfer', { top: 24, right: 62, bottom: 24, left: 62 }, 200)
+
+/**
+ * Vertical thermometer (256×1024): brass-framed plaque, glass tube, mercury
+ * column fill (`fillFrom="bottom"`). The bulb is part of the background so it
+ * stays red at 0%. Plaque spans art y 12–1012.
+ */
+export const exampleThermometerBar = createLayeredBarArt('thermometer', { top: 83, right: 114, bottom: 161, left: 114 }, 0, 256, 1024)
