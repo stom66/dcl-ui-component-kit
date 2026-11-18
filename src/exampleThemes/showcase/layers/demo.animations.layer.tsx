@@ -1,12 +1,42 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Label, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Wiggle, ZoneType } from '../../../ui-component-kit'
-import { alpha, easingFunctions, vhToPixels, vwToPixels } from '../../../ui-component-kit/utils'
+import { atlasIconsFontAwesome, Background, Bounce, Column, FlashColor, getTheme, H1, Icon, Layer, playOnce, Pulse, Row, setPlaying, Shake, Spinner, Text, Wiggle, ZoneType } from '../../../ui-component-kit'
+import { easingFunctions, vwToPixels } from '../../../ui-component-kit/utils'
 
-const CELL = {
-	height: '128',
-	width : '128',
-} as const
+const CELL   = 128
+const GUTTER = 8
+
+/** Outer width of the six caption cells, including the margin around each one. */
+const ROW_SPAN = 6 * (CELL + GUTTER * 2)
+
+type SplitCellSize = {
+	width : number
+	height: number
+	icon  : number
+}
+
+/** Row 2 — one double-wide square: caption left, animation in a square on the right. */
+const SPLIT_WIDE: SplitCellSize = {
+	width : CELL * 2,
+	height: CELL,
+	icon  : CELL,
+}
+
+/**
+ * Row 3 — same side-by-side layout, scaled so four double-wide squares
+ * share the caption row's width.
+ */
+const SPLIT_COMPACT: SplitCellSize = {
+	width : ROW_SPAN / 4 - GUTTER * 2,
+	height: (ROW_SPAN / 4 - GUTTER * 2) / 2,
+	icon  : (ROW_SPAN / 4 - GUTTER * 2) / 2,
+}
+
+type AnimCellEvents = {
+	onMouseEnter?: () => void
+	onMouseLeave?: () => void
+	onMouseDown ?: () => void
+}
 
 const ICON_UVS = atlasIconsFontAwesome.uv.star
 
@@ -34,7 +64,7 @@ const ID = {
 
 
 // MARK: DemoAnimationsLayer
-/** Demo panel for motion wrappers and spinners (four cells per row). */
+/** Demo panel for motion wrappers and spinners. */
 export class DemoAnimationsLayer extends Layer {
 	constructor() {
 		super({
@@ -45,7 +75,7 @@ export class DemoAnimationsLayer extends Layer {
 			showCloseButton: true,
 			uiTransform    : {
 				width : vwToPixels(50),
-				height: vhToPixels(75),
+				height: 'auto',
 			},
 		})
 	}
@@ -60,9 +90,8 @@ export class DemoAnimationsLayer extends Layer {
 			<Column
 				key            = "body"
 				cols           = {12}
-				height         = "100%"
 				alignItems     = "center"
-				justifyContent = "center"
+				justifyContent = "flex-start"
 				padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
 			>
 					<H1 value="Animations" fontColor={theme.colors.light} />
@@ -151,7 +180,7 @@ export class DemoAnimationsLayer extends Layer {
 					*/}
 					<Row justifyContent="center">
 
-						{this.renderAnimCell('Spinner + \nPulse > FlashColor', theme.colors.info, [
+						{this.renderSplitCell('Spinner + \nPulse > FlashColor', theme.colors.info, [
 							<Spinner
 								id          = {ID.spinnerBeamsVaried}
 								duration    = {1}
@@ -188,9 +217,9 @@ export class DemoAnimationsLayer extends Layer {
 									/>
 								</FlashColor>
 							</Pulse>,
-						])}
+						], SPLIT_WIDE)}
 
-						{this.renderAnimCell('Spinner > Spinner + \nSpinner > Pulse', theme.colors.warning, [
+						{this.renderSplitCell('Spinner > Spinner + \nSpinner > Pulse', theme.colors.warning, [
 							<Spinner
 								id             = {ID.spinnerBeamsOuter}
 								duration       = {1}
@@ -237,9 +266,9 @@ export class DemoAnimationsLayer extends Layer {
 									/>
 								</Pulse>
 							</Spinner>,
-						])}
+						], SPLIT_WIDE)}
 
-						{this.renderAnimCell('Pulse, Shake, and Wiggle', theme.colors.primary, [
+						{this.renderSplitCell('Pulse, Shake, and Wiggle', theme.colors.primary, [
 							<Pulse
 								id             = {ID.pulseBeamsEven}
 								easingFunction = {easingFunctions.easeSine}
@@ -271,14 +300,14 @@ export class DemoAnimationsLayer extends Layer {
 										</Wiggle>
 									</Shake>
 							</Pulse>,
-						])}
+						], SPLIT_WIDE)}
 					</Row>
 
 					{/* MARK: Row 3 — event
 					*/}
 					<Row justifyContent="center">
-						{this.renderAnimCell(
-							'onHover | One-shot\nShake',
+						{this.renderSplitCell(
+							'onHover: One-shot\nShake',
 							theme.colors.danger,
 							(
 								<Shake
@@ -295,13 +324,14 @@ export class DemoAnimationsLayer extends Layer {
 									/>
 								</Shake>
 							),
+							SPLIT_COMPACT,
 							{
 								onMouseEnter: () => playOnce(ID.hoverShake),
 							},
 						)}
 
-						{this.renderAnimCell(
-							'onHover | Loop\nPulse',
+						{this.renderSplitCell(
+							'onHover: Loop\nPulse',
 							theme.colors.primary,
 							(
 								<Pulse
@@ -318,14 +348,15 @@ export class DemoAnimationsLayer extends Layer {
 									/>
 								</Pulse>
 							),
+							SPLIT_COMPACT,
 							{
 								onMouseEnter: () => setPlaying(ID.hoverPulse, true),
 								onMouseLeave: () => setPlaying(ID.hoverPulse, false),
 							},
 						)}
 
-						{this.renderAnimCell(
-							'onClick\nFlashColor',
+						{this.renderSplitCell(
+							'onClick: FlashColor',
 							theme.colors.info,
 							(
 								<FlashColor
@@ -342,13 +373,14 @@ export class DemoAnimationsLayer extends Layer {
 									/>
 								</FlashColor>
 							),
+							SPLIT_COMPACT,
 							{
 								onMouseDown: () => playOnce(ID.clickFlash),
 							},
 						)}
 
-						{this.renderAnimCell(
-							'onClick\nWiggle once',
+						{this.renderSplitCell(
+							'onClick: Wiggle once',
 							theme.colors.warning,
 							(
 								<Wiggle
@@ -365,6 +397,7 @@ export class DemoAnimationsLayer extends Layer {
 									/>
 								</Wiggle>
 							),
+							SPLIT_COMPACT,
 							{
 								onMouseDown: () => playOnce(ID.clickWiggle),
 							},
@@ -376,43 +409,140 @@ export class DemoAnimationsLayer extends Layer {
 
 
 	// MARK: renderAnimCell
-	/** Animation preview box with an explicit component-name caption underneath. */
+	/** Square preview. The animation stays centered; its name sits on the top edge. */
 	private renderAnimCell(
 		label   : string,
 		bgColor : Color4,
 		children: ReactEcs.JSX.Element | ReactEcs.JSX.Element[],
-		events? : {
-			onMouseEnter?: () => void
-			onMouseLeave?: () => void
-			onMouseDown ?: () => void
-		},
 	) {
 		return (
 			<Column
+				key        = {label}
 				alignItems = "center"
-				margin     = {{ top: 8, right: 8, bottom: 8, left: 8 }}
+				margin     = {{ top: GUTTER, right: GUTTER, bottom: GUTTER, left: GUTTER }}
 			>
 				<UiEntity
 					uiTransform={{
-						width         : CELL.width,
-						height        : CELL.height,
+						width         : CELL,
+						height        : CELL,
 						alignItems    : 'center',
 						justifyContent: 'center',
+					}}
+				>
+					<Background key="chrome" backgroundColor={bgColor} />
+					{children}
+					{this.renderCaption(label, true)}
+				</UiEntity>
+			</Column>
+		)
+	}
+
+
+	// MARK: renderSplitCell
+	/**
+	 * Double-wide preview. Caption fills the left column; the animation sits in
+	 * a square on the right, so every cell in the row shares one height.
+	 */
+	private renderSplitCell(
+		label    : string,
+		bgColor  : Color4,
+		children : ReactEcs.JSX.Element | ReactEcs.JSX.Element[],
+		size     : SplitCellSize,
+		events?  : AnimCellEvents,
+	) {
+		const textWidth = size.width - size.icon
+
+		return (
+			<Column
+				key        = {label}
+				alignItems = "center"
+				margin     = {{ top: GUTTER, right: GUTTER, bottom: GUTTER, left: GUTTER }}
+			>
+				<UiEntity
+					uiTransform={{
+						width         : size.width,
+						height        : size.height,
+						flexDirection : 'row',
+						alignItems    : 'center',
+						justifyContent: 'flex-start',
 					}}
 					onMouseEnter = {events?.onMouseEnter}
 					onMouseLeave = {events?.onMouseLeave}
 					onMouseDown  = {events?.onMouseDown}
 				>
-					<Background backgroundColor={bgColor} />
-					{children}
+					<Background key="chrome" backgroundColor={bgColor} />
+					<Column
+						key            = "caption"
+						spacing        = {0}
+						width          = {textWidth}
+						height         = {size.height}
+						alignItems     = "center"
+						justifyContent = "center"
+						padding        = {{ top: 4, right: 6, bottom: 4, left: 6 }}
+						uiTransform    = {{ flexShrink: 0 }}
+					>
+						{this.renderCaption(label, false)}
+					</Column>
+					<UiEntity
+						key         = "demo"
+						uiTransform = {{
+							width         : size.icon,
+							height        : size.height,
+							flexShrink    : 0,
+							alignItems    : 'center',
+							justifyContent: 'center',
+						}}
+					>
+						{children}
+					</UiEntity>
 				</UiEntity>
-				<Label
-					value           = {label}
-					width           = {CELL.width}
-					margin          = {{ top: 4 }}
-					backgroundColor = {alpha(bgColor, 0.5)}
-				/>
 			</Column>
+		)
+	}
+
+
+	// MARK: renderCaption
+	/** Centered caption along the top of a square, or in the left half of a split cell. */
+	private renderCaption(
+		label  : string,
+		overlay: boolean,
+	) {
+		const theme = getTheme()
+		const text  = (
+			<Text
+				key           = "label"
+				value         = {label}
+				fontSize      = {theme.typography.size.small}
+				fontColor     = {theme.colors.light}
+				textAlign     = "middle-center"
+				textWrap      = {overlay ? 'nowrap' : 'wrap'}
+				pointerFilter = "none"
+				uiTransform   = {overlay
+					? { width: 'auto', flexGrow: 0, alignSelf: 'center' }
+					: { width: '100%', flexShrink: 0, alignSelf: 'center' }}
+			/>
+		)
+
+		// The square caption is absolutely positioned, so a full-width row has to
+		// center the shrink-wrapped label. textAlign alone stays on the left.
+		if (!overlay) return text
+
+		return (
+			<Row
+				key            = "caption"
+				spacing        = {0}
+				justifyContent = "center"
+				alignItems     = "center"
+				pointerFilter  = "none"
+				uiTransform    = {{
+					positionType: 'absolute',
+					position    : { top: 2, left: 0 },
+					width       : '100%',
+					zIndex      : 2,
+				}}
+			>
+				{text}
+			</Row>
 		)
 	}
 }
