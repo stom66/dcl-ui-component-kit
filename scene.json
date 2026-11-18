@@ -4,7 +4,7 @@
   "display": {
     "title": "🦆 DCL UI Component Kit",
     "description": "Demo scene for the DCL UI Component Kit",
-    "navmapThumbnail": "assets/Images/scene-thumbnail.png",
+    "navmapThumbnail": "assets/images/scene-thumbnail.png",
     "favicon": "favicon_asset"
   },
   "owner": "",
@@ -15,10 +15,10 @@
   "main": "bin/index.js",
   "tags": [],
   "scene": {
+    "base": "0,0",
     "parcels": [
       "0,0"
-    ],
-    "base": "0,0"
+    ]
   },
   "spawnPoints": [
     {
@@ -62,5 +62,8 @@
     "projectId": "0506ce0b-5f3e-4e33-9ed3-3ff39f045d67"
   },
   "landscapeTerrain": true,
-  "rating": "A"
+  "rating": "A",
+  "worldConfiguration": {
+    "name": "duckdemo.dcl.eth"
+  }
 }
