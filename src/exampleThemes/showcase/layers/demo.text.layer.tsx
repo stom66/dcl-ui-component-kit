@@ -1,18 +1,111 @@
+import { Color4 } from '@dcl/sdk/math'
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasIconsFontAwesome, Background, Code, Column, Divider, getTheme, H1, H2, H3, H4, H5, H6, Icon, IconNumber, IconString, Label, Layer, Row, SectionHeader, Text, ZoneType } from '../../../ui-component-kit'
+import { Background, Code, Column, Divider, FontAwesome, getTheme, H1, H2, H3, H4, H5, H6, Label, Layer, Row, scaleThemeFontSize, SectionHeader, Text, ZoneType } from '../../../ui-component-kit'
 
 
-/** Bundled glyph specimen, atlas order. Each alphabet is two lines; symbols are two lines. */
-const GLYPH_LOWER_A   = 'abcdefghijklm'
-const GLYPH_LOWER_B   = 'nopqrstuvwxyz'
-const GLYPH_UPPER_A   = 'ABCDEFGHIJKLM'
-const GLYPH_UPPER_B   = 'NOPQRSTUVWXYZ'
-const GLYPH_DIGITS    = '0123456789'
-const GLYPH_SYMBOLS_A = '.\'";()!?&%@#÷=$_×:'
-const GLYPH_SYMBOLS_B = ',/+-£€¥~^*\\|<>[]{}'
+const FONT_BANGERS      = 'assets/fonts/examples/Bangers/Bangers-Regular.ttf'
+const FONT_LUCKIEST_GUY = 'assets/fonts/examples/Luckiest_Guy/LuckiestGuy-Regular.ttf'
+const FONT_MONTSERRAT   = 'assets/fonts/examples/Montserrat/Montserrat-Regular.ttf'
+const FONT_DENK_ONE     = 'assets/fonts/examples/Denk_One/DenkOne-Regular.ttf'
+
+const LOREM       = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+const LOREM_SHORT = 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+const LOREM_FACE  = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+
+
+// MARK: FontSample
+/**
+ * One custom-font specimen. The face name and a short line both use `fontSrc`,
+ * with the built-in sans-serif face as the SDK fallback.
+ *
+ * Call it as a function so the returned `Column` is a direct `Row` child and
+ * `cols` is visible to the grid.
+ */
+function FontSample({
+	sampleKey,
+	name,
+	fontSrc,
+	nameSize,
+	bodySize,
+}: {
+	sampleKey : string
+	name      : string
+	fontSrc   : string
+	nameSize  : number
+	bodySize  : number
+}) {
+	return (
+		<Column
+			key            = {sampleKey}
+			cols           = {3}
+			alignItems     = "flex-start"
+			justifyContent = "flex-start"
+			spacing        = {4}
+		>
+			<Text
+				key      = "name"
+				value    = {name}
+				font     = "sans-serif"
+				fontSrc  = {fontSrc}
+				fontSize = {nameSize}
+			/>
+			<Text
+				key      = "sample"
+				value    = {LOREM_FACE}
+				font     = "sans-serif"
+				fontSrc  = {fontSrc}
+				fontSize = {bodySize}
+			/>
+		</Column>
+	)
+}
+
+
+// MARK: StatusLabel
+/**
+ * Colour chip with a Font Awesome status glyph beside the caption.
+ * Called as a function so the `Label` is a direct `Row` child.
+ */
+function StatusLabel({
+	labelKey,
+	value,
+	icon,
+	backgroundColor,
+	fontSize,
+}: {
+	labelKey        : string
+	value           : string
+	icon            : string
+	backgroundColor : Color4
+	fontSize        : number
+}) {
+	return (
+		<Label
+			key             = {labelKey}
+			backgroundColor = {backgroundColor}
+			uiTransform     = {{ justifyContent: 'flex-start' }}
+		>
+			<FontAwesome
+				key       = "icon"
+				icon      = {icon}
+				fontSize  = {scaleThemeFontSize(fontSize)}
+				fontColor = {getTheme().colors.light}
+			/>
+			<Text
+				key      = "caption"
+				value    = {value}
+				fontSize = {fontSize}
+				textWrap = "nowrap"
+				width    = "auto"
+				margin   = {{ left: 4 }}
+			/>
+		</Label>
+	)
+}
+
 
 // MARK: DemoTextLayer
-/** Demo panel for headers, body text, labels, code, and icons. */
+/** Demo panel for headers, body text, labels, one code sample, and custom fonts. */
 export class DemoTextLayer extends Layer {
 	constructor() {
 		super({
@@ -20,7 +113,7 @@ export class DemoTextLayer extends Layer {
 			zone           : ZoneType.Default,
 			canBeHidden    : true,
 			startHidden    : true,
-			showCloseButton: true,
+			showCloseButton: false,
 			uiTransform    : {
 				height: 'auto',
 			},
@@ -40,131 +133,117 @@ export class DemoTextLayer extends Layer {
 				alignItems     = "flex-start"
 				justifyContent = "flex-start"
 			>
-			<Row key="main">
-				<Column
-					key            = "headers"
-					cols           = {4}
-					alignItems     = "flex-start"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
-				>
-						<H1 value="Header 1" />
-						<H2 value="Header 2" />
-						<H3 value="Header 3" />
-						<H4 value="Header 4" />
-						<H5 value="Header 5" />
-						<H6 value="Header 6" />
-				</Column>
-				<Column
-					key            = "copy"
-					cols           = {8}
-					alignItems     = "flex-start"
-					justifyContent = "flex-start"
-					padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
-				>
-						<SectionHeader value="Section header" />
-						<Text value="Body text via the Text component. Use this for longer copy. By default it will fill 100% width, and automatically wrap long content" />
+				<Row key="main">
+					<Column
+						key            = "headers"
+						cols           = {4}
+						spacing        = {Math.round(theme.spacing * 2 / 3)}
+						alignItems     = "flex-start"
+						justifyContent = "flex-start"
+						padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
+					>
+						<H1 key="h1" value="Header 1" />
+						<H2 key="h2" value="Header 2" />
+						<H3 key="h3" value="Header 3" />
+						<H4 key="h4" value="Header 4" />
+						<H5 key="h5" value="Header 5" />
+						<H6 key="h6" value="Header 6" />
+					</Column>
+					<Column
+						key            = "copy"
+						cols           = {8}
+						alignItems     = "flex-start"
+						justifyContent = "flex-start"
+						padding        = {{ top: 16, right: 16, bottom: 16, left: 16 }}
+					>
+						<SectionHeader key="section" value="Lorem ipsum" />
+						<Text key="body" value={LOREM} />
 						<Text
-							value    = "Prefer theme.typography.size.* (small / default / code / h1–h6). Kit Text auto-scales those base px values."
+							key      = "body-small"
+							value    = {LOREM_SHORT}
 							fontSize = {theme.typography.size.small}
 						/>
-						<Code value="const tip = '<Code> uses the monospace theme font.</Code>'" />
-						<Code value={"// Ad-hoc size: pass theme-base px on fontSize — kit components scale it. Raw UiEntity: scaleThemeFontSize(theme.typography.size.default)"} />
+						<Code key="code" value="const sample = 'Lorem ipsum dolor sit amet'" />
 
-						<Divider />
-
-						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
-							<Text value="Labels:" width="auto" />
+						<Row key="labels" justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
 							<Label
-								value  = "Sample label"
+								key   = "labels"
+								value = "Labels!"
 							/>
-							<Label
-								value  = "Success"
-								backgroundColor  = {theme.colors.success}
-							/>
-							<Label
-								value = "Info"
-								backgroundColor = {theme.colors.info}
-							/>
-							<Label
-								value = "Warning"
-								backgroundColor = {theme.colors.warning}
-							/>
-							<Label
-								value = "Danger"
-								backgroundColor = {theme.colors.danger}
-							/>
+							{StatusLabel({
+								labelKey       : 'success',
+								value          : 'Success',
+								icon           : 'circle-check',
+								backgroundColor: theme.colors.success,
+								fontSize       : theme.typography.size.default,
+							})}
+							{StatusLabel({
+								labelKey       : 'info',
+								value          : 'Info',
+								icon           : 'circle-info',
+								backgroundColor: theme.colors.info,
+								fontSize       : theme.typography.size.default,
+							})}
+							{StatusLabel({
+								labelKey       : 'warning',
+								value          : 'Warning',
+								icon           : 'triangle-exclamation',
+								backgroundColor: theme.colors.warning,
+								fontSize       : theme.typography.size.default,
+							})}
+							{StatusLabel({
+								labelKey       : 'danger',
+								value          : 'Danger',
+								icon           : 'circle-exclamation',
+								backgroundColor: theme.colors.danger,
+								fontSize       : theme.typography.size.default,
+							})}
 						</Row>
-
-						<Divider />
-
-						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
-							<Text
-								value  = "Icons, and deprecated atlas glyph text (prefer Text + fontSrc / theme.typography.fontSrc):"
-								margin = {{ right: 8 }}
-								width = "auto"
-							/>
-						</Row>
-
-						<Row justifyContent="flex-start" alignItems="center" margin={{ top: 8 }}>
-							
-							<Icon
-								src = {atlasIconsFontAwesome.source}
-								uvs    = {atlasIconsFontAwesome.uv.gift}
-								width  = "48"
-								height = "48"
-							/>
-							<IconNumber value="+1" margin={{right: 64}} />
-							
-							
-							<IconNumber value="1*0+120/2=60" margin={{right: 64}} />
-							
-							
-							<IconNumber value="12:30" margin={{right: 16}} />
-						</Row>
-				</Column>
-			</Row>
-			<Divider key="glyphs-rule" />
-			<Row
-				key        = "glyphs"
-				alignItems = "flex-start"
-				padding    = {{ top: 4, right: 16, bottom: 16, left: 16 }}
-			>
+					</Column>
+				</Row>
+				<Divider key="fonts-rule" />
 				<Column
-					key            = "symbols"
-					cols           = {6}
-					alignItems     = "flex-start"
-					justifyContent = "flex-start"
-					spacing        = {4}
+					key     = "fonts"
+					cols    = {12}
+					padding = {{ top: 4, right: 16, bottom: 16, left: 16 }}
+					spacing = {8}
 				>
-					<Text
-						key      = "symbols-label"
-						value    = "Symbols"
-						fontSize = {theme.typography.size.small}
+					<SectionHeader
+						key      = "fonts-label"
+						value    = "Custom fonts"
 					/>
-					<IconString key="symbols-a" value={GLYPH_SYMBOLS_A} height={36} />
-					<IconString key="symbols-b" value={GLYPH_SYMBOLS_B} height={36} />
+					<Row key="faces" alignItems="flex-start">
+						{FontSample({
+							sampleKey: 'bangers',
+							name     : 'Bangers',
+							fontSrc  : FONT_BANGERS,
+							nameSize : theme.typography.size.h3,
+							bodySize : theme.typography.size.default,
+						})}
+						{FontSample({
+							sampleKey: 'luckiest-guy',
+							name     : 'Luckiest Guy',
+							fontSrc  : FONT_LUCKIEST_GUY,
+							nameSize : theme.typography.size.h3,
+							bodySize : theme.typography.size.default,
+						})}
+						{FontSample({
+							sampleKey: 'montserrat',
+							name     : 'Montserrat',
+							fontSrc  : FONT_MONTSERRAT,
+							nameSize : theme.typography.size.h3,
+							bodySize : theme.typography.size.default,
+						})}
+						{FontSample({
+							sampleKey: 'denk-one',
+							name     : 'Denk One',
+							fontSrc  : FONT_DENK_ONE,
+							nameSize : theme.typography.size.h3,
+							bodySize : theme.typography.size.default,
+						})}
+					</Row>
 				</Column>
-				<Column
-					key            = "alphanumeric"
-					cols           = {6}
-					alignItems     = "flex-start"
-					justifyContent = "flex-start"
-					spacing        = {4}
-				>
-					<Text
-						key      = "alphanumeric-label"
-						value    = "Alphanumeric"
-						fontSize = {theme.typography.size.small}
-					/>
-					<IconString key="lower-a" value={GLYPH_LOWER_A} height={36} />
-					<IconString key="lower-b" value={GLYPH_LOWER_B} height={36} />
-					<IconString key="upper-a" value={GLYPH_UPPER_A} height={36} />
-					<IconString key="upper-b" value={GLYPH_UPPER_B} height={36} />
-					<IconString key="digits" value={GLYPH_DIGITS} height={36} />
-				</Column>
-			</Row>
-			</Column>
+			</Column>,
 		]
 	}
 }
