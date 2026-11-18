@@ -2,7 +2,7 @@
 
 `@stom66/dcl-ui-component-kit` (aka **DUCK**) is a reusable UI toolkit for Decentraland SDK7.
 
-[![See the demo scene: duckdemo.dcl.eth](https://img.shields.io/badge/%E2%96%B6%20See%20the%20demo%20scene-a530f0?style=for-the-badge)](https://play.decentraland.org/?realm=duckdemo.dcl.eth)
+[![See the demo scene: duckdemo.dcl.eth](https://img.shields.io/badge/%E2%96%B6%20See%20the%20demo%20scene-a530f0?style=for-the-badge)](https://decentraland.org/jump?realm=duckdemo.dcl.eth)
 
 ## Human? Here, watch this
 
