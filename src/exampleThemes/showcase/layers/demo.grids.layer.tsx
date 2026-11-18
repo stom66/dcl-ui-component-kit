@@ -1,6 +1,6 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { alpha, atlasIconsFontAwesome, Background, Column, Divider, getTheme, Grid, H2, H3, Icon, IconNumber, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
+import { alpha, atlasIconsFontAwesome, Background, Code, Column, Divider, getTheme, Grid, H2, H3, Icon, IconNumber, Layer, Row, Text, ZoneType } from '../../../ui-component-kit'
 
 
 /** FA icons for cells after the numbered first track. */
@@ -10,7 +10,9 @@ const DEMO_ICONS = [
 	'lock', 'unlock', 'users', 'house', 'sun', 'moon', 'clock',
 ] as const
 
-const CELL_SIZE = 48
+/** Shared square so the vertical and horizontal examples use the same cell size. */
+const CELL_SIZE  = 72
+const GLYPH_SIZE = 48
 
 
 // MARK: DemoGridsLayer
@@ -26,7 +28,7 @@ export class DemoGridsLayer extends Layer {
 			startHidden    : true,
 			showCloseButton: true,
 			uiTransform    : {
-				width : '52vw',
+				width : '44vw',
 				height: 'auto',
 			},
 		})
@@ -50,10 +52,10 @@ export class DemoGridsLayer extends Layer {
 					<Divider margin={{ top: 4, bottom: 4 }} />
 
 					<Row alignItems="flex-start" spacing={18}>
-						<Column cols={5} alignItems="stretch">
+						<Column cols={4} alignItems="stretch">
 							{this.renderVerticalExample()}
 						</Column>
-						<Column cols={7} alignItems="stretch">
+						<Column cols={8} alignItems="stretch">
 							{this.renderHorizontalExample()}
 						</Column>
 					</Row>
@@ -65,35 +67,35 @@ export class DemoGridsLayer extends Layer {
 
 	// MARK: renderVerticalExample
 	/**
-	 * Column-major grid: `limit={5}` rows per column, 12 entries.
-	 * First column is numbered 1–5.
+	 * Column-major grid: `limit={3}` rows per column, 7 entries.
+	 * First column is numbered 1–3.
 	 */
 	private renderVerticalExample() {
 		const theme = getTheme()
 		const cell  = {
-			width       : CELL_SIZE,
-			height      : CELL_SIZE,
-			alignSelf   : 'center' as const,
-			borderRadius: theme.border.radiusSmall,
-			borderWidth : theme.border.width,
-			borderColor : alpha(theme.colors.light, 0.12),
-			alignItems  : 'center' as const,
+			width         : CELL_SIZE,
+			height        : CELL_SIZE,
+			alignSelf     : 'center' as const,
+			borderRadius  : theme.border.radiusSmall,
+			borderWidth   : theme.border.width,
+			borderColor   : alpha(theme.colors.light, 0.12),
+			alignItems    : 'center' as const,
 			justifyContent: 'center' as const,
 		}
 		const cells: ReactEcs.JSX.Element[] = []
 
-		for (let n = 1; n <= 5; n++) {
+		for (let n = 1; n <= 3; n++) {
 			cells.push(
 				<UiEntity
 					key          = {`vert-num-${n}`}
 					uiTransform  = {cell}
 					uiBackground = {{ color: alpha(theme.colors.primary, 0.5) }}
 				>
-					<IconNumber value={n} height={28} />
+					<IconNumber value={n} height={GLYPH_SIZE} />
 				</UiEntity>
 			)
 		}
-		for (let i = 0; i < 7; i++) {
+		for (let i = 0; i < 4; i++) {
 			const name = DEMO_ICONS[i]
 			cells.push(
 				<UiEntity
@@ -102,10 +104,10 @@ export class DemoGridsLayer extends Layer {
 					uiBackground = {{ color: alpha(theme.colors.body, 0.45) }}
 				>
 					<Icon
-						src = {atlasIconsFontAwesome.source}
+						src    = {atlasIconsFontAwesome.source}
 						uvs    = {atlasIconsFontAwesome.uv[name]}
-						width  = {28}
-						height = {28}
+						width  = {GLYPH_SIZE}
+						height = {GLYPH_SIZE}
 					/>
 				</UiEntity>
 			)
@@ -113,12 +115,9 @@ export class DemoGridsLayer extends Layer {
 
 		return (
 			<Column cols={12} spacing={6} alignItems="stretch">
-				<H3 value="Vertical — limit={5}" />
-				<Text
-					value    = {'direction="vertical", 12 cells. Numbers mark the first column.'}
-					fontSize = {theme.typography.size.small}
-				/>
-				<Grid direction="vertical" limit={5} spacing={6}>
+				<H3 key="title" value="Vertical" />
+				<Code key="limit" value="limit={3}" />
+				<Grid key="grid" direction="vertical" limit={3} spacing={6}>
 					{cells}
 				</Grid>
 			</Column>
@@ -134,13 +133,13 @@ export class DemoGridsLayer extends Layer {
 	private renderHorizontalExample() {
 		const theme = getTheme()
 		const cell  = {
-			width       : CELL_SIZE,
-			height      : CELL_SIZE,
-			alignSelf   : 'center' as const,
-			borderRadius: theme.border.radiusSmall,
-			borderWidth : theme.border.width,
-			borderColor : alpha(theme.colors.light, 0.12),
-			alignItems  : 'center' as const,
+			width         : CELL_SIZE,
+			height        : CELL_SIZE,
+			alignSelf     : 'center' as const,
+			borderRadius  : theme.border.radiusSmall,
+			borderWidth   : theme.border.width,
+			borderColor   : alpha(theme.colors.light, 0.12),
+			alignItems    : 'center' as const,
 			justifyContent: 'center' as const,
 		}
 		const cells: ReactEcs.JSX.Element[] = []
@@ -152,7 +151,7 @@ export class DemoGridsLayer extends Layer {
 					uiTransform  = {cell}
 					uiBackground = {{ color: alpha(theme.colors.primary, 0.5) }}
 				>
-					<IconNumber value={n} height={28} />
+					<IconNumber value={n} height={GLYPH_SIZE} />
 				</UiEntity>
 			)
 		}
@@ -165,10 +164,10 @@ export class DemoGridsLayer extends Layer {
 					uiBackground = {{ color: alpha(theme.colors.body, 0.45) }}
 				>
 					<Icon
-						src = {atlasIconsFontAwesome.source}
+						src    = {atlasIconsFontAwesome.source}
 						uvs    = {atlasIconsFontAwesome.uv[name]}
-						width  = {28}
-						height = {28}
+						width  = {GLYPH_SIZE}
+						height = {GLYPH_SIZE}
 					/>
 				</UiEntity>
 			)
@@ -176,12 +175,9 @@ export class DemoGridsLayer extends Layer {
 
 		return (
 			<Column cols={12} spacing={6} alignItems="stretch">
-				<H3 value="Horizontal — limit={7}" />
-				<Text
-					value    = "Default direction, 18 cells. Numbers mark the first row."
-					fontSize = {theme.typography.size.small}
-				/>
-				<Grid limit={7} spacing={6}>
+				<H3 key="title" value="Horizontal" />
+				<Code key="limit" value="limit={7}" />
+				<Grid key="grid" limit={7} spacing={6}>
 					{cells}
 				</Grid>
 			</Column>
