@@ -6,14 +6,15 @@ import { PropsController } from '../../classes/propsController'
 import { getTheme } from '../../styles'
 import { getColSelfTransform, getColSpan, type ColSpanInput } from '../../utils'
 import { resolveAspectDimensions } from '../../utils/aspect'
-import { lighten } from '../../utils/colors'
+import { darken, lighten } from '../../utils/colors'
 import { easingFunctions, tweenValue } from '../../utils/tweens'
 import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { mergeTextShorthands, type TextShorthandProps } from '../text/textShorthands'
 
 
-const hoverStates  : Map<string, boolean> = new Map()
-const pressedStates: Map<string, boolean> = new Map()
+const hoverStates    : Map<string, boolean> = new Map()
+const pressedStates  : Map<string, boolean> = new Map()
+const colorTweenToken: Map<string, number>  = new Map()
 
 type ButtonTextPropsState = {
 	backgroundColor: Color4
@@ -55,22 +56,46 @@ function getButtonProps(
 }
 
 
+// MARK: nextColorTween
+/** Bumps the color-tween token so an in-flight lerp stops writing this button. */
+function nextColorTween(id: string): number {
+	const token = (colorTweenToken.get(id) ?? 0) + 1
+	colorTweenToken.set(id, token)
+	return token
+}
+
+
 // MARK: tweenBackgroundColor
 /** Lerps the button background color toward `to` and stores it on the controller. */
 function tweenBackgroundColor(
+	id    : string,
 	button: PropsController<ButtonTextPropsState>,
-	to    : Color4
+	to    : Color4,
 ) {
-	const from = button.get('backgroundColor')
+	const token = nextColorTween(id)
+	const from  = button.get('backgroundColor')
 	tweenValue(0, 1, 0.2, (value) => {
+		if (colorTweenToken.get(id) !== token) return
 		button.set('backgroundColor', Color4.lerp(from, to, value))
 	}, undefined, easingFunctions.easeOutQuart)
 }
 
 
+// MARK: setBackgroundColor
+/** Snaps the background color and cancels any in-flight color tween. */
+function setBackgroundColor(
+	id    : string,
+	button: PropsController<ButtonTextPropsState>,
+	color : Color4,
+) {
+	nextColorTween(id)
+	button.set('backgroundColor', color)
+}
+
+
 // MARK: ButtonText
 /**
- * Renders a text button with hover styling and an optional click callback.
+ * Renders a text button with hover and press styling and an optional click callback.
  * Sizes from `theme.buttons` aspect ratio (default height 48, width = height × 2.6)
  * unless both axes are set. Pass one axis to derive the other.
  * Prefer `cols` for grid widths (`cols={12}` = full parent width).
@@ -107,6 +132,7 @@ export const ButtonText = ({
 	const theme        = getTheme()
 	const defaultColor = backgroundColor ?? theme.colors.primary
 	const hoverColor   = lighten(defaultColor, 0.1)
+	const pressedColor = darken(defaultColor, 0.1)
 	const button       = getButtonProps(id, defaultColor)
 	const color        = button.get('backgroundColor')
 	const col          = getColSelfTransform(cols, colsDesktop, colsMobile)!
@@ -159,16 +185,22 @@ export const ButtonText = ({
 				pointerFilter: 'block',
 				onMouseEnter: () => {
 					hoverStates.set(id, true)
-					tweenBackgroundColor(button, hoverColor)
+					if (pressedStates.get(id) === true) {
+						setBackgroundColor(id, button, pressedColor)
+					} else {
+						tweenBackgroundColor(id, button, hoverColor)
+					}
 					onMouseEnter?.()
 				},
 				onMouseLeave: () => {
 					hoverStates.set(id, false)
-					tweenBackgroundColor(button, defaultColor)
+					pressedStates.set(id, false)
+					tweenBackgroundColor(id, button, defaultColor)
 					onMouseLeave?.()
 				},
 				onMouseDown: () => {
 					pressedStates.set(id, true)
+					setBackgroundColor(id, button, pressedColor)
 					onMouseDown?.()
 					if (isMobile()) callback?.()
 				},
@@ -177,6 +209,11 @@ export const ButtonText = ({
 
 					onMouseUp?.()
 					pressedStates.set(id, false)
+					tweenBackgroundColor(
+						id,
+						button,
+						hoverStates.get(id) === true ? hoverColor : defaultColor,
+					)
 				},
 			})}
 		>
