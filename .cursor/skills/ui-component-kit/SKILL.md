@@ -435,6 +435,28 @@ Layout numbers only get the multiply.
 
 **Do not tear down a layer’s UiEntity tree after it has been shown.** Returning `null` / skipping `body()` when `isFullyHidden` lets ReactEcs recycle those entities into sibling layers (Progress bars permanently stuck inside Grids, Layout, left nav, etc.). After the first show, keep `body()` mounted under a keyed Zone with `display: 'none'`. Never-opened `startHidden` layers may skip `body()` until first shown. Prefer unique React `key`s per layer (`demo_progress_chrome`, not bare `chrome`).
 
+## Plan the layers first (critical — agents)
+
+A scene's UI is **several small Layers, not one big one.** Before writing code, list the separate UI surfaces and give each its own Layer. A single Layer holding the whole UI throws away what the kit does for you: zone placement, show / hide / slide animations, `inset`, `zIndex` stacking and the close button all work **per Layer**.
+
+**One Layer per surface.** A surface is anything that sits in its own screen slot or appears / disappears on its own:
+
+| Surface | Typical Layer |
+|---|---|
+| Always-on HUD in a corner or edge (score, timer, health) | One Layer per slot: `ZoneType.TopRight`, `BottomCenter`, … |
+| Popup / modal / dialog (settings, shop, quest complete) | `ZoneType.Default` + `canBeHidden`, often `showCloseButton` |
+| Menu or side panel the player toggles | `Left` / `Right` strip + `canBeHidden` |
+| Splash / loading / full-screen overlay | `ZoneType.FullScreen` |
+| Toasts | Stock `toastHostLayer` (do not build your own) |
+
+Split when two pieces live in different zones, show / hide at different times, or need a different `inset`. Keep in one Layer only what always moves together (a score label and its icon).
+
+**Porting an existing UI:** read the project's current UI first and map each existing panel / screen / component to its own Layer, mirroring its boundaries. Do not flatten it into one file.
+
+**Name each Layer for what it does.** File `src/themes/<theme>/layers/<purpose>.layer.tsx`, class `<Purpose>Layer`, instance `<purpose>Layer`, `id: '<purpose>'` — e.g. `scoreboard.layer.tsx` / `ScoreboardLayer` / `'scoreboard'`, `shop.layer.tsx`, `round-timer.layer.tsx`. **Never** name a Layer after the agent or tool (`codex`, `claude`, `cursor`, `ai`), the theme, the project, or a generic word (`main`, `ui`, `app`, `layer`). The scaffolded `example.layer.tsx` is a sample: replace it, do not rename it and pile everything into it. Register every Layer in `layers/index.ts` (keep `toastHostLayer`).
+
+When you finish, tell the user which Layers you created and what each holds, so they can ask for a different split.
+
 ## Create a layer
 
 ```tsx
@@ -496,6 +518,8 @@ export const myCtaLayer   = new MyCtaLayer()
 | Layer shorthands (`backgroundColor`, `borderRadius`, `showFrame`) | `uiTransform` / `uiBackground` / sibling `<Background />` |
 | Nest content inside `<Background>…</Background>` | Sibling chrome: `[ <Background />, content ]` so zone flex still applies |
 | Edge-zone HUD with `cols={12}`, bare `<Row>`, or `<Column cols={12}>` around a single control | Content-sized siblings (omit `cols` on `ButtonText` / `Label`) **or** size the Layer with `uiTransform` then fill that box — see **Zone alignment needs content-sized children** |
+| One Layer holding the whole scene UI | One Layer per surface (each HUD slot, popup, menu, overlay) — see **Plan the layers first** |
+| Layer named after the agent / tool / theme / a generic word (`codex.layer.tsx`, `ai.layer.tsx`, `main.layer.tsx`) | Name it for its purpose: `scoreboard.layer.tsx`, `shop.layer.tsx` |
 | Treat `Layer` as JSX | `class X extends Layer` + export instance |
 | `UiEntity` + `onMouseDown` / `onMouseUp` as a button | `ButtonImage` or `ButtonText` (ask which — see Buttons) |
 | `UiBox` in new code | `Column` / `Row` for containers, SDK `UiEntity` for plain boxes (`UiBox` is deprecated) |

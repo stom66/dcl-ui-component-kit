@@ -106,7 +106,8 @@ import { Background, Column, Layer, Text, ZoneType, getTheme } from '${PACKAGE_N
 
 // MARK: ExampleLayer
 /**
- * Minimal sample layer — edit or delete.
+ * Minimal sample layer — replace it. Build one Layer per UI surface (HUD slot, popup, menu),
+ * each in its own file named for its purpose (e.g. scoreboard.layer.tsx).
  * Panel chrome is a sibling empty \`Background\` (do not nest content inside it).
  */
 export class ExampleLayer extends Layer {

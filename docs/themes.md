@@ -27,6 +27,8 @@ Atlas / UV details: [custom-textures.md](./custom-textures.md).
 - Export PNGs into `assets/images/themes/<name>/`.
 - Then ask you to wire those files (atlases, progress-bar texture sets, image-button sources).
 
+Replace the sample `example.layer.tsx` with one layer per UI surface, each named for its purpose — see [layers-and-zones.md](./layers-and-zones.md#split-your-ui-into-several-layers).
+
 Do not mark a custom look “done” until the PNGs exist in that folder **and** they are referenced from the theme (not left as commented examples).
 
 ## Human walkthrough

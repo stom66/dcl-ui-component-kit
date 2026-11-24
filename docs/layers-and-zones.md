@@ -1,5 +1,19 @@
 # Layers and zones
 
+## Split your UI into several layers
+
+Build a scene's UI as **several small layers, one per surface**, not one layer that holds everything. Zone placement, show / hide animations, `inset`, `zIndex` and the close button all work per layer.
+
+| Surface | Layer |
+|---|---|
+| HUD in a corner / edge (score, timer) | One per slot: `ZoneType.TopRight`, `BottomCenter`, … |
+| Popup / modal (settings, shop) | `ZoneType.Default` + `canBeHidden` |
+| Toggleable menu / side panel | `Left` / `Right` + `canBeHidden` |
+| Splash / loading | `ZoneType.FullScreen` |
+| Toasts | Stock `toastHostLayer` |
+
+Name each layer for what it does: `src/themes/<theme>/layers/scoreboard.layer.tsx` → `ScoreboardLayer` → `id: 'scoreboard'`. Not `main`, `ui`, or the name of your AI tool.
+
 ## `Layer`
 
 Class-based UI surface. Implement **`body()` only**. Base `render()` mounts the zone.
