@@ -61,6 +61,7 @@
     "convert-fa-fonts": "python scripts/convert-fa-fonts.py",
     "generate-fa-icons": "python scripts/generate-fa-icons.py",
     "build-game-icons": "python scripts/build-game-icons.py",
+    "generate-color-picker-textures": "node scripts/generate-color-picker-textures.mjs",
     "init-theme": "node scripts/cli.js init-theme",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",

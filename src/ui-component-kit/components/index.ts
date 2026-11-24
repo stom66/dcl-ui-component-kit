@@ -17,6 +17,11 @@ export { ButtonImageClose }       from './buttons'
 export { ButtonText }             from './buttons'
 
 
+// Color picker
+export { ColorPicker, getColorPickerColor, getColorPickerHex, getColorPickerProps, hexToRgb, hsvToRgb, rgbToHex, rgbToHsv, setColorPickerColor } from './colorPicker'
+export type { ColorPickerChangeHandler, ColorPickerProps, ColorPickerState, Hsv, Rgb } from './colorPicker'
+
+
 // Components
 export { Header }                 from './header'
 

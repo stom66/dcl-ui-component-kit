@@ -553,6 +553,59 @@ Same pointer rule as buttons: **mobile** `onChange` / click on `mouseDown`; **de
 
 ---
 
+## Color picker
+
+HSV colour wheel: hue around the circle (red at the top), saturation outward from the centre, plus an optional brightness slider and preset swatches.
+
+React-ECS pointer events carry no position, so the wheel is tiled with an N×N grid of invisible hit cells (only cells touching the circle are created). A click picks that cell's centre; on desktop, holding and dragging refines the pick continuously (cursor offset from the drag start via `PrimaryPointerInfo.screenCoordinates` — not summed `screenDelta`, which drops movement between scene ticks and lags). Mobile has no free cursor, so taps snap to the nearest cell — raise `gridResolution` for finer taps.
+
+The wheel texture is generated from the same function the component uses to turn a hit back into a colour (`colorPicker.math.ts` → `sampleWheel`), so the picture and the picked colour always line up. Regenerate with `npm run generate-color-picker-textures` after changing the math.
+
+### `ColorPicker`
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique id (required) — keys the state controller |
+| `defaultColor` | `Color4 \| string` | Starting colour, used once when the controller is created (`#FFFFFF`) |
+| `size` | `PositionUnit` | Wheel diameter, px / vw / vh (default `220`) |
+| `showValueSlider` | `boolean` | Brightness slider under the wheel (`true`) |
+| `sliderHeight` | `number` | Slider height, pill-shaped (default `28`) |
+| `gridResolution` | `number` | Hit cells per side (default `16`, ≈ 0.8 × N² entities) |
+| `presets` | `string[]` | Optional hex swatches |
+| `presetSize` | `number` | Swatch size (default `28`) |
+| `spacing` | `number` | Gap between wheel / slider / presets (default `12`) |
+| `onChange` | `(color: Color4, hex: string) => void` | Every change — click, each drag frame, preset |
+| `uiTransform` | native | Extra layout for the root column |
+
+### Reading the value elsewhere
+
+| Function | Description |
+|---|---|
+| `getColorPickerColor(id)` | Current `Color4` (copy), or `null` before first render |
+| `getColorPickerHex(id)` | Current `#RRGGBB`, or `null` |
+| `setColorPickerColor(id, color, notify?)` | Set from code (`Color4` or hex); `notify: true` also fires `onChange` |
+| `getColorPickerProps(id)` | The underlying `PropsController<ColorPickerState>` (`hue`, `saturation`, `value`, `color`, `hex`) |
+
+Colour helpers `hsvToRgb`, `rgbToHsv`, `hexToRgb`, `rgbToHex` are exported too.
+
+```tsx
+<ColorPicker
+	id           = "hair"
+	defaultColor = "#3BA4FF"
+	presets      = {['#000000', '#5A3825', '#E8C07D']}
+	onChange     = {(color, hex) => setHairColor(color)}
+/>
+
+// anywhere else:
+const hex = getColorPickerHex('hair')
+```
+
+Pointer: wheel and slider pick on `mouseDown` (so a drag can start); presets follow the button rule (`mouseDown` on mobile, `mouseUp` on desktop). While dragging, a pointer-blocking release catcher sits over the screen and is removed on release.
+
+Demo: showcase **Components → Color Picker** (`demo.colorPicker.layer.tsx`).
+
+---
+
 ## Animations
 
 Wrappers that animate a **single child** (child should expose numeric `width` / `height` where needed).

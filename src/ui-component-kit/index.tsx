@@ -16,7 +16,8 @@ export type { KitScreenInset, LayerOptions } from './components/layers'
 export { VisibilityController, Zone, ZoneRoot, ZoneType, getLeftZoneInset } from './components/zones'
 export type { VisibilityPosition, ZoneProps } from './components/zones'
 
-export { AvatarIcon, Background, BackgroundGradient, Bounce, ButtonImage, ButtonImageClose, ButtonText, clearToastGroup, Code, Column, ColumnReverse, DEFAULT_AVATAR_USER_ID, Divider, FlashBorder, FlashColor, FontAwesome, GameIcon, getToggleProps, Grid, H1, H2, H3, H4, H5, H6, Header, hideToast, Icon, IconCharacter, IconNumber, IconString, IconSymbol, isPlaying, Label, mergeUiBackground, playOnce, ProgressBar, ProgressBarImage, ProgressBarRadial, progressToRadialFrame, Pulse, resolveContentInset, resolveKitEntityProps, resolveRadialInset, resolveSpriteLocalFrame, resolveUiBackground, Row, RowReverse, SectionHeader, setLooping, setPlaying, Shake, showToast, Spinner, spriteCycleFrameCount, spriteFrameToUvCell, SpriteIcon, Text, Toggle, toastHostLayer, ToastHostLayer, UiBox, Wiggle } from './components'
+export { AvatarIcon, Background, BackgroundGradient, Bounce, ButtonImage, ButtonImageClose, ButtonText, clearToastGroup, Code, ColorPicker, Column, ColumnReverse, DEFAULT_AVATAR_USER_ID, Divider, FlashBorder, FlashColor, FontAwesome, GameIcon, getColorPickerColor, getColorPickerHex, getColorPickerProps, getToggleProps, Grid, H1, H2, H3, H4, H5, H6, Header, hideToast, Icon, IconCharacter, IconNumber, IconString, IconSymbol, isPlaying, Label, mergeUiBackground, playOnce, ProgressBar, ProgressBarImage, ProgressBarRadial, progressToRadialFrame, Pulse, resolveContentInset, resolveKitEntityProps, resolveRadialInset, resolveSpriteLocalFrame, resolveUiBackground, Row, RowReverse, SectionHeader, setColorPickerColor, setLooping, setPlaying, Shake, showToast, Spinner, spriteCycleFrameCount, spriteFrameToUvCell, SpriteIcon, Text, Toggle, toastHostLayer, ToastHostLayer, UiBox, Wiggle } from './components'
+export type { ColorPickerChangeHandler, ColorPickerProps, ColorPickerState } from './components'
 export type { ShowToastOptions, ToastGroupPolicy, ToastItem, ToastPhase, ToastPosition } from './components'
 export { FONT_AWESOME_ALIASES, FONT_AWESOME_FONT_SRC, FONT_AWESOME_ICONS, normalizeIconName, pickStyle, resolveCanonicalName, resolveFontAwesomeIcon, unicodeToGlyph } from './fonts'
 export type { FontAwesomeIconEntry, FontAwesomeStyle, ResolvedFontAwesomeIcon } from './fonts'
@@ -24,6 +25,8 @@ export { GAME_ICON_AUTHOR_INDEX, GAME_ICON_AUTHORS, GAME_ICON_IDS, GAME_ICONS_BU
 export type { GameIconAuthor, GameIconId, ResolvedGameIcon } from './fonts'
 
 export { darken, lighten, alpha } from './utils/colors'
+export { hexToRgb, hsvToRgb, rgbToHex, rgbToHsv } from './components/colorPicker'
+export type { Hsv, Rgb } from './components/colorPicker'
 export { easingFunctions, lerp, tweenValue } from './utils/tweens'
 export type { EasingFn } from './utils/tweens'
 export { resolveLayoutFontSize, resolveThemeFontSrc, resolveTypographySize, scaleThemeFontSize, scaleUiTextFontSize } from './utils/typography'
