@@ -4,7 +4,8 @@ description: >-
   Build and extend Decentraland UI Component Kit layers, zones, and components.
   Use when creating UI, popups, HUDs, layers, zones, timers, themes, buttons
   (ButtonImage / ButtonText), custom icon packs / texture atlases, Affinity
-  artboard grids, or anything under src/ui-component-kit (including examples).
+  artboard grids, Affinity install / MCP setup, splitting UI into layers, or
+  anything under src/ui-component-kit (including examples).
   MUST be read before adding or changing a Layer or button.
 ---
 
@@ -552,10 +553,51 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 | Progress bars | `ProgressBar` | `ProgressBarImage` / `ProgressBarRadial` | `textures?` (per-layer optional) / `atlas` + `uvCell` / radial sprite sheet |
 | Icons | — | `FontAwesome` / `GameIcon` / `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | **FA Free:** `<FontAwesome icon="star" />` (TTF via `copy-assets`; only `icon` / `fontSize` / `fontColor`). **game-icons.net (~4,000, by name):** `<GameIcon icon="crossed-swords" />` (same props as `FontAwesome`; TTF via `copy-assets`; CC BY 3.0 credit required). **Large / dense HUDs:** texture `Icon` with required `src` + optional `uvs`. `rotate` (UV) on texture icons; **tint** with `fontColor` (`FontAwesome`) or `iconColor` (texture icons); `backgroundColor` is always a chip fill; `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid plus optional playback props — trigger with `setPlaying` / `playOnce` |
 
+## Affinity: install and connect (agents — prompt the user)
+
+DUCK's art templates (`duck-assets.af`, `duck-showcase-assets.af`) are Affinity files, and the fastest custom-art workflow is an agent driving Affinity over MCP. **Affinity by Canva is free** for Windows and macOS (it needs a free Canva account). It replaces the old separate Affinity Designer / Photo / Publisher apps, so "Affinity Designer" now means this one app.
+
+### When to prompt
+
+Offer this, once per conversation, when the user:
+
+- scaffolds a theme (`init-theme`) or asks for a custom look, their own buttons / progress bars / icons, or a re-skin
+- asks to edit or export from a `.af` template
+- wants an icon atlas from an SVG pack
+
+First check whether Affinity tools are already in your MCP catalog (names such as `execute_script`, `read_sdk_documentation_topic`, `render_spread`, or a bridge's `affinity_status`). If they are, skip the pitch and use them. If not, say something like:
+
+> Your custom art starts from DUCK's Affinity template. Affinity is free from Canva, and if you connect it to me over MCP I can set up artboards, build icon grids and export PNGs for you instead of you doing it by hand. Want me to walk you through it? It takes about five minutes.
+
+If they decline, carry on: they can edit the template by hand and drop PNGs into `assets/images/themes/<theme>/`. Do not ask again in the same conversation.
+
+### Walkthrough (one step at a time — wait for the user to confirm each)
+
+1. **Install.** Download Affinity from <https://affinity.studio/> and sign in with a Canva account (a free one is enough). If they already have Affinity, have them update to the latest version: the MCP server needs a recent build (3.2+).
+2. **Enable MCP.** In Affinity open **Settings** and find the MCP server options (*Model Context Protocol*), enable the server, then restart Affinity. Affinity must stay open while the agent uses it.
+3. **Connect the agent.** Give only the line for the client they are using:
+	- **Claude desktop app:** add the **Affinity** connector from Claude's connector directory (*Add to Claude*). Both apps must be running.
+	- **Claude Code:** `claude mcp add affinity -- npx -y affinity-mcp-bridge`, then start a new session (or reconnect with `/mcp`).
+	- **Codex:** add to `~/.codex/config.toml`, then start a new Codex session:
+	  ```toml
+	  [mcp_servers.affinity]
+	  command = "npx"
+	  args = ["-y", "affinity-mcp-bridge"]
+	  startup_timeout_sec = 30
+	  ```
+	- **Cursor / other MCP clients:** add an MCP server whose command is `npx -y affinity-mcp-bridge`.
+
+	The bridge needs Node.js and talks to Affinity's local endpoint, `http://localhost:6767/sse` by default (override with the `AFFINITY_MCP_SSE_URL` env var).
+4. **Test.** Once the tools appear, call `read_sdk_documentation_topic({ filename: 'preamble' })` (or the bridge's `affinity_status`). Then open the template (step 1 of **Custom textures / atlases** below) and render one artboard so the user can see it working.
+5. **Troubleshoot.** No tools after connecting → the client needs a new session / reconnect, Affinity is closed, or MCP isn't enabled. Connection refused on Windows → set `AFFINITY_MCP_SSE_URL=http://[::1]:6767/sse`. `PERMISSION_DENIED` when a script reads files → see the filesystem note under **Bulk icon atlas via Affinity**.
+
+Always `read_sdk_documentation_topic({ filename: 'preamble' })` before the first `execute_script`.
+
 ## Custom textures / atlases (agent checklist)
 
 When a user wants **their own images, atlases, or styles**, walk them through this — do not invent a parallel path:
 
+0. **Affinity not installed or not connected?** Offer **Affinity: install and connect** above first.
 1. **Open the Affinity template** at `assets/images/ui-component-kit/src/duck-assets.af` (kit chrome: buttons, progress bars, spinners, gradients, backgrounds). Showcase demo sheets (smoke sprites, `atlas-icons-showcase-4x4`) are in `assets/images/example-themes/showcase/duck-showcase-assets.af`. They should **duplicate** the closest artboard and edit a copy (keep grid, guidelines, and margins).
 2. **Export PNGs** into `assets/images/example-themes/<theme>/` (never into `assets/images/ui-component-kit/` unless they intend to replace framework defaults).
 3. **Declare** a `TextureAtlas` (or `ProgressBarImageTextures`) in `src/exampleThemes/<theme>/`, mirroring the examples already there (`exampleBtnIconsAtlas`, `exampleIconsAtlas`, progress-bar sets). Character glyph sheets are the bundled `atlasCharsAlphaNumeric` (8×8 letters + digits) and `atlasCharsSymbols` (6×6). Their `layout` arrays live in `src/ui-component-kit/atlases/atlases.ts`.
@@ -584,13 +626,10 @@ Ask for: pack path, solid vs regular preference, cell size / max icon size / pad
 
 ### Affinity MCP setup (suggest if missing)
 
-Affinity 3.2+ exposes a local MCP server. Cursor may need a bridge:
+Not connected yet? Follow **Affinity: install and connect** above. Extra notes for bulk work:
 
-1. Affinity → **Settings → Model Context Protocol → Enable MCP server** (restart Affinity).
-2. Default SSE endpoint: `http://localhost:6767/sse` (often IPv6 `::1` on Windows).
-3. Add a Cursor MCP entry, e.g. `npx -y affinity-mcp-bridge` (or equivalent), so tools like `execute_script` / `read_sdk_documentation_topic` appear.
-4. If Affinity tools are not in the agent’s MCP catalog, the agent can still drive Affinity over that SSE endpoint with a small local client (initialize with protocol `2025-11-25`, then `tools/call`).
-5. **Filesystem permission:** Affinity scripts often cannot `Document.load` / `fs.exists` outside allowed paths (`PERMISSION_DENIED`). Prefer reading SVGs from the host (Node) and recreating paths in Affinity via `CurveBuilder` / `PolyCurveNodeDefinition` — that path is proven and fine for bulk work.
+1. If Affinity tools are not in the agent’s MCP catalog, the agent can still drive Affinity over that SSE endpoint with a small local client (initialize with protocol `2025-11-25`, then `tools/call`).
+2. **Filesystem permission:** Affinity scripts often cannot `Document.load` / `fs.exists` outside allowed paths (`PERMISSION_DENIED`). Prefer reading SVGs from the host (Node) and recreating paths in Affinity via `CurveBuilder` / `PolyCurveNodeDefinition` — that path is proven and fine for bulk work.
 
 Always `read_sdk_documentation_topic({ filename: 'preamble' })` before `execute_script`.
 

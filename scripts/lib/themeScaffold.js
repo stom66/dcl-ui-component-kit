@@ -261,9 +261,11 @@ async function initTheme(argv) {
 		console.log(`${LOG_PREFIX} no src/index.ts found — create one using the snippet above`)
 	}
 
-	console.log(`${LOG_PREFIX} next: grab assets/images/ui-component-kit/src/duck-assets.af from https://github.com/stom66/dcl-ui-component-kit`)
+	console.log(`${LOG_PREFIX} next: install Affinity (free from Canva): https://affinity.studio/`)
+	console.log(`${LOG_PREFIX} then grab assets/images/ui-component-kit/src/duck-assets.af from https://github.com/stom66/dcl-ui-component-kit`)
 	console.log(`${LOG_PREFIX} export PNGs into assets/images/themes/${name}/ (do not overwrite assets/images/ui-component-kit/)`)
 	console.log(`${LOG_PREFIX} then ask your agent to wire those files into atlases.ts / the theme`)
+	console.log(`${LOG_PREFIX} tip: connect Affinity to your agent over MCP and it can edit the template and export PNGs for you`)
 }
 
 

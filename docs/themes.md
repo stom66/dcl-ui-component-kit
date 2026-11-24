@@ -9,7 +9,7 @@
 One workflow. The agent scaffolds folders; the human makes art; the agent wires the files.
 
 1. Scaffold a theme (`npx @stom66/dcl-ui-component-kit init-theme myGame`).
-2. Copy the Affinity template and customize buttons / progress bars / icons / etc.
+2. Install [Affinity](https://affinity.studio/) (free from Canva), copy the Affinity template and customize buttons / progress bars / icons / etc. Connect Affinity to your agent over MCP and it can do the artboard and export work for you.
 3. Export PNGs into `assets/images/themes/<name>/` — never into stock `assets/images/ui-component-kit/`.
 4. Ask the agent to register those PNGs in `atlases.ts` / `theme.ts` and use them on `ButtonImage`, `ProgressBarImage`, `ProgressBarRadial`, `Icon`, …
 5. Mount with `SetupUiComponentKit({ theme, layers })`.
@@ -22,6 +22,7 @@ Atlas / UV details: [custom-textures.md](./custom-textures.md).
 
 **Agents:** after scaffolding, tell the human:
 
+- If no Affinity MCP tools are available: Affinity is free from Canva, and you can walk them through installing it and connecting it to you (skill → **Affinity: install and connect**). Offer once; carry on if they decline.
 - Download / copy the Affinity template: [`assets/images/ui-component-kit/src/duck-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/assets/images/ui-component-kit/src/duck-assets.af) (GitHub repo — not shipped on npm).
 - Customize the artboards they need. Keep the same cell grid, guidelines, and margins so UV sampling stays aligned.
 - Export PNGs into `assets/images/themes/<name>/`.
@@ -33,7 +34,7 @@ Do not mark a custom look “done” until the PNGs exist in that folder **and**
 
 ## Human walkthrough
 
-1. Get the template: [`assets/images/ui-component-kit/src/duck-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/assets/images/ui-component-kit/src/duck-assets.af) (also in this repo under [`assets/images/ui-component-kit/src/`](../assets/images/ui-component-kit/src/README.md)). Showcase demo sheets (smoke sprites, icon atlas) are in [`assets/images/example-themes/showcase/duck-showcase-assets.af`](../assets/images/example-themes/showcase/duck-showcase-assets.af).
+1. Install [Affinity](https://affinity.studio/) — free, Windows / macOS, needs a free Canva account. Then get the template: [`assets/images/ui-component-kit/src/duck-assets.af`](https://github.com/stom66/dcl-ui-component-kit/blob/main/assets/images/ui-component-kit/src/duck-assets.af) (also in this repo under [`assets/images/ui-component-kit/src/`](../assets/images/ui-component-kit/src/README.md)). Showcase demo sheets (smoke sprites, icon atlas) are in [`assets/images/example-themes/showcase/duck-showcase-assets.af`](../assets/images/example-themes/showcase/duck-showcase-assets.af).
 2. Duplicate the artboard closest to what you need. Keep the cell grid so atlas UVs still match.
 3. Export PNGs into **`assets/images/themes/<name>/`**. Leave `assets/images/ui-component-kit/` for kit stock textures (re-synced on upgrade / `copy-assets`).
 4. Tell your AI something like: *use the PNGs in `assets/images/themes/<name>/` for this theme’s buttons, progress bars, and icons.*

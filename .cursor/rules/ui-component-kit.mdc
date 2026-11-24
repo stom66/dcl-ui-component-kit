@@ -9,6 +9,7 @@ alwaysApply: false
 Before adding or changing a Layer, read `.cursor/skills/ui-component-kit/SKILL.md` and mirror `src/exampleThemes/showcase/layers/*.layer.tsx`.
 
 - **Split UI into several Layers** — one per surface (each HUD slot, popup, menu, overlay) — and name each for its purpose (`scoreboard.layer.tsx`), never after the agent / tool / theme or a generic word (`codex`, `main`, `ui`). See skill → **Plan the layers first**.
+- Custom art: if no Affinity MCP tools are available, offer the skill's **Affinity: install and connect** walkthrough (Affinity is free from Canva).
 - One Layer = one Zone + optional **`inset`**. Implement **`body()` only**. Base `render()` mounts `<Zone type={…}>`. There are no `ZoneTop` / `ZoneLeft` helpers. Setup groups layers by resolved inset (`layer.inset ?? screenInset`, default `'none'`) into at most three SDK renderers — do not re-wrap `ScreenInsetArea` / `InteractableArea`. Only `ZoneType.Default` gets a centering shell inside its renderer. Prefer `inset: 'interactable'` over deprecated `ZoneType.InteractableArea`.
 - Select layout with `zone: ZoneType.*`. Override size/alignment via **`uiTransform`** / **`uiBackground`** only (no Layer shorthands like `backgroundColor` / `borderRadius` / `showFrame`). Panel fill / border → sibling empty **`<Background />`** in `body()` (**never nest content inside it** — keeps zone flex).
 - **`zIndex`** only when the Layer sets it (not from list index); use it for stacking across inset groups.
