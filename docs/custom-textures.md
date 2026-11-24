@@ -92,7 +92,7 @@ A working version lives in the demo scene: `exampleIconsAtlas` in [`src/exampleT
 
 | Atlas | Use |
 |---|---|
-| `atlasIconsFontAwesome` | **Deprecated** PNG subset — still useful for dense HUDs (Unity `fontSrc` atlas fits ~35–50 unique FA TTFs) |
+| `atlasIconsFontAwesome` | **Deprecated** PNG subset — prefer `FontAwesome` |
 | `atlasBtnIcons` / `atlasBtnIconsStyled` | Button variants × states |
 | `atlasCharsAlphaNumeric` | Letters and digits |
 | `atlasCharsSymbols` | Punctuation and operators |

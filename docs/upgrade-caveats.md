@@ -96,11 +96,10 @@ export function MyThing({ children, uiTransform, ...props }: KitEntityProps) {
 Font Awesome Free icons via custom TTF (`FontAwesome`) and `Icon` breaking change:
 
 - **Run `copy-assets` after upgrade** so converted TTFs land under `assets/fonts/` (`duck-font-awesome-solid.ttf`, `…-regular.ttf`, `…-brands.ttf`) plus `LICENSE-OFL.txt`. Images alone are not enough.
-- **Known issue — Unity atlas capacity.** Each `fontSrc` gets one dynamic SDF atlas. After Latin prefill, expect only about **~35–50 unique** FA icons per font (varies by glyph complexity). More unique icons → tofu. Repeats of the same icon are fine. Prefer texture `Icon` / a project atlas for large sets.
 - **Unity Desktop preview needs asset bundles for `fontSrc`.** Without them you get tofu even within budget (fallback face has no PUA glyphs). Use Creator Hub **Compress Assets**, or `npm run start:bundles` / `npm run start -- --asset-bundles`. Bevy / web preview loads `.ttf` directly and does not need this.
-- **`<FontAwesome icon="star" />`** — kebab or camelCase; optional `fontSize` / `fontColor` only. Use for small curated FA sets; keep `atlasIconsFontAwesome` / project atlases for dense HUDs.
+- **`<FontAwesome icon="star" />`** — kebab or camelCase; optional `fontSize` / `fontColor` only.
 - **Breaking — `Icon` no longer defaults to the Font Awesome atlas.** Pass `src` (and optional `uvs` from your `TextureAtlas`) for custom art. Omitting `src` logs an error and renders empty.
-- **`atlasIconsFontAwesome` is deprecated** but still exported for one release (texture subset — unaffected by the `fontSrc` atlas limit).
+- **`atlasIconsFontAwesome` is deprecated** but still exported for one release (texture subset).
 - Fonts are Modified Versions under **SIL OFL 1.1** (Reserved Font Name “Font Awesome” — kit families use `DuckFa7FreeSolid` / `DuckFa7FreeRegular` / `DuckFa7Brands`; files `duck-font-awesome-*.ttf`). See `assets/fonts/LICENSE-OFL.txt` and [licensing.md](./licensing.md).
 
 ---

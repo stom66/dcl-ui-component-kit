@@ -442,9 +442,8 @@ export const atlasSpritesProgressSquareSunburst = new TextureAtlas({
 
 // MARK: atlasIconsFontAwesome
 /**
- * @deprecated Prefer `FontAwesome` for small curated TTF sets (Unity ~35–50 unique
- * PUA glyph atlas limit). Keep this texture sheet for dense / many-icon UIs. This
- * limited solid-style PNG subset remains exported for existing scenes.
+ * @deprecated Prefer `FontAwesome` (TTF glyphs by name). This limited solid-style
+ * PNG subset remains exported for existing scenes.
  *
  * Font Awesome Free (solid) — see docs/licensing.md and https://fontawesome.com.
  * 16×16 grid (PNG top → bottom; UV Y is bottom → top). Cells are 128×128 with

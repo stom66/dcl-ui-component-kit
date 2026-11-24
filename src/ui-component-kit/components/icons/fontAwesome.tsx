@@ -26,11 +26,7 @@ export type FontAwesomeProps = {
  * Font Awesome Free glyph via scene TTF (`fontSrc`). Bare `UiEntity` — `key`
  * is forwarded so sibling lists keep a stable identity.
  *
- * **Known issue (Unity Desktop):** each `fontSrc` gets one dynamic SDF atlas.
- * After Latin prefill there is only room for roughly **~35–50 unique** PUA
- * icons (varies by glyph complexity). Repeats of the same icon are fine;
- * more unique icons → tofu. Prefer texture `Icon` / project atlases for
- * large sets. Preview needs asset bundles (`npm run start:bundles`).
+ * Preview needs asset bundles (`npm run start:bundles`).
  */
 export function FontAwesome({
 	key,

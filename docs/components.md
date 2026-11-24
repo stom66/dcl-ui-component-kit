@@ -419,8 +419,6 @@ Font Awesome Free glyph via kit TTFs (`fontSrc`). Bare `UiEntity` — only the p
 | `fontSize` | `number` | Pixel size (defaults to `theme.icons.defaultSize`) |
 | `fontColor` | `Color4` | Glyph tint (defaults to theme light) |
 
-**Known issue (Unity Desktop):** each custom `fontSrc` uses **one** dynamic SDF atlas. After Latin / punctuation prefill there is only room for roughly **~35–50 unique** Private Use icons (results vary by glyph complexity). Repeating the same icon is fine; exceeding the budget shows empty squares (tofu). Prefer texture `Icon` / a project `TextureAtlas` when you need a large icon set.
-
 ```tsx
 import { FontAwesome, getTheme } from '@stom66/dcl-ui-component-kit'
 

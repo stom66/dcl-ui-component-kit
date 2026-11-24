@@ -28,7 +28,7 @@ The TTFs are **Modified Versions** under SIL OFL 1.1, renamed so they do **not**
 
 Brand icons are trademarks of their respective owners — use them only to represent that brand.
 
-**Known issue:** Unity Desktop’s `fontSrc` path uses one dynamic SDF atlas per font. After Latin prefill, only about **~35–50 unique** FA icons fit (results vary). Prefer the deprecated texture sheet `atlasIconsFontAwesome` or a project atlas when you need many icons. After install/upgrade, run `npx @stom66/dcl-ui-component-kit copy-assets` so stock textures and these TTFs land in the scene.
+After install/upgrade, run `npx @stom66/dcl-ui-component-kit copy-assets` so stock textures and these TTFs land in the scene.
 
 Unity Desktop only applies `fontSrc` after optimized assets (Creator Hub **Compress Assets**, or `npm run start:bundles`). Plain preview without bundles falls back to the built-in face — PUA glyphs then show as tofu.
 
