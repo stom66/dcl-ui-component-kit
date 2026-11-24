@@ -45,7 +45,10 @@ export type ToggleProps = Omit<
 	value?         : boolean
 	/** Initial value for uncontrolled usage. Defaults to `false`. */
 	defaultValue?  : boolean
-	/** Track fill color. Defaults to theme dark. Lerps when the prop changes. */
+	/**
+	 * Track fill color. Defaults to theme success (green) when on and theme
+	 * dark when off. Lerps when the resolved color changes.
+	 */
 	backgroundColor?: Color4
 	/** Thumb (knob) fill color. Defaults to theme light. Lerps when the prop changes. */
 	toggleColor?   : Color4
@@ -232,7 +235,8 @@ function syncToggleColors(
  * thumb that slides left ↔ right. Click is on the whole track (thumb/row use
  * `pointerFilter: 'none'` so they do not steal hits from the track).
  *
- * Pass `backgroundColor` / `toggleColor` for track / thumb fills — both lerp over
+ * The track defaults to theme success (green) when on and theme dark when off.
+ * Pass `backgroundColor` / `toggleColor` to override track / thumb fills — both lerp over
  * `lerpDuration` when they change (in sync with the thumb slide). Borders and other
  * chrome go through `uiTransform` / `uiBackground` (no dedicated borderColor prop).
  */
@@ -255,12 +259,12 @@ export function Toggle({
 	...props
 }: ToggleProps) {
 	const theme       = getTheme()
-	const trackTarget = backgroundColor ?? theme.colors.dark
-	const thumbTarget = toggleColor     ?? theme.colors.light
+	const thumbTarget = toggleColor ?? theme.colors.light
 	const controlled  = value !== undefined
 	const resolved    = controlled
 		? value
-		: getToggleProps(id, defaultValue, trackTarget, thumbTarget).get('value')
+		: getToggleProps(id, defaultValue, backgroundColor ?? (defaultValue ? theme.colors.success : theme.colors.dark), thumbTarget).get('value')
+	const trackTarget = backgroundColor ?? (resolved ? theme.colors.success : theme.colors.dark)
 	const slide = syncToggleValue(id, resolved, lerpDuration, trackTarget, thumbTarget)
 	const colors = syncToggleColors(id, trackTarget, thumbTarget, lerpDuration, resolved)
 
