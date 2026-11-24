@@ -98,6 +98,19 @@ A working version lives in the demo scene: `exampleIconsAtlas` in [`src/exampleT
 | `atlasCharsSymbols` | Punctuation and operators |
 | `atlasGradientColors` | Gradient strips for progress fills |
 | `atlasSpritesProgressRadial` | 16×16 radial progress ring (256 frames) for `ProgressBarRadial` |
+| `atlasSpritesProgressRadialThick` | Same 16×16 / 256-frame layout — thick ring |
+| `atlasSpritesProgressRadialPie` | Same 16×16 / 256-frame layout — solid pie wedge |
+| `atlasSpritesProgressRadialSegments` | Same 16×16 / 256-frame layout — 12 dashed segments |
+| `atlasSpritesProgressRadialComet` | Same 16×16 / 256-frame layout — alpha-ramped comet tail |
+| `atlasSpritesProgressRadialDots` | Same 16×16 / 256-frame layout — 24 growing dots |
+| `atlasSpritesProgressRadialKnob` | Same 16×16 / 256-frame layout — rounded ring with leading knob |
+| `atlasSpritesProgressRadialStopwatch` | Same 16×16 / 256-frame layout — stopwatch face (pie + hand) |
+| `atlasSpritesProgressRadialSunburst` | Same 16×16 / 256-frame layout — 16 radiating spokes |
+| `atlasSpritesProgressSquare` | Same 16×16 / 256-frame layout — rounded-square outline (8px corners per 64px cell) |
+| `atlasSpritesProgressSquareSegments` | Same 16×16 / 256-frame layout — square dashes with a square block in each corner (20 segments) |
+| `atlasSpritesProgressSquareComet` | Same 16×16 / 256-frame layout — rounded-square alpha-ramped comet with round head |
+| `atlasSpritesProgressSquareDots` | Same 16×16 / 256-frame layout — rounded-square 24 growing dots |
+| `atlasSpritesProgressSquareSunburst` | Same 16×16 / 256-frame layout — square sunburst: 16 straight spokes (4 per side) + growing quarter-circle corners |
 
 Every `TextureAtlas` defaults `wrapMode` to `'clamp'`. Optional `filterMode`: `'point'` | `'bi-linear'` | `'tri-linear'`. Prefer `atlas.texture` over `{ src: atlas.source }` alone.
 

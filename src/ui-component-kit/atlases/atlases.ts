@@ -248,6 +248,198 @@ export const atlasSpritesProgressRadial = new TextureAtlas({
 })
 
 
+// MARK: atlasSpritesProgressRadialThick
+/**
+ * Thick radial progress ring (`sprites-progress-radial-thick.png`) — same
+ * 16×16 / 256-frame layout as `atlasSpritesProgressRadial`, but a 12px
+ * stroke (per 64px cell) instead of 4px. Outer edge matches the thin ring.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialThick = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-thick.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+
+// MARK: atlasSpritesProgressRadialPie
+/**
+ * Solid pie radial progress (`sprites-progress-radial-pie.png`) — same
+ * 16×16 / 256-frame layout as `atlasSpritesProgressRadial`. Frames grow as a
+ * clockwise wedge from 12 o'clock; the last frame is a full disc. Pass as
+ * `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialPie = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-pie.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+
+// MARK: atlasSpritesProgressRadialSegments
+/**
+ * Twelve dashed segments that light up in turn; the next segment fades in as progress approaches it.
+ * `sprites-progress-radial-segments.png` — 16×16 / 256 frames, same layout as
+ * `atlasSpritesProgressRadial`. White + alpha so `fillColor` tints it.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialSegments = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-segments.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressRadialComet
+/**
+ * Thick ring whose alpha ramps from clear at 12 o'clock to solid at the leading edge, with a round head.
+ * `sprites-progress-radial-comet.png` — 16×16 / 256 frames, same layout as
+ * `atlasSpritesProgressRadial`. White + alpha so `fillColor` tints it.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialComet = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-comet.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressRadialDots
+/**
+ * Twenty-four dots around the ring; each grows from nothing to full size as progress reaches it.
+ * `sprites-progress-radial-dots.png` — 16×16 / 256 frames, same layout as
+ * `atlasSpritesProgressRadial`. White + alpha so `fillColor` tints it.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialDots = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-dots.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressRadialKnob
+/**
+ * Thick ring with round caps and a larger knob at the leading edge (knob alone at 0%).
+ * `sprites-progress-radial-knob.png` — 16×16 / 256 frames, same layout as
+ * `atlasSpritesProgressRadial`. White + alpha so `fillColor` tints it.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialKnob = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-knob.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressRadialStopwatch
+/**
+ * Stopwatch face: crown + outline ring (solid), translucent pie fill (~60% alpha) and a solid hand on the leading edge.
+ * `sprites-progress-radial-stopwatch.png` — 16×16 / 256 frames, same layout as
+ * `atlasSpritesProgressRadial`. White + alpha so `fillColor` tints it.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialStopwatch = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-stopwatch.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressRadialSunburst
+/**
+ * Sixteen spokes radiating outward; each spoke grows in length and opacity in turn. Leaves the centre clear for a readout.
+ * `sprites-progress-radial-sunburst.png` — 16×16 / 256 frames, same layout as
+ * `atlasSpritesProgressRadial`. White + alpha so `fillColor` tints it.
+ * Pass as `atlas` to `ProgressBarRadial`.
+ */
+export const atlasSpritesProgressRadialSunburst = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-radial-sunburst.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressSquare
+/**
+ * Rounded-square progress outline (`sprites-progress-square.png`) — 16×16 /
+ * 256 frames, same layout as `atlasSpritesProgressRadial`. Per 64px cell: a
+ * 56×56 outline (4px in from the cell edge), 4px stroke, outer corner radius
+ * 8 (1/8 of the cell). Fills clockwise from top-centre, by distance along
+ * the outline. White + alpha so `fillColor` tints it. Use with
+ * `ProgressBarRadial` and pass an explicit `borderRadius` for a square chip.
+ */
+export const atlasSpritesProgressSquare = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-square.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressSquareSegments
+/**
+ * Square variant: four straight dashes per side plus one square block in
+ * each corner (20 segments; the corner blocks round their outer corner with a
+ * full-size radius, i.e. a quarter-circle), lighting up clockwise from 12 o'clock; the next
+ * fades in as progress approaches it.
+ * `sprites-progress-square-segments.png` — 16×16 / 256 frames, 8px outer corners
+ * per 64px cell like `atlasSpritesProgressSquare`. White + alpha so
+ * `fillColor` tints it.
+ */
+export const atlasSpritesProgressSquareSegments = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-square-segments.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressSquareComet
+/**
+ * Rounded-square variant: Outline whose alpha ramps from clear at top-centre to solid at the leading edge, with a round head.
+ * `sprites-progress-square-comet.png` — 16×16 / 256 frames, 8px outer corners
+ * per 64px cell like `atlasSpritesProgressSquare`. White + alpha so
+ * `fillColor` tints it.
+ */
+export const atlasSpritesProgressSquareComet = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-square-comet.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressSquareDots
+/**
+ * Rounded-square variant: Twenty-four dots spaced evenly along the outline; each grows in as progress reaches it.
+ * `sprites-progress-square-dots.png` — 16×16 / 256 frames, 8px outer corners
+ * per 64px cell like `atlasSpritesProgressSquare`. White + alpha so
+ * `fillColor` tints it.
+ */
+export const atlasSpritesProgressSquareDots = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-square-dots.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
+// MARK: atlasSpritesProgressSquareSunburst
+/**
+ * Square variant of the sunburst: 16 straight spokes (four per side, evenly
+ * spaced) plus a quarter-circle in each corner (20 pieces), all sharing one
+ * band from 19px to 28px out from the centre (per 64px cell), so they line up. Spokes grow in length,
+ * corners grow in radius, and both brighten in turn,
+ * clockwise from 12 o'clock. Leaves the centre clear for a readout.
+ * `sprites-progress-square-sunburst.png` — 16×16 / 256 frames. White + alpha
+ * so `fillColor` tints it.
+ */
+export const atlasSpritesProgressSquareSunburst = new TextureAtlas({
+	source : 'assets/images/ui-component-kit/sprites-progress-square-sunburst.png',
+	columns: 16,
+	rows   : 16,
+	inset  : 0.02,
+})
+
 // MARK: atlasIconsFontAwesome
 /**
  * @deprecated Prefer `FontAwesome` for small curated TTF sets (Unity ~35–50 unique
