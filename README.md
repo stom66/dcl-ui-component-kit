@@ -61,6 +61,7 @@ Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
     - [SpriteIcon](#spriteicon)
     - [AvatarIcon](#avataricon)
     - [FontAwesome](#fontawesome)
+    - [GameIcon](#gameicon)
   - [Progress bars](#progress-bars)
     - [ProgressBar](#progressbar)
     - [ProgressBarImage](#progressbarimage)
@@ -1051,6 +1052,35 @@ For the full list of included icons, see the [Font Awesome Free icon search](htt
 
 ---
 
+### GameIcon
+
+Displays any of the ~4,000 [game-icons.net](https://game-icons.net) icons by name. Same props as `FontAwesome`.
+
+Find names on game-icons.net (the last part of an icon's URL) or search [`gameIcons.icons.ts`](src/ui-component-kit/fonts/gameIcons.icons.ts). The font (`assets/fonts/duck-game-icons.ttf`) is copied into your scene by `copy-assets`. The icons are CC BY 3.0, so credit the authors in your scene. See [docs/game-icons.md](docs/game-icons.md).
+
+**Minimum usage**
+
+```tsx
+<GameIcon icon="crossed-swords" />
+```
+
+<details>
+<summary><b>Full shorthand usage</b></summary>
+
+```tsx
+<GameIcon
+ icon      = "health-potion"
+ fontSize  = {48}
+ fontColor = {Color4.Red()}
+/>
+```
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
 ## Progress bars
 
 ### ProgressBar
@@ -1532,7 +1562,8 @@ A game HUD layout that combines round status and a timer.
 
 The package is **MIT**. Third-party art is credited separately:
 
-- **[Font Awesome Free](https://fontawesome.com)** — `<FontAwesome icon="…" />` + TTFs under `assets/fonts/` (SIL OFL 1.1; see [docs/licensing.md](docs/licensing.md)). Unity Desktop only fits ~35–50 unique icons per font atlas — prefer texture atlases for large sets. Deprecated PNG subset: `atlasIconsFontAwesome`.
+- **[Font Awesome Free](https://fontawesome.com)** — `<FontAwesome icon="…" />` + TTFs under `assets/fonts/` (SIL OFL 1.1; see [docs/licensing.md](docs/licensing.md)). Deprecated PNG subset: `atlasIconsFontAwesome`.
+- **[game-icons.net](https://game-icons.net)** — `<GameIcon icon="…" />` + `assets/fonts/duck-game-icons.ttf` (CC BY 3.0 — **credit required** in your scene; see [docs/game-icons.md](docs/game-icons.md)).
 - **[CraftPix.net](https://craftpix.net)** — some showcase demo sprite sheets (not npm stock textures).
 
 Full notes: [docs/licensing.md](docs/licensing.md).

@@ -407,7 +407,7 @@ Always pair `fontSrc` with a built-in `font` fallback (missing file / clients th
 
 ## Icons
 
-**Variants:** `FontAwesome` · `Icon` · `AvatarIcon` · `SpriteIcon`
+**Variants:** `FontAwesome` · `GameIcon` · `Icon` · `AvatarIcon` · `SpriteIcon`
 
 ### `FontAwesome`
 
@@ -428,6 +428,25 @@ import { FontAwesome, getTheme } from '@stom66/dcl-ui-component-kit'
 ```
 
 Requires stock fonts from `copy-assets` (`assets/fonts/duck-font-awesome-*.ttf`). Rebuild with `npm run convert-fa-fonts` from desktop sources in `scripts/fa-desktop-sources/` (gitignored). Unity Desktop preview needs asset bundles (`npm run start:bundles`) or PUA glyphs show as tofu even within budget.
+
+### `GameIcon`
+
+Any of the ~4,000 [game-icons.net](https://game-icons.net) icons by name, as a TTF glyph. Same props and behaviour as `FontAwesome`.
+
+| Option | Type | Description |
+|---|---|---|
+| `icon` | `GameIconId \| string` | Icon name (`crossed-swords`, `crossedSwords`, or `author/name` such as `skoll/bat`) — search `fonts/gameIcons.icons.ts` or game-icons.net |
+| `fontSize` | `number` | Pixel size (defaults to `theme.icons.defaultSize`) |
+| `fontColor` | `Color4` | Glyph tint (defaults to theme light) |
+
+```tsx
+import { GameIcon, getTheme } from '@stom66/dcl-ui-component-kit'
+
+<GameIcon icon="crossed-swords" />
+<GameIcon icon="health-potion" fontSize={64} fontColor={getTheme().colors.danger} />
+```
+
+All icons are in one font, `assets/fonts/duck-game-icons.ttf` (~1.7 MB), copied into the scene by `copy-assets` alongside the Font Awesome TTFs. **CC BY 3.0: credit the authors in your scene.** Full guide: [game-icons.md](./game-icons.md).
 
 ### `Icon`
 

@@ -31,6 +31,7 @@ When `@stom66/dcl-ui-component-kit` is **installed or upgraded in a consumer pro
    and/or add `"postinstall": "dcl-ui-component-kit copy-assets"` to the **consumer** `package.json`.
 5. Full checklist: **[`docs/manual-install.md`](../../../docs/manual-install.md)** (also linked from the README).
 6. **Upgrade caveats (required after install/upgrade):** read **[`docs/upgrade-caveats.md`](../../../docs/upgrade-caveats.md)** and apply any breaking / behavioural migrations for the version jump just installed. Do not assume existing Layer / Zone / button code still matches the previous major/minor API.
+7. **Game icons:** `GameIcon` needs `assets/fonts/duck-game-icons.ttf` (copied by `copy-assets` with the Font Awesome TTFs). Remind the user that game-icons.net icons are CC BY 3.0 and need an in-scene credit — see [`docs/game-icons.md`](../../../docs/game-icons.md).
 
 **Upgrades do not refresh scene PNGs.** `npm update` replaces kit code in `node_modules`. The scene renders textures from its own `assets/images/ui-component-kit/` copies. Those copies are written only when `copy-assets` (or an allowed postinstall) runs. A folder that already has PNGs is not up to date.
 
@@ -422,7 +423,7 @@ SetupUiComponentKit({
 />
 ```
 
-Kit ships Font Awesome Free as `assets/fonts/duck-font-awesome-*.ttf` (via `copy-assets`). Other custom faces: put `.ttf` files under the scene’s `assets/fonts/` with a redistributable licence. Always pair `fontSrc` with a built-in `font` fallback. **Known issue:** Unity allows only about **~35–50 unique** PUA icons per `fontSrc` atlas (after Latin prefill; varies by glyph). Prefer texture `Icon` / project atlases for large sets. Confirm `--asset-bundles` / `start:bundles` before debugging tofu.
+Kit ships Font Awesome Free as `assets/fonts/duck-font-awesome-*.ttf` (via `copy-assets`), and the game-icons.net set as `assets/fonts/duck-game-icons.ttf` (`GameIcon`). Other custom faces: put `.ttf` files under the scene’s `assets/fonts/` with a redistributable licence. Always pair `fontSrc` with a built-in `font` fallback. Confirm `--asset-bundles` / `start:bundles` before debugging tofu.
 
 Fonts go through three steps: `resolveTypographySize(base)` (optional theme platform scale)
 → `scaleFontSize(...)` (additive fluid boost from viewport width) → × `uiScale` at parse.
@@ -525,7 +526,7 @@ Project art goes under **`assets/images/example-themes/<theme>/`**. Define custo
 |---|---|---|---|
 | Buttons | `ButtonText` | `ButtonImage` / `ButtonImageClose` | `textureSrc` + `uvColumnCount` / `uvRowCount` |
 | Progress bars | `ProgressBar` | `ProgressBarImage` / `ProgressBarRadial` | `textures?` (per-layer optional) / `atlas` + `uvCell` / radial sprite sheet |
-| Icons | — | `FontAwesome` / `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | **FA Free (small sets):** `<FontAwesome icon="star" />` (TTF via `copy-assets`; only `icon` / `fontSize` / `fontColor`; Unity ~35–50 unique-glyph atlas limit). **Large / dense HUDs:** texture `Icon` with required `src` + optional `uvs`. `rotate` (UV) on texture icons; **tint** with `fontColor` (`FontAwesome`) or `iconColor` (texture icons); `backgroundColor` is always a chip fill; `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid plus optional playback props — trigger with `setPlaying` / `playOnce` |
+| Icons | — | `FontAwesome` / `GameIcon` / `Icon` / `IconNumber` / `IconSymbol` / `IconCharacter` / `IconString` / `AvatarIcon` / `SpriteIcon` | **FA Free:** `<FontAwesome icon="star" />` (TTF via `copy-assets`; only `icon` / `fontSize` / `fontColor`). **game-icons.net (~4,000, by name):** `<GameIcon icon="crossed-swords" />` (same props as `FontAwesome`; TTF via `copy-assets`; CC BY 3.0 credit required). **Large / dense HUDs:** texture `Icon` with required `src` + optional `uvs`. `rotate` (UV) on texture icons; **tint** with `fontColor` (`FontAwesome`) or `iconColor` (texture icons); `backgroundColor` is always a chip fill; `atlas` on number/symbol/character/sprite; `atlases` on `IconString`; `userId` on `AvatarIcon`; `SpriteIcon` needs `id` + sheet grid plus optional playback props — trigger with `setPlaying` / `playOnce` |
 
 ## Custom textures / atlases (agent checklist)
 
@@ -540,7 +541,7 @@ When a user wants **their own images, atlases, or styles**, walk them through th
 5. **Coordinates are 1-based and inclusive.** First column/row is `1`, not `0`. Totals (`columns`, `rows`, `xTotal`, `yTotal`, `uvColumnCount`) are counts. Example: first cell of a 4×4 → `{ xStart: 1, yStart: 1, xTotal: 4, yTotal: 4 }`; `ButtonImage` `uvColumn={1}` for the first variant.
 6. Point them at root `README.md` → **Custom textures** and the Affinity callout at the top of the README.
 
-**Font Awesome Free:** kit `<FontAwesome icon="…" />` for small curated sets (TTFs from `copy-assets`; props: `icon`, `fontSize`, `fontColor` only). **Unity known issue:** ~35–50 unique PUA icons per font atlas — use texture atlases beyond that. **Custom icon packs / bulk atlases** (game-icons, project art, etc.): generate a snap grid in Affinity, export one PNG, register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Showcase reference: `exampleIconsAtlas` in `src/exampleThemes/showcase/atlases.ts`.
+**Font Awesome Free:** kit `<FontAwesome icon="…" />` (TTFs from `copy-assets`; props: `icon`, `fontSize`, `fontColor` only). **game-icons.net:** use kit `<GameIcon icon="…" />` (names: `src/ui-component-kit/fonts/gameIcons.icons.ts` or game-icons.net; TTF via `copy-assets`; credit the authors). Don't build an Affinity atlas for game-icons. **Other custom icon packs / bulk atlases** (project art, etc.): generate a snap grid in Affinity, export one PNG, register named cells — see **Bulk icon atlas via Affinity (agent workflow)** below. Showcase reference: `exampleIconsAtlas` in `src/exampleThemes/showcase/atlases.ts`.
 
 **Anti-patterns:** hard-coded UV quads; mixing 0-based indexes with counts; inventing a second atlas registry outside `exampleThemes/` / `ui-component-kit/atlases/`.
 
@@ -874,7 +875,7 @@ return [
 
 ## Texture atlases & UV helpers
 
-Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …; `atlasIconsFontAwesome` is deprecated). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Font Awesome Free icons: `FontAwesome` + TTFs under `assets/fonts/`. Project sheets: start from `assets/images/ui-component-kit/src/duck-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. Showcase icon atlas: `assets/images/example-themes/showcase/atlas-icons-showcase-4x4.png` from `duck-showcase-assets.af`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
+Bundled sheets live as `TextureAtlas` instances under `src/ui-component-kit/atlases/` (`atlasBtnIconsStyled`, `atlasCharsAlphaNumeric`, `atlasCharsSymbols`, `atlasSpritesProgressRadial`, …; `atlasIconsFontAwesome` is deprecated). Prefer those over hard-coded paths and repeated `xTotal` / `yTotal`. Font Awesome Free icons: `FontAwesome` + TTFs under `assets/fonts/`. game-icons.net icons: `GameIcon` + `assets/fonts/duck-game-icons.ttf` (maintainers rebuild with `npm run build-game-icons` — see `docs/game-icons.md`). Project sheets: start from `assets/images/ui-component-kit/src/duck-assets.af`, export to `assets/images/example-themes/<theme>/`, declare atlases in `src/exampleThemes/<theme>/`. Showcase icon atlas: `assets/images/example-themes/showcase/atlas-icons-showcase-4x4.png` from `duck-showcase-assets.af`. For bulk SVG icon packs → Affinity grid → named atlas, follow **Bulk icon atlas via Affinity** above.
 
 `TextureAtlas` defaults `wrapMode` to `'clamp'` (avoids neighbour-cell bleed). Optional `filterMode` (`'point'` | `'bi-linear'` | `'tri-linear'`) applies to the whole sheet. Use `atlas.texture` (or `mergeUiBackground`) instead of `{ src: atlas.source }` alone. `Spinner` is an animation wrapper around a child `Icon` — there are no dedicated spinner presets / atlas.
 

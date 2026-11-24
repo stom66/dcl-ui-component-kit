@@ -6,6 +6,16 @@ Breaking and behavioural changes when moving between versions of `@stom66/dcl-ui
 
 ---
 
+## Unreleased (`GameIcon`)
+
+New, no breaking changes:
+
+- **`<GameIcon icon="crossed-swords" />`** — the full [game-icons.net](https://game-icons.net) set by name. Same props as `FontAwesome` (`icon`, `fontSize`, `fontColor`). Guide: [game-icons.md](./game-icons.md).
+- **Run `npx @stom66/dcl-ui-component-kit copy-assets`** so `assets/fonts/duck-game-icons.ttf` (~1.7 MB, all icons) and its `LICENSE-game-icons.md` land in the scene.
+- **Credit required:** the icons are CC BY 3.0. Add the credit line from [licensing.md](./licensing.md) to your scene.
+
+---
+
 ## 0.4.0 (`UiBox` deprecated)
 
 `UiBox` is **deprecated, not removed**. Existing scenes keep compiling and rendering exactly as before — no action is required to upgrade.

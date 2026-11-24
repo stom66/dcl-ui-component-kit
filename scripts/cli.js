@@ -12,7 +12,7 @@ Usage:
   npx @stom66/dcl-ui-component-kit <command> [options]
 
 Commands:
-  copy-assets              Copy stock textures + Font Awesome TTFs into the scene
+  copy-assets              Copy stock textures + icon TTFs (Font Awesome, Game Icons) into the scene
                            (images → ./assets/images/ui-component-kit,
                             fonts  → ./assets/fonts)
                            (required after npm install — postinstall may be blocked)
@@ -45,7 +45,7 @@ function runCopyAssets() {
 	if (result.ok) {
 		console.log(`${LOG_PREFIX} copied stock textures → ${result.dest}`)
 		if (result.fontsDest) {
-			console.log(`${LOG_PREFIX} copied Font Awesome TTFs → ${result.fontsDest}`)
+			console.log(`${LOG_PREFIX} copied icon TTFs (Font Awesome, Game Icons) → ${result.fontsDest}`)
 		}
 		return
 	}

@@ -21,6 +21,8 @@ scripts/fa-desktop-sources/
 assets/fonts/*.otf
 assets/fonts/fa-*.ttf
 assets/fonts/Font Awesome*
+# game-icons/icons checkout (build with npm run build-game-icons; ship assets/fonts/duck-game-icons.ttf only)
+scripts/game-icons-sources/
 # Local scratch / investigation dumps
 tmp-unity-fonts/
 tmp-abgen/

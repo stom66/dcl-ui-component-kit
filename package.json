@@ -31,16 +31,19 @@
     "assets/images/ui-component-kit/*.png",
     "assets/fonts/*.ttf",
     "assets/fonts/LICENSE-OFL.txt",
+    "assets/fonts/LICENSE-game-icons.md",
     "scripts/cli.js",
     "scripts/postinstall.js",
     "scripts/lib/assets.js",
     "scripts/lib/themeScaffold.js",
     "scripts/convert-fa-fonts.py",
     "scripts/generate-fa-icons.py",
+    "scripts/build-game-icons.py",
     "INSTALL.md",
     "docs/manual-install.md",
     "docs/upgrade-caveats.md",
-    "docs/licensing.md"
+    "docs/licensing.md",
+    "docs/game-icons.md"
   ],
   "bin": {
     "dcl-ui-component-kit": "scripts/cli.js"
@@ -57,6 +60,7 @@
     "copy-assets": "node scripts/cli.js copy-assets",
     "convert-fa-fonts": "python scripts/convert-fa-fonts.py",
     "generate-fa-icons": "python scripts/generate-fa-icons.py",
+    "build-game-icons": "python scripts/build-game-icons.py",
     "init-theme": "node scripts/cli.js init-theme",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",

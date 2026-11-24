@@ -82,7 +82,7 @@ function skipKitAffinitySources(source) {
 
 // MARK: copyStockAssets
 /**
- * Copies stock textures (and Font Awesome TTFs) into the consumer scene.
+ * Copies stock textures (and the Font Awesome + Game Icons TTFs) into the consumer scene.
  * Images → `assets/images/ui-component-kit/` (PNGs only; `src/*.af` stays in the repo)
  * Fonts  → `assets/fonts/` (TTFs + LICENSE-OFL.txt; OTFs are local sources only)
  * @returns {{ ok: boolean, reason?: string, dest?: string, fontsDest?: string }}

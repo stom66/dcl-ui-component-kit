@@ -32,6 +32,19 @@ After install/upgrade, run `npx @stom66/dcl-ui-component-kit copy-assets` so sto
 
 Unity Desktop only applies `fontSrc` after optimized assets (Creator Hub **Compress Assets**, or `npm run start:bundles`). Plain preview without bundles falls back to the built-in face — PUA glyphs then show as tofu.
 
+### game-icons.net
+
+`GameIcon` renders icons from **[game-icons.net](https://game-icons.net)** (source: [game-icons/icons](https://github.com/game-icons/icons)), converted to fonts by `scripts/build-game-icons.py`.
+
+| Detail | |
+|---|---|
+| Component | `GameIcon` — look up icons by name; renders TTF glyphs via `fontSrc` |
+| Font | `assets/fonts/duck-game-icons.ttf` (all icons; copied to the scene by `copy-assets`) |
+| Notice | `assets/fonts/LICENSE-game-icons.md` (credits every contributor; keep it with the font) |
+| License | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) (some contributors CC0) |
+
+**Attribution is required.** A scene that shows game icons must credit the authors, e.g. in an in-scene credits panel or the scene description: *"Icons made by Lorc, Delapouite and contributors. Available on https://game-icons.net (CC BY 3.0)"*. Per-icon authors: `resolveGameIcon(name).author`. Details: [game-icons.md](./game-icons.md).
+
 ### CraftPix.net
 
 Some **demo / showcase** sprite sheets come from **[CraftPix.net](https://craftpix.net)** (Free Game Assets). They live under `assets/images/example-themes/showcase/` and are used by the showcase `SpriteIcon` demos.

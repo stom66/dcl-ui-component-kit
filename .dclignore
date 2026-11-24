@@ -44,3 +44,5 @@ assets/fonts/*.otf
 assets/fonts/fa-*.ttf
 assets/fonts/Font Awesome*
 docs/*
+# game-icons/icons SVG checkout used by npm run build-game-icons (not scene content)
+scripts/game-icons-sources
