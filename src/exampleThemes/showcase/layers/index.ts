@@ -29,7 +29,7 @@ import { demoSafeZoneTopRightLayer }         from './zones/demo.safeZone.topRigh
 import { demoSpriteIconLayer }               from './components/demo.spriteIcon.layer'
 import { demoTextLayer }                     from './components/demo.text.layer'
 import { demoToastsLayer }                   from './components/demo.toasts.layer'
-import { demoToggleLayer }                   from './components/demo.toggle.layer'
+import { demoInputsLayer }                   from './components/demo.inputs.layer'
 import { infoLayer }                         from './info.layer'
 
 import { demoHotbarsLayer }                  from './layouts/demo.hotbars.layer'
@@ -80,7 +80,7 @@ export const layers: Layer[] = [
 	demoLayoutLayer,
 	demoBackgroundsLayer,
 	demoToastsLayer,
-	demoToggleLayer,
+	demoInputsLayer,
 	demoColorPickerLayer,
 
 	// Layout demos.

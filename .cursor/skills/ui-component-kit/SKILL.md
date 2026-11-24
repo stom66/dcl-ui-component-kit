@@ -711,7 +711,7 @@ When creating any kind of button element, ask the user if this is meant to be an
 
 Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `src/ui-component-kit/components/buttons/`.
 
-**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `callback` fires on any `onMouseUp` on the button (Explorer only sends UP to the element under the pointer, so release-off still cancels). Hover is visual only — do not gate the click on it. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). `Toggle` uses the same rule.
+**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `callback` fires on any `onMouseUp` on the button (Explorer only sends UP to the element under the pointer, so release-off still cancels). Hover is visual only — do not gate the click on it. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). The inputs (`Toggle`, `MultiSelect`) use the same rule.
 
 **Pointer filter:** react-ecs defaults every element to `PFM_NONE`; `onMouseDown` does **not** make a box pickable. `ButtonText` / `ButtonImage` force `pointerFilter="block"` on the box that owns the handlers. In any hand-rolled clickable box, set `pointerFilter="block"` on the handler owner and `pointerFilter="none"` on decorative children (icons, glyphs, spinners).
 
@@ -748,6 +748,18 @@ import { atlasBtnIconsStyled } from '../../atlases'
 ```
 
 Atlas layout for `ButtonImage`: columns = button variants, rows = states. Pass `uvColumn` (required, **1-based** — first column is `1`). Defaults use `atlasBtnIconsStyled` (`source`, `columns`, `rows`). Wide blank sheet: `atlasBtn3x1` (1×4) — nest icon / text children for labelled image buttons. For a custom sheet, pass `textureSrc` + `uvColumnCount` + `uvRowCount` (define the atlas in `src/exampleThemes/<theme>/`). Prefer `TextureAtlas` instances over hard-coded paths / `xTotal` / `yTotal`. See `demo.buttons.layer.tsx`.
+
+## Inputs
+
+All in `components/inputs/`; each keeps per-`id` state and supports `value` (controlled) or `defaultValue`. Demo: `demo.inputs.layer.tsx`.
+
+| Need | Component | Notes |
+|---|---|---|
+| On / off | `Toggle` | `onChange(boolean)` |
+| Pick one of a few options in a row | `MultiSelect` + `MultiSelectOption` children | Click cycles to the next (wraps) by default; `clickMode="direct"` to click an option. `variant="filled" \| "outline"`. `onSelect(value, index)` / `onDeselect(value, index)`. `render(state)` on an option for icons (tint with `state.color`). Game-driven HUDs: `readOnly` + `setMultiSelectIndex(id, i)` |
+| Number in a range | `RangeSlider` | `min` / `max` / `step`, `onChange` + `onChangeEnd`. `width` must be px / vw / vh. Taps jump to the nearest of `tapCells` (the full mobile interface); desktop hold-drag |
+
+Do not hand-roll a sliding selector or a drag slider — use these. For a dropdown or text field use the SDK `Dropdown` / `Input`.
 
 ## Progress bars
 

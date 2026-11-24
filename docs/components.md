@@ -528,9 +528,9 @@ import { playOnce, setPlaying, SpriteIcon } from '@stom66/dcl-ui-component-kit'
 
 ---
 
-## Toggle
+## Inputs
 
-Same pointer rule as buttons: **mobile** `onChange` / click on `mouseDown`; **desktop** on `mouseUp` after hover (`isMobile()`, not `!isDesktop()`).
+Toggle, MultiSelect and RangeSlider live in `components/inputs/`. Clicks follow the button rule: **mobile** on `mouseDown`, **desktop** on `mouseUp` (`isMobile()`, not `!isDesktop()`). Each keeps per-`id` state, and each can be controlled (`value`) or uncontrolled (`defaultValue`).
 
 ### `Toggle`
 
@@ -549,6 +549,78 @@ Same pointer rule as buttons: **mobile** `onChange` / click on `mouseDown`; **de
 
 ```tsx
 <Toggle id="music" defaultValue={true} onChange={(on) => { /* … */ }} />
+```
+
+### `MultiSelect` / `MultiSelectOption`
+
+Single-choice segmented control: options sit side by side and a selector box slides over the chosen one. In `cycle` mode (default) any click moves to the next option and wraps back to the first. In `direct` mode each option is its own hit area. Option labels lerp from `inactiveColor` to `activeColor` as the selector passes over them.
+
+Declare options as `<MultiSelectOption>` children (also `MultiSelect.Option`), or pass `options={[…]}`.
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique id (required) |
+| `value` | `string \| number` | Controlled selected value |
+| `defaultValue` | `string \| number` | Uncontrolled initial (first option) |
+| `variant` | `'filled' \| 'outline'` | `filled`: secondary track, primary border, solid primary selector. `outline`: transparent, borders only (default `filled`) |
+| `clickMode` | `'cycle' \| 'direct'` | Click advances / click picks (default `cycle`) |
+| `readOnly` | `boolean` | Ignore clicks; drive it with `setMultiSelectIndex` |
+| `width` / `height` | `PositionUnit` | Any unit, `%` included — the selector is placed in % (default `360` × `48`) |
+| `inset` | `number` | Gap between outer border and selector (default `3`) |
+| `backgroundColor` / `borderColor` / `borderWidth` / `borderRadius` | | Outer box |
+| `selectorColor` / `selectorBorderColor` / `selectorBorderWidth` / `selectorRadius` | | Selector box (radius defaults to `borderRadius − inset`) |
+| `activeColor` / `inactiveColor` | `Color4` | Label colours (theme light / tertiary) |
+| `fontSize` | `number` | Label size |
+| `duration` / `easing` | `number` / `EasingFn` | Slide timing (default `0.3`, `easeOutQuart`) |
+| `onSelect` | `(value, index) => void` | After a click, with the new option |
+| `onDeselect` | `(value, index) => void` | After a click, with the previous option |
+
+`MultiSelectOption` props: `value` (required), `label` (defaults to `String(value)`), `render(state)` for custom content (`state.color` / `state.weight` / `state.active` — use `state.color` to tint icons), and per-option `onSelect` / `onDeselect`.
+
+Game code: `setMultiSelectIndex(id, index, animate?)`, `setMultiSelectValue(id, value, animate?)`, `getMultiSelectIndex(id)`, `getMultiSelectValue(id)`. These do not fire the click events.
+
+```tsx
+<MultiSelect id="aim_step" onSelect={(value) => setAimStep(value)}>
+	<MultiSelectOption value="position"  label="Position"  />
+	<MultiSelectOption value="direction" label="Direction" />
+	<MultiSelectOption value="strength"  label="Strength"  />
+</MultiSelect>
+
+<MultiSelect
+	id        = "difficulty"
+	variant   = "outline"
+	clickMode = "direct"
+	options   = {[{ value: 'easy' }, { value: 'normal' }, { value: 'hard' }]}
+/>
+```
+
+### `RangeSlider`
+
+Horizontal value slider: groove, fill and a round thumb.
+
+UI pointer events carry no position, so the slider is covered by `tapCells` invisible hit cells. A tap jumps to the nearest cell — this is the full interface on mobile. On desktop, holding after the press drags the value (cursor offset from the press via `PrimaryPointerInfo.screenCoordinates`, same as `ColorPicker`), and a full-screen catcher exists only while dragging so a release anywhere ends it. On mobile, sliding a held finger across cells also updates the value if the client sends enter events during a touch.
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique id (required) |
+| `value` / `defaultValue` | `number` | Controlled / uncontrolled initial (`min`) |
+| `min` / `max` | `number` | Range (default `0` – `100`) |
+| `step` | `number` | Snap increment; `0` = continuous |
+| `width` | `PositionUnit` | px / vw / vh — `%` unsupported (drag math needs pixels). Default `300` |
+| `height` | `number` | Thumb diameter (default `32`) |
+| `trackHeight` | `number` | Groove thickness (default 35% of `height`) |
+| `variant` | `'filled' \| 'outline'` | `outline`: bordered transparent groove, dark thumb |
+| `trackColor` / `fillColor` / `thumbColor` / `thumbBorderColor` / `borderColor` | `Color4` | Overrides |
+| `tapCells` | `number` | Hit cells (default one per step up to 41, else `21`) |
+| `readOnly` | `boolean` | Display only |
+| `onChange` | `(value) => void` | Every change (taps, each drag frame) |
+| `onChangeEnd` | `(value) => void` | Once on release |
+
+Game code: `getRangeSliderValue(id)`, `setRangeSliderValue(id, value)`.
+
+```tsx
+<RangeSlider id="volume" width="20vw" defaultValue={70} onChange={(v) => setVolume(v / 100)} />
+<RangeSlider id="fov" variant="outline" min={40} max={120} step={10} value={fov} onChange={setFov} />
 ```
 
 ---

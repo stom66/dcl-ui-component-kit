@@ -56,6 +56,8 @@ Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
     - [ButtonImage](#buttonimage)
     - [ButtonImageClose](#buttonimageclose)
     - [Toggle](#toggle)
+    - [MultiSelect](#multiselect)
+    - [RangeSlider](#rangeslider)
   - [Icons](#icons)
     - [Icon](#icon)
     - [SpriteIcon](#spriteicon)
@@ -122,7 +124,7 @@ You do not need a custom theme to start — defaults look like Decentraland out 
 | **Layer** | Show/hide group for a collection of UI (HUD, popup, menu). One layer = one zone. |
 | **Zone** | Preset slot (`Top`, `BottomRight`, `Default`, …) via `zone: ZoneType.*` or `<Zone type={…}>`. |
 | **Layout** | `Row` / `RowReverse`, `Column` / `ColumnReverse`, `Background`, `BackgroundGradient`, `Divider`, `Label`. |
-| **Components** | Buttons, progress bars, text, icons, toggle, spinners / motion, toasts. |
+| **Components** | Buttons, progress bars, text, icons, inputs (toggle, multi-select, range slider), spinners / motion, toasts. |
 | **Theme** | Colours / type / sizing. Override via `SetupUiComponentKit({ theme })` — never fork the defaults in place. |
 
 # Components
@@ -898,6 +900,98 @@ Boolean switch control with an animated track and thumb.
  height          = {32}
  lerpDuration    = {0.2}
  onChange        = {(enabled) => setMusicEnabled(enabled)}
+/>
+```
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
+### MultiSelect
+
+Single-choice segmented control. A selector box slides over the chosen option; click to cycle to the next one (wraps around), or set `clickMode="direct"` to click an option directly. `filled` and `outline` variants.
+
+**Minimum usage**
+
+```tsx
+<MultiSelect id="aim_step">
+ <MultiSelectOption value="position"  label="Position"  />
+ <MultiSelectOption value="direction" label="Direction" />
+ <MultiSelectOption value="strength"  label="Strength"  />
+</MultiSelect>
+```
+
+<details>
+<summary><b>Full usage</b></summary>
+
+```tsx
+<MultiSelect
+ id                  = "difficulty"
+ value               = {difficulty}
+ defaultValue        = "normal"
+ variant             = "outline"
+ clickMode           = "direct"
+ readOnly            = {false}
+ width               = "100%"
+ height              = {48}
+ inset               = {3}
+ borderColor         = {theme.colors.tertiary}
+ selectorColor       = {Color4.Clear()}
+ selectorBorderColor = {theme.colors.primary}
+ activeColor         = {theme.colors.light}
+ inactiveColor       = {theme.colors.tertiary}
+ duration            = {0.3}
+ easing              = {easingFunctions.easeOutBack}
+ onSelect            = {(value, index) => setDifficulty(value)}
+ onDeselect          = {(value, index) => {}}
+>
+ <MultiSelectOption value="easy"   label="Easy"   />
+ <MultiSelectOption value="normal" label="Normal" onSelect={() => {}} />
+ <MultiSelectOption value="hard"   render={(state) => <FontAwesome icon="skull" fontColor={state.color} />} />
+</MultiSelect>
+```
+
+Drive it from game code with `setMultiSelectIndex(id, index)` / `setMultiSelectValue(id, value)`.
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
+### RangeSlider
+
+Drag or tap to pick a number. Tap anywhere on the slider to jump there (the whole interface on mobile); on desktop, hold and drag.
+
+**Minimum usage**
+
+```tsx
+<RangeSlider id="volume" />
+```
+
+<details>
+<summary><b>Full usage</b></summary>
+
+```tsx
+<RangeSlider
+ id               = "fov"
+ value            = {fov}
+ defaultValue     = {70}
+ min              = {40}
+ max              = {120}
+ step             = {10}
+ width            = "20vw"
+ height           = {32}
+ trackHeight      = {12}
+ variant          = "outline"
+ fillColor        = {theme.colors.primary}
+ thumbColor       = {theme.colors.dark}
+ thumbBorderColor = {theme.colors.primary}
+ tapCells         = {9}
+ onChange         = {(value) => setFov(value)}
+ onChangeEnd      = {(value) => saveSettings()}
 />
 ```
 

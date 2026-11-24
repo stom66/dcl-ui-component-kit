@@ -78,9 +78,13 @@ export { SectionHeader }          from './text'
 export { Text }                   from './text'
 
 
-// Toggle
-export { getToggleProps, Toggle } from './toggle'
-export type { ToggleProps }       from './toggle'
+// Inputs
+export { getMultiSelectIndex, getMultiSelectProps, getMultiSelectValue, MultiSelect, MultiSelectOption, setMultiSelectIndex, setMultiSelectValue } from './inputs'
+export type { MultiSelectClickMode, MultiSelectOptionProps, MultiSelectOptionRenderState, MultiSelectProps, MultiSelectValue, MultiSelectVariant } from './inputs'
+export { getRangeSliderProps, getRangeSliderValue, RangeSlider, setRangeSliderValue } from './inputs'
+export type { RangeSliderProps, RangeSliderVariant } from './inputs'
+export { getToggleProps, Toggle } from './inputs'
+export type { ToggleProps }       from './inputs'
 
 
 // Toasts

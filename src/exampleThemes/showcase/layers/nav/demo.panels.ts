@@ -11,7 +11,7 @@ import { demoProgressLayer } from '../components/demo.progress.layer'
 import { demoSpriteIconLayer } from '../components/demo.spriteIcon.layer'
 import { demoTextLayer } from '../components/demo.text.layer'
 import { demoToastsLayer } from '../components/demo.toasts.layer'
-import { demoToggleLayer } from '../components/demo.toggle.layer'
+import { demoInputsLayer } from '../components/demo.inputs.layer'
 
 import { demoHotbarsLayer } from '../layouts/demo.hotbars.layer'
 import { demoListLayer } from '../layouts/demo.list.layer'
@@ -34,7 +34,7 @@ export const COMPONENT_PANEL_LAYERS: Layer[] = [
 	demoProgressLayer,
 	demoTextLayer,
 	demoToastsLayer,
-	demoToggleLayer,
+	demoInputsLayer,
 ]
 
 /** Layout demo panels (opened from the Layouts sidebar). */

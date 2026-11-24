@@ -14,7 +14,7 @@ import { demoProgressLayer } from '../components/demo.progress.layer'
 import { demoSpriteIconLayer } from '../components/demo.spriteIcon.layer'
 import { demoTextLayer } from '../components/demo.text.layer'
 import { demoToastsLayer } from '../components/demo.toasts.layer'
-import { demoToggleLayer } from '../components/demo.toggle.layer'
+import { demoInputsLayer } from '../components/demo.inputs.layer'
 
 import { demoHotbarsLayer } from '../layouts/demo.hotbars.layer'
 import { demoListLayer } from '../layouts/demo.list.layer'
@@ -39,12 +39,12 @@ export const demoComponentsNavLayer = new DemoSidebarLayer('demo-nav-components'
 	{ id: 'btn_demo_color_picker', label: 'Color Picker', icon: 'palette',           layer: demoColorPickerLayer },
 	{ id: 'btn_demo_grids',       label: 'Grids',       icon: 'cubes',             layer: demoGridsLayer },
 	{ id: 'btn_demo_icons',       label: 'Icons',       icon: 'star',              layer: demoIconsLayer },
+	{ id: 'btn_demo_inputs',      label: 'Inputs',      icon: 'sliders',           layer: demoInputsLayer },
 	{ id: 'btn_demo_sprite_icon', label: 'Sprite Icon', icon: 'play',              layer: demoSpriteIconLayer },
 	{ id: 'btn_demo_layout',      label: 'Cols / Rows', icon: 'bars',              layer: demoLayoutLayer },
 	{ id: 'btn_demo_progress',    label: 'Progress',    icon: 'hourglassHalf',     layer: demoProgressLayer },
 	{ id: 'btn_demo_text',        label: 'Text',        icon: 'pencil',            layer: demoTextLayer },
 	{ id: 'btn_demo_toasts',      label: 'Toasts',      icon: 'bell',              layer: demoToastsLayer },
-	{ id: 'btn_demo_toggle',      label: 'Toggle',      icon: 'sliders',           layer: demoToggleLayer },
 ])
 
 /** Layouts sidebar — full example screens built from several components. */
