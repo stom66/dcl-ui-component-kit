@@ -32,6 +32,7 @@ Use `pointerEventsSystem.onPointerDown()` to add click handlers to entities. Als
 
 - Pointer events reach only an entity with a collider on `ColliderLayer.CL_POINTER`. Primitive or invisible hitbox: `MeshCollider.setBox(entity)`. GLB: set its collision masks per **add-3d-models** → *RULE: Always check for built-in colliders* (`visibleMeshesCollisionMask` defaults to `0`, so a GLB without `_collider` meshes is not clickable until you set it).
 - **Occluders need `CL_POINTER` too.** The pointer ray stops at the closest collider on `CL_POINTER` (alone, or with `CL_PHYSICS` = mask `3`); a `CL_PHYSICS`-only collider goes to a character-only layer the ray ignores, so a physics-only wall, floor or door is transparent to clicks and a clickable behind it stays reachable. Give enclosing geometry mask `3` (`CL_PHYSICS | CL_POINTER`) (source: unity-explorer `PhysicsLayers.cs`; in-world, 2026-11-05).
+- **Faces seen from behind don't stop the ray.** Like the renderer, the pointer ray does not hit a face from its back side, so a wall built as single-sided panels, or a window's paper facing outward, lets hovers and clicks through to whatever is behind it (observed 2026-11: a board hung inside a room over a window was hovered from outside, through the window, although the walls carry `CL_POINTER`). Put an invisible `CL_POINTER` box behind such an object, or build the panel with both windings.
 - **Register the handler on the entity that owns the collider.** Pointer events reach the entity whose collider the ray hits — a handler on a parent group, or on a child that has no collider of its own, never fires. When a model is an empty parent with the collider mesh on a child entity, register on the child (or give the parent its own `MeshCollider`).
 - Skinned / armature-rigged GLB (NPCs, characters) with no `_collider` mesh: the visible-mesh mask does not make it clickable — see *Skinned-mesh exception* below.
 
@@ -118,6 +119,8 @@ PointerEventType.PET_PROXIMITY_LEAVE; // Player moves out of entity's proximity 
 - The callback map is keyed by `eventType:interactionType`, so **`onProximityDown` and `onPointerDown` coexist** on the same entity: register both a cursor and a proximity handler for the same event type, and **both callbacks fire** when both conditions are met.
 - A removal takes only its own registration's entry: `removeOnClick` and `onPointerDown` (both `PET_DOWN` + `CURSOR`) are independent.
 - On an older pin, a removal without `hoverText` leaves its entry behind (the interaction stays advertised and re-registering grows the array), and `onProximityDown` replaces an existing `onPointerDown` on the same entity.
+
+**Opening a client panel from a handler**: `openExplorerUi` opens Explorer panels (map, backpack, places, events, …), and `openExplorerUiAndWait` (`@dcl/sdk/explorer-ui`) resolves when the player closes it. A click or button-press callback (`onPointerDown` / `onPointerUp`, not hover or proximity) counts as the user gesture, but only for its own tick plus one — call them **first** in the handler, before any `await`. See **scene-runtime** > "openExplorerUi -- Open Explorer Panels".
 
 ---
 
