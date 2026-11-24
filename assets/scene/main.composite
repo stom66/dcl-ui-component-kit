@@ -478,7 +478,7 @@
           "json": {
             "name": "🦆 DCL UI Component Kit",
             "description": "Demo scene for the DCL UI Component Kit",
-            "thumbnail": "assets/Images/scene-thumbnail.png",
+            "thumbnail": "assets/images/scene-thumbnail.png",
             "ageRating": "A",
             "categories": [],
             "author": "stom",
