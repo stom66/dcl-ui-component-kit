@@ -58,6 +58,8 @@ export class InfoLayer extends Layer {
 		super({
 			id    : 'info',
 			zone  : ZoneType.BottomRight,
+			// Toggled by the Info tab (top right) and keyboard 2.
+			canBeHidden: true,
 			// Above demo safe-zone overlays (zIndex 0) and the safe-zones panel (100).
 			zIndex: 200,
 			uiTransform: {

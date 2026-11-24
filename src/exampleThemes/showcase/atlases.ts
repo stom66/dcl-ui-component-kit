@@ -118,30 +118,6 @@ export const exampleProgressBarTexturesVertical: ProgressBarImageTextures = {
 }
 
 
-// MARK: exampleFuelFillAtlas
-/**
- * Sky Chaser fuel-gauge fill. One full-frame cell, revealed with
- * `uvCropWithFill` (not stretched). Pair with `exampleFuelGaugeTextures`.
- */
-export const exampleFuelFillAtlas = new TextureAtlas({
-	source : 'assets/images/example-themes/showcase/progressBar-fuel-fill.png',
-	columns: 1,
-	rows   : 1,
-})
-
-
-// MARK: exampleFuelGaugeTextures
-/**
- * Sky Chaser fuel-gauge frame. The border art is twice the fill height
- * (dial housing above the tube). Center the fill with `contentInset`.
- * The rotating needle is a separate icon and is not part of this set.
- */
-export const exampleFuelGaugeTextures: ProgressBarImageTextures = {
-	background: 'assets/images/example-themes/showcase/progressBar-fuel-bg.png',
-	border    : 'assets/images/example-themes/showcase/progressBar-fuel-fg.png',
-}
-
-
 // MARK: exampleBubblesAtlas
 /**
  * Pictorial fill for an image-reveal bar — liquid with bubbles (1024×128,
@@ -162,8 +138,8 @@ export const exampleBubblesAtlas = new TextureAtlas({
  * — one artboard per PNG, named to match (`progressBar-<name>-background`,
  * `-border`, `-fill`); export the artboards over these files to update the art.
  *
- * - `background` / `border` are full-frame `artWidth × artHeight` and are
- *   stretched over the whole bar (display at the same aspect ratio).
+ * - `background` / `border` are cropped tight to the frame (no transparent
+ *   margin), so the bar's visible edges are the element's edges.
  * - `fill` is cropped to the fill's own bounds and revealed with
  *   `uvCropWithFill`; `fillInset` is where that crop sits inside the frame,
  *   in art pixels — scale it to the display size for `contentInset`.
@@ -178,7 +154,7 @@ export type ExampleLayeredBarArt = {
 	fillInset : { top: number, right: number, bottom: number, left: number }
 	/**
 	 * Art pixels from each horizontal edge that must not stretch (angled /
-	 * rounded ends, chevrons, studs). The middle stretches so the bar can fill
+	 * rounded ends, studs, rivets). The middle stretches so the bar can fill
 	 * any width; the fill uses the same split. `0` = fixed-size art only.
 	 */
 	capArt    : number
@@ -192,8 +168,8 @@ function createLayeredBarArt(
 	name     : string,
 	fillInset: ExampleLayeredBarArt['fillInset'],
 	capArt   : number,
-	artWidth  = 1024,
-	artHeight = 128,
+	artWidth : number,
+	artHeight: number,
 ): ExampleLayeredBarArt {
 	return {
 		capArt,
@@ -210,14 +186,14 @@ function createLayeredBarArt(
 	}
 }
 
-/** Angled sci-fi bar: striped cyan fill, gunmetal frame, chevron caps. */
-export const exampleNeonSlantBar = createLayeredBarArt('neon-slant', { top: 26, right: 119, bottom: 26, left: 119 }, 176)
+/** Angled sci-fi bar: striped cyan fill, gunmetal frame, cyan accent strips. */
+export const exampleNeonSlantBar = createLayeredBarArt('neon-slant', { top: 14, right: 22, bottom: 14, left: 22 }, 79, 962, 110)
 
 /** Rounded capsule: glossy orange fill, gold rim, gem studs. */
-export const exampleEmberCapsuleBar = createLayeredBarArt('ember-capsule', { top: 28, right: 66, bottom: 28, left: 66 }, 120)
+export const exampleEmberCapsuleBar = createLayeredBarArt('ember-capsule', { top: 14, right: 14, bottom: 14, left: 14 }, 68, 920, 100)
 
 /** Chamfered corners: segmented green fill, brushed-steel frame, rivets. */
-export const exampleTacticalChamferBar = createLayeredBarArt('tactical-chamfer', { top: 24, right: 62, bottom: 24, left: 62 }, 200)
+export const exampleTacticalChamferBar = createLayeredBarArt('tactical-chamfer', { top: 14, right: 14, bottom: 14, left: 14 }, 152, 928, 108)
 
 /**
  * Vertical thermometer (256×1024): brass-framed plaque, glass tube, mercury
@@ -225,3 +201,19 @@ export const exampleTacticalChamferBar = createLayeredBarArt('tactical-chamfer',
  * stays red at 0%. Plaque spans art y 12–1012.
  */
 export const exampleThermometerBar = createLayeredBarArt('thermometer', { top: 83, right: 114, bottom: 161, left: 114 }, 0, 256, 1024)
+
+/**
+ * Narrow vertical plasma column (128×1024): gunmetal chamfered frame with
+ * violet accent strips, LEDs and rivets; segmented magenta → violet fill
+ * (`fillFrom="bottom"`). Frame spans art y 8–1016. Fixed-size art (no caps).
+ */
+export const examplePlasmaColumnBar = createLayeredBarArt('plasma-column', { top: 52, right: 30, bottom: 52, left: 30 }, 0, 128, 1024)
+
+/**
+ * Narrow wooden gauge (208×1024): planked timber case with iron brackets,
+ * rivets, rope bands and blank brass plates around a glass tube; bubbly
+ * green liquid fill (`fillFrom="bottom"`). Glass gloss and tick marks live on
+ * the border layer so they sit over the liquid. Case spans art y 8–1016.
+ * Original kit art.
+ */
+export const exampleTimberGaugeBar = createLayeredBarArt('timber-gauge', { top: 150, right: 58, bottom: 178, left: 58 }, 0, 208, 1024)

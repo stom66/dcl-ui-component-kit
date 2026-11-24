@@ -650,7 +650,7 @@ import { Bounce, FontAwesome, Spinner } from '@stom66/dcl-ui-component-kit'
 </Bounce>
 ```
 
-Demo: `src/exampleThemes/showcase/layers/demo.animations.layer.tsx` in this repo.
+Demo: `src/exampleThemes/showcase/layers/components/demo.animations.layer.tsx` in this repo.
 
 ---
 

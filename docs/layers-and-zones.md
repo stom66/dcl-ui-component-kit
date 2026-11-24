@@ -102,7 +102,7 @@ export class NotificationLayer extends Layer {
 notificationLayer.show()
 ```
 
-Live values belong on `this.props` (`PropsController`) — see `src/exampleThemes/showcase/layers/demo.progress.layer.tsx` in this repo.
+Live values belong on `this.props` (`PropsController`) — see `src/exampleThemes/showcase/layers/components/demo.progress.layer.tsx` in this repo.
 
 ---
 

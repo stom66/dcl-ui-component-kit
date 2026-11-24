@@ -1,38 +1,45 @@
 import type { Layer } from '../../../ui-component-kit'
 import { toastHostLayer } from '../../../ui-component-kit'
 
-import { demoAnimationsLayer }               from './demo.animations.layer'
-import { demoBackgroundsLayer }              from './demo.backgrounds.layer'
-import { demoButtonsLayer }                  from './demo.buttons.layer'
-import { demoGridsLayer }                    from './demo.grids.layer'
-import { demoIconsLayer }                    from './demo.icons.layer'
-import { demoLayoutLayer }                   from './demo.layout.layer'
-import { demoLeftBarLayer }                  from './demo.leftBar.layer'
-import { demoListLayer }                     from './demo.list.layer'
-import { demoProgressLayer }                 from './demo.progress.layer'
-import { demoSafeZoneBottomLayer }           from './demo.safeZone.bottom.layer'
-import { demoSafeZoneBottomCenterLayer }     from './demo.safeZone.bottomCenter.layer'
-import { demoSafeZoneBottomLeftLayer }       from './demo.safeZone.bottomLeft.layer'
-import { demoSafeZoneBottomRightLayer }      from './demo.safeZone.bottomRight.layer'
-import { demoSafeZoneDefaultLayer }          from './demo.safeZone.default.layer'
-import { demoSafeZoneFullScreenLayer }       from './demo.safeZone.fullScreen.layer'
-import { demoSafeZoneInteractableAreaLayer } from './demo.safeZone.interactableArea.layer'
-import { demoSafeZoneLeftLayer }             from './demo.safeZone.left.layer'
-import { demoSafeZoneLeftBottomLayer }       from './demo.safeZone.leftBottom.layer'
-import { demoSafeZoneLeftTopLayer }          from './demo.safeZone.leftTop.layer'
-import { demoSafeZoneRightLayer }            from './demo.safeZone.right.layer'
-import { demoSafeZoneRightBottomLayer }      from './demo.safeZone.rightBottom.layer'
-import { demoSafeZoneRightTopLayer }         from './demo.safeZone.rightTop.layer'
-import { demoSafeZoneTopLayer }              from './demo.safeZone.top.layer'
-import { demoSafeZoneTopCenterLayer }        from './demo.safeZone.topCenter.layer'
-import { demoSafeZoneTopLeftLayer }          from './demo.safeZone.topLeft.layer'
-import { demoSafeZoneTopRightLayer }         from './demo.safeZone.topRight.layer'
-import { demoSafeZonesLayer }                from './demo.safeZones.layer'
-import { demoSpriteIconLayer }               from './demo.spriteIcon.layer'
-import { demoTextLayer }                     from './demo.text.layer'
-import { demoToastsLayer }                   from './demo.toasts.layer'
-import { demoToggleLayer }                   from './demo.toggle.layer'
+import { demoAnimationsLayer }               from './components/demo.animations.layer'
+import { demoBackgroundsLayer }              from './components/demo.backgrounds.layer'
+import { demoButtonsLayer }                  from './components/demo.buttons.layer'
+import { demoColorPickerLayer }              from './components/demo.colorPicker.layer'
+import { demoGridsLayer }                    from './components/demo.grids.layer'
+import { demoIconsLayer }                    from './components/demo.icons.layer'
+import { demoLayoutLayer }                   from './components/demo.layout.layer'
+import { demoProgressLayer }                 from './components/demo.progress.layer'
+import { demoSafeZoneBottomLayer }           from './zones/demo.safeZone.bottom.layer'
+import { demoSafeZoneBottomCenterLayer }     from './zones/demo.safeZone.bottomCenter.layer'
+import { demoSafeZoneBottomLeftLayer }       from './zones/demo.safeZone.bottomLeft.layer'
+import { demoSafeZoneBottomRightLayer }      from './zones/demo.safeZone.bottomRight.layer'
+import { demoSafeZoneDefaultLayer }          from './zones/demo.safeZone.default.layer'
+import { demoSafeZoneFullScreenLayer }       from './zones/demo.safeZone.fullScreen.layer'
+import { demoSafeZoneInteractableAreaLayer } from './zones/demo.safeZone.interactableArea.layer'
+import { demoSafeZoneLeftLayer }             from './zones/demo.safeZone.left.layer'
+import { demoSafeZoneLeftBottomLayer }       from './zones/demo.safeZone.leftBottom.layer'
+import { demoSafeZoneLeftTopLayer }          from './zones/demo.safeZone.leftTop.layer'
+import { demoSafeZoneRightLayer }            from './zones/demo.safeZone.right.layer'
+import { demoSafeZoneRightBottomLayer }      from './zones/demo.safeZone.rightBottom.layer'
+import { demoSafeZoneRightTopLayer }         from './zones/demo.safeZone.rightTop.layer'
+import { demoSafeZoneTopLayer }              from './zones/demo.safeZone.top.layer'
+import { demoSafeZoneTopCenterLayer }        from './zones/demo.safeZone.topCenter.layer'
+import { demoSafeZoneTopLeftLayer }          from './zones/demo.safeZone.topLeft.layer'
+import { demoSafeZoneTopRightLayer }         from './zones/demo.safeZone.topRight.layer'
+import { demoSpriteIconLayer }               from './components/demo.spriteIcon.layer'
+import { demoTextLayer }                     from './components/demo.text.layer'
+import { demoToastsLayer }                   from './components/demo.toasts.layer'
+import { demoToggleLayer }                   from './components/demo.toggle.layer'
 import { infoLayer }                         from './info.layer'
+
+import { demoHotbarsLayer }                  from './layouts/demo.hotbars.layer'
+import { demoListLayer }                     from './layouts/demo.list.layer'
+import { demoLoadingScreenFullLayer, demoLoadingScreenLayer } from './layouts/demo.loadingScreen.layer'
+import { demoMatchSummaryLayer }             from './layouts/demo.matchSummary.layer'
+import { demoSettingsMenuLayer }             from './layouts/demo.settingsMenu.layer'
+import { demoTimersLayer }                   from './layouts/demo.timers.layer'
+
+import { demoComponentsNavLayer, demoLayoutsNavLayer, demoNavTabsLayer, demoZonesNavLayer } from './nav/demo.nav.layer'
 
 
 /** Showcase demo layer list. Comment out entries to hide them. */
@@ -56,7 +63,13 @@ export const layers: Layer[] = [
 	demoSafeZoneBottomLeftLayer,
 	demoSafeZoneBottomRightLayer,
 
-	demoLeftBarLayer,
+	// Navigation: top-right tabs switch between the two right-hand sidebars.
+	demoNavTabsLayer,
+	demoComponentsNavLayer,
+	demoLayoutsNavLayer,
+	demoZonesNavLayer,
+
+	// Component demos.
 	demoTextLayer,
 	demoAnimationsLayer,
 	demoProgressLayer,
@@ -65,11 +78,20 @@ export const layers: Layer[] = [
 	demoSpriteIconLayer,
 	demoGridsLayer,
 	demoLayoutLayer,
-	demoListLayer,
 	demoBackgroundsLayer,
 	demoToastsLayer,
 	demoToggleLayer,
-	demoSafeZonesLayer,
+	demoColorPickerLayer,
+
+	// Layout demos.
+	demoTimersLayer,
+	demoListLayer,
+	demoMatchSummaryLayer,
+	demoSettingsMenuLayer,
+	demoHotbarsLayer,
+	demoLoadingScreenLayer,
+	demoLoadingScreenFullLayer,
+
 	infoLayer,
 	toastHostLayer,
 ]
