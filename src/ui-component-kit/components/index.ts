@@ -15,6 +15,8 @@ export type { UiBoxProps }        from './base'
 export { ButtonImage }            from './buttons'
 export { ButtonImageClose }       from './buttons'
 export { ButtonText }             from './buttons'
+export { ButtonHold, getButtonHoldProgress, getButtonHoldProps } from './buttons'
+export type { ButtonHoldProps }   from './buttons'
 
 
 // Color picker
@@ -79,10 +81,14 @@ export { Text }                   from './text'
 
 
 // Inputs
-export { getMultiSelectIndex, getMultiSelectProps, getMultiSelectValue, MultiSelect, MultiSelectOption, setMultiSelectIndex, setMultiSelectValue } from './inputs'
-export type { MultiSelectClickMode, MultiSelectOptionProps, MultiSelectOptionRenderState, MultiSelectProps, MultiSelectValue, MultiSelectVariant } from './inputs'
+export { Checkbox, getCheckboxProps, getCheckboxValue, setCheckboxValue } from './inputs'
+export type { CheckboxIcon, CheckboxProps } from './inputs'
+export { getNumberInputProps, getNumberInputValue, NumberInput, setNumberInputValue } from './inputs'
+export type { NumberInputProps } from './inputs'
 export { getRangeSliderProps, getRangeSliderValue, RangeSlider, setRangeSliderValue } from './inputs'
-export type { RangeSliderProps, RangeSliderVariant } from './inputs'
+export type { RangeSliderProps, RangeSliderShape, RangeSliderVariant } from './inputs'
+export { getSegmentedControlIndex, getSegmentedControlProps, getSegmentedControlValue, SegmentedControl, SegmentedControlOption, setSegmentedControlIndex, setSegmentedControlValue } from './inputs'
+export type { SegmentedControlClickMode, SegmentedControlOptionProps, SegmentedControlOptionRenderState, SegmentedControlProps, SegmentedControlValue, SegmentedControlVariant } from './inputs'
 export { getToggleProps, Toggle } from './inputs'
 export type { ToggleProps }       from './inputs'
 

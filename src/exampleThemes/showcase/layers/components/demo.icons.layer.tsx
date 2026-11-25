@@ -1,17 +1,16 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 import { openExternalUrl } from '~system/RestrictedActions'
 
-import { alpha, AvatarIcon, Background, Column, DEFAULT_AVATAR_USER_ID, FontAwesome, GAME_ICONS_BUILD, GameIcon, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType, type Theme } from '../../../../ui-component-kit'
+import { alpha, AvatarIcon, Background, ButtonText, Column, DEFAULT_AVATAR_USER_ID, FontAwesome, GAME_ICONS_BUILD, GameIcon, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType, type Theme } from '../../../../ui-component-kit'
 import { exampleIconsAtlas } from '../../atlases'
 
 const FONT_AWESOME_ICONS_URL = 'https://fontawesome.com/search?o=r&m=free'
 const GAME_ICONS_URL         = 'https://game-icons.net'
 
-/** Common DCL-game FA sample — 3×6 grid (not the full Free catalog). */
+/** Common DCL-game FA sample — 2×6 grid (not the full Free catalog). */
 const GAME_FA_ICONS = [
 	'heart', 'star', 'coins', 'trophy', 'fire', 'bolt',
-	'key', 'gem', 'crown', 'gift', 'compass', 'clock',
-	'users', 'shield', 'rocket', 'bomb', 'gamepad', 'dice',
+	'key', 'crown', 'gift', 'shield', 'rocket', 'gamepad',
 ] as const
 
 /** game-icons.net sample — 2×6 grid (not the full set). */
@@ -32,6 +31,8 @@ const AVATAR_USER_B = '0x327f74101F930c76653FD11aC7C8BA3C8694678f'
 const AVATAR_SIZE = 48
 const FA_SIZE     = AVATAR_SIZE
 const ATLAS_SIZE  = 48
+/** Indent icon example rows so they sit under the code chip text, not flush with the chip edge. */
+const ICON_ROW_INSET = 12
 
 
 // MARK: chunk
@@ -127,32 +128,28 @@ export class DemoIconsLayer extends Layer {
 				<H2 key="title" value="Icons" />
 				<Text
 					key      = "intro"
-					value    = "This kit supports AvatarIcon, FontAwesome and GameIcon out of the box. Custom icons are also supported — see the documentation for more info on adding your own. Font Awesome and game-icons.net have far more icons than we show here — browse them at the links below."
+					value    = "This kit supports AvatarIcon, FontAwesome and GameIcon out of the box. Custom icons are also supported — see the documentation for more info on adding your own. Font Awesome and game-icons.net have far more icons than we show here — browse them with the buttons below."
 					fontSize = {theme.typography.size.small}
 				/>
-				<Text
-					key       = "fa-icons-link"
-					value     = "fontawesome.com/icons"
-					fontSize  = {theme.typography.size.small}
-					fontColor = {theme.colors.info}
-					width     = "auto"
-					textWrap  = "nowrap"
-					onMouseDown = {openFontAwesomeIcons}
-					margin    = {{ top: 2 }}
-				/>
-				<Text
-					key         = "game-icons-link"
-					value       = "game-icons.net"
-					fontSize    = {theme.typography.size.small}
-					fontColor   = {theme.colors.info}
-					width       = "auto"
-					textWrap    = "nowrap"
-					onMouseDown = {openGameIcons}
-					margin      = {{ bottom: 4 }}
-				/>
+				<Row key="icon-links" justifyContent="flex-start" alignItems="center" spacing={12} margin={{ top: 2, bottom: 4 }}>
+					<ButtonText
+						id              = "demo_icons_link_fa"
+						textLabel       = "fontawesome.com"
+						cols            = {4}
+						backgroundColor = {theme.colors.info}
+						callback        = {openFontAwesomeIcons}
+					/>
+					<ButtonText
+						id              = "demo_icons_link_gi"
+						textLabel       = "game-icons.net"
+						cols            = {4}
+						backgroundColor = {theme.colors.info}
+						callback        = {openGameIcons}
+					/>
+				</Row>
 
-				{/* AvatarIcon | FontAwesome */}
-				<Row key="row-avatar-fa" justifyContent="flex-start" alignItems="flex-start" spacing={12} margin={{ top: 4 }}>
+				{/* AvatarIcon | Custom icons */}
+				<Row key="row-avatar-custom" justifyContent="flex-start" alignItems="flex-start" spacing={12} margin={{ top: 4 }}>
 					<Column key="avatar-col" cols={6} spacing={8} alignItems="flex-start">
 						<Label key="avatar-label" cols={12} value="AvatarIcon" />
 						<ExampleCodeChip
@@ -160,7 +157,7 @@ export class DemoIconsLayer extends Layer {
 							theme   = {theme}
 							value   = {'<AvatarIcon userId="…" />'}
 						/>
-						<Row key="avatar-row-default" justifyContent="flex-start" alignItems="center" spacing={8}>
+						<Row key="avatar-row-default" margin={{ left: ICON_ROW_INSET }} justifyContent="flex-start" alignItems="center" spacing={8}>
 							<AvatarIcon key="avatar-default-plain" userId={DEFAULT_AVATAR_USER_ID} width={AVATAR_SIZE} height={AVATAR_SIZE} />
 							<AvatarIcon
 								key          = "avatar-default-round"
@@ -182,7 +179,7 @@ export class DemoIconsLayer extends Layer {
 								backgroundColor = {alpha(theme.colors.info, 0.8)}
 							/>
 						</Row>
-						<Row key="avatar-row-a" justifyContent="flex-start" alignItems="center" spacing={8}>
+						<Row key="avatar-row-a" margin={{ left: ICON_ROW_INSET }} justifyContent="flex-start" alignItems="center" spacing={8}>
 							<AvatarIcon key="avatar-a-plain" userId={AVATAR_USER_A} width={AVATAR_SIZE} height={AVATAR_SIZE} />
 							<AvatarIcon
 								key          = "avatar-a-round"
@@ -204,7 +201,7 @@ export class DemoIconsLayer extends Layer {
 								backgroundColor = {alpha(theme.colors.primary, 0.8)}
 							/>
 						</Row>
-						<Row key="avatar-row-b" justifyContent="flex-start" alignItems="center" spacing={8}>
+						<Row key="avatar-row-b" margin={{ left: ICON_ROW_INSET }} justifyContent="flex-start" alignItems="center" spacing={8}>
 							<AvatarIcon key="avatar-b-plain" userId={AVATAR_USER_B} width={AVATAR_SIZE} height={AVATAR_SIZE} />
 							<AvatarIcon
 								key          = "avatar-b-round"
@@ -228,30 +225,6 @@ export class DemoIconsLayer extends Layer {
 						</Row>
 					</Column>
 
-					<Column key="fa-col" cols={6} spacing={8} alignItems="flex-start">
-						<Label key="fa-label" cols={12} value="FontAwesome" />
-						<ExampleCodeChip
-							keyName = "fa-code"
-							theme   = {theme}
-							value   = {`<FontAwesome icon="star" fontSize={${FA_SIZE}} />`}
-						/>
-						{chunk(GAME_FA_ICONS, 6).map((row, rowIndex) => (
-							<Row
-								key            = {`fa-row-${rowIndex}`}
-								justifyContent = "flex-start"
-								alignItems     = "center"
-								spacing        = {8}
-							>
-								{row.map((icon) => (
-									<FontAwesome key={`fa-${icon}`} icon={icon} fontSize={FA_SIZE} />
-								))}
-							</Row>
-						))}
-					</Column>
-				</Row>
-
-				{/* Custom atlas | Color */}
-				<Row key="row-atlas-color" justifyContent="flex-start" alignItems="flex-start" spacing={12} margin={{ top: 8 }}>
 					<Column key="atlas-col" cols={6} spacing={8} alignItems="flex-start">
 						<Label key="atlas-label" cols={12} value="Custom icons" />
 						<ExampleCodeChip
@@ -262,6 +235,7 @@ export class DemoIconsLayer extends Layer {
 						{chunk(ATLAS_SAMPLE, 6).map((row, rowIndex) => (
 							<Row
 								key            = {`atlas-row-${rowIndex}`}
+								margin         = {{ left: ICON_ROW_INSET }}
 								justifyContent = "flex-start"
 								alignItems     = "center"
 								spacing        = {8}
@@ -278,6 +252,31 @@ export class DemoIconsLayer extends Layer {
 							</Row>
 						))}
 					</Column>
+				</Row>
+
+				{/* FontAwesome | Color */}
+				<Row key="row-fa-color" justifyContent="flex-start" alignItems="flex-start" spacing={12} margin={{ top: 8 }}>
+					<Column key="fa-col" cols={6} spacing={8} alignItems="flex-start">
+						<Label key="fa-label" cols={12} value="FontAwesome" />
+						<ExampleCodeChip
+							keyName = "fa-code"
+							theme   = {theme}
+							value   = {`<FontAwesome icon="star" fontSize={${FA_SIZE}} />`}
+						/>
+						{chunk(GAME_FA_ICONS, 6).map((row, rowIndex) => (
+							<Row
+								key            = {`fa-row-${rowIndex}`}
+								margin         = {{ left: ICON_ROW_INSET }}
+								justifyContent = "flex-start"
+								alignItems     = "center"
+								spacing        = {8}
+							>
+								{row.map((icon) => (
+									<FontAwesome key={`fa-${icon}`} icon={icon} fontSize={FA_SIZE} />
+								))}
+							</Row>
+						))}
+					</Column>
 
 					<Column key="color-col" cols={6} spacing={8} alignItems="flex-start">
 						<Label key="color-label" cols={12} value="Color" />
@@ -286,7 +285,7 @@ export class DemoIconsLayer extends Layer {
 							theme   = {theme}
 							value   = {'<FontAwesome icon="star" fontColor={…} />'}
 						/>
-						<Row key="fa-color-row" justifyContent="flex-start" alignItems="center" spacing={8}>
+						<Row key="fa-color-row" margin={{ left: ICON_ROW_INSET }} justifyContent="flex-start" alignItems="center" spacing={8}>
 							<FontAwesome key="fa-color-primary" icon="star" fontSize={FA_SIZE} fontColor={theme.colors.primary} />
 							<FontAwesome key="fa-color-danger" icon="star" fontSize={FA_SIZE} fontColor={theme.colors.danger} />
 							<FontAwesome key="fa-color-light" icon="star" fontSize={FA_SIZE} fontColor={theme.colors.light} />
@@ -309,6 +308,7 @@ export class DemoIconsLayer extends Layer {
 						{chunk(GAME_ICONS_SAMPLE, 6).map((row, rowIndex) => (
 							<Row
 								key            = {`gi-row-${rowIndex}`}
+								margin         = {{ left: ICON_ROW_INSET }}
 								justifyContent = "flex-start"
 								alignItems     = "center"
 								spacing        = {8}
@@ -327,7 +327,7 @@ export class DemoIconsLayer extends Layer {
 							theme   = {theme}
 							value   = {'<GameIcon icon="health-potion" fontColor={…} />'}
 						/>
-						<Row key="gi-color-row" justifyContent="flex-start" alignItems="center" spacing={8}>
+						<Row key="gi-color-row" margin={{ left: ICON_ROW_INSET }} justifyContent="flex-start" alignItems="center" spacing={8}>
 							<GameIcon key="gi-color-primary" icon="crossed-swords" fontSize={FA_SIZE} fontColor={theme.colors.primary} />
 							<GameIcon key="gi-color-danger" icon="health-potion" fontSize={FA_SIZE} fontColor={theme.colors.danger} />
 							<GameIcon key="gi-color-light" icon="wizard-staff" fontSize={FA_SIZE} fontColor={theme.colors.light} />

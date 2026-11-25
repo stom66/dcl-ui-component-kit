@@ -1,3 +1,5 @@
 export { ButtonImage } from './buttonImage'
 export { ButtonImageClose } from './buttonImage.close'
 export { ButtonText } from './buttonText'
+export { ButtonHold, getButtonHoldProgress, getButtonHoldProps } from './buttonHold'
+export type { ButtonHoldProps } from './buttonHold'

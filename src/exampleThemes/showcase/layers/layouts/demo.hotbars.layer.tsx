@@ -1,13 +1,14 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { Dropdown, Input, UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { alpha, Background, ButtonText, Column, getTheme, H2, Label, Layer, ProgressBar, ProgressBarRadial, PropsController, Row, showToast, Text, ZoneType } from '../../../../ui-component-kit'
+import { alpha, Background, Column, getTheme, H2, Label, Layer, ProgressBar, ProgressBarRadial, PropsController, Row, Text, ZoneType } from '../../../../ui-component-kit'
 
-import { Card, demoClock, FaIcon, type FaIconName, SectionLabel } from './demo.layouts.shared'
+import { demoClock, FaIcon, type FaIconName, SectionLabel } from './demo.layouts.shared'
 
 
 const SLOT_SIZE        = 60
 const ABILITY_SIZE     = 64
+const ABILITY_BORDER   = 3
 const STATUS_BAR_H     = 22
 const STATUS_ICON      = 20
 
@@ -52,14 +53,11 @@ const PROMPTS: { keys: string[], label: string, icon?: FaIconName }[] = [
 	{ keys: [],        label: 'Shoot', icon: 'arrowPointer' },
 ]
 
-const REGIONS = ['Europe', 'North America', 'South America', 'Asia', 'Oceania']
-
 
 // MARK: DemoHotbarsLayer
 /**
- * Hotbars and inputs: status bars, a selectable 8-slot item hotbar with stack
- * counts and cooldown sweeps, an ability bar, key prompts, and native SDK
- * Input / Dropdown fields next to a quantity stepper.
+ * Hotbars / abilities: status bars, a selectable 8-slot item hotbar with stack
+ * counts and cooldown sweeps, an ability bar, and key prompts.
  */
 export class DemoHotbarsLayer extends Layer {
 	constructor() {
@@ -76,11 +74,8 @@ export class DemoHotbarsLayer extends Layer {
 		})
 
 		this.props = new PropsController<Record<string, unknown>>({
-			selected  : 0,
-			cooldowns : {} as Record<string, number>,
-			quantity  : 1,
-			region    : 0,
-			playerName: '',
+			selected : 0,
+			cooldowns: {} as Record<string, number>,
 		})
 	}
 
@@ -119,7 +114,7 @@ export class DemoHotbarsLayer extends Layer {
 				justifyContent = "flex-start"
 				padding        = {{ top: 16, right: 20, bottom: 16, left: 20 }}
 			>
-				<H2 value="Hotbars & Inputs" />
+				<H2 value="Hotbars / Abilities" />
 				<Text value="Click a slot to select it; click the selected slot (or an ability) to use it and start its cooldown." />
 
 				<SectionLabel value="Status bars" />
@@ -133,9 +128,6 @@ export class DemoHotbarsLayer extends Layer {
 
 				<SectionLabel value="Input prompts" />
 				{this.renderPrompts()}
-
-				<SectionLabel value="Inputs — SDK Input + Dropdown, quantity stepper" />
-				{this.renderInputs()}
 			</Column>,
 		]
 	}
@@ -313,18 +305,27 @@ export class DemoHotbarsLayer extends Layer {
 									alignItems    : 'center',
 									justifyContent: 'center',
 									borderRadius  : ABILITY_SIZE / 2,
-									borderWidth   : 3,
+									borderWidth   : ABILITY_BORDER,
 									borderColor   : ready ? color : theme.colors.secondary,
 									overflow      : 'hidden',
 								}}
 								uiBackground = {{ color: alpha(color, ready ? 0.35 : 0.15) }}
 								onMouseDown  = {() => this.startCooldown(key, ability.cooldown)}
 							>
-								<FaIcon name={ability.icon} size={ABILITY_SIZE * 0.45} color={ready ? theme.colors.light : theme.colors.tertiary} />
+								<FaIcon key="icon" name={ability.icon} size={ABILITY_SIZE * 0.45} color={ready ? theme.colors.light : theme.colors.tertiary} />
 								{ready ? null : (
 									<UiEntity
 										key         = "cd"
-										uiTransform = {{ positionType: 'absolute', position: { top: 0, left: 0 }, width: ABILITY_SIZE, height: ABILITY_SIZE }}
+										uiTransform = {{
+											// Border is inside the box, so top/left 0 is the inner
+											// corner. Pull back by the stroke so the sweep matches the circle.
+											positionType  : 'absolute',
+											position      : { top: -ABILITY_BORDER, left: -ABILITY_BORDER },
+											width         : ABILITY_SIZE,
+											height        : ABILITY_SIZE,
+											alignItems    : 'center',
+											justifyContent: 'center',
+										}}
 									>
 										<ProgressBarRadial
 											progress        = {left}
@@ -387,81 +388,6 @@ export class DemoHotbarsLayer extends Layer {
 						<Text value={prompt.label} width="auto" textWrap="nowrap" fontColor={theme.colors.light} />
 					</Row>
 				))}
-			</Row>
-		)
-	}
-
-
-	// MARK: renderInputs
-	private renderInputs() {
-		const theme    = getTheme()
-		const quantity = this.props?.get('quantity') as number
-		const region   = this.props?.get('region') as number
-		const fieldBg  = { color: alpha(theme.colors.dark, 0.8) }
-		const fontSize = theme.typography.size.default
-
-		const setQuantity = (next: number) => this.props?.set('quantity', Math.max(1, Math.min(99, next)))
-
-		return (
-			<Row key="inputs" alignItems="flex-end" spacing={10}>
-				<Column cols={5} alignItems="stretch" spacing={4}>
-					<Text value="Player name (Enter to submit)" fontSize={theme.typography.size.small} />
-					<Input
-						placeholder      = "Type a name…"
-						fontSize         = {fontSize}
-						color            = {theme.colors.light}
-						placeholderColor = {theme.colors.tertiary}
-						uiTransform      = {{ width: '100%', height: 40 }}
-						uiBackground     = {fieldBg}
-						onChange         = {(value) => this.props?.set('playerName', value)}
-						onSubmit         = {(value) => showToast({
-							position     : 'top',
-							duration     : 2,
-							isDismissable: true,
-							width        : 240,
-							height       : 48,
-							content      : () => <Label value={`Hello, ${value || 'stranger'}!`} backgroundColor={theme.colors.info} />,
-						})}
-					/>
-				</Column>
-
-				<Column cols={4} alignItems="stretch" spacing={4}>
-					<Text value="Region" fontSize={theme.typography.size.small} />
-					<Dropdown
-						options       = {REGIONS}
-						selectedIndex = {region}
-						fontSize      = {fontSize}
-						color         = {theme.colors.light}
-						uiTransform   = {{ width: '100%', height: 40 }}
-						uiBackground  = {fieldBg}
-						onChange      = {(index) => this.props?.set('region', index)}
-					/>
-				</Column>
-
-				<Column cols={3} alignItems="stretch" spacing={4}>
-					<Text value="Quantity" fontSize={theme.typography.size.small} />
-					<Card padding={0} height={40}>
-						<Row alignItems="center" justifyContent="space-between" height="100%">
-							<ButtonText
-								id              = "demo_hotbar_qty_minus"
-								textLabel       = "−"
-								width           = {36}
-								height          = {36}
-								backgroundColor = {theme.colors.secondary}
-								callback        = {() => setQuantity(quantity - 1)}
-							/>
-							<Text value={String(quantity)} width="auto" alignSelf="center" textWrap="nowrap" fontColor={theme.colors.light} font={theme.typography.family.code} />
-							<ButtonText
-								id              = "demo_hotbar_qty_plus"
-								textLabel       = "+"
-								width           = {36}
-								height          = {36}
-								backgroundColor = {theme.colors.secondary}
-								callback        = {() => setQuantity(quantity + 1)}
-							/>
-						</Row>
-					</Card>
-				</Column>
 			</Row>
 		)
 	}

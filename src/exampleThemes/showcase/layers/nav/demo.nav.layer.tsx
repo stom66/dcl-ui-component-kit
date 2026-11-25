@@ -53,7 +53,7 @@ export const demoLayoutsNavLayer = new DemoSidebarLayer('demo-nav-layouts', [
 	{ id: 'btn_demo_list',           label: 'Scoreboard',      icon: 'listUl',        layer: demoListLayer },
 	{ id: 'btn_demo_match_summary',  label: 'Match Summary',   icon: 'trophy',        layer: demoMatchSummaryLayer },
 	{ id: 'btn_demo_settings_menu',  label: 'Settings Menu',   icon: 'gear',          layer: demoSettingsMenuLayer },
-	{ id: 'btn_demo_hotbars',        label: 'Hotbars & Inputs', icon: 'gamepad',      layer: demoHotbarsLayer },
+	{ id: 'btn_demo_hotbars',        label: 'Hotbars / Abilities', icon: 'gamepad',   layer: demoHotbarsLayer },
 	{ id: 'btn_demo_loading_screen', label: 'Loading Screen',  icon: 'hourglass',     layer: demoLoadingScreenLayer },
 ])
 

@@ -10,20 +10,20 @@ import { type KitEntityProps, resolveKitEntityProps } from '../base'
 import { Text } from '../text'
 
 
-const MULTI_SELECT_WIDTH_DEFAULT  = 360
-const MULTI_SELECT_HEIGHT_DEFAULT = 48
-const MULTI_SELECT_INSET_DEFAULT  = 3
-const MULTI_SELECT_DURATION       = 0.3
+const SEGMENTED_CONTROL_WIDTH_DEFAULT  = 360
+const SEGMENTED_CONTROL_HEIGHT_DEFAULT = 48
+const SEGMENTED_CONTROL_INSET_DEFAULT  = 3
+const SEGMENTED_CONTROL_DURATION       = 0.3
 
 
 // MARK: Types
-export type MultiSelectValue   = string | number
-export type MultiSelectVariant = 'filled' | 'outline'
-/** `cycle`: any click moves to the next option (wrapping). `direct`: click an option to select it. */
-export type MultiSelectClickMode = 'cycle' | 'direct'
+export type SegmentedControlValue   = string | number
+export type SegmentedControlVariant = 'filled' | 'outline'
+/** `direct`: click an option to select it. `cycle`: any click moves to the next option (wrapping). */
+export type SegmentedControlClickMode = 'cycle' | 'direct'
 
 /** Passed to an option's `render` so custom content (icons, atlas labels) can tint itself. */
-export type MultiSelectOptionRenderState = {
+export type SegmentedControlOptionRenderState = {
 	/** True for the selected option. */
 	active: boolean
 	/** 0–1: how much of the selector currently covers this option (smooth during the slide). */
@@ -32,45 +32,45 @@ export type MultiSelectOptionRenderState = {
 	color : Color4
 }
 
-export type MultiSelectOptionProps = {
+export type SegmentedControlOptionProps = {
 	/** Value reported to `onSelect` / `onDeselect` and matched by `value` / `defaultValue`. */
-	value      : MultiSelectValue
+	value      : SegmentedControlValue
 	/** Text shown in the option. Defaults to `String(value)`. Ignored when `render` is set. */
 	label?     : string
 	/** Custom content for the option cell (replaces the label). */
-	render?    : (state: MultiSelectOptionRenderState) => ReactEcs.JSX.Element
+	render?    : (state: SegmentedControlOptionRenderState) => ReactEcs.JSX.Element
 	/** Fires when this option becomes selected by a click. */
 	onSelect?  : () => void
 	/** Fires when this option stops being selected by a click. */
 	onDeselect?: () => void
 }
 
-type MultiSelectState = {
+type SegmentedControlState = {
 	/** Selected option index. */
 	index   : number
 	/** Selector position in option units (lerps toward `index`). */
 	position: number
 }
 
-export type MultiSelectProps = Omit<
+export type SegmentedControlProps = Omit<
 	KitEntityProps,
 	'uiTransform' | 'aspectRatio' | 'children' | 'onMouseDown' | 'onMouseUp'
 > & {
 	/** Unique id for the per-instance state controller. */
 	id                  : string
-	/** `<MultiSelectOption>` elements (also available as `MultiSelect.Option`). */
+	/** `<SegmentedControlOption>` elements (also available as `SegmentedControl.Option`). */
 	children?           : ReactEcs.JSX.Element | ReactEcs.JSX.Element[]
 	/** Alternative to children: plain option list. Children win when both are given. */
-	options?            : MultiSelectOptionProps[]
+	options?            : SegmentedControlOptionProps[]
 	/** Controlled selected value. Omit to let the component keep its own state. */
-	value?              : MultiSelectValue
+	value?              : SegmentedControlValue
 	/** Initial value for uncontrolled use. Defaults to the first option. */
-	defaultValue?       : MultiSelectValue
+	defaultValue?       : SegmentedControlValue
 	/** `filled` (solid track + solid selector) or `outline` (transparent, borders only). Defaults to `filled`. */
-	variant?            : MultiSelectVariant
-	/** `cycle` (default) or `direct`. See `MultiSelectClickMode`. */
-	clickMode?          : MultiSelectClickMode
-	/** Display only — ignores clicks (drive it with `setMultiSelectIndex`). */
+	variant?            : SegmentedControlVariant
+	/** `direct` (default) or `cycle`. See `SegmentedControlClickMode`. */
+	clickMode?          : SegmentedControlClickMode
+	/** Display only — ignores clicks (drive it with `setSegmentedControlIndex`). */
 	readOnly?           : boolean
 	/** Gap between the outer border and the selector, in px. Defaults to `3`. */
 	inset?              : number
@@ -93,57 +93,57 @@ export type MultiSelectProps = Omit<
 	easing?             : EasingFn
 	uiTransform?        : UiTransformProps
 	/** Fires after a click with the newly selected option. */
-	onSelect?           : (value: MultiSelectValue, index: number) => void
+	onSelect?           : (value: SegmentedControlValue, index: number) => void
 	/** Fires after a click with the option that was selected before it. */
-	onDeselect?         : (value: MultiSelectValue, index: number) => void
+	onDeselect?         : (value: SegmentedControlValue, index: number) => void
 }
 
 
 // MARK: State
-const multiSelectProps   = new Map<string, PropsController<MultiSelectState>>()
+const segmentedControlProps   = new Map<string, PropsController<SegmentedControlState>>()
 const slideGeneration    = new Map<string, number>()
-const lastRenderedValues = new Map<string, MultiSelectValue[]>()
+const lastRenderedValues = new Map<string, SegmentedControlValue[]>()
 
 
-// MARK: MultiSelectOption
+// MARK: SegmentedControlOption
 /**
- * Declares one option inside a `MultiSelect`. Renders nothing by itself — the
+ * Declares one option inside a `SegmentedControl`. Renders nothing by itself — the
  * parent reads its props and lays the options out.
  */
-export function MultiSelectOption(_props: MultiSelectOptionProps): ReactEcs.JSX.Element | null {
+export function SegmentedControlOption(_props: SegmentedControlOptionProps): ReactEcs.JSX.Element | null {
 	return null
 }
 
 
-// MARK: getMultiSelectProps
+// MARK: getSegmentedControlProps
 /** Returns the per-id state controller, creating one if needed. */
-export function getMultiSelectProps(
+export function getSegmentedControlProps(
 	id          : string,
 	initialIndex: number = 0
-): PropsController<MultiSelectState> {
-	let props = multiSelectProps.get(id)
+): PropsController<SegmentedControlState> {
+	let props = segmentedControlProps.get(id)
 	if (!props) {
-		props = new PropsController<MultiSelectState>({
+		props = new PropsController<SegmentedControlState>({
 			index   : initialIndex,
 			position: initialIndex,
 		})
-		multiSelectProps.set(id, props)
+		segmentedControlProps.set(id, props)
 	}
 	return props
 }
 
 
-// MARK: getMultiSelectIndex
+// MARK: getSegmentedControlIndex
 /** Selected index for `id`, or `-1` if the component has never rendered. */
-export function getMultiSelectIndex(id: string): number {
-	return multiSelectProps.get(id)?.get('index') ?? -1
+export function getSegmentedControlIndex(id: string): number {
+	return segmentedControlProps.get(id)?.get('index') ?? -1
 }
 
 
-// MARK: getMultiSelectValue
+// MARK: getSegmentedControlValue
 /** Selected value for `id`, or `undefined` if the component has never rendered. */
-export function getMultiSelectValue(id: string): MultiSelectValue | undefined {
-	const index = getMultiSelectIndex(id)
+export function getSegmentedControlValue(id: string): SegmentedControlValue | undefined {
+	const index = getSegmentedControlIndex(id)
 	return lastRenderedValues.get(id)?.[index]
 }
 
@@ -152,7 +152,7 @@ export function getMultiSelectValue(id: string): MultiSelectValue | undefined {
 /** Tweens the selector toward `to`. Newer calls cancel older ones via a generation counter. */
 function slideTo(
 	id      : string,
-	props   : PropsController<MultiSelectState>,
+	props   : PropsController<SegmentedControlState>,
 	to      : number,
 	duration: number,
 	easing  : EasingFn
@@ -180,22 +180,22 @@ function slideTo(
 }
 
 
-// MARK: setMultiSelectIndex
+// MARK: setSegmentedControlIndex
 /**
- * Moves an uncontrolled `MultiSelect` from game code (e.g. a HUD that advances
+ * Moves an uncontrolled `SegmentedControl` from game code (e.g. a HUD that advances
  * on its own). Does not fire `onSelect` / `onDeselect`.
  */
-export function setMultiSelectIndex(
+export function setSegmentedControlIndex(
 	id      : string,
 	index   : number,
 	animate : boolean = true,
-	duration: number  = MULTI_SELECT_DURATION,
+	duration: number  = SEGMENTED_CONTROL_DURATION,
 	easing  : EasingFn = easingFunctions.easeOutQuart
 ) {
-	const props = getMultiSelectProps(id, index)
+	const props = getSegmentedControlProps(id, index)
 	const count = lastRenderedValues.get(id)?.length
 	if (count !== undefined && (index < 0 || index >= count)) {
-		console.error('setMultiSelectIndex: index out of range', id, index)
+		console.error('setSegmentedControlIndex: index out of range', id, index)
 		return
 	}
 	props.set('index', index)
@@ -203,32 +203,32 @@ export function setMultiSelectIndex(
 }
 
 
-// MARK: setMultiSelectValue
-/** Like `setMultiSelectIndex`, by option value. Needs the component to have rendered once. */
-export function setMultiSelectValue(
+// MARK: setSegmentedControlValue
+/** Like `setSegmentedControlIndex`, by option value. Needs the component to have rendered once. */
+export function setSegmentedControlValue(
 	id     : string,
-	value  : MultiSelectValue,
+	value  : SegmentedControlValue,
 	animate: boolean = true
 ) {
 	const values = lastRenderedValues.get(id)
 	const index  = values ? values.indexOf(value) : -1
 	if (index < 0) {
-		console.error('setMultiSelectValue: unknown value (or component not rendered yet)', id, value)
+		console.error('setSegmentedControlValue: unknown value (or component not rendered yet)', id, value)
 		return
 	}
-	setMultiSelectIndex(id, index, animate)
+	setSegmentedControlIndex(id, index, animate)
 }
 
 
 // MARK: collectOptions
-/** Flattens children into option props, keeping only `MultiSelectOption` elements. */
+/** Flattens children into option props, keeping only `SegmentedControlOption` elements. */
 function collectOptions(
-	children: MultiSelectProps['children'],
-	fallback: MultiSelectOptionProps[] | undefined
-): MultiSelectOptionProps[] {
+	children: SegmentedControlProps['children'],
+	fallback: SegmentedControlOptionProps[] | undefined
+): SegmentedControlOptionProps[] {
 	if (children === undefined || children === null) return fallback ?? []
 
-	const out: MultiSelectOptionProps[] = []
+	const out: SegmentedControlOptionProps[] = []
 	const walk = (node: unknown) => {
 		if (Array.isArray(node)) {
 			for (const child of node) walk(child)
@@ -236,10 +236,10 @@ function collectOptions(
 		}
 		if (!node || typeof node !== 'object') return
 		const element = node as ReactEcs.JSX.Element
-		if (element.type === MultiSelectOption) {
-			out.push(element.props as MultiSelectOptionProps)
+		if (element.type === SegmentedControlOption) {
+			out.push(element.props as SegmentedControlOptionProps)
 		} else {
-			console.error('MultiSelect: children must be <MultiSelectOption> elements', element.type)
+			console.error('SegmentedControl: children must be <SegmentedControlOption> elements', element.type)
 		}
 	}
 	walk(children)
@@ -253,36 +253,36 @@ function clamp01(value: number): number {
 }
 
 
-// MARK: MultiSelect
+// MARK: SegmentedControl
 /**
  * Segmented single-choice input: options sit side by side and a selector box
- * slides over the chosen one. In `cycle` mode (default) any click advances to
- * the next option and wraps back to the first; in `direct` mode each option is
- * its own hit area.
+ * slides over the chosen one. In `direct` mode (default) each option is its own
+ * hit area; in `cycle` mode any click advances to the next option and wraps
+ * back to the first.
  *
  * ```tsx
- * <MultiSelect id="aim_step" onSelect={(value) => console.log(value)}>
- *   <MultiSelectOption value="position"  label="Position"  />
- *   <MultiSelectOption value="direction" label="Direction" />
- *   <MultiSelectOption value="strength"  label="Strength"  />
- * </MultiSelect>
+ * <SegmentedControl id="aim_step" onSelect={(value) => console.log(value)}>
+ *   <SegmentedControlOption value="position"  label="Position"  />
+ *   <SegmentedControlOption value="direction" label="Direction" />
+ *   <SegmentedControlOption value="strength"  label="Strength"  />
+ * </SegmentedControl>
  * ```
  *
  * `width` accepts any `PositionUnit` (the selector is placed in %). Clicks use
  * the kit button rule — `mouseDown` on mobile, `mouseUp` on desktop.
  */
-export function MultiSelect({
+export function SegmentedControl({
 	id,
 	children,
 	options: optionsProp,
 	value,
 	defaultValue,
 	variant      = 'filled',
-	clickMode    = 'cycle',
+	clickMode    = 'direct',
 	readOnly     = false,
-	inset        = MULTI_SELECT_INSET_DEFAULT,
-	width        = MULTI_SELECT_WIDTH_DEFAULT,
-	height       = MULTI_SELECT_HEIGHT_DEFAULT,
+	inset        = SEGMENTED_CONTROL_INSET_DEFAULT,
+	width        = SEGMENTED_CONTROL_WIDTH_DEFAULT,
+	height       = SEGMENTED_CONTROL_HEIGHT_DEFAULT,
 	backgroundColor,
 	borderColor,
 	borderWidth,
@@ -294,19 +294,19 @@ export function MultiSelect({
 	activeColor,
 	inactiveColor,
 	fontSize,
-	duration     = MULTI_SELECT_DURATION,
+	duration     = SEGMENTED_CONTROL_DURATION,
 	easing       = easingFunctions.easeOutQuart,
 	uiTransform,
 	onSelect,
 	onDeselect,
 	...props
-}: MultiSelectProps) {
+}: SegmentedControlProps) {
 	const theme   = getTheme()
 	const options = collectOptions(children, optionsProp)
 	const count   = options.length
 
 	if (count === 0) {
-		console.error('MultiSelect: no options', id)
+		console.error('SegmentedControl: no options', id)
 		return null
 	}
 
@@ -314,13 +314,13 @@ export function MultiSelect({
 	lastRenderedValues.set(id, values)
 
 	const defaultIndex = Math.max(0, defaultValue === undefined ? 0 : values.indexOf(defaultValue))
-	const controller   = getMultiSelectProps(id, defaultIndex)
+	const controller   = getSegmentedControlProps(id, defaultIndex)
 
 	// Controlled: follow `value`. Uncontrolled: keep stored index in range if options shrink.
 	if (value !== undefined) {
 		const controlledIndex = values.indexOf(value)
 		if (controlledIndex < 0) {
-			console.error('MultiSelect: value not found in options', id, value)
+			console.error('SegmentedControl: value not found in options', id, value)
 		} else if (controlledIndex !== controller.get('index')) {
 			controller.set('index', controlledIndex)
 			slideTo(id, controller, controlledIndex, duration, easing)
@@ -464,4 +464,4 @@ export function MultiSelect({
 	)
 }
 
-MultiSelect.Option = MultiSelectOption
+SegmentedControl.Option = SegmentedControlOption

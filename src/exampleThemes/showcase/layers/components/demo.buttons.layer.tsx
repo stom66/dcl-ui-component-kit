@@ -1,8 +1,8 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
-import { atlasBtn1x1, atlasBtn3x1, atlasBtnIconsStyled, atlasIconsFontAwesome, Background, ButtonImage, ButtonText, Column, Divider, getTheme, H2, Icon, Label, Layer, Row, Text, ZoneType } from '../../../../ui-component-kit'
+import { atlasBtn1x1, atlasBtn3x1, atlasBtnIconsStyled, atlasIconsFontAwesome, Background, ButtonHold, ButtonImage, ButtonText, Column, Divider, getTheme, H2, Icon, Label, Layer, PropsController, Row, Text, ZoneType } from '../../../../ui-component-kit'
 
 // MARK: DemoButtonsLayer
-/** Demo panel for ButtonText and ButtonImage variants. */
+/** Demo panel for ButtonText, ButtonHold and ButtonImage variants. */
 export class DemoButtonsLayer extends Layer {
 	constructor() {
 		super({
@@ -15,6 +15,11 @@ export class DemoButtonsLayer extends Layer {
 				width : '45vw',
 				height: 'auto',
 			},
+		})
+
+		this.props = new PropsController<Record<string, unknown>>({
+			holdQuick: 0,
+			holdSlow : 0,
 		})
 	}
 
@@ -93,6 +98,40 @@ export class DemoButtonsLayer extends Layer {
 							cols            = {4}
 							backgroundColor = {theme.colors.secondary}
 							callback        = {() => console.log('DemoButtonsLayer: secondary clicked')}
+						/>
+					</Row>
+
+					<Divider margin={{ top: 16, bottom: 8 }} />
+
+					<Label
+						cols   = {12}
+						value  = "ButtonHold — press and hold to fill; release early and it drains"
+						margin = {{ bottom: 8 }}
+					/>
+					<Row
+						justifyContent = "flex-start"
+						alignItems     = "center"
+						spacing        = {16}
+					>
+						<ButtonHold
+							id         = "demo_btn_hold_quick"
+							textLabel  = "Hold 1.5s"
+							onComplete = {() => this.props?.set('holdQuick', (this.props.get('holdQuick') as number) + 1)}
+						/>
+						<ButtonHold
+							id              = "demo_btn_hold_slow"
+							textLabel       = "Hold 3s"
+							fillTime        = {3}
+							drainTime       = {1}
+							backgroundColor = {theme.colors.dark}
+							fillColor       = {theme.colors.danger}
+							borderColor     = {theme.colors.danger}
+							onComplete      = {() => this.props?.set('holdSlow', (this.props.get('holdSlow') as number) + 1)}
+						/>
+						<Text
+							value    = {`Completed: ${this.props?.get('holdQuick') ?? 0} / ${this.props?.get('holdSlow') ?? 0}`}
+							width    = "auto"
+							textWrap = "nowrap"
 						/>
 					</Row>
 

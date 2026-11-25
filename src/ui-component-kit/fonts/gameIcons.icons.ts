@@ -11,7 +11,7 @@
 
 /** When and from what this file + assets/fonts/duck-game-icons.ttf were built. */
 export const GAME_ICONS_BUILD = {
-	builtAt       : '2026-11-19',
+	builtAt       : '2026-11-25',
 	upstreamRepo  : 'https://github.com/game-icons/icons',
 	upstreamCommit: '82d948812bfe3f269ef8f731dcdb07b08160edc4',
 	upstreamDate  : '2026-04-23',

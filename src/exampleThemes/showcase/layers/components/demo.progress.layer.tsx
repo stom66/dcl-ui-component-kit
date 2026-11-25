@@ -46,6 +46,8 @@ const BAR_HEIGHT         = 27
 const TRANSPARENT        = Color4.create(0, 0, 0, 0)
 /** How long the procedural bars take to blend to a new theme colour after each value change. */
 const COLOR_LERP_MS      = 250
+/** Slot width for letters beside horizontal bars, so every bar shares a left edge. */
+const EXAMPLE_LETTER_WIDTH = 14
 
 /**
  * Shared height of every vertical bar (display px), so the row lines up top
@@ -156,18 +158,42 @@ function barCaption(value: string) {
 }
 
 
-// MARK: radialExample
+// MARK: exampleLetter
 /**
- * Wraps one radial demo with its letter label underneath. The letter
- * (A, B, C…) is how the examples are referred to — "radial example C" in
- * the demo maps to the `Example C` comment on the matching block below.
+ * Small letter that names one progress-bar design. The letter (A, B, C…)
+ * is how the examples are referred to — "vertical example B" in the demo
+ * maps to the `Example B` comment on the matching block below.
  */
+function exampleLetter(
+	letter: string,
+	width : number | 'auto' = 'auto',
+) {
+	const theme = getTheme()
+
+	return (
+		<Text
+			key         = "letter"
+			value       = {letter}
+			fontSize    = {theme.typography.size.small}
+			textAlign   = "middle-center"
+			textWrap    = "nowrap"
+			uiTransform = {{
+				width    : width,
+				height   : theme.typography.size.small + 2,
+				minHeight: 0,
+				alignSelf: 'center',
+			}}
+		/>
+	)
+}
+
+
+// MARK: radialExample
+/** Wraps one radial demo with its letter label underneath. */
 function radialExample(
 	letter: string,
 	child : ReactEcs.JSX.Element,
 ) {
-	const theme = getTheme()
-
 	return (
 		<Column
 			key        = {`demo_progress_radial_example_${letter}`}
@@ -176,19 +202,58 @@ function radialExample(
 			spacing    = {2}
 		>
 			{child}
-			<Text
-				value       = {letter}
-				fontSize    = {theme.typography.size.small}
-				textAlign   = "middle-center"
-				textWrap    = "nowrap"
-				uiTransform = {{
-					width    : 'auto',
-					height   : theme.typography.size.small + 2,
-					minHeight: 0,
-					alignSelf: 'center',
-				}}
-			/>
+			{exampleLetter(letter)}
 		</Column>
+	)
+}
+
+
+// MARK: verticalExample
+/** Wraps one vertical demo with its letter label above the bar. */
+function verticalExample(
+	letter: string,
+	child : ReactEcs.JSX.Element,
+) {
+	return (
+		<Column
+			key        = {`demo_progress_vertical_example_${letter}`}
+			width      = "auto"
+			alignItems = "center"
+			spacing    = {8}
+		>
+			{exampleLetter(letter)}
+			{child}
+		</Column>
+	)
+}
+
+
+// MARK: horizontalExample
+/** Wraps one horizontal demo with its letter label to the left of the bar. */
+function horizontalExample(
+	letter: string,
+	child : ReactEcs.JSX.Element,
+) {
+	return (
+		<Row
+			key        = {`demo_progress_horizontal_example_${letter}`}
+			alignItems = "center"
+			spacing    = {6}
+		>
+			{exampleLetter(letter, EXAMPLE_LETTER_WIDTH)}
+			<UiEntity
+				key         = "bar"
+				uiTransform = {{
+					width     : 0,
+					height    : 'auto',
+					flexGrow  : 1,
+					flexShrink: 1,
+					flexBasis : 0,
+				}}
+			>
+				{child}
+			</UiEntity>
+		</Row>
 	)
 }
 
@@ -487,49 +552,58 @@ export class DemoProgressLayer extends Layer {
 							alignItems     = "flex-start"
 							justifyContent = "flex-start"
 						>
-							{cropBox(
+							{/* Example A — timber gauge. */}
+							{verticalExample('A', cropBox(
 								'demo_progress_timber_gauge_box',
 								exampleTimberGaugeBar.artWidth * TIMBER_DISPLAY_HEIGHT / exampleTimberGaugeBar.artHeight,
 								VERTICAL_HEIGHT,
 								TIMBER_CASE_ART_TOP * TIMBER_DISPLAY_HEIGHT / exampleTimberGaugeBar.artHeight,
 								layeredBar('demo_progress_timber_gauge', exampleTimberGaugeBar, randomValue, TIMBER_DISPLAY_HEIGHT, 'bottom'),
-							)}
-							{cropBox(
+							))}
+							{/* Example B — thermometer. */}
+							{verticalExample('B', cropBox(
 								'demo_progress_thermometer_box',
 								exampleThermometerBar.artWidth * THERMO_DISPLAY_HEIGHT / exampleThermometerBar.artHeight,
 								VERTICAL_HEIGHT,
 								THERMO_PLAQUE_ART_TOP * THERMO_DISPLAY_HEIGHT / exampleThermometerBar.artHeight,
 								layeredBar('demo_progress_thermometer', exampleThermometerBar, randomValue, THERMO_DISPLAY_HEIGHT, 'bottom'),
-							)}
-							{cropBox(
+							))}
+							{/* Example C — plasma column. */}
+							{verticalExample('C', cropBox(
 								'demo_progress_plasma_column_box',
 								examplePlasmaColumnBar.artWidth * PLASMA_DISPLAY_HEIGHT / examplePlasmaColumnBar.artHeight,
 								VERTICAL_HEIGHT,
 								PLASMA_FRAME_ART_TOP * PLASMA_DISPLAY_HEIGHT / examplePlasmaColumnBar.artHeight,
 								layeredBar('demo_progress_plasma_column', examplePlasmaColumnBar, randomValue, PLASMA_DISPLAY_HEIGHT, 'bottom'),
+							))}
+							{/* Example D — gradient atlas, filling from the bottom. */}
+							{verticalExample('D',
+								<ProgressBarImage
+									key            = "demo_progress_vertical_atlas"
+									id             = "demo_progress_vertical_atlas"
+									value          = {randomValue}
+									fillFrom       = "bottom"
+									width          = {28}
+									height         = {VERTICAL_HEIGHT}
+									atlas          = {atlasGradientColors}
+									uvCell         = {atlasGradientColors.named.green}
+									uvCropWithFill = {true}
+									uvRotate       = {1}
+									uvFlip         = {true}
+								/>,
 							)}
-							<ProgressBarImage
-								key            = "demo_progress_vertical_atlas"
-								id             = "demo_progress_vertical_atlas"
-								value          = {randomValue}
-								fillFrom       = "bottom"
-								width          = {28}
-								height         = {VERTICAL_HEIGHT}
-								atlas          = {atlasGradientColors}
-								uvCell         = {atlasGradientColors.named.green}
-								uvCropWithFill = {true}
-								uvRotate       = {1}
-								uvFlip         = {true}
-							/>
-							<ProgressBar
-								key       = "demo_progress_vertical_procedural"
-								id        = "demo_progress_vertical_procedural"
-								height    = {VERTICAL_HEIGHT}
-								width     = {28}
-								fillFrom  = "top"
-								fillColor = {colorLerpCurrent(this.procColorVertical, now)}
-								value     = {randomValue}
-							/>
+							{/* Example E — procedural fill, from the top. */}
+							{verticalExample('E',
+								<ProgressBar
+									key       = "demo_progress_vertical_procedural"
+									id        = "demo_progress_vertical_procedural"
+									height    = {VERTICAL_HEIGHT}
+									width     = {28}
+									fillFrom  = "top"
+									fillColor = {colorLerpCurrent(this.procColorVertical, now)}
+									value     = {randomValue}
+								/>,
+							)}
 						</Row>
 					</Column>
 
@@ -811,34 +885,43 @@ export class DemoProgressLayer extends Layer {
 						{/* MARK: Horizontal
 						*/}
 						<H3 key="demo_progress_h_horizontal" value="Horizontal" />
-						<ProgressBar
-							key       = "demo_progress_procedural"
-							id        = "demo_progress_procedural"
-							value     = {randomValue}
-							fillColor = {colorLerpCurrent(this.procColorHorizontal, now)}
-							height    = {BAR_HEIGHT}
-						>
-							{barCaption('procedural')}
-						</ProgressBar>
-						<ProgressBarImage
-							key            = "demo_progress_gradient_reversed"
-							id             = "demo_progress_gradient_reversed"
-							value          = {randomValue}
-							height         = {BAR_HEIGHT}
-							fillFrom       = "right"
-							atlas          = {atlasGradientColors}
-							uvCell         = {atlasGradientColors.named.yellowOrange}
-							uvCropWithFill = {true}
-							uvMirror       = {true}
-						>
-							{barCaption('gradient + reversed')}
-						</ProgressBarImage>
+						{/* Example A — procedural fill. */}
+						{horizontalExample('A',
+							<ProgressBar
+								key       = "demo_progress_procedural"
+								id        = "demo_progress_procedural"
+								value     = {randomValue}
+								fillColor = {colorLerpCurrent(this.procColorHorizontal, now)}
+								height    = {BAR_HEIGHT}
+							>
+								{barCaption('procedural')}
+							</ProgressBar>,
+						)}
+						{/* Example B — gradient atlas, filling from the right. */}
+						{horizontalExample('B',
+							<ProgressBarImage
+								key            = "demo_progress_gradient_reversed"
+								id             = "demo_progress_gradient_reversed"
+								value          = {randomValue}
+								height         = {BAR_HEIGHT}
+								fillFrom       = "right"
+								atlas          = {atlasGradientColors}
+								uvCell         = {atlasGradientColors.named.yellowOrange}
+								uvCropWithFill = {true}
+								uvMirror       = {true}
+							>
+								{barCaption('gradient + reversed')}
+							</ProgressBarImage>,
+						)}
 
 						{/* MARK: Layered textures
 						*/}
-						{stretchLayeredBar('demo_progress_neon_slant', exampleNeonSlantBar, randomValue, LAYERED_BAR_HEIGHT, 'texture: "neon slant"')}
-						{stretchLayeredBar('demo_progress_ember_capsule', exampleEmberCapsuleBar, randomValue, LAYERED_BAR_HEIGHT, 'texture: "ember capsule"')}
-						{stretchLayeredBar('demo_progress_tactical_chamfer', exampleTacticalChamferBar, randomValue, LAYERED_BAR_HEIGHT, 'texture: "tactical chamfer"')}
+						{/* Example C — neon slant. */}
+						{horizontalExample('C', stretchLayeredBar('demo_progress_neon_slant', exampleNeonSlantBar, randomValue, LAYERED_BAR_HEIGHT, 'texture: "neon slant"'))}
+						{/* Example D — ember capsule. */}
+						{horizontalExample('D', stretchLayeredBar('demo_progress_ember_capsule', exampleEmberCapsuleBar, randomValue, LAYERED_BAR_HEIGHT, 'texture: "ember capsule"'))}
+						{/* Example E — tactical chamfer. */}
+						{horizontalExample('E', stretchLayeredBar('demo_progress_tactical_chamfer', exampleTacticalChamferBar, randomValue, LAYERED_BAR_HEIGHT, 'texture: "tactical chamfer"'))}
 					</Column>
 				</Row>
 			</Column>,

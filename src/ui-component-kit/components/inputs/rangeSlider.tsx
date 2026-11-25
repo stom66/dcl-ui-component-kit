@@ -19,8 +19,16 @@ const CATCHER_REACH            = 6000
 
 // MARK: Types
 export type RangeSliderVariant = 'filled' | 'outline'
+/**
+ * - `round`: thin groove, round thumb taller than the groove (default).
+ * - `inset`: thick groove with a round thumb that fits inside it.
+ * - `capsule`: thin groove, tall pill-shaped thumb (rounded top and bottom).
+ */
+export type RangeSliderShape = 'round' | 'inset' | 'capsule'
 
 export type RangeSliderProps = {
+	/** Sibling identity. react-ecs passes `key` through as a real prop. */
+	key?             : string
 	/** Unique id for the per-instance state controller. */
 	id               : string
 	/** Controlled value. Omit to let the slider keep its own state. */
@@ -33,10 +41,22 @@ export type RangeSliderProps = {
 	step?            : number
 	/** Overall width (`PositionUnit`: px / vw / vh). `%` is unsupported (drag math needs pixels). Defaults to `300`. */
 	width?           : PositionUnit
-	/** Overall height = thumb diameter, in px. Defaults to `32`. */
+	/**
+	 * Overall height in px. Defaults to `32`. `round`: thumb diameter.
+	 * `inset`: groove height (the thumb sits inside). `capsule`: thumb height.
+	 */
 	height?          : number
-	/** Track (groove) thickness in px. Defaults to `35%` of `height`. */
+	/** Thumb and groove shape. Defaults to `round`. See `RangeSliderShape`. */
+	shape?           : RangeSliderShape
+	/**
+	 * Groove thickness in px for `round` / `capsule`. Defaults to `35%` (round)
+	 * or `25%` (capsule) of `height`. `inset` always uses `height`.
+	 */
 	trackHeight?     : number
+	/** `inset`: gap between the groove edge and the thumb, in px. Defaults to `4`. */
+	thumbInset?      : number
+	/** `capsule`: thumb width in px. Defaults to `40%` of `height`. */
+	thumbWidth?      : number
 	/** `filled` (solid groove + fill) or `outline` (bordered groove, transparent fill track). Defaults to `filled`. */
 	variant?         : RangeSliderVariant
 	trackColor?      : Color4
@@ -205,7 +225,8 @@ engine.addSystem(sys_rangeSliderDrag)
 
 // MARK: RangeSlider
 /**
- * Horizontal value slider: groove, fill and a round thumb.
+ * Horizontal value slider: groove, fill and a thumb, in three shapes
+ * (`round`, `inset`, `capsule` — see `RangeSliderShape`).
  *
  * Input:
  * - Tap / click anywhere on the slider to jump to that point (nearest tap cell).
@@ -225,7 +246,10 @@ export function RangeSlider({
 	step         = 0,
 	width        = RANGE_WIDTH_DEFAULT,
 	height       = RANGE_HEIGHT_DEFAULT,
+	shape        = 'round',
 	trackHeight,
+	thumbInset   = 4,
+	thumbWidth,
 	variant      = 'filled',
 	trackColor,
 	fillColor,
@@ -265,14 +289,30 @@ export function RangeSlider({
 	}
 
 	const outlined = variant === 'outline'
-	const thumb    = height
-	const groove   = trackHeight ?? Math.max(4, Math.round(height * 0.35))
-	const travelPx = Math.max(1, widthPx - thumb)
+	const inset    = shape === 'inset'
+
+	// Geometry (virtual px). The thumb travels between `edge` and `widthPx - edge - thumbW`.
+	const edge     = inset ? Math.max(0, thumbInset) : 0
+	const thumbH   = inset ? Math.max(4, height - edge * 2) : height
+	const thumbW   = shape === 'capsule'
+		? Math.max(4, thumbWidth ?? Math.round(height * 0.4))
+		: thumbH
+	const groove   = inset
+		? height
+		: Math.max(2, trackHeight ?? Math.round(height * (shape === 'capsule' ? 0.25 : 0.35)))
+	const travelPx = Math.max(1, widthPx - edge * 2 - thumbW)
+	const thumbX   = edge + t * travelPx
+	// Round / capsule: groove ends line up with the thumb centre at min / max.
+	const grooveX  = inset ? 0 : thumbW / 2
+	const grooveW  = inset ? widthPx : Math.max(0, widthPx - thumbW)
+	// Inset: fill wraps the thumb. Otherwise it runs to the thumb centre.
+	const fillW    = inset ? thumbX + thumbW + edge : t * travelPx
 
 	const grooveFill   = trackColor ?? (outlined ? Color4.Clear() : theme.colors.secondary)
 	const grooveStroke = borderColor ?? theme.colors.tertiary
 	const barFill      = fillColor ?? theme.colors.primary
-	const knobFill     = thumbColor ?? (outlined ? theme.colors.dark : theme.colors.light)
+	const knobFill     = thumbColor ?? (outlined && !inset ? theme.colors.dark : theme.colors.light)
+	const knobBorder   = inset && thumbBorderColor === undefined ? 0 : theme.border.width
 	const knobStroke   = thumbBorderColor ?? theme.colors.primary
 
 	const steps = step > 0 ? Math.round((max - min) / step) : 0
@@ -305,12 +345,9 @@ export function RangeSlider({
 			key         = {`${id}_root`}
 			uiTransform = {{
 				width         : widthPx,
-				height        : thumb,
+				height        : height,
 				flexGrow      : 0,
 				flexShrink    : 0,
-				flexDirection : 'row',
-				alignItems    : 'center',
-				padding       : { left: thumb / 2, right: thumb / 2 },
 				overflow      : 'visible',
 				...uiTransform,
 			}}
@@ -319,7 +356,9 @@ export function RangeSlider({
 			<UiEntity
 				key         = {`${id}_groove`}
 				uiTransform = {{
-					width        : '100%',
+					positionType : 'absolute',
+					position     : { left: grooveX, top: (height - groove) / 2 },
+					width        : grooveW,
 					height       : groove,
 					borderRadius : groove / 2,
 					borderWidth  : outlined ? theme.border.width : 0,
@@ -335,32 +374,32 @@ export function RangeSlider({
 					uiTransform = {{
 						positionType : 'absolute',
 						position     : { left: 0, top: 0 },
-						width        : `${t * 100}%`,
+						width        : fillW,
 						height       : '100%',
 						borderRadius : groove / 2,
 						pointerFilter: 'none',
 					}}
 					uiBackground = {{ color: Color4.create(barFill.r, barFill.g, barFill.b, barFill.a) }}
 				/>
-				{/* Thumb */}
-				<UiEntity
-					key         = {`${id}_thumb`}
-					uiTransform = {{
-						positionType : 'absolute',
-						position     : { left: `${t * 100}%`, top: (groove - thumb) / 2 },
-						margin       : { left: -thumb / 2 },
-						width        : thumb,
-						height       : thumb,
-						borderRadius : thumb / 2,
-						borderWidth  : theme.border.width,
-						borderColor  : knobStroke,
-						pointerFilter: 'none',
-					}}
-					uiBackground = {{ color: Color4.create(knobFill.r, knobFill.g, knobFill.b, knobFill.a) }}
-				/>
 			</UiEntity>
 
-			{/* Tap cells — cover the whole slider (padding included). */}
+			{/* Thumb */}
+			<UiEntity
+				key         = {`${id}_thumb`}
+				uiTransform = {{
+					positionType : 'absolute',
+					position     : { left: thumbX, top: (height - thumbH) / 2 },
+					width        : thumbW,
+					height       : thumbH,
+					borderRadius : Math.min(thumbW, thumbH) / 2,
+					borderWidth  : knobBorder,
+					borderColor  : knobStroke,
+					pointerFilter: 'none',
+				}}
+				uiBackground = {{ color: Color4.create(knobFill.r, knobFill.g, knobFill.b, knobFill.a) }}
+			/>
+
+			{/* Tap cells — cover the whole slider. */}
 			{readOnly ? null : (
 				<UiEntity
 					key         = {`${id}_cells`}
@@ -399,7 +438,7 @@ export function RangeSlider({
 						positionType : 'absolute',
 						position     : { top: -CATCHER_REACH, left: -CATCHER_REACH },
 						width        : CATCHER_REACH * 2 + widthPx,
-						height       : CATCHER_REACH * 2 + thumb,
+						height       : CATCHER_REACH * 2 + height,
 						pointerFilter: 'block',
 					}}
 					onMouseUp = {() => { if (drag?.id === id) finish(id) }}

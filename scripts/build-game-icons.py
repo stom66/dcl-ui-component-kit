@@ -16,7 +16,11 @@ Glyph pipeline (tuned to match convert-fa-fonts.py for Unity's FontEngine):
   - flip SVG y-down into font y-up; 1024 upem (SVG units ×2) for precision
   - cubic → quadratic (cu2qu), outer contours clockwise (TrueType convention)
   - removeOverlaps when skia-pathops is installed (strongly recommended)
-  - only core tables (no GSUB/GPOS), no Latin letters → no Latin atlas prefill
+  - only core tables (no GSUB/GPOS)
+  - one visible ASCII glyph ('.'): the asset-bundle converter (abgen) pre-fills each
+    font's atlas from ASCII/Latin-1 and REFUSES a font with no outline for any of
+    those characters — the scene then silently keeps the built-in font (icons = tofu)
+  - checked against the converter's other limits before saving (see check_converter_limits)
 
 Requires: pip install fonttools skia-pathops
 
@@ -68,6 +72,12 @@ FONT_SRC        = f'assets/fonts/{FONT_FILE}'
 FAMILY          = 'DuckGameIcons'
 # Folders in the upstream repo that are not part of the game-icons.net set.
 SKIP_AUTHOR_DIRS = {'badges'}
+# abgen (Explorer asset-bundle converter) limits — crate/src/fontgen in decentraland/abgen.
+ABGEN_MAX_FONT_BYTES   = 16 * 1024 * 1024
+ABGEN_MAX_GLYPH_POINTS = 8192
+ABGEN_MAX_FONT_POINTS  = 4_000_000
+# ASCII 0x20–0x7E plus the Latin-1 extras abgen pre-fills; the font must draw at least one.
+ABGEN_PREFILL_SAMPLE   = '.'
 # Which author keeps the bare name when two contributors use the same filename.
 # Everyone else's copy is addressed as `author/name`.
 AUTHOR_PRIORITY  = ('lorc', 'delapouite')
@@ -167,6 +177,45 @@ def empty_glyph():
 	return TTGlyphPen(None).glyph()
 
 
+# MARK: period_glyph
+def period_glyph():
+	"""A small clockwise square on the baseline, mapped to '.' so abgen has an ASCII outline to pre-fill."""
+	pen = TTGlyphPen(None)
+	size = round(64 * SCALE)
+	x0   = (UPEM - size) // 2
+	pen.moveTo((x0, 0))
+	pen.lineTo((x0, size))
+	pen.lineTo((x0 + size, size))
+	pen.lineTo((x0 + size, 0))
+	pen.closePath()
+	return pen.glyph()
+
+
+# MARK: check_converter_limits
+def check_converter_limits(path: Path) -> None:
+	"""
+	Fail the build when abgen would refuse the font. A refused font gets no asset bundle,
+	so the Explorer keeps its built-in face and every icon renders as tofu, with no error
+	in the scene.
+	"""
+	data = path.read_bytes()
+	assert len(data) <= ABGEN_MAX_FONT_BYTES, f'{path.name} is {len(data)} bytes, over abgen\'s 16 MB cap'
+	assert data[:4] == b'\x00\x01\x00\x00', 'abgen takes TrueType (glyf) fonts only'
+	font = TTFont(str(path))
+	glyf = font['glyf']
+	cmap = font.getBestCmap()
+	total = 0
+	for name in font.getGlyphOrder():
+		glyph = glyf[name]
+		points = len(glyph.coordinates) if glyph.numberOfContours > 0 else 0
+		assert points <= ABGEN_MAX_GLYPH_POINTS, f'{name} has {points} points, over abgen\'s {ABGEN_MAX_GLYPH_POINTS}'
+		total += points
+	assert total <= ABGEN_MAX_FONT_POINTS, f'{total} outline points, over abgen\'s {ABGEN_MAX_FONT_POINTS}'
+	prefill = [cmap[ord(c)] for c in ABGEN_PREFILL_SAMPLE if ord(c) in cmap]
+	assert any(glyf[g].numberOfContours > 0 for g in prefill), \
+		'no outline for any ASCII character — abgen refuses the font (icons render as tofu)'
+
+
 # MARK: glyph_lsb
 def glyph_lsb(glyph) -> int:
 	coords = getattr(glyph, 'coordinates', None)
@@ -179,9 +228,9 @@ def glyph_lsb(glyph) -> int:
 def build_font(members: list[tuple[int, Icon]], dest: Path, upstream: dict) -> dict:
 	"""Write the icon TTF. Returns stats."""
 	family = FAMILY
-	order  = ['.notdef', 'space']
-	cmap   = {0x20: 'space'}
-	glyphs = {'.notdef': empty_glyph(), 'space': empty_glyph()}
+	order  = ['.notdef', 'space', 'period']
+	cmap   = {0x20: 'space', 0x2E: 'period'}
+	glyphs = {'.notdef': empty_glyph(), 'space': empty_glyph(), 'period': period_glyph()}
 	for index, icon in members:
 		cp   = CODEPOINT_START + index
 		name = f'uni{cp:04X}'
@@ -236,8 +285,7 @@ def build_font(members: list[tuple[int, Icon]], dest: Path, upstream: dict) -> d
 		overlaps_removed = True
 
 	font.save(str(dest))
-	check = TTFont(str(dest))
-	assert check.sfntVersion == '\x00\x01\x00\x00'
+	check_converter_limits(dest)
 	return {'glyphs': len(members), 'bytes': dest.stat().st_size, 'overlaps_removed': overlaps_removed}
 
 
