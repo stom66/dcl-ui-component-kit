@@ -2,6 +2,10 @@
 
 `<GameIcon />` renders any of the ~4,000 icons from **[game-icons.net](https://game-icons.net)** by name, as a font glyph. It works the same as `<FontAwesome />`: same props, same tinting, same sizing.
 
+![game-icons.net icons rendered with GameIcon](./media/gameicon.png)
+
+![Game icons tinted with fontColor](./media/gameicon-color.png)
+
 ```tsx
 import { GameIcon, getTheme } from '@stom66/dcl-ui-component-kit'
 
@@ -84,4 +88,4 @@ Then:
 
 **Build options:** `--only a,b,c` builds a small pilot set. It overwrites the outputs, so run a full build afterwards.
 
-**What the script does:** drops each SVG's black background square, flips the white icon path into font coordinates (1024 upem), converts curves to TrueType quadratics, makes outer contours clockwise, removes overlaps (skia-pathops), and writes core tables only (no Latin glyphs, so Unity has nothing to prefill). The `badges/` folder upstream is a separate template set and is skipped. Codepoints start at U+E000; the BMP Private Use Area holds 6,400, so there's room for about 2,200 more icons before the script needs to move to plane 15.
+**What the script does:** drops each SVG's black background square, flips the white icon path into font coordinates (1024 upem), converts curves to TrueType quadratics, makes outer contours clockwise, removes overlaps (skia-pathops), writes core tables only, and adds one visible ASCII glyph (`.`). That last one is required: the Explorer's asset-bundle converter pre-fills each font's atlas from ASCII and **refuses a font that draws none of those characters**. A refused font gets no bundle, so every icon silently falls back to the built-in font and renders as tofu. The script checks this, and the converter's size and point limits, before saving. The `badges/` folder upstream is a separate template set and is skipped. Codepoints start at U+E000; the BMP Private Use Area holds 6,400, so there's room for about 2,200 more icons before the script needs to move to plane 15.

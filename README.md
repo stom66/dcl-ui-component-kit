@@ -47,7 +47,6 @@ Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
     - [Divider](#divider)
   - [Typography](#typography)
     - [H1 – H6](#h1--h6)
-    - [SectionHeader](#sectionheader)
     - [Text](#text)
     - [Code](#code)
     - [Label](#label)
@@ -55,9 +54,13 @@ Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
     - [ButtonText](#buttontext)
     - [ButtonImage](#buttonimage)
     - [ButtonImageClose](#buttonimageclose)
+    - [ButtonHold](#buttonhold)
     - [Toggle](#toggle)
-    - [MultiSelect](#multiselect)
+    - [Checkbox](#checkbox)
+    - [SegmentedControl](#segmentedcontrol)
     - [RangeSlider](#rangeslider)
+    - [NumberInput](#numberinput)
+    - [ColorPicker](#colorpicker)
   - [Icons](#icons)
     - [Icon](#icon)
     - [SpriteIcon](#spriteicon)
@@ -81,6 +84,10 @@ Prefer to do it yourself? **[docs/manual-install.md](docs/manual-install.md)**.
 - [Example layouts](#example-layouts)
   - [Scoreboard / leaderboard](#scoreboard--leaderboard)
   - [Game status / round timer](#game-status--round-timer)
+  - [Match summary](#match-summary)
+  - [Settings menu](#settings-menu)
+  - [Hotbars / abilities](#hotbars--abilities)
+  - [Loading screen](#loading-screen)
 - [License & credits](#license--credits)
 - [This repo as a demo scene](#this-repo-as-a-demo-scene)
 - [Agent guidance](#agent-guidance)
@@ -124,12 +131,10 @@ You do not need a custom theme to start — defaults look like Decentraland out 
 | **Layer** | Show/hide group for a collection of UI (HUD, popup, menu). One layer = one zone. |
 | **Zone** | Preset slot (`Top`, `BottomRight`, `Default`, …) via `zone: ZoneType.*` or `<Zone type={…}>`. |
 | **Layout** | `Row` / `RowReverse`, `Column` / `ColumnReverse`, `Background`, `BackgroundGradient`, `Divider`, `Label`. |
-| **Components** | Buttons, progress bars, text, icons, inputs (toggle, multi-select, range slider), spinners / motion, toasts. |
+| **Components** | Buttons, progress bars, text, icons, inputs (toggle, checkbox, segmented control, range slider, number input, color picker), hold-to-confirm button, spinners / motion, toasts. |
 | **Theme** | Colours / type / sizing. Override via `SetupUiComponentKit({ theme })` — never fork the defaults in place. |
 
 # Components
-
-<!-- Screenshots: save isolated captures under docs/media/components/ using the filenames below. -->
 
 The examples assume the kit components, `Color4`, referenced atlases, and app callbacks are already in scope. `fullKitShorthands` shows the shared layout and visual shorthands accepted by components based on `KitEntityProps`; component-specific options are shown in each full example. Use only the shared options supported by the component's props.
 
@@ -270,8 +275,6 @@ Positions UI in one of the kit's preset screen areas.
 ### ZoneRoot
 
 Root container used to place content within a zone.
-
-![ZoneRoot component screenshot](docs/media/components/zone-root.png)
 
 **Minimum usage**
 
@@ -602,39 +605,6 @@ Theme-styled headings, from `H1` (largest) down to `H6` (smallest). All six take
 
 ---
 
-### SectionHeader
-
-Styled heading for a section within a panel.
-
-![SectionHeader component screenshot](docs/media/components/section-header.png)
-
-**Minimum usage**
-
-```tsx
-<SectionHeader value="Audio" />
-```
-
-<details>
-<summary><b>Full shorthand usage</b></summary>
-
-```tsx
-<SectionHeader
- {...fullKitShorthands}
- {...fullTextShorthands}
- value     = "Audio"
- fontColor = {Color4.White()}
- fontSize  = {22}
- font      = "sans-serif"  // 'sans-serif' | 'serif' | 'monospace'
- fontSrc   = "assets/fonts/Display.ttf"
- textAlign = "middle-left" // 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
- textWrap  = "nowrap"      // 'wrap' | 'nowrap'
-/>
-```
-
-</details>
-
----
-
 ### Text
 
 Displays body text with theme-aware typography and text shorthands.
@@ -872,11 +842,51 @@ Image-based close button, commonly used by a hideable layer.
 
 ---
 
+### ButtonHold
+
+Press and hold to confirm. A bar fills the button while it's held and drains when released early (twice as fast by default); when it fills, the button pulses once and `onComplete` fires.
+
+![ButtonHold filling, draining and completing](docs/media/components/button-hold.gif)
+
+**Minimum usage**
+
+```tsx
+<ButtonHold id="leave_match" textLabel="Hold to leave" onComplete={() => leaveMatch()} />
+```
+
+<details>
+<summary><b>Full usage</b></summary>
+
+```tsx
+<ButtonHold
+ id              = "leave_match"
+ textLabel       = "Hold to leave"
+ width           = {200}
+ height          = {48}
+ fillTime        = {3}   // seconds to fill from empty
+ drainTime       = {1}   // seconds to drain from full (default fillTime / 2)
+ backgroundColor = {theme.colors.dark}
+ fillColor       = {theme.colors.danger}
+ borderColor     = {theme.colors.danger}
+ pulse           = {true}
+ onProgress      = {(progress) => {}}
+ onComplete      = {() => leaveMatch()}
+/>
+```
+
+Read the fill anywhere with `getButtonHoldProgress(id)`.
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
 ### Toggle
 
 Boolean switch control with an animated track and thumb.
 
-![Toggle switching on and off](docs/media/duck-toggles.gif)
+![Toggle switching on and off](docs/media/input-toggles.gif)
 
 **Minimum usage**
 
@@ -909,30 +919,75 @@ Boolean switch control with an animated track and thumb.
 
 ---
 
-### MultiSelect
+### Checkbox
 
-Single-choice segmented control. A selector box slides over the chosen option; click to cycle to the next one (wraps around), or set `clickMode="direct"` to click an option directly. `filled` and `outline` variants.
+Square on/off box: a solid check when on, a faint cross when off. Icons and on / off colours are configurable.
+
+![Checkbox default, custom and empty styles](docs/media/checkbox.gif)
 
 **Minimum usage**
 
 ```tsx
-<MultiSelect id="aim_step">
- <MultiSelectOption value="position"  label="Position"  />
- <MultiSelectOption value="direction" label="Direction" />
- <MultiSelectOption value="strength"  label="Strength"  />
-</MultiSelect>
+<Checkbox id="show_hints" label="Show hints" />
 ```
 
 <details>
 <summary><b>Full usage</b></summary>
 
 ```tsx
-<MultiSelect
+<Checkbox
+ id                     = "favourite"
+ label                  = "Favourite"
+ value                  = {isFavourite}
+ defaultValue           = {false}
+ size                   = {32}
+ checkedIcon            = "star"     // Font Awesome name, any element, or null
+ uncheckedIcon          = {null}
+ iconSize               = {20}
+ checkedIconColor       = {theme.colors.warning}
+ uncheckedIconColor     = {theme.colors.tertiary}
+ checkedBackgroundColor = {theme.colors.info}
+ backgroundColor        = {theme.colors.dark}
+ checkedBorderColor     = {theme.colors.info}
+ borderColor            = {theme.colors.tertiary}
+ onChange               = {(on) => setFavourite(on)}
+/>
+```
+
+Read it anywhere with `getCheckboxValue(id)`; set it from game code with `setCheckboxValue(id, true)`.
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
+### SegmentedControl
+
+Single-choice segmented control. A selector box slides over the chosen option; click an option to select it, or set `clickMode="cycle"` so any click moves to the next one (wrapping around). `filled` and `outline` variants.
+
+![SegmentedControl options being selected, with the selector sliding between them](docs/media/segmented-controls.gif)
+
+**Minimum usage**
+
+```tsx
+<SegmentedControl id="aim_step">
+ <SegmentedControlOption value="position"  label="Position"  />
+ <SegmentedControlOption value="direction" label="Direction" />
+ <SegmentedControlOption value="strength"  label="Strength"  />
+</SegmentedControl>
+```
+
+<details>
+<summary><b>Full usage</b></summary>
+
+```tsx
+<SegmentedControl
  id                  = "difficulty"
  value               = {difficulty}
  defaultValue        = "normal"
  variant             = "outline"
- clickMode           = "direct"
+ clickMode           = "cycle"
  readOnly            = {false}
  width               = "100%"
  height              = {48}
@@ -947,13 +1002,13 @@ Single-choice segmented control. A selector box slides over the chosen option; c
  onSelect            = {(value, index) => setDifficulty(value)}
  onDeselect          = {(value, index) => {}}
 >
- <MultiSelectOption value="easy"   label="Easy"   />
- <MultiSelectOption value="normal" label="Normal" onSelect={() => {}} />
- <MultiSelectOption value="hard"   render={(state) => <FontAwesome icon="skull" fontColor={state.color} />} />
-</MultiSelect>
+ <SegmentedControlOption value="easy"   label="Easy"   />
+ <SegmentedControlOption value="normal" label="Normal" onSelect={() => {}} />
+ <SegmentedControlOption value="hard"   render={(state) => <FontAwesome icon="skull" fontColor={state.color} />} />
+</SegmentedControl>
 ```
 
-Drive it from game code with `setMultiSelectIndex(id, index)` / `setMultiSelectValue(id, value)`.
+Drive it from game code with `setSegmentedControlIndex(id, index)` / `setSegmentedControlValue(id, value)`, and read it with `getSegmentedControlIndex(id)` / `getSegmentedControlValue(id)`. Setting it from code does not fire `onSelect` / `onDeselect`.
 
 </details>
 
@@ -963,7 +1018,9 @@ Drive it from game code with `setMultiSelectIndex(id, index)` / `setMultiSelectV
 
 ### RangeSlider
 
-Drag or tap to pick a number. Tap anywhere on the slider to jump there (the whole interface on mobile); on desktop, hold and drag.
+Drag or tap to pick a number. Tap anywhere on the slider to jump there (the whole interface on mobile); on desktop, hold and drag. Three shapes: `round` (thin groove, round thumb), `inset` (thumb inside a thick groove) and `capsule` (thin groove, tall pill thumb).
+
+![RangeSlider round, stepped, inset and capsule shapes](docs/media/range-slider.gif)
 
 **Minimum usage**
 
@@ -984,16 +1041,107 @@ Drag or tap to pick a number. Tap anywhere on the slider to jump there (the whol
  step             = {10}
  width            = "20vw"
  height           = {32}
- trackHeight      = {12}
+ shape            = "capsule"
+ trackHeight      = {8}
+ thumbWidth       = {14}   // capsule only
+ thumbInset       = {4}    // inset only
  variant          = "outline"
+ trackColor       = {theme.colors.dark}
  fillColor        = {theme.colors.primary}
  thumbColor       = {theme.colors.dark}
  thumbBorderColor = {theme.colors.primary}
+ borderColor      = {theme.colors.tertiary}
  tapCells         = {9}
+ readOnly         = {false}
  onChange         = {(value) => setFov(value)}
  onChangeEnd      = {(value) => saveSettings()}
 />
 ```
+
+`width` must be px, vw or vh (not `%`). Read it anywhere with `getRangeSliderValue(id)`; set it from game code with `setRangeSliderValue(id, 90)`.
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
+### NumberInput
+
+A number field wrapped by − / + buttons, joined into one bar with rounded outer corners. Click the buttons, or click the field, type a value and press Enter. Supports `min`, `max`, `step`, and several button pairs (e.g. ±1 and ±10).
+
+![NumberInput with single and multiple step buttons](docs/media/number-input.gif)
+
+**Minimum usage**
+
+```tsx
+<NumberInput id="rounds" min={1} max={10} />
+```
+
+<details>
+<summary><b>Full usage</b></summary>
+
+```tsx
+<NumberInput
+ id              = "bet"
+ value           = {bet}
+ defaultValue    = {100}
+ min             = {0}
+ max             = {9999}
+ step            = {10}
+ steps           = {[10, 100]}  // −100 −10 [field] +10 +100
+ decimals        = {0}
+ editable        = {true}
+ width           = {320}
+ height          = {40}
+ backgroundColor = {theme.colors.dark}
+ borderRadius    = {8}
+ buttonColor     = {theme.colors.secondary}
+ fontColor       = {theme.colors.light}
+ fontSize        = {18}
+ onChange        = {(value) => setBet(value)}
+/>
+```
+
+Read it anywhere with `getNumberInputValue(id)`; set it from game code with `setNumberInputValue(id, 250)`.
+
+</details>
+
+<sub>[↑ Back to contents](#contents)</sub>
+
+---
+
+### ColorPicker
+
+HSV colour wheel with an optional brightness slider and preset swatches. Tap the wheel to pick; on desktop, hold and drag to fine-tune. Read the colour anywhere with `getColorPickerColor(id)` / `getColorPickerHex(id)`.
+
+![ColorPicker: picking from the wheel, adjusting brightness and choosing presets](docs/media/color_picker.gif)
+
+**Minimum usage**
+
+```tsx
+<ColorPicker id="hair" />
+```
+
+<details>
+<summary><b>Full usage</b></summary>
+
+```tsx
+<ColorPicker
+ id              = "hair"
+ defaultColor    = "#3BA4FF"
+ size            = {220}
+ showValueSlider = {true}
+ sliderHeight    = {28}
+ gridResolution  = {16}
+ presets         = {['#000000', '#5A3825', '#E8C07D']}
+ presetSize      = {28}
+ spacing         = {12}
+ onChange        = {(color, hex) => setHairColor(color)}
+/>
+```
+
+Set it from game code with `setColorPickerColor(id, '#FF8800')`.
 
 </details>
 
@@ -1150,6 +1298,10 @@ For the full list of included icons, see the [Font Awesome Free icon search](htt
 
 Displays any of the ~4,000 [game-icons.net](https://game-icons.net) icons by name. Same props as `FontAwesome`.
 
+![game-icons.net icons rendered with GameIcon](docs/media/gameicon.png)
+
+![Game icons tinted with fontColor](docs/media/gameicon-color.png)
+
 Find names on game-icons.net (the last part of an icon's URL) or search [`gameIcons.icons.ts`](src/ui-component-kit/fonts/gameIcons.icons.ts). The font (`assets/fonts/duck-game-icons.ttf`) is copied into your scene by `copy-assets`. The icons are CC BY 3.0, so credit the authors in your scene. See [docs/game-icons.md](docs/game-icons.md).
 
 **Minimum usage**
@@ -1181,7 +1333,7 @@ Find names on game-icons.net (the last part of an icon's URL) or search [`gameIc
 
 Procedural progress bar with configurable fill, background, and border.
 
-![Horizontal progress bars: procedural, gradient and layered-texture styles](docs/media/progress_horizontal.gif)
+![Horizontal progress bars: procedural, reversed gradient, and the neon slant, ember capsule and tactical chamfer textures](docs/media/progress-horizontal.gif)
 
 **Minimum usage**
 
@@ -1279,7 +1431,9 @@ Progress bar with image or atlas textures, including optional cropped fill.
 
 Circular progress indicator rendered from a sprite sheet.
 
-![ProgressBarRadial filling](docs/media/progress_radial.gif)
+Pass a different sheet as `atlas` for another style. Stock sheets: `atlasSpritesProgressRadial` (default thin ring), `…RadialThick`, `…RadialPie`, `…RadialSegments`, `…RadialComet`, `…RadialDots`, `…RadialKnob`, `…RadialStopwatch`, `…RadialSunburst`, and rounded-square `atlasSpritesProgressSquare`, `…SquareSegments`, `…SquareComet`, `…SquareDots`, `…SquareSunburst`.
+
+![Every stock radial and square ProgressBarRadial style filling](docs/media/progress_radial.gif)
 
 > **Your own ring sprite sheet:** see [Custom textures](docs/custom-textures.md).
 
@@ -1326,6 +1480,8 @@ Every animation below, plus combinations and hover / click triggers:
 ### Bounce
 
 Moves its child up and down.
+
+![Bounce moving its child up and down](docs/media/anim-bounce.gif)
 
 **Minimum usage**
 
@@ -1408,6 +1564,8 @@ Flashes its child's border toward a chosen colour.
 
 Temporarily shifts its child's tint toward a chosen colour.
 
+![FlashColor flashing to a target colour and back](docs/media/anim-flashColor.gif)
+
 **Minimum usage**
 
 ```tsx
@@ -1447,6 +1605,8 @@ Temporarily shifts its child's tint toward a chosen colour.
 ### Pulse
 
 Grows and shrinks its child.
+
+![Pulse scaling its child up and down](docs/media/anim-pulse.gif)
 
 **Minimum usage**
 
@@ -1489,6 +1649,8 @@ Grows and shrinks its child.
 
 Moves its child from side to side.
 
+![Shake jittering its child side to side](docs/media/anim-shake.gif)
+
 **Minimum usage**
 
 ```tsx
@@ -1529,6 +1691,8 @@ Moves its child from side to side.
 
 Rotates its child's texture UVs to show activity.
 
+![Spinner rotating its child](docs/media/anim-spinner.gif)
+
 **Minimum usage**
 
 ```tsx
@@ -1566,6 +1730,8 @@ Rotates its child's texture UVs to show activity.
 ### Wiggle
 
 Rotates its child's texture UVs back and forth.
+
+![Wiggle rocking its child back and forth](docs/media/anim-wiggle.gif)
 
 **Minimum usage**
 
@@ -1610,7 +1776,7 @@ Rotates its child's texture UVs back and forth.
 
 Layer that displays toast notifications created with the toast helpers.
 
-![ToastHostLayer component screenshot](docs/media/components/toast-host-layer.png)
+![Toast notifications appearing and dismissing](docs/media/toasts.gif)
 
 **Minimum usage**
 
@@ -1651,6 +1817,30 @@ The current list layout demonstrates a scoreboard or leaderboard built from reus
 A game HUD layout that combines round status and a timer.
 
 ![Game status / round timer layout](docs/media/duck-round-timer.gif)
+
+### Match summary
+
+End-of-match screen: result banner, stat tiles, an MVP card, rewards, an animated XP bar, team K/D/A rows and Play again / Leave actions.
+
+![Match summary layout](docs/media/layout-matchSummary.gif)
+
+### Settings menu
+
+Tabbed settings: volume range sliders, toggles, segmented pickers for particle level and light / dark theme, and a dropdown, with reset / apply actions. Only settings a scene can control itself.
+
+![Settings menu layout](docs/media/layout-settings.gif)
+
+### Hotbars / abilities
+
+Status bars, a selectable 8-slot item hotbar with stack counts and cooldown sweeps, an ability bar, and key prompts.
+
+![Hotbars / abilities layout](docs/media/hotbars.gif)
+
+### Loading screen
+
+Full-screen loading screen with progress and tips.
+
+![Loading screen layout](docs/media/layout-loadingScreen.gif)
 
 ## License & credits
 

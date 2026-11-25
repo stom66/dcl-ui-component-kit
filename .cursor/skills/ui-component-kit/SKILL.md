@@ -165,7 +165,7 @@ On **kit components**, **prefer top-level shorthands** over nesting `uiTransform
 
 | Component | Prefer | Instead of |
 |---|---|---|
-| `Text` / `H1`–`H6` / `Code` / `Header` / `SectionHeader` | `value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize, fontSrc, … }}` |
+| `Text` / `H1`–`H6` / `Code` / `Header` | `value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap` | `uiText={{ value, color, fontSize, fontSrc, … }}` |
 | `Background` / `Row` / `Column` fill | `backgroundColor` | `uiBackground={{ color }}` |
 | Border chrome | `borderColor`, `borderWidth`, `borderRadius` | nesting border fields on `uiTransform` |
 | Layout (`Row` / `Column` / `Background` / …) | `flexWrap`, `alignItems`, `justifyContent`, `padding`, `margin`, `minHeight`, … | `uiTransform={{ flexWrap, alignItems, … }}` |
@@ -306,7 +306,7 @@ canvas size is known.
 | `theme.typography.size.default` | Body text, `ButtonText` labels |
 | `theme.typography.size.small` | Captions, hints, dense UI |
 | `theme.typography.size.code` | Monospace / debug (`Code`) |
-| `theme.typography.size.h1`–`h6` | Headings (`H1`–`H6`, `Header` / `SectionHeader` use `h2`) |
+| `theme.typography.size.h1`–`h6` | Headings (`H1`–`H6`, `Header` uses `h2`) |
 
 Omitting `fontSize` on `Text` / `Label` / `ButtonText` uses `default` (headings use their level).
 
@@ -707,11 +707,12 @@ When creating any kind of button element, ask the user if this is meant to be an
 |---|---|---|
 | Image | `ButtonImage` | Atlas / texture button (hover + press states) |
 | Text | `ButtonText` | Labelled control with no dedicated image asset |
+| Press and hold | `ButtonHold` | Confirm a destructive or important action: fills over `fillTime`, drains over `drainTime`, `onComplete` once per hold |
 | Close / dismiss | `ButtonImageClose` or `showCloseButton: true` | Hideable layer chrome |
 
 Both `ButtonImage` and `ButtonText` take a unique `id` and a `callback`. See `src/ui-component-kit/components/buttons/`.
 
-**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `callback` fires on any `onMouseUp` on the button (Explorer only sends UP to the element under the pointer, so release-off still cancels). Hover is visual only — do not gate the click on it. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). The inputs (`Toggle`, `MultiSelect`) use the same rule.
+**Pointer:** on **mobile**, `callback` fires on `mouseDown` (touch). On **desktop**, `callback` fires on any `onMouseUp` on the button (Explorer only sends UP to the element under the pointer, so release-off still cancels). Hover is visual only — do not gate the click on it. Use `isMobile()` for that split — **not** `!isDesktop()` (`isWeb` may be added later). The inputs (`Toggle`, `SegmentedControl`) use the same rule.
 
 **Pointer filter:** react-ecs defaults every element to `PFM_NONE`; `onMouseDown` does **not** make a box pickable. `ButtonText` / `ButtonImage` force `pointerFilter="block"` on the box that owns the handlers. In any hand-rolled clickable box, set `pointerFilter="block"` on the handler owner and `pointerFilter="none"` on decorative children (icons, glyphs, spinners).
 
@@ -756,8 +757,11 @@ All in `components/inputs/`; each keeps per-`id` state and supports `value` (con
 | Need | Component | Notes |
 |---|---|---|
 | On / off | `Toggle` | `onChange(boolean)` |
-| Pick one of a few options in a row | `MultiSelect` + `MultiSelectOption` children | Click cycles to the next (wraps) by default; `clickMode="direct"` to click an option. `variant="filled" \| "outline"`. `onSelect(value, index)` / `onDeselect(value, index)`. `render(state)` on an option for icons (tint with `state.color`). Game-driven HUDs: `readOnly` + `setMultiSelectIndex(id, i)` |
-| Number in a range | `RangeSlider` | `min` / `max` / `step`, `onChange` + `onChangeEnd`. `width` must be px / vw / vh. Taps jump to the nearest of `tapCells` (the full mobile interface); desktop hold-drag |
+| On / off in a list or form | `Checkbox` | `label`, `checkedIcon` / `uncheckedIcon` (FA names, element or `null`), on / off colours |
+| Whole number / amount | `NumberInput` | − / + buttons around a typed field; `min` / `max` / `step`, extra pairs with `steps={[1, 10]}` |
+| Pick one of a few options in a row | `SegmentedControl` + `SegmentedControlOption` children | Click an option to select it (default); `clickMode="cycle"` makes any click advance to the next (wrapping). `variant="filled" \| "outline"`. `onSelect(value, index)` / `onDeselect(value, index)`. `render(state)` on an option for icons (tint with `state.color`). Game-driven HUDs: `readOnly` + `setSegmentedControlIndex(id, i)` |
+| Number in a range | `RangeSlider` | `min` / `max` / `step`, `onChange` + `onChangeEnd`. `shape="round" \| "inset" \| "capsule"` (round thumb / thumb inside a thick groove / tall pill thumb). `width` must be px / vw / vh. Taps jump to the nearest of `tapCells` (the full mobile interface); desktop hold-drag |
+| Pick a colour | `ColorPicker` (`components/colorPicker/`) | HSV wheel + optional brightness slider (`showValueSlider`) + `presets` hex swatches. `defaultColor` (hex or `Color4`), `size`, `gridResolution` (tap precision). `onChange(color, hex)`; game code: `getColorPickerColor(id)` / `getColorPickerHex(id)` / `setColorPickerColor(id, c)`. Taps snap to a cell; desktop hold-drag. Demo: `demo.colorPicker.layer.tsx` |
 
 Do not hand-roll a sliding selector or a drag slider — use these. For a dropdown or text field use the SDK `Dropdown` / `Input`.
 

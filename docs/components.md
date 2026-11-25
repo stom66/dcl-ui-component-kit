@@ -164,7 +164,7 @@ Short labelled chip / callout. Supports `cols`. Chip fill via `backgroundColor`;
 
 ## Buttons
 
-**Variants:** procedural (`ButtonText`) · image-based (`ButtonImage` / `ButtonImageClose`)
+**Variants:** procedural (`ButtonText`, `ButtonHold`) · image-based (`ButtonImage` / `ButtonImageClose`)
 
 ### `ButtonText`
 
@@ -233,6 +233,33 @@ import { atlasBtn3x1, atlasBtnIconsStyled, ButtonImage, FontAwesome, Row, Text }
 ### `ButtonImageClose`
 
 Same image API as `ButtonImage`; default atlas column `1`. Usually injected via `showCloseButton` on a layer.
+
+### `ButtonHold`
+
+Press-and-hold button. While held, a bar fills the button left to right over `fillTime`; released early, it drains over `drainTime`. Rates are linear: with `fillTime` 3 and `drainTime` 1, holding 2 s fills 2/3, and half a second after release 1/6 is left. When the bar fills, the button pulses once and `onComplete` fires; holding on does nothing more until release. The button's own fill never changes. Press starts on `mouseDown` on every platform; releasing anywhere, or leaving the button, drains it.
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique id (required) |
+| `textLabel` | `string` | Label |
+| `width` / `height` | `PositionUnit` / `number` | Defaults to theme button size |
+| `fillTime` | `number` | Seconds to fill from empty (default `1.5`) |
+| `drainTime` | `number` | Seconds to drain from full (default `fillTime / 2`) |
+| `backgroundColor` | `Color4` | Button fill (theme secondary) |
+| `fillColor` | `Color4` | Progress fill (theme primary) |
+| `borderColor` / `borderWidth` / `borderRadius` | | Chrome |
+| `fontColor` / `fontSize` | | Label |
+| `pulse` | `boolean` | Pulse once on completion (`true`) |
+| `disabled` | `boolean` | Ignore input |
+| `onComplete` | `() => void` | Once per hold, when the bar fills |
+| `onProgress` | `(progress) => void` | Every frame the fill changes, `0`–`1` |
+| `children` | JSX | Extra content drawn over the fill |
+
+Read the fill anywhere with `getButtonHoldProgress(id)`.
+
+```tsx
+<ButtonHold id="leave_match" textLabel="Hold to leave" fillTime={3} drainTime={1} onComplete={() => leaveMatch()} />
+```
 
 ---
 
@@ -358,7 +385,6 @@ Prefer top-level shorthands over nesting `uiText`. `fontSize` takes a **theme-ba
 | `Text` | `value`, `fontColor`, `fontSize`, `font`, `fontSrc`, `textAlign`, `textWrap` | Body text |
 | `Code` | same | Monospace |
 | `Header` | same | Panel title (h2-sized helper; `H1`–`H6` stay the levelled headings) |
-| `SectionHeader` | same | Section title in a panel |
 | `H1` … `H6` | same | Heading levels from theme |
 | `Label` / `ButtonText` | same text shorthands (`ButtonText` uses `textLabel` for copy) | Chips / buttons |
 
@@ -530,7 +556,7 @@ import { playOnce, setPlaying, SpriteIcon } from '@stom66/dcl-ui-component-kit'
 
 ## Inputs
 
-Toggle, MultiSelect and RangeSlider live in `components/inputs/`. Clicks follow the button rule: **mobile** on `mouseDown`, **desktop** on `mouseUp` (`isMobile()`, not `!isDesktop()`). Each keeps per-`id` state, and each can be controlled (`value`) or uncontrolled (`defaultValue`).
+Toggle, Checkbox, NumberInput, SegmentedControl and RangeSlider live in `components/inputs/`. Clicks follow the button rule: **mobile** on `mouseDown`, **desktop** on `mouseUp` (`isMobile()`, not `!isDesktop()`). Each keeps per-`id` state, and each can be controlled (`value`) or uncontrolled (`defaultValue`).
 
 ### `Toggle`
 
@@ -551,11 +577,11 @@ Toggle, MultiSelect and RangeSlider live in `components/inputs/`. Clicks follow 
 <Toggle id="music" defaultValue={true} onChange={(on) => { /* … */ }} />
 ```
 
-### `MultiSelect` / `MultiSelectOption`
+### `SegmentedControl` / `SegmentedControlOption`
 
-Single-choice segmented control: options sit side by side and a selector box slides over the chosen one. In `cycle` mode (default) any click moves to the next option and wraps back to the first. In `direct` mode each option is its own hit area. Option labels lerp from `inactiveColor` to `activeColor` as the selector passes over them.
+Single-choice segmented control: options sit side by side and a selector box slides over the chosen one. In `direct` mode (default) each option is its own hit area. In `cycle` mode any click moves to the next option and wraps back to the first. Option labels lerp from `inactiveColor` to `activeColor` as the selector passes over them.
 
-Declare options as `<MultiSelectOption>` children (also `MultiSelect.Option`), or pass `options={[…]}`.
+Declare options as `<SegmentedControlOption>` children (also `SegmentedControl.Option`), or pass `options={[…]}`.
 
 | Option | Type | Description |
 |---|---|---|
@@ -563,8 +589,8 @@ Declare options as `<MultiSelectOption>` children (also `MultiSelect.Option`), o
 | `value` | `string \| number` | Controlled selected value |
 | `defaultValue` | `string \| number` | Uncontrolled initial (first option) |
 | `variant` | `'filled' \| 'outline'` | `filled`: secondary track, primary border, solid primary selector. `outline`: transparent, borders only (default `filled`) |
-| `clickMode` | `'cycle' \| 'direct'` | Click advances / click picks (default `cycle`) |
-| `readOnly` | `boolean` | Ignore clicks; drive it with `setMultiSelectIndex` |
+| `clickMode` | `'direct' \| 'cycle'` | Click picks / click advances (default `direct`) |
+| `readOnly` | `boolean` | Ignore clicks; drive it with `setSegmentedControlIndex` |
 | `width` / `height` | `PositionUnit` | Any unit, `%` included — the selector is placed in % (default `360` × `48`) |
 | `inset` | `number` | Gap between outer border and selector (default `3`) |
 | `backgroundColor` / `borderColor` / `borderWidth` / `borderRadius` | | Outer box |
@@ -575,28 +601,86 @@ Declare options as `<MultiSelectOption>` children (also `MultiSelect.Option`), o
 | `onSelect` | `(value, index) => void` | After a click, with the new option |
 | `onDeselect` | `(value, index) => void` | After a click, with the previous option |
 
-`MultiSelectOption` props: `value` (required), `label` (defaults to `String(value)`), `render(state)` for custom content (`state.color` / `state.weight` / `state.active` — use `state.color` to tint icons), and per-option `onSelect` / `onDeselect`.
+`SegmentedControlOption` props: `value` (required), `label` (defaults to `String(value)`), `render(state)` for custom content (`state.color` / `state.weight` / `state.active` — use `state.color` to tint icons), and per-option `onSelect` / `onDeselect`.
 
-Game code: `setMultiSelectIndex(id, index, animate?)`, `setMultiSelectValue(id, value, animate?)`, `getMultiSelectIndex(id)`, `getMultiSelectValue(id)`. These do not fire the click events.
+Game code: `setSegmentedControlIndex(id, index, animate?)`, `setSegmentedControlValue(id, value, animate?)`, `getSegmentedControlIndex(id)`, `getSegmentedControlValue(id)`. These do not fire the click events.
 
 ```tsx
-<MultiSelect id="aim_step" onSelect={(value) => setAimStep(value)}>
-	<MultiSelectOption value="position"  label="Position"  />
-	<MultiSelectOption value="direction" label="Direction" />
-	<MultiSelectOption value="strength"  label="Strength"  />
-</MultiSelect>
+<SegmentedControl id="aim_step" onSelect={(value) => setAimStep(value)}>
+	<SegmentedControlOption value="position"  label="Position"  />
+	<SegmentedControlOption value="direction" label="Direction" />
+	<SegmentedControlOption value="strength"  label="Strength"  />
+</SegmentedControl>
 
-<MultiSelect
+<SegmentedControl
 	id        = "difficulty"
 	variant   = "outline"
-	clickMode = "direct"
+	clickMode = "cycle"
 	options   = {[{ value: 'easy' }, { value: 'normal' }, { value: 'hard' }]}
 />
 ```
 
+### `Checkbox`
+
+Square on/off box: a solid check when on, a faint cross when off. Icons are Font Awesome names by default; pass any element for custom content, or `null` for an empty box.
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique id (required) |
+| `value` / `defaultValue` | `boolean` | Controlled / uncontrolled initial (`false`) |
+| `size` | `number` | Box size (default `32`) |
+| `label` | `string` | Text to the right; clicking it toggles too |
+| `checkedIcon` / `uncheckedIcon` | `string \| JSX \| null` | Defaults `'check'` / `'xmark'` |
+| `iconSize` | `number` | Default 60% of `size` |
+| `checkedIconColor` / `uncheckedIconColor` | `Color4` | Theme light / light at 25% alpha |
+| `checkedBackgroundColor` / `backgroundColor` | `Color4` | Box fill on / off (theme success / dark) |
+| `checkedBorderColor` / `borderColor` | `Color4` | Box border on / off |
+| `borderWidth` / `borderRadius` | `number` | |
+| `fontSize` | `number` | Label size |
+| `readOnly` | `boolean` | Ignore clicks |
+| `onChange` | `(value: boolean) => void` | After a click |
+
+Game code: `getCheckboxValue(id)`, `setCheckboxValue(id, value)`.
+
+```tsx
+<Checkbox id="show_hints" label="Show hints" defaultValue={true} onChange={(on) => setHints(on)} />
+<Checkbox id="favourite" checkedIcon="star" uncheckedIcon={null} checkedBackgroundColor={theme.colors.info} />
+```
+
+### `NumberInput`
+
+Numeric field wrapped by − / + buttons, joined edge to edge into one bar with only the outermost corners rounded. Several button pairs are allowed (`steps={[1, 10]}` gives −10 −1 [field] +1 +10). The player can also type a value and press **Enter**. Typed and stepped values are clamped to `min` / `max` and snapped to `step`; a typed value that isn't a number is discarded.
+
+| Option | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique id (required) |
+| `value` / `defaultValue` | `number` | Controlled / uncontrolled initial (`min`, or `0`) |
+| `min` / `max` | `number` | Bounds; omit for none |
+| `step` | `number` | Snap increment and default button step (`1`; `0` = no snapping) |
+| `steps` | `number[]` | Button increments, smallest nearest the field (default `[step]`, labelled − / +) |
+| `decimals` | `number` | Decimal places shown (default: those in `step`) |
+| `editable` | `boolean` | Let the player type (`true`) |
+| `width` / `height` | `PositionUnit` / `number` | Default `220` × `40` |
+| `backgroundColor` | `Color4` | Field fill (theme dark) |
+| `borderRadius` | `number` | Radius of the outermost corners (`theme.border.radiusSmall`) |
+| `buttonColor` | `Color4` | Button fill (theme secondary) |
+| `fontColor` / `fontSize` | | Field and button text |
+| `onChange` | `(value: number) => void` | On a button press, or a typed value submitted with Enter |
+
+Game code: `getNumberInputValue(id)`, `setNumberInputValue(id, value)`.
+
+```tsx
+<NumberInput id="rounds" min={1} max={10} defaultValue={3} onChange={setRounds} />
+<NumberInput id="bet" min={0} max={9999} step={10} steps={[10, 100]} value={bet} onChange={setBet} />
+```
+
 ### `RangeSlider`
 
-Horizontal value slider: groove, fill and a round thumb.
+Horizontal value slider: groove, fill and a thumb, in three shapes:
+
+- `round` (default): thin groove, round thumb taller than the groove.
+- `inset`: thick groove with the round thumb sitting inside it; the fill wraps the thumb.
+- `capsule`: thin groove, tall pill-shaped thumb (rounded top and bottom).
 
 UI pointer events carry no position, so the slider is covered by `tapCells` invisible hit cells. A tap jumps to the nearest cell — this is the full interface on mobile. On desktop, holding after the press drags the value (cursor offset from the press via `PrimaryPointerInfo.screenCoordinates`, same as `ColorPicker`), and a full-screen catcher exists only while dragging so a release anywhere ends it. On mobile, sliding a held finger across cells also updates the value if the client sends enter events during a touch.
 
@@ -607,8 +691,11 @@ UI pointer events carry no position, so the slider is covered by `tapCells` invi
 | `min` / `max` | `number` | Range (default `0` – `100`) |
 | `step` | `number` | Snap increment; `0` = continuous |
 | `width` | `PositionUnit` | px / vw / vh — `%` unsupported (drag math needs pixels). Default `300` |
-| `height` | `number` | Thumb diameter (default `32`) |
-| `trackHeight` | `number` | Groove thickness (default 35% of `height`) |
+| `shape` | `'round' \| 'inset' \| 'capsule'` | See above (default `round`) |
+| `height` | `number` | Overall height (default `32`): thumb diameter for `round`, groove height for `inset`, thumb height for `capsule` |
+| `trackHeight` | `number` | Groove thickness for `round` / `capsule` (default 35% / 25% of `height`) |
+| `thumbInset` | `number` | `inset`: gap between groove edge and thumb (default `4`) |
+| `thumbWidth` | `number` | `capsule`: thumb width (default 40% of `height`) |
 | `variant` | `'filled' \| 'outline'` | `outline`: bordered transparent groove, dark thumb |
 | `trackColor` / `fillColor` / `thumbColor` / `thumbBorderColor` / `borderColor` | `Color4` | Overrides |
 | `tapCells` | `number` | Hit cells (default one per step up to 41, else `21`) |
@@ -621,6 +708,8 @@ Game code: `getRangeSliderValue(id)`, `setRangeSliderValue(id, value)`.
 ```tsx
 <RangeSlider id="volume" width="20vw" defaultValue={70} onChange={(v) => setVolume(v / 100)} />
 <RangeSlider id="fov" variant="outline" min={40} max={120} step={10} value={fov} onChange={setFov} />
+<RangeSlider id="music" shape="inset" defaultValue={50} />
+<RangeSlider id="zoom" shape="capsule" height={36} defaultValue={50} />
 ```
 
 ---
